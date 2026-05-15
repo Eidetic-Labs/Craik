@@ -104,6 +104,40 @@ def test_project_add_rejects_non_repo(tmp_path) -> None:
     assert "not inside a Git repository" in result.output
 
 
+def test_policy_show_defaults_to_strict() -> None:
+    result = runner.invoke(app, ["policy", "show"])
+
+    assert result.exit_code == 0
+    assert '"profile": "strict"' in result.stdout
+    assert '"fail_open": false' in result.stdout
+
+
+def test_policy_show_requires_trusted_local_fail_open_opt_in() -> None:
+    result = runner.invoke(app, ["policy", "show", "--profile", "trusted-local"])
+
+    assert result.exit_code != 0
+    assert "requires explicit" in result.output
+
+
+def test_policy_show_can_include_fail_open_receipt() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "policy",
+            "show",
+            "--profile",
+            "trusted-local",
+            "--trusted-local-fail-open",
+            "--include-receipt",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"profile": "trusted-local"' in result.stdout
+    assert '"fail_open": true' in result.stdout
+    assert '"capability": "policy.fail_open"' in result.stdout
+
+
 def _run_git(repo, *args: str) -> None:
     import subprocess
 

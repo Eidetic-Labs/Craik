@@ -44,6 +44,8 @@ Every fail-open decision must be visible in:
 - capability receipts,
 - and the final handoff.
 
+The v0.1.0 policy profile implementation generates the policy envelope directly and provides a mandatory fail-open receipt shape for trusted-local opt-ins. Case files and handoffs must preserve those fields when those layers are implemented.
+
 ## Policy Profiles
 
 Craik should ship with conservative named policy profiles.
