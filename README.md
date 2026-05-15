@@ -68,6 +68,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Policy Profiles](docs/reference/policy-profiles.md)
 - [Fail-Open](docs/guides/fail-open.md)
 - [Capability Grants](docs/guides/capability-grants.md)
+- [Redaction](docs/reference/redaction.md)
 - [Local State Layout](docs/reference/local-state.md)
 - [Local Store](docs/reference/local-store.md)
 - [Project Profile](docs/reference/project-profile.md)

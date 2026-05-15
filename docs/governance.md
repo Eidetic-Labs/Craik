@@ -148,6 +148,8 @@ Redaction requirements:
 - preserve enough shape to debug without exposing raw secret values,
 - and treat redaction failures as security bugs.
 
+The v0.1.0 utility is `craik.runtime.redaction`; local persistence rejects payloads that still appear to contain unredacted secret material.
+
 Secrets must not be written to Stigmem facts.
 
 ## Capability-Gated Actions
