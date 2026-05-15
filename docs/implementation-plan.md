@@ -223,8 +223,12 @@ Build:
 
 - Stigmem config,
 - API key setup,
+- backend capability detection,
 - fact search/read/write,
 - fact proposal mapping,
+- provenance reads,
+- optional recall support,
+- optional conflict support,
 - handoff summary fact writes,
 - memory diff for task runs.
 
@@ -238,10 +242,14 @@ Commands:
 Acceptance criteria:
 
 - Craik can connect to a local Stigmem node,
+- backend verifies `GET /healthz` and `GET /.well-known/stigmem`,
 - failed auth has a clear error,
 - facts are included in case files,
+- direct fact writes require memory write grant,
 - proposed facts can be reviewed before write,
-- and written facts include provenance.
+- written facts include provenance,
+- optional recall/conflict capabilities are detected without becoming required,
+- and Craik falls back to local proposals, local contradiction reports, and local memory diffs when optional Stigmem capabilities are unavailable.
 
 ## Milestone 7: GitHub Adapter
 
@@ -431,6 +439,7 @@ These should be decided before coding starts, but they should not block the plan
 - Public repository: `Eidetic-Labs/Craik`.
 - Product framing: durable agent runtime.
 - Reference memory substrate: Stigmem.
+- Minimum Stigmem compatibility: health, well-known metadata, authenticated fact read/write/query, fact provenance, scopes, confidence, and source fields.
 - Initial interface: CLI-first.
 - First demo target: Stigmem documentation and state reconciliation.
 - Initial first-class agent runners: Codex, Claude, and Gemini.

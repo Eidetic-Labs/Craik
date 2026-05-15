@@ -250,6 +250,36 @@ Agents propose memory updates through a reviewable structure.
 }
 ```
 
+## Memory Backend Capabilities
+
+Craik should persist detected backend capabilities.
+
+```json
+{
+  "schema": "craik.memory_backend_capabilities",
+  "version": "0.1.0",
+  "backend": "stigmem",
+  "node_url": "http://127.0.0.1:18765",
+  "node_id": "stigmem:node:...",
+  "auth_required": true,
+  "required": {
+    "health": true,
+    "metadata": true,
+    "fact_write": true,
+    "fact_query": true,
+    "fact_get": true,
+    "fact_provenance": true
+  },
+  "optional": {
+    "recall": true,
+    "conflicts": true,
+    "source_attestation": "warn|enforce|off",
+    "federation": false
+  },
+  "checked_at": "..."
+}
+```
+
 ## Contradiction Report
 
 Captures incompatible assertions.

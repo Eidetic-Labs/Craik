@@ -140,7 +140,10 @@ Acceptance criteria:
 - all backends implement the same interface,
 - tests run against ephemeral backend,
 - local backend persists between CLI calls,
-- and Stigmem backend can read/write facts with provenance.
+- Stigmem backend can read/write facts with provenance,
+- Stigmem backend detects optional recall and conflict capabilities,
+- direct Stigmem writes require grants,
+- and unavailable optional Stigmem capabilities fall back to local Craik state.
 
 ## Feature 7: GitHub Adapter
 
