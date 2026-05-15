@@ -196,11 +196,11 @@ def test_unredacted_secret_payload_is_rejected(
     payload["result"] = {
         "status": "passed",
         "summary": "Secret scan fixture.",
-        "metadata": {"api_token": "fixture-value"},
+        "metadata": {"api_token": "redaction-fixture-value"},
     }
     receipt = CapabilityReceipt.model_validate(payload)
 
-    with pytest.raises(UnredactedSecretError):
+    with pytest.raises(UnredactedSecretError, match="unredacted secret material"):
         store.put_receipt(receipt)
 
 

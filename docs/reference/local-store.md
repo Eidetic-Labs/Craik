@@ -48,11 +48,10 @@ Rules:
 
 ## Secrets
 
-The local store must not persist unredacted secrets. Payloads with secret-like field names are rejected unless the value is explicitly redacted.
+The local store must not persist unredacted secrets. Payloads are checked with the central redaction utility before persistence and rejected if they still appear to contain secret material.
 
 ## Backup And Cleanup
 
 Back up the SQLite database while Craik is not running, or use SQLite backup tooling once long-running gateway mode exists.
 
 For local cleanup, remove only rebuildable files under `cache/`. Do not delete `state/craik.sqlite3`, `receipts/`, `handoffs/`, or `case-files/` unless you intentionally want to discard local continuity.
-

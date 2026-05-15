@@ -24,6 +24,7 @@ from craik.contracts.models import (
 )
 from craik.contracts.registry import CONTRACT_REGISTRY, ContractModel
 from craik.runtime.paths import CraikPaths, ensure_craik_home
+from craik.runtime.redaction import contains_unredacted_secret
 
 CURRENT_MIGRATION = 1
 DATABASE_NAME = "craik.sqlite3"
@@ -38,11 +39,6 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.evidence_reference": "evidence",
     "craik.work_graph_event": "graph_events",
 }
-
-SECRET_KEY_PARTS = ("secret", "token", "password", "api_key", "apikey", "credential")
-REDACTED_VALUES = ("[REDACTED]", "<redacted>", "redacted")
-REDACTED_VALUE_KEYS = frozenset(value.lower() for value in REDACTED_VALUES)
-
 
 class LocalStoreError(RuntimeError):
     """Base error for local store failures."""
@@ -303,23 +299,8 @@ def _kind_for_schema(schema_name: str) -> str:
 
 
 def _reject_unredacted_secrets(value: Any) -> None:
-    if isinstance(value, dict):
-        for key, item in value.items():
-            lowered = str(key).lower()
-            if any(part in lowered for part in SECRET_KEY_PARTS) and not _is_redacted(item):
-                raise UnredactedSecretError(f"refusing to persist unredacted secret field: {key}")
-            _reject_unredacted_secrets(item)
-    elif isinstance(value, list):
-        for item in value:
-            _reject_unredacted_secrets(item)
-
-
-def _is_redacted(value: Any) -> bool:
-    if value is None:
-        return True
-    if isinstance(value, str):
-        return value.lower() in REDACTED_VALUE_KEYS
-    return False
+    if contains_unredacted_secret(value):
+        raise UnredactedSecretError("refusing to persist unredacted secret material")
 
 
 def _utc_now() -> str:
