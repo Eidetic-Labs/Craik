@@ -21,6 +21,8 @@ Given a real software repository, Craik should assemble a task-specific project 
 
 ## MVP Components
 
+The MVP should be delivered as a CLI-first runtime with real persisted state and typed schemas. A UI should wait until the CLI workflow proves that the runtime contracts are correct.
+
 ### CLI
 
 Commands:
@@ -33,6 +35,15 @@ Commands:
 - `craik handoff show`
 - `craik facts propose`
 - `craik receipts list`
+
+The command list should start small. Implementation should prioritize:
+
+1. `craik project add`
+2. `craik task create`
+3. `craik case build`
+4. `craik receipts list`
+5. `craik handoff create`
+6. `craik memory diff`
 
 ### Runtime Schemas
 
@@ -117,6 +128,21 @@ Required sections:
 - stale-risk notes,
 - contradiction notes,
 - verification expectations.
+
+The case file is the most important MVP artifact. If a future agent cannot use it to understand why the current task is safe, relevant, and bounded, the MVP is not complete.
+
+## MVP Build Order
+
+1. Define schemas and fixtures.
+2. Build local project registry.
+3. Build case file assembly from local repo state.
+4. Add local receipt and handoff storage.
+5. Add policy envelope enforcement for write boundaries.
+6. Add Stigmem memory read/propose/write.
+7. Add GitHub read-only context.
+8. Add guarded GitHub writes.
+9. Add work graph export.
+10. Add contradiction reports and memory diff.
 
 ## Non-Goals For MVP
 

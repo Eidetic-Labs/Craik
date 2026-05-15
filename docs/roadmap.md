@@ -21,6 +21,11 @@ Exit criteria:
 - handoff schema validated,
 - and Stigmem connection can read/write basic facts.
 
+Maps to implementation milestones:
+
+- Milestone 1: Contract Foundation.
+- Milestone 2: Project Registry And Local State.
+
 ## Phase 1: Repository-Aware Runtime
 
 Goals:
@@ -39,6 +44,12 @@ Exit criteria:
 - case file assembly is deterministic enough to test,
 - and docs explain degraded vs Stigmem-backed modes.
 
+Maps to implementation milestones:
+
+- Milestone 3: Case File Assembly.
+- Milestone 4: Policy And Receipts.
+- Milestone 5: Handoff Loop.
+
 ## Phase 2: GitHub Workflows
 
 Goals:
@@ -56,6 +67,10 @@ Exit criteria:
 - verification status is visible,
 - and policy controls write operations.
 
+Maps to implementation milestones:
+
+- Milestone 7: GitHub Adapter.
+
 ## Phase 3: Multi-Agent Coordination
 
 Goals:
@@ -72,6 +87,10 @@ Exit criteria:
 - disagreements are surfaced,
 - handoffs preserve specialist outputs,
 - and the work graph shows task lineage.
+
+Maps to implementation milestones:
+
+- Milestone 10: Multi-Agent Orchestration.
 
 ## Phase 4: Governance-Native Execution
 
@@ -91,6 +110,11 @@ Exit criteria:
 - policy violations are blocked or flagged,
 - and receipt logs can explain important changes.
 
+Maps to implementation milestones:
+
+- Milestone 4: Policy And Receipts.
+- Milestone 11: Skills And Probationary Plugins.
+
 ## Phase 5: Stigmem-Native Intelligence
 
 Goals:
@@ -109,6 +133,11 @@ Exit criteria:
 - stale-risk facts are surfaced before acting,
 - and future agents consume prior facts reliably.
 
+Maps to implementation milestones:
+
+- Milestone 6: Stigmem Backend.
+- Milestone 9: Contradictions And Memory Diff.
+
 ## Phase 6: Operator Experience
 
 Goals:
@@ -125,6 +154,11 @@ Exit criteria:
 - users can understand what agents did without reading raw logs,
 - handoffs are easy to browse,
 - and project state is visible at a glance.
+
+Maps to implementation milestones:
+
+- Milestone 8: Work Graph.
+- Later UI milestones after CLI validation.
 
 ## Phase 7: Plugin And Ecosystem Layer
 

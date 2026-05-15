@@ -36,8 +36,12 @@ Craik can run in degraded local mode without Stigmem for demos and development, 
 ## Planning Docs
 
 - [Vision](docs/vision.md)
+- [Product Strategy](docs/product-strategy.md)
 - [Architecture](docs/architecture.md)
+- [Runtime Contracts](docs/runtime-contracts.md)
+- [Feature Specification](docs/features.md)
 - [MVP Plan](docs/mvp.md)
+- [Implementation Plan](docs/implementation-plan.md)
 - [Roadmap](docs/roadmap.md)
 - [Governance Model](docs/governance.md)
 - [Stigmem Integration](docs/stigmem-integration.md)
@@ -47,3 +51,17 @@ Craik can run in degraded local mode without Stigmem for demos and development, 
 Craik is in planning. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
+
+## Initial Build Target
+
+The first implementation should focus on a repository-aware CLI runtime:
+
+1. Create a project profile for a local Git repository.
+2. Connect optional Stigmem memory.
+3. Assemble a task case file from repository state, docs, issues, policies, and facts.
+4. Execute a governed single-agent task with scoped capabilities.
+5. Record capability receipts.
+6. Produce a structured handoff.
+7. Propose fact updates for future agents.
+
+Multi-agent orchestration, work graph visualization, contradiction inbox, and plugin probation should be layered on after the single-agent durable workflow is working end to end.

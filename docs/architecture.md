@@ -150,6 +150,18 @@ Initial surfaces:
 10. A structured handoff is created.
 11. The work graph is updated.
 
+## Borrowed Patterns And Craik Extensions
+
+| Source pattern | Craik adoption | Craik extension |
+| --- | --- | --- |
+| OpenClaw gateway | CLI/API gateway owns entry points and session routing. | Gateway also creates policy envelopes and receipt obligations. |
+| OpenClaw workspace | Project profile and local runtime state isolate work. | Case files and handoffs make workspace state portable across agents. |
+| OpenClaw skills | Skills provide repeatable operating guidance. | Skills declare context contracts and capability requirements. |
+| OpenClaw tool descriptors | Tools are discovered as typed capabilities. | Capabilities require grants and produce receipts. |
+| Hermes orchestrator | Orchestrator decomposes complex tasks. | Orchestrator uses Stigmem-backed project memory and cannot flatten unresolved contradictions. |
+| Hermes specialists | Workers receive scoped context and return typed results. | Worker results become graph-linked artifacts and durable handoffs. |
+| Hermes task board | Task state survives the active run. | Task state becomes part of a work graph connected to facts, PRs, receipts, and decisions. |
+
 ## Core Runtime Contracts
 
 Craik should define stable schemas for:
