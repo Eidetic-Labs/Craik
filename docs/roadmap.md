@@ -19,6 +19,7 @@ Goals:
 - define minimum Stigmem compatibility and backend endpoint mapping,
 - define `~/.craik` and `CRAIK_HOME` local state convention,
 - define strict-by-default security posture and named fail-open profiles,
+- define evidence, assumptions, onboarding, policy tests, delegation, and budget differentiators,
 - commit Stigmem documentation/state reconciliation as the first demo target,
 - and create the first working CLI skeleton.
 
@@ -30,6 +31,7 @@ Exit criteria:
 - `craik` package, module, and CLI naming decision committed,
 - local state directory convention committed,
 - strict/fail-open security baseline committed,
+- differentiator objectives committed,
 - minimum Stigmem backend compatibility committed,
 - first demo target committed,
 - schemas committed,
@@ -187,6 +189,9 @@ Goals:
 - show handoff history,
 - show receipts,
 - show contradiction inbox,
+- show evidence and assumptions,
+- show human delegation points,
+- show budget and quota status,
 - and make project status inspectable.
 
 Exit criteria:
@@ -198,6 +203,8 @@ Exit criteria:
 Maps to implementation milestones:
 
 - Milestone 8: Work Graph.
+- Milestone 8a: Evidence, Assumptions, And Onboarding.
+- Milestone 8b: Policy Tests, Delegation, And Budgets.
 - Later UI milestones after CLI validation.
 
 ## Phase 7: Plugin And Ecosystem Layer

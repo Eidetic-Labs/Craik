@@ -355,3 +355,112 @@ Acceptance criteria:
 - and reputation affects routing only when policy enables it.
 
 This feature should not be part of the MVP implementation, but contracts should leave room for it.
+
+## Feature 15: Evidence And Assumption Management
+
+Purpose: distinguish evidence-backed facts from unverified assumptions.
+
+MVP behavior:
+
+- case files include evidence references,
+- agent conclusions can be marked as assumptions,
+- assumptions include confidence and verification requirements,
+- memory proposals require evidence references before promotion,
+- and handoffs list unresolved assumptions.
+
+Acceptance criteria:
+
+- unsupported assertions do not become direct memory writes,
+- assumptions are visible in case files and handoffs,
+- evidence references can point to files, commands, GitHub objects, Stigmem facts, user instructions, or prior handoffs,
+- and memory promotion fails when required evidence is missing.
+
+## Feature 16: Agent-Native Onboarding
+
+Purpose: give a new agent a safe, current project model before it starts work.
+
+Target command:
+
+- `craik onboard --project <project-id>`
+
+MVP output:
+
+- current project model,
+- active policy profile,
+- relevant ADRs and immutable paths,
+- docs boundaries,
+- recent handoffs,
+- unresolved contradictions,
+- stale-risk warnings,
+- validation commands,
+- Stigmem backend status,
+- and allowed next actions.
+
+Acceptance criteria:
+
+- onboarding output is generated from the same case-file primitives as tasks,
+- stale or missing context is clearly marked,
+- policies and write boundaries are visible,
+- and the output is usable by Codex, Claude, and Gemini runner adapters.
+
+## Feature 17: Policy Tests
+
+Purpose: make runtime policy behavior testable and regressions visible.
+
+Required policy tests:
+
+- ADR paths cannot be edited in strict mode,
+- memory writes become proposals by default,
+- trusted-local fail-open still records receipts,
+- automation mode fails closed,
+- runner adapters cannot bypass grants,
+- secrets are redacted from receipts, logs, handoffs, and case files.
+
+Acceptance criteria:
+
+- policy tests run in CI once implementation begins,
+- failures identify the violated policy,
+- and every new policy profile must include fixture tests.
+
+## Feature 18: Human Delegation Points
+
+Purpose: make human approval and clarification part of the work graph.
+
+Delegation point types:
+
+- approval request,
+- clarification request,
+- policy override request,
+- contradiction adjudication request,
+- memory promotion request,
+- release signoff request.
+
+Acceptance criteria:
+
+- delegation points are graph nodes,
+- resolution creates receipts,
+- unresolved delegation points appear in handoffs,
+- and agents cannot silently continue past required approvals.
+
+## Feature 19: Budget And Quota Controls
+
+Purpose: keep agent work operationally bounded.
+
+Budget types:
+
+- context tokens,
+- model spend,
+- wall-clock time,
+- shell command count,
+- GitHub write count,
+- memory write count,
+- parallel worker count,
+- retry count,
+- and human approval count.
+
+Acceptance criteria:
+
+- budgets can be set by policy profile,
+- budget state appears in case files and receipts,
+- budget exhaustion blocks or escalates according to policy,
+- and fail-open profiles do not bypass budget receipts.

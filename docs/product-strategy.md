@@ -199,6 +199,24 @@ It links:
 - approvals,
 - and artifacts.
 
+### Evidence And Assumption Management
+
+Craik should make it clear what an agent knows, what it assumes, and what evidence supports each durable assertion.
+
+This gives Craik a stronger operational truth model than ordinary agent memory.
+
+### Agent-Native Onboarding
+
+Craik should let Codex, Claude, Gemini, and future runners join a project with a current project model, recent handoffs, policy boundaries, unresolved contradictions, stale-risk warnings, and allowed next actions.
+
+### Policy Tests And Human Delegation
+
+Craik policies should be testable. Human approval and clarification should be modeled as structured delegation points rather than untracked chat interruptions.
+
+### Budgets And Quotas
+
+Craik should bound agent work with policy-level budgets for context, model spend, time, writes, commands, retries, parallelism, and approvals.
+
 ## Product Differentiation
 
 Craik should be described in terms of durable work, not swarm novelty.

@@ -44,6 +44,9 @@ craik/
     handoff.py
     memory.py
     graph.py
+    evidence.py
+    assumption.py
+    delegation.py
   runtime/
     project_registry.py
     paths.py
@@ -52,6 +55,7 @@ craik/
     handoff_writer.py
     receipt_store.py
     policy_engine.py
+    budget.py
   memory/
     base.py
     ephemeral.py
@@ -144,6 +148,9 @@ Build:
 - ADR/policy discovery,
 - Stigmem/local fact loading,
 - stale-risk section,
+- evidence references,
+- assumption ledger,
+- context budget accounting,
 - verification-plan section,
 - Markdown and JSON output.
 
@@ -158,6 +165,8 @@ Acceptance criteria:
 - case file includes repo status,
 - docs and immutable paths are labeled,
 - facts include source/confidence,
+- unsupported conclusions are tracked as assumptions,
+- included and omitted context is explainable,
 - output is deterministic for fixtures,
 - and missing context is clearly reported.
 
@@ -284,6 +293,7 @@ Build:
 - export command,
 - task/handoff/fact/receipt graph links,
 - contradiction graph links.
+- human delegation point nodes.
 
 Commands:
 
@@ -296,6 +306,57 @@ Acceptance criteria:
 - handoffs and receipts are linked,
 - fact proposals link to evidence,
 - and graph export is deterministic.
+
+## Milestone 8a: Evidence, Assumptions, And Onboarding
+
+Build:
+
+- evidence reference model,
+- assumption ledger model,
+- belief promotion lifecycle model,
+- onboarding command,
+- context budgeting metadata,
+- provenance-aware documentation links,
+- and decision-record suggestion hooks.
+
+Commands:
+
+- `craik onboard --project <project-id>`
+- `craik assumptions list <task-id>`
+- `craik evidence show <task-id>`
+
+Acceptance criteria:
+
+- case files explain included and omitted context,
+- assumptions are separate from facts,
+- memory proposals require evidence before promotion,
+- onboarding output includes policies, recent handoffs, contradictions, stale-risk warnings, and allowed next actions,
+- and decision-record suggestions are generated only as proposals.
+
+## Milestone 8b: Policy Tests, Delegation, And Budgets
+
+Build:
+
+- policy fixture test harness,
+- required policy regression tests,
+- human delegation point model,
+- budget and quota model,
+- budget receipts,
+- and budget enforcement hooks.
+
+Commands:
+
+- `craik policy test`
+- `craik delegations list`
+- `craik budgets show <task-id>`
+
+Acceptance criteria:
+
+- policy tests cover immutable paths, memory proposal defaults, fail-open receipts, automation fail-closed behavior, runner grant boundaries, and redaction,
+- unresolved delegation points appear in handoffs,
+- resolved delegation points create receipts,
+- budgets appear in case files and receipts,
+- and budget exhaustion blocks or escalates according to policy.
 
 ## Milestone 9: Contradictions And Memory Diff
 
@@ -444,6 +505,7 @@ These should be decided before coding starts, but they should not block the plan
 - First demo target: Stigmem documentation and state reconciliation.
 - Initial first-class agent runners: Codex, Claude, and Gemini.
 - OpenClaw relationship: design reference and possible future bridge, not a required dependency.
+- Differentiator objective: evidence-first, assumption-aware, policy-tested, budgeted, human-delegable agent work.
 - Core implementation language: Python 3.12+.
 - PyPI distribution: `craik`.
 - Python module: `craik`.

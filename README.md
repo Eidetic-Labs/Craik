@@ -49,6 +49,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 - [Vision](docs/vision.md)
 - [Product Strategy](docs/product-strategy.md)
+- [Differentiators](docs/differentiators.md)
 - [Architecture](docs/architecture.md)
 - [Runtime Contracts](docs/runtime-contracts.md)
 - [Feature Specification](docs/features.md)
