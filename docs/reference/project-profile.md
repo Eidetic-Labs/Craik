@@ -48,3 +48,4 @@ Immutable paths are policy inputs for later write protection. Register them expl
 craik project add /path/to/repo --immutable-path architecture/decisions/
 ```
 
+Immutable paths are denied by default. Writes require explicit approval metadata and a matching immutable write capability grant.
