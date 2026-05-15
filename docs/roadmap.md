@@ -94,6 +94,8 @@ Root-level project governance files remain authoritative for contribution, secur
 
 ## Release Gates
 
+Craik should remain on `0.x.0` releases until the maintainers are very confident that the product is stable enough to call `1.0`. The gates below are sequencing targets, not promises that `1.0.0` follows immediately after `0.7.0`. Additional `0.x.0` releases should be added whenever the product needs more soak time, compatibility work, security hardening, or real-user validation.
+
 ### v0.1.0 Gate: Durable Single-Agent Runtime
 
 `v0.1.0` must prove Craik's core value without requiring the full north-star surface.
@@ -265,11 +267,13 @@ Required capabilities:
 - known traps view,
 - run delta view.
 
-### v1.0.0 Gate: Professional Agent Runtime
+### Future 1.0 Graduation Gate: Professional Agent Runtime
 
 Required outcome:
 
 > Craik is stable enough for external teams to use for real multi-agent software delivery workflows.
+
+This is a graduation gate, not a scheduled release. Craik should continue shipping `0.x.0` releases until this bar is clearly met by real usage, documentation maturity, compatibility confidence, and security posture.
 
 Required capabilities:
 
@@ -291,6 +295,16 @@ Required capabilities:
 - work product classification,
 - decision record suggestions,
 - learning without self-trust.
+
+Confidence requirements before `1.0.0`:
+
+- at least one complete runner adapter has been used successfully on real workflows,
+- Stigmem-backed memory has soaked on real projects,
+- persisted schema migrations have been exercised,
+- security and redaction behavior has been tested under realistic agent runs,
+- documentation is complete enough for external users without maintainer hand-holding,
+- community contribution and support expectations are clear,
+- and known limitations are documented honestly.
 
 ## Executable Workstreams
 

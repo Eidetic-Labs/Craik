@@ -33,13 +33,15 @@ Before merging implementation changes, maintainers should check:
 
 ## Versioning
 
-Craik should use Semantic Versioning after the first package release.
+Craik should use pre-1.0 Semantic Versioning after the first package release and stay on `0.x.0` releases until maintainers are very confident the product is ready for a `1.0.0` stability commitment.
 
-Before `0.1.0`, compatibility is not guaranteed. After `0.1.0`, breaking changes to persisted schemas should require:
+Before `0.1.0`, compatibility is not guaranteed. After `0.1.0`, breaking changes to persisted schemas should still be allowed while Craik remains pre-1.0, but they require:
 
 - versioned schema updates,
 - migration notes,
 - and release notes.
+
+`1.0.0` should be treated as a confidence-based graduation, not a scheduled milestone.
 
 ## Release Process
 
