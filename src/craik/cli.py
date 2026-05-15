@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -11,6 +12,8 @@ import typer
 from craik import __version__
 from craik.contracts.registry import schema_model, schema_names
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
+from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
+from craik.runtime.store import LocalStore
 
 PACKAGE_NAME = "craik"
 
@@ -23,6 +26,8 @@ schema_app = typer.Typer(help="Inspect Craik runtime contract schemas.")
 app.add_typer(schema_app, name="schema")
 home_app = typer.Typer(help="Inspect and initialize Craik local state paths.")
 app.add_typer(home_app, name="home")
+project_app = typer.Typer(help="Register and inspect Craik projects.")
+app.add_typer(project_app, name="project")
 
 
 def package_version() -> str:
@@ -106,6 +111,75 @@ def _paths_payload(paths: CraikPaths) -> dict[str, str]:
         "secrets": str(paths.secrets),
         "state": str(paths.state),
     }
+
+
+@project_app.command("add")
+def project_add(
+    path: Annotated[
+        Path,
+        typer.Argument(help="Path inside the Git repository to register."),
+    ],
+    name: Annotated[
+        str | None,
+        typer.Option("--name", help="Project name. Defaults to the repository directory name."),
+    ] = None,
+    docs_path: Annotated[
+        list[str] | None,
+        typer.Option("--docs-path", help="Documentation path to include. May be repeated."),
+    ] = None,
+    immutable_path: Annotated[
+        list[str] | None,
+        typer.Option("--immutable-path", help="Immutable path to include. May be repeated."),
+    ] = None,
+) -> None:
+    """Register a Git project."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        registry = ProjectRegistry(store)
+        project = registry.add_project(
+            path,
+            name=name,
+            docs_paths=tuple(docs_path or ()),
+            immutable_paths=tuple(immutable_path or ()),
+        )
+    except NotGitRepositoryError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(project.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+
+
+@project_app.command("list")
+def project_list() -> None:
+    """List registered projects."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        registry = ProjectRegistry(store)
+        projects = registry.list_projects()
+    finally:
+        store.close()
+
+    payload = [project.model_dump(mode="json", by_alias=True) for project in projects]
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@project_app.command("show")
+def project_show(project: str) -> None:
+    """Show one registered project by id or name."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        registry = ProjectRegistry(store)
+        profile = registry.get_project(project)
+    finally:
+        store.close()
+
+    if profile is None:
+        raise typer.BadParameter(f"unknown project: {project}")
+    typer.echo(json.dumps(profile.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
 
 
 def main() -> None:
