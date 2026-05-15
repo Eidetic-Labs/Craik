@@ -11,3 +11,4 @@ Defaults:
 
 Issue #3 only creates the local state locations. It does not store credentials or add runtime authority to read or write secrets.
 
+Policy profiles do not bypass redaction. The trusted-local fail-open profile still requires redacted receipts and must not persist raw secret values.

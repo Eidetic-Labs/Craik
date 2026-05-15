@@ -44,4 +44,16 @@ Print registered projects as JSON.
 
 Print one registered project as JSON.
 
+## `craik policy show`
+
+Print a generated policy envelope.
+
+Options:
+
+- `--task-id <id>`: task id to include in the envelope.
+- `--actor <actor>`: actor to include in the envelope.
+- `--profile <name>`: `strict`, `trusted-local`, or `automation`.
+- `--trusted-local-fail-open`: required explicit opt-in for trusted-local fail-open.
+- `--include-receipt`: include the fail-open receipt preview when applicable.
+
 Additional commands will be documented as they are implemented.

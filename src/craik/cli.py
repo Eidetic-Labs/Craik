@@ -5,13 +5,19 @@ from __future__ import annotations
 import json
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, cast
 
 import typer
 
 from craik import __version__
+from craik.contracts.models import PolicyProfile
 from craik.contracts.registry import schema_model, schema_names
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
+from craik.runtime.policy import (
+    FailOpenNotAllowedError,
+    fail_open_receipt,
+    generate_policy_envelope,
+)
 from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
 from craik.runtime.store import LocalStore
 
@@ -28,6 +34,8 @@ home_app = typer.Typer(help="Inspect and initialize Craik local state paths.")
 app.add_typer(home_app, name="home")
 project_app = typer.Typer(help="Register and inspect Craik projects.")
 app.add_typer(project_app, name="project")
+policy_app = typer.Typer(help="Inspect Craik policy profiles.")
+app.add_typer(policy_app, name="policy")
 
 
 def package_version() -> str:
@@ -180,6 +188,64 @@ def project_show(project: str) -> None:
     if profile is None:
         raise typer.BadParameter(f"unknown project: {project}")
     typer.echo(json.dumps(profile.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+
+
+@policy_app.command("show")
+def policy_show(
+    task_id: Annotated[
+        str,
+        typer.Option("--task-id", help="Task id for the envelope."),
+    ] = "task_preview",
+    actor: Annotated[
+        str,
+        typer.Option("--actor", help="Actor for the envelope."),
+    ] = "agent:preview",
+    profile: Annotated[
+        str,
+        typer.Option("--profile", help="Policy profile: strict, trusted-local, or automation."),
+    ] = "strict",
+    trusted_local_fail_open: Annotated[
+        bool,
+        typer.Option(
+            "--trusted-local-fail-open",
+            help="Explicitly opt in to trusted-local fail-open semantics.",
+        ),
+    ] = False,
+    include_receipt: Annotated[
+        bool,
+        typer.Option("--include-receipt", help="Include the fail-open receipt when applicable."),
+    ] = False,
+) -> None:
+    """Print a generated policy envelope."""
+    policy_profile = _policy_profile(profile)
+    try:
+        envelope = generate_policy_envelope(
+            task_id=task_id,
+            actor=actor,
+            profile=policy_profile,
+            trusted_local_fail_open=trusted_local_fail_open,
+        )
+    except FailOpenNotAllowedError as error:
+        raise typer.BadParameter(str(error)) from None
+
+    payload: dict[str, object] = {
+        "policy_envelope": envelope.model_dump(mode="json", by_alias=True),
+    }
+    if include_receipt and envelope.fail_open:
+        receipt = fail_open_receipt(
+            task_id=task_id,
+            actor=actor,
+            target=profile,
+            reason="Policy preview requested fail-open receipt.",
+        )
+        payload["receipt"] = receipt.model_dump(mode="json", by_alias=True)
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+def _policy_profile(value: str) -> PolicyProfile:
+    if value in {"strict", "trusted-local", "automation"}:
+        return cast(PolicyProfile, value)
+    raise typer.BadParameter(f"unknown policy profile: {value}")
 
 
 def main() -> None:
