@@ -464,3 +464,90 @@ Acceptance criteria:
 - budget state appears in case files and receipts,
 - budget exhaustion blocks or escalates according to policy,
 - and fail-open profiles do not bypass budget receipts.
+
+## Feature 20: Runtime Instruction Distillation
+
+Purpose: convert declared agent-runtime instruction files into structured, scoped, provenance-linked runtime memory.
+
+Sources may include `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `HERMES.md`, `SKILLS.md`, `.cursorrules`, `.github/copilot-instructions.md`, `.codex/instructions.md`, and declared project policy docs.
+
+Acceptance criteria:
+
+- declared sources only,
+- source path, hash, timestamp, scope, and line/range provenance are tracked,
+- extracted items become proposals by default,
+- policy constraints can be promoted by approval,
+- contradictions between instruction sources are surfaced,
+- stale distillations are invalidated when source hashes change,
+- and case files cite both distilled item and source file.
+
+## Feature 21: Intent, Scratchpad, And Scope Control
+
+Purpose: keep agent work aligned while allowing temporary thinking.
+
+Capabilities:
+
+- task intent lock,
+- scratchpad with expiry,
+- scope-change proposal,
+- first-class unknowns,
+- structured context requests,
+- and context debt tracking.
+
+Acceptance criteria:
+
+- task execution references the accepted intent lock,
+- scratchpad entries expire unless promoted,
+- out-of-scope discoveries create scope-change proposals,
+- unknowns identify what is needed to resolve them,
+- context requests are recorded,
+- and context debt appears in handoffs.
+
+## Feature 22: Runtime Quality Gates
+
+Purpose: improve output quality before durable handoff or memory writes.
+
+Capabilities:
+
+- self-audit before handoff,
+- runtime critic,
+- red team mode,
+- handoff quality score,
+- evidence coverage score,
+- tool result attestation,
+- and agent exit discipline.
+
+Acceptance criteria:
+
+- major handoffs include self-audit results,
+- critic findings are typed and actionable,
+- high-risk tasks can require red team review,
+- test/command claims distinguish runtime-observed from agent-reported,
+- incomplete runs still produce useful exit handoffs,
+- and low-quality handoffs can block memory promotion.
+
+## Feature 23: Runtime Intelligence And Routing
+
+Purpose: make Craik smarter about runners, evidence, artifacts, and continuity.
+
+Capabilities:
+
+- runner capability matrix,
+- agent workload memory,
+- known traps,
+- evidence expiration rules,
+- knowledge freshness probe,
+- policy-aware prompt compiler,
+- real-runner contract tests,
+- work product classification,
+- and "what changed since last time" deltas.
+
+Acceptance criteria:
+
+- runner selection can account for capabilities and workload memory,
+- known traps appear in onboarding and case files,
+- stale evidence can trigger freshness probes,
+- prompts compile from shared contracts into runner-specific forms,
+- adapter contract tests run against fixture tasks,
+- artifacts carry class and lifecycle metadata,
+- and task start can show relevant deltas since prior runs.

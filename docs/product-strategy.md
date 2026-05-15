@@ -217,6 +217,14 @@ Craik policies should be testable. Human approval and clarification should be mo
 
 Craik should bound agent work with policy-level budgets for context, model spend, time, writes, commands, retries, parallelism, and approvals.
 
+### Runtime Instruction Distillation
+
+Craik should distill declared agent-runtime instruction files into structured, scoped, provenance-linked proposals. This lets agents consume durable guidance from files such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `HERMES.md`, and `SKILLS.md` without treating raw Markdown as unreviewed truth.
+
+### Runtime Quality And Continuity
+
+Craik should provide quality gates, recovery mode, runner capability awareness, known traps, freshness probes, work product classification, and "what changed since last time" deltas so agents can work professionally across interrupted and long-running tasks.
+
 ## Product Differentiation
 
 Craik should be described in terms of durable work, not swarm novelty.

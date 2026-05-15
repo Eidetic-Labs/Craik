@@ -192,6 +192,9 @@ Goals:
 - show evidence and assumptions,
 - show human delegation points,
 - show budget and quota status,
+- show runtime instruction distillations,
+- show quality gates and memory impact previews,
+- show known traps and run deltas,
 - and make project status inspectable.
 
 Exit criteria:
@@ -205,6 +208,8 @@ Maps to implementation milestones:
 - Milestone 8: Work Graph.
 - Milestone 8a: Evidence, Assumptions, And Onboarding.
 - Milestone 8b: Policy Tests, Delegation, And Budgets.
+- Milestone 8c: Instruction Distillation And Runtime Quality.
+- Milestone 8d: Runner Intelligence And Continuity.
 - Later UI milestones after CLI validation.
 
 ## Phase 7: Plugin And Ecosystem Layer

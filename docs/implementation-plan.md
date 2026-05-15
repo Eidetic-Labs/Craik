@@ -47,6 +47,10 @@ craik/
     evidence.py
     assumption.py
     delegation.py
+    intent.py
+    instruction.py
+    quality.py
+    artifact.py
   runtime/
     project_registry.py
     paths.py
@@ -56,6 +60,9 @@ craik/
     receipt_store.py
     policy_engine.py
     budget.py
+    prompt_compiler.py
+    critic.py
+    distiller.py
   memory/
     base.py
     ephemeral.py
@@ -357,6 +364,77 @@ Acceptance criteria:
 - resolved delegation points create receipts,
 - budgets appear in case files and receipts,
 - and budget exhaustion blocks or escalates according to policy.
+
+## Milestone 8c: Instruction Distillation And Runtime Quality
+
+Build:
+
+- runtime instruction source registry,
+- Markdown instruction distiller,
+- source hash tracking,
+- distillation proposal store,
+- task intent lock,
+- expiring scratchpad,
+- scope-change proposal model,
+- self-audit checklist,
+- runtime critic,
+- evidence coverage score,
+- handoff quality score,
+- tool result attestation,
+- and memory impact preview.
+
+Commands:
+
+- `craik instructions scan <project-id>`
+- `craik instructions distill <project-id>`
+- `craik intent show <task-id>`
+- `craik scratchpad list <task-id>`
+- `craik quality check <task-id>`
+- `craik memory preview <task-id>`
+
+Acceptance criteria:
+
+- instruction distillation uses declared sources only,
+- source hash changes invalidate stale distillations,
+- extracted instruction facts remain proposals until approved,
+- intent lock is included in case files and handoffs,
+- scratchpad does not become durable memory without promotion,
+- quality gates flag unsupported claims and missing validation,
+- and memory impact preview appears before direct Stigmem writes.
+
+## Milestone 8d: Runner Intelligence And Continuity
+
+Build:
+
+- runner capability matrix,
+- agent workload memory,
+- known traps registry,
+- evidence expiration rules,
+- knowledge freshness probes,
+- policy-aware prompt compiler,
+- real-runner contract test harness,
+- work product classification,
+- "what changed since last time" deltas,
+- recovery mode,
+- and red team mode.
+
+Commands:
+
+- `craik runners matrix`
+- `craik traps list <project-id>`
+- `craik freshness probe <task-id>`
+- `craik prompt compile <task-id> --runner <runner>`
+- `craik recover <task-id>`
+- `craik delta <task-id>`
+
+Acceptance criteria:
+
+- case files include known traps and freshness state,
+- prompt compilation uses policy, context contracts, runner capabilities, and output schemas,
+- recovery mode can resume from partial receipts, scratchpad, changed files, and unfinished handoff,
+- real-runner contract tests validate adapter output shape,
+- red team mode can be required by policy,
+- and task starts can show relevant deltas since the last related run.
 
 ## Milestone 9: Contradictions And Memory Diff
 
