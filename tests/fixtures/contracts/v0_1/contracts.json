@@ -1,0 +1,260 @@
+{
+  "craik.assumption": {
+    "schema": "craik.assumption",
+    "version": "0.1.0",
+    "id": "assumption_demo_docs_stale",
+    "task_id": "task_docs_reconcile",
+    "statement": "Some published docs may still describe pre-implementation behavior.",
+    "rationale": "The task was created because docs are suspected to lag implementation.",
+    "evidence_ids": ["evidence_readme_status"],
+    "confidence": 0.65,
+    "status": "open"
+  },
+  "craik.capability_grant": {
+    "schema": "craik.capability_grant",
+    "version": "0.1.0",
+    "id": "grant_docs_write",
+    "task_id": "task_docs_reconcile",
+    "capability": "repo.write.docs",
+    "target": {
+      "repo": "Eidetic-Labs/stigmem",
+      "paths": ["docs/**", "README.md"],
+      "exclude": ["docs/adr/**"],
+      "metadata": {
+        "reason": "ADR files are immutable."
+      }
+    },
+    "operations": ["read", "write", "patch"],
+    "expires_at": "2026-05-16T00:00:00Z",
+    "reason": "Documentation reconciliation task.",
+    "approved_by": "user:maintainer"
+  },
+  "craik.capability_receipt": {
+    "schema": "craik.capability_receipt",
+    "version": "0.1.0",
+    "id": "receipt_pytest",
+    "task_id": "task_docs_reconcile",
+    "actor": "agent:codex",
+    "capability": "shell.test",
+    "target": "uv run --python 3.12 --extra dev pytest",
+    "policy_profile": "strict",
+    "fail_open": false,
+    "reason": "Validate contract fixtures.",
+    "result": {
+      "status": "passed",
+      "summary": "All tests passed.",
+      "metadata": {
+        "redacted": true
+      }
+    },
+    "redacted": true,
+    "created_at": "2026-05-15T22:45:00Z"
+  },
+  "craik.case_file": {
+    "schema": "craik.case_file",
+    "version": "0.1.0",
+    "id": "case_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "objective": "Find stale docs and propose updates.",
+    "policy_envelope_id": "policy_docs_reconcile",
+    "facts": [
+      {
+        "entity": "repo:Eidetic-Labs/stigmem",
+        "relation": "craik:current_state",
+        "value": "Docs reconciliation is the first demo target.",
+        "source": "docs/roadmap.md",
+        "confidence": 0.9,
+        "scope": "team",
+        "trust_class": "observed"
+      }
+    ],
+    "evidence": [
+      {
+        "schema": "craik.evidence_reference",
+        "version": "0.1.0",
+        "id": "evidence_readme_status",
+        "source": "README.md",
+        "kind": "file",
+        "locator": "README.md#current-status",
+        "summary": "README describes current implementation state.",
+        "captured_at": "2026-05-15T22:40:00Z",
+        "metadata": {}
+      }
+    ],
+    "assumptions": [],
+    "docs": ["README.md", "docs/roadmap.md"],
+    "adrs": ["docs/adr/"],
+    "repo_state": {
+      "branch": "main"
+    },
+    "github_state": {
+      "issue": 2
+    },
+    "recent_handoffs": [],
+    "stale_risks": ["Planning docs may lag merged implementation."],
+    "contradictions": [],
+    "verification_plan": ["Run tests.", "Review docs against contracts."],
+    "context_budget": {
+      "max_tokens": 24000
+    }
+  },
+  "craik.contradiction_report": {
+    "schema": "craik.contradiction_report",
+    "version": "0.1.0",
+    "id": "contradiction_docs_status",
+    "facts": ["fact_docs_planned", "fact_cli_implemented"],
+    "summary": "Docs say the CLI is planned while implementation shows it exists.",
+    "affected_artifacts": ["README.md", "docs/guides/quickstart.md"],
+    "proposed_resolution": "Update docs to pre-0.1.0 implementation language.",
+    "status": "open",
+    "owner": "user:maintainer"
+  },
+  "craik.evidence_reference": {
+    "schema": "craik.evidence_reference",
+    "version": "0.1.0",
+    "id": "evidence_readme_status",
+    "source": "README.md",
+    "kind": "file",
+    "locator": "README.md#current-status",
+    "summary": "README describes current implementation state.",
+    "captured_at": "2026-05-15T22:40:00Z",
+    "metadata": {}
+  },
+  "craik.handoff": {
+    "schema": "craik.handoff",
+    "version": "0.1.0",
+    "id": "handoff_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "agent": "agent:codex",
+    "summary": "Contract schema work completed with tests and docs.",
+    "completed_actions": ["Added schemas.", "Validated fixtures."],
+    "files_changed": ["src/craik/contracts/models.py"],
+    "artifacts": ["docs/reference/schemas.md"],
+    "commands_run": ["uv run --python 3.12 --extra dev pytest"],
+    "tests_run": ["pytest", "ruff", "mypy"],
+    "facts_learned": ["craik:contract_surface"],
+    "facts_invalidated": [],
+    "contradictions_opened": [],
+    "risks": [],
+    "next_steps": ["Implement project registry."],
+    "receipt_ids": ["receipt_pytest"],
+    "memory_proposal_ids": [],
+    "created_at": "2026-05-15T22:50:00Z"
+  },
+  "craik.intent_lock": {
+    "schema": "craik.intent_lock",
+    "version": "0.1.0",
+    "id": "intent_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "objective": "Define contract schemas without adding runtime authority.",
+    "in_scope": ["Pydantic schemas", "fixtures", "schema docs"],
+    "out_of_scope": ["Policy enforcement", "memory writes"],
+    "created_at": "2026-05-15T22:35:00Z"
+  },
+  "craik.memory_backend_capabilities": {
+    "schema": "craik.memory_backend_capabilities",
+    "version": "0.1.0",
+    "backend": "stigmem",
+    "node_url": "http://127.0.0.1:18765",
+    "node_id": "stigmem:node:local-dev",
+    "auth_required": true,
+    "required": {
+      "health": true,
+      "metadata": true,
+      "fact_write": true,
+      "fact_query": true,
+      "fact_get": true,
+      "fact_provenance": true
+    },
+    "optional": {
+      "recall": false,
+      "conflicts": false,
+      "source_attestation": "warn",
+      "federation": false
+    },
+    "checked_at": "2026-05-15T22:42:00Z"
+  },
+  "craik.memory_proposal": {
+    "schema": "craik.memory_proposal",
+    "version": "0.1.0",
+    "id": "memprop_contract_surface",
+    "task_id": "task_docs_reconcile",
+    "operation": "add",
+    "fact": {
+      "entity": "repo:Eidetic-Labs/Craik",
+      "relation": "craik:contract_surface",
+      "value": "Craik defines v0.1.0 runtime contracts as Pydantic schemas.",
+      "source": "src/craik/contracts/models.py",
+      "confidence": 0.95,
+      "scope": "team",
+      "trust_class": "observed"
+    },
+    "evidence": [],
+    "requires_approval": true
+  },
+  "craik.policy_envelope": {
+    "schema": "craik.policy_envelope",
+    "version": "0.1.0",
+    "id": "policy_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "actor": "agent:codex",
+    "profile": "strict",
+    "fail_open": false,
+    "allowed_capabilities": ["repo.read", "memory.read", "receipt.write"],
+    "denied_capabilities": ["repo.write.adr", "git.force_push"],
+    "approval_required": ["repo.write.docs", "github.create_pr", "memory.write"],
+    "verification_required": ["pytest", "ruff", "mypy"],
+    "handoff_required": true,
+    "receipt_required": true,
+    "redaction_required": true
+  },
+  "craik.project_profile": {
+    "schema": "craik.project_profile",
+    "version": "0.1.0",
+    "id": "project_stigmem",
+    "name": "stigmem",
+    "repo": {
+      "type": "git",
+      "local_path": "/workspace/stigmem",
+      "remote": "git@github.com:Eidetic-Labs/stigmem.git",
+      "default_branch": "main"
+    },
+    "docs": {
+      "paths": ["README.md", "docs/"],
+      "immutable_paths": ["docs/adr/"]
+    },
+    "memory": {
+      "backend": "stigmem",
+      "scope": "team"
+    },
+    "policies": ["policy_no_adr_edits"]
+  },
+  "craik.task_request": {
+    "schema": "craik.task_request",
+    "version": "0.1.0",
+    "id": "task_docs_reconcile",
+    "title": "Review documentation against implementation state",
+    "objective": "Find stale docs and propose updates.",
+    "project_id": "project_stigmem",
+    "requested_by": "user:maintainer",
+    "priority": "normal",
+    "mode": "review",
+    "constraints": ["Do not edit ADRs."],
+    "expected_outputs": ["case_file", "findings", "handoff"],
+    "created_at": "2026-05-15T22:30:00Z"
+  },
+  "craik.work_graph_event": {
+    "schema": "craik.work_graph_event",
+    "version": "0.1.0",
+    "id": "event_case_created",
+    "task_id": "task_docs_reconcile",
+    "type": "created",
+    "from": "task_docs_reconcile",
+    "to": "case_docs_reconcile",
+    "metadata": {
+      "contract": "craik.case_file"
+    },
+    "created_at": "2026-05-15T22:45:00Z"
+  }
+}

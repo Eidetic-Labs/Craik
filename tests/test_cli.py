@@ -22,3 +22,16 @@ def test_version_command_prints_version() -> None:
     assert result.exit_code == 0
     assert result.stdout.strip() == package_version()
 
+
+def test_schema_list_includes_task_request() -> None:
+    result = runner.invoke(app, ["schema", "list"])
+
+    assert result.exit_code == 0
+    assert "craik.task_request" in result.stdout
+
+
+def test_schema_show_prints_json_schema() -> None:
+    result = runner.invoke(app, ["schema", "show", "craik.task_request"])
+
+    assert result.exit_code == 0
+    assert '"title": "TaskRequest"' in result.stdout
