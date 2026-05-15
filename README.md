@@ -58,10 +58,17 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Roadmap](docs/roadmap.md)
 - [Governance Model](docs/governance.md)
 - [Stigmem Integration](docs/stigmem-integration.md)
+- [Installation](docs/guides/installation.md)
+- [Quickstart](docs/guides/quickstart.md)
+- [Development Checks](docs/guides/development.md)
+- [CLI Reference](docs/reference/cli.md)
+- [Limitations](docs/limitations.md)
 
 ## Current Status
 
-Craik is in planning. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
+Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
+
+The Python package and `craik` CLI scaffold now exist. Runtime workflows such as project registration, case file assembly, governed execution, receipts, handoffs, and Stigmem-backed memory are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 
@@ -70,7 +77,7 @@ The first useful demo should show an agent entering a real repository, assemblin
 Craik core will be implemented in Python 3.12+ with a CLI-first package shape. The initial stack is:
 
 - Python 3.12+
-- Typer or Click for CLI
+- Typer for CLI
 - Pydantic for runtime contracts
 - SQLite for local persistent state
 - `httpx` for Stigmem and GitHub API clients
