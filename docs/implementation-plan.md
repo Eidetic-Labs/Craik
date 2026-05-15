@@ -371,13 +371,21 @@ These should be decided before coding starts, but they should not block the plan
 
 ## Contribution And Trademark Follow-Up
 
-The MIT license governs code reuse. It does not define project governance, contribution terms, or trademark rights.
+The MIT license governs code reuse. It does not define project governance, contribution terms, or trademark rights. Craik now captures initial lightweight project governance in root-level policy files.
 
-Before broad external contribution, add:
+Initial standards:
 
-- `CONTRIBUTING.md`,
-- code of conduct decision,
-- DCO or CLA decision,
-- security disclosure policy,
-- trademark/brand usage note,
-- and maintainer/release policy.
+- Contribution guide: `CONTRIBUTING.md`.
+- Contribution certification: DCO, not CLA.
+- Code of conduct: Contributor Covenant 2.1 baseline.
+- Security disclosure: private report path in `SECURITY.md`.
+- Trademark guidance: `TRADEMARKS.md`.
+- Maintainer and release policy: `MAINTAINERS.md`.
+
+Before broad external contribution, revisit:
+
+- final security contact,
+- DCO enforcement automation,
+- release automation,
+- package publishing ownership,
+- and whether a dedicated governance document is needed after `0.1.0`.

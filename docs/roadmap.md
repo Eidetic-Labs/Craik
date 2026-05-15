@@ -10,6 +10,7 @@ Goals:
 - define initial schemas,
 - choose implementation language and package shape,
 - publish the MIT license,
+- publish lightweight contribution, conduct, security, trademark, and maintainer policies,
 - document relationship to Stigmem,
 - define local degraded mode,
 - define Stigmem-backed full mode,
@@ -18,6 +19,7 @@ Goals:
 Exit criteria:
 
 - MIT license committed,
+- initial governance files committed,
 - schemas committed,
 - local task creation works,
 - handoff schema validated,

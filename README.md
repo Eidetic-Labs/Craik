@@ -56,6 +56,14 @@ The first useful demo should show an agent entering a real repository, assemblin
 
 Craik is released under the [MIT License](LICENSE). The license choice is intended to match the permissive adoption pattern used by comparable agent frameworks while keeping Eidetic Labs trademarks and branding separate from the code license.
 
+## Project Governance
+
+- Contributions: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- Security disclosure: [SECURITY.md](SECURITY.md)
+- Trademark and brand usage: [TRADEMARKS.md](TRADEMARKS.md)
+- Maintainer and release policy: [MAINTAINERS.md](MAINTAINERS.md)
+
 ## Initial Build Target
 
 The first implementation should focus on a repository-aware CLI runtime:
