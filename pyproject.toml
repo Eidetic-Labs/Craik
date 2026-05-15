@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling==1.26.3"]
+build-backend = "hatchling.build"
+
+[project]
+name = "craik"
+version = "0.0.0"
+description = "Durable agent runtime for shared project models and governed multi-agent work."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+  { name = "Eidetic Labs" }
+]
+keywords = [
+  "agents",
+  "ai",
+  "automation",
+  "memory",
+  "runtime"
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development",
+]
+dependencies = [
+  "click==8.1.8",
+  "typer==0.12.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy==1.14.1",
+  "pytest==8.3.4",
+  "ruff==0.8.4",
+]
+
+[project.scripts]
+craik = "craik.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Eidetic-Labs/Craik"
+Issues = "https://github.com/Eidetic-Labs/Craik/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/craik"]
+artifacts = ["src/craik/py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["craik"]
