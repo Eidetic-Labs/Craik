@@ -56,4 +56,18 @@ Options:
 - `--trusted-local-fail-open`: required explicit opt-in for trusted-local fail-open.
 - `--include-receipt`: include the fail-open receipt preview when applicable.
 
+## `craik receipts list`
+
+Print persisted capability receipts as JSON.
+
+Options:
+
+- `--task-id <id>`: only include receipts for this task id.
+- `--policy-id <id>`: only include receipts linked to this policy envelope.
+- `--handoff-id <id>`: only include receipts linked to this handoff.
+
+## `craik receipts show <receipt-id>`
+
+Print one persisted capability receipt as JSON.
+
 Additional commands will be documented as they are implemented.

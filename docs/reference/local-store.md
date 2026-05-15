@@ -50,6 +50,20 @@ Rules:
 
 The local store must not persist unredacted secrets. Payloads are checked with the central redaction utility before persistence and rejected if they still appear to contain secret material.
 
+## Receipt Queries
+
+The receipt store builds on local SQLite persistence for `craik.capability_receipt` records.
+
+Supported lookup paths:
+
+- all receipts,
+- one receipt by id,
+- receipts by task id,
+- receipts linked to a policy envelope id,
+- and receipts linked to a handoff id.
+
+Policy envelope and handoff links are read from receipt result metadata keys `policy_envelope_id` and `handoff_ids`.
+
 ## Backup And Cleanup
 
 Back up the SQLite database while Craik is not running, or use SQLite backup tooling once long-running gateway mode exists.

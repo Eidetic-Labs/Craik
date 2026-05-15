@@ -212,6 +212,8 @@ Receipts are not meant to replace logs. They are concise accountability records 
 
 Receipts must record when a task runs under a fail-open policy profile or when a capability grant widens access beyond strict defaults.
 
+The v0.1.0 receipt store persists validated `craik.capability_receipt` records and exposes local lookup through `craik receipts list` and `craik receipts show`. Receipts link directly to tasks and can link to policy envelopes and handoffs through redacted result metadata.
+
 ## Memory Write Policy
 
 Memory writes should be governed by confidence and source.
