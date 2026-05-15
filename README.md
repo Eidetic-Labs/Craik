@@ -23,6 +23,18 @@ Craik is a separate product and repository from Stigmem.
 
 Craik can run in degraded local mode without Stigmem for demos and development, but Stigmem is the reference substrate for real team use.
 
+## Agent Integration Model
+
+Craik core is runner-agnostic, but the first implementation should provide direct, first-class runner adapters for:
+
+- Codex
+- Claude
+- Gemini
+
+Each runner adapter should consume the same Craik contracts: project case file, policy envelope, capability grants, worker result, receipts, handoff, and memory proposals.
+
+OpenClaw is not a required dependency and is not the initial execution target. Craik borrows OpenClaw's useful gateway, workspace, session, tool, and skill ergonomics, while reserving a possible future bridge for teams that want OpenClaw-style channel integrations.
+
 ## Core Ideas
 
 - **Shared project models:** Agents receive a task-specific model of the project before acting.

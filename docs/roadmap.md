@@ -81,6 +81,29 @@ Maps to implementation milestones:
 
 - Milestone 7: GitHub Adapter.
 
+## Phase 2a: First-Class Runner Adapters
+
+Goals:
+
+- define runner adapter interface,
+- add Codex adapter,
+- add Claude adapter,
+- add Gemini adapter,
+- normalize runner outputs into Craik worker results,
+- normalize handoffs, receipts, blocks, failures, and memory proposals,
+- and preserve runner metadata for auditability.
+
+Exit criteria:
+
+- tasks can be run through Codex, Claude, and Gemini adapters,
+- each adapter consumes the same case file and policy envelope contracts,
+- outputs validate against Craik contracts,
+- and OpenClaw is documented as a possible future bridge rather than a required runtime dependency.
+
+Maps to implementation milestones:
+
+- Milestone 11: First-Class Runner Adapters.
+
 ## Phase 3: Multi-Agent Coordination
 
 Goals:
@@ -101,6 +124,7 @@ Exit criteria:
 Maps to implementation milestones:
 
 - Milestone 10: Multi-Agent Orchestration.
+- Milestone 11: First-Class Runner Adapters.
 
 ## Phase 4: Governance-Native Execution
 
@@ -123,7 +147,7 @@ Exit criteria:
 Maps to implementation milestones:
 
 - Milestone 4: Policy And Receipts.
-- Milestone 11: Skills And Probationary Plugins.
+- Milestone 12: Skills And Probationary Plugins.
 
 ## Phase 5: Stigmem-Native Intelligence
 

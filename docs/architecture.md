@@ -58,6 +58,28 @@ Responsibilities:
 
 The orchestrator should coordinate work, but it should not be the sole source of truth. Durable truth belongs in the memory substrate.
 
+### 3a. Runner Adapter Layer
+
+Runner adapters connect Craik contracts to concrete agent environments.
+
+Initial first-class adapters:
+
+- Codex,
+- Claude,
+- Gemini.
+
+Responsibilities:
+
+- translate case files into runner-specific task context,
+- pass policy envelopes and capability grants to the runner,
+- collect typed worker results,
+- collect or create capability receipts,
+- collect durable handoffs,
+- translate runner-specific artifacts back into Craik contracts,
+- and preserve enough metadata to make runs auditable.
+
+The adapter layer should be thin. Craik core should own contracts, state, policy, receipts, handoffs, and memory integration. Runners should own model execution and environment-specific interaction.
+
 ### 4. Capability Layer
 
 The capability layer exposes tools under explicit policy.
@@ -154,13 +176,14 @@ Initial surfaces:
 
 | Source pattern | Craik adoption | Craik extension |
 | --- | --- | --- |
-| OpenClaw gateway | CLI/API gateway owns entry points and session routing. | Gateway also creates policy envelopes and receipt obligations. |
+| OpenClaw gateway | CLI/API gateway ergonomics inform entry points and session routing. | Gateway also creates policy envelopes and receipt obligations. |
 | OpenClaw workspace | Project profile and local runtime state isolate work. | Case files and handoffs make workspace state portable across agents. |
 | OpenClaw skills | Skills provide repeatable operating guidance. | Skills declare context contracts and capability requirements. |
 | OpenClaw tool descriptors | Tools are discovered as typed capabilities. | Capabilities require grants and produce receipts. |
 | Hermes orchestrator | Orchestrator decomposes complex tasks. | Orchestrator uses Stigmem-backed project memory and cannot flatten unresolved contradictions. |
 | Hermes specialists | Workers receive scoped context and return typed results. | Worker results become graph-linked artifacts and durable handoffs. |
 | Hermes task board | Task state survives the active run. | Task state becomes part of a work graph connected to facts, PRs, receipts, and decisions. |
+| Codex, Claude, Gemini runners | Direct adapters execute work in real agent environments. | Adapters normalize outputs into Craik contracts and memory proposals. |
 
 ## Core Runtime Contracts
 
@@ -177,4 +200,4 @@ Craik should define stable schemas for:
 - verification results,
 - and work graph events.
 
-These contracts are more important than any single adapter language. Craik core will start as a Python 3.12+ CLI runtime, while the contracts remain the basis for interoperability with Codex, Claude Code, OpenClaw-like environments, GitHub, CI, TypeScript gateways, UI surfaces, and Stigmem.
+These contracts are more important than any single adapter language. Craik core will start as a Python 3.12+ CLI runtime, while the contracts remain the basis for interoperability with Codex, Claude, Gemini, OpenClaw-like environments, GitHub, CI, TypeScript gateways, UI surfaces, and Stigmem.

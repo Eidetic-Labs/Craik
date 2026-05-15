@@ -59,6 +59,11 @@ craik/
   adapters/
     repo.py
     github.py
+  runners/
+    base.py
+    codex.py
+    claude.py
+    gemini.py
   orchestration/
     roles.py
     orchestrator.py
@@ -318,7 +323,38 @@ Acceptance criteria:
 - read-only work can run in parallel,
 - and unresolved contradictions block flattening into a final answer.
 
-## Milestone 11: Skills And Probationary Plugins
+## Milestone 11: First-Class Runner Adapters
+
+Build:
+
+- runner adapter interface,
+- Codex adapter,
+- Claude adapter,
+- Gemini adapter,
+- runner metadata capture,
+- worker result normalization,
+- handoff normalization,
+- memory proposal normalization,
+- and failure/block reporting.
+
+Commands:
+
+- `craik runners list`
+- `craik runners inspect <runner>`
+- `craik task run --runner codex <task-id>`
+- `craik task run --runner claude <task-id>`
+- `craik task run --runner gemini <task-id>`
+
+Acceptance criteria:
+
+- Codex, Claude, and Gemini adapters implement the same interface,
+- each adapter consumes case files and policy envelopes,
+- each adapter emits typed worker results or clear block/failure states,
+- adapter outputs can create handoffs and receipts,
+- runner-specific metadata is preserved without polluting core contracts,
+- and OpenClaw remains a future bridge rather than a required execution layer.
+
+## Milestone 12: Skills And Probationary Plugins
 
 Build:
 
@@ -380,6 +416,8 @@ These should be decided before coding starts, but they should not block the plan
 - Reference memory substrate: Stigmem.
 - Initial interface: CLI-first.
 - First demo target: Stigmem documentation and state reconciliation.
+- Initial first-class agent runners: Codex, Claude, and Gemini.
+- OpenClaw relationship: design reference and possible future bridge, not a required dependency.
 - Core implementation language: Python 3.12+.
 - PyPI distribution: `craik`.
 - Python module: `craik`.

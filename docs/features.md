@@ -258,6 +258,37 @@ Acceptance criteria:
 - child handoffs link to parent task,
 - and orchestrator cannot discard unresolved contradictions.
 
+## Feature 11a: First-Class Runner Adapters
+
+Purpose: let Craik work directly with real agent runners instead of requiring a separate agent framework as an execution layer.
+
+Initial adapters:
+
+- Codex,
+- Claude,
+- Gemini.
+
+Adapter responsibilities:
+
+- receive task request, case file, policy envelope, and grants,
+- start or guide a runner session,
+- preserve runner identity and version metadata,
+- capture typed worker results,
+- capture receipts or receipt inputs,
+- capture handoff output,
+- return proposed memory updates,
+- and report blocks, failures, or missing capabilities.
+
+Acceptance criteria:
+
+- each adapter implements the same runner interface,
+- adapter outputs validate against Craik contracts,
+- runner-specific details do not leak into core contracts,
+- unsupported capabilities fail clearly,
+- and a task can be replayed or inspected from Craik artifacts without relying on raw chat history.
+
+OpenClaw-style integration should be tracked as a later bridge, not a dependency for this feature.
+
 ## Feature 12: Skills And Plugins
 
 Purpose: make repeated workflows reusable while keeping authority governed.

@@ -4,6 +4,29 @@ Craik should build on the strengths of OpenClaw and Hermes without becoming a cl
 
 The opportunity is to combine the approachable local-agent ergonomics of OpenClaw, the multi-agent decomposition patterns of Hermes, and Stigmem's durable memory/truth substrate into a new product category: a durable runtime for agent organizations.
 
+## Agent Runner Strategy
+
+Craik should be built for agents to use directly.
+
+The initial first-class runner targets are:
+
+- Codex,
+- Claude,
+- Gemini.
+
+Craik core should remain runner-agnostic through contracts, but the first implementation should include direct runner adapters that can:
+
+- receive a project case file,
+- receive a policy envelope,
+- receive capability grants,
+- execute or guide a task,
+- emit typed worker results,
+- emit capability receipts,
+- emit durable handoffs,
+- and propose memory updates.
+
+OpenClaw is not a required dependency and should not be treated as the initial execution layer. Its value to Craik is as a reference for local/self-hosted ergonomics, gateway design, workspace identity, sessions, tool descriptors, skills, and channel integrations. A future OpenClaw bridge may be useful, but Craik's first agent path should be direct integration with Codex, Claude, and Gemini.
+
 ## License Strategy
 
 Craik uses the MIT License.
@@ -31,7 +54,7 @@ Reference sources:
 Craik should adopt:
 
 - **Self-hosted first:** users should be able to run the runtime locally or on their own infrastructure.
-- **Gateway model:** one entry point should connect users, agents, tools, sessions, and channels.
+- **Gateway ergonomics:** one entry point should connect users, agents, tools, sessions, and channels where useful.
 - **Workspace identity:** each agent/project should have a clear workspace with scoped files, runtime config, and persistent session artifacts.
 - **Session continuity:** agent runs should survive restarts and remain inspectable.
 - **Skills as operating guidance:** repeatable workflows should be installable and scoped by project, workspace, or runtime.
@@ -46,6 +69,8 @@ Craik should improve on this pattern by adding:
 - trust-aware facts,
 - contradiction workflows,
 - and project-level work graphs.
+
+OpenClaw should be considered a design reference and possible later integration target, not a core dependency.
 
 ## What To Borrow From Hermes
 
