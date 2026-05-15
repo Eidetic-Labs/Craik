@@ -77,6 +77,8 @@ Defines what the runtime is allowed and obligated to do.
   "id": "policy_...",
   "task_id": "task_...",
   "actor": "agent:...",
+  "profile": "strict|trusted-local|automation|custom",
+  "fail_open": false,
   "allowed_capabilities": ["repo.read", "repo.write.docs", "shell.test", "memory.propose"],
   "denied_capabilities": ["repo.write.adr", "git.force_push"],
   "approval_required": ["github.create_pr", "memory.write.policy"],
@@ -122,6 +124,8 @@ Records important actions.
   "actor": "agent:...",
   "capability": "shell.test",
   "target": "uv run pytest node/tests/plugins",
+  "policy_profile": "strict",
+  "fail_open": false,
   "reason": "Validate plugin registry docs against test suite.",
   "result": {
     "status": "passed",

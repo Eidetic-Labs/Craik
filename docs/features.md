@@ -60,13 +60,18 @@ MVP behavior:
 - implementation tasks require explicit write grants.
 - immutable paths cannot be written unless policy explicitly allows it.
 - memory writes default to proposals unless configured for direct write.
+- strict mode is the default policy profile.
+- fail-open behavior is only available through named policy profiles.
+- fail-open profile use appears in case files, receipts, and handoffs.
 
 Acceptance criteria:
 
 - denied file writes are blocked,
 - denied memory writes become proposals,
 - policy envelope is included in the case file,
-- and policy failures create receipts.
+- policy failures create receipts,
+- trusted-local fail-open behavior requires explicit opt-in,
+- and automation mode fails closed instead of widening permissions.
 
 ## Feature 4: Capability Receipts
 
@@ -88,7 +93,9 @@ Acceptance criteria:
 - receipts are persisted locally,
 - receipts can be listed by task,
 - receipt IDs appear in handoffs,
-- and receipts include actor, capability, target, reason, result, and timestamp.
+- receipts include actor, capability, target, reason, result, and timestamp,
+- receipts include policy profile and fail-open status,
+- and receipt payloads are redacted before persistence.
 
 ## Feature 5: Handoff Writer
 
@@ -300,6 +307,7 @@ MVP behavior:
 - plugin capabilities require grants,
 - plugin actions produce receipts,
 - probationary plugins have restricted permissions.
+- plugins cannot bypass runner or task policy envelopes.
 
 Acceptance criteria:
 

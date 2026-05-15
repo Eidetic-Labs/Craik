@@ -19,6 +19,91 @@ The envelope defines:
 - documentation obligations,
 - and handoff obligations.
 
+## Default Security Posture
+
+Craik should be secure by default and explicitly fail-open by policy.
+
+Default behavior:
+
+- task execution starts read-only,
+- file writes require capability grants,
+- shell commands require capability grants,
+- GitHub writes require capability grants,
+- memory writes default to proposals,
+- immutable paths are denied by default,
+- runner adapters cannot bypass Craik grants,
+- plugins start probationary,
+- and important actions create receipts.
+
+Fail-open behavior is allowed only through named policy profiles. It should never happen as an accidental fallback.
+
+Every fail-open decision must be visible in:
+
+- the policy envelope,
+- the case file,
+- capability receipts,
+- and the final handoff.
+
+## Policy Profiles
+
+Craik should ship with conservative named policy profiles.
+
+### Strict
+
+Default profile for normal tasks.
+
+```yaml
+policy:
+  mode: strict
+  fail_open: false
+```
+
+Expected behavior:
+
+- read-only by default,
+- explicit grants for all writes,
+- memory writes become proposals unless direct write is granted,
+- shell commands require grant,
+- GitHub writes require grant,
+- immutable path writes denied.
+
+### Trusted Local
+
+Opt-in profile for trusted local development.
+
+```yaml
+policy:
+  mode: trusted-local
+  fail_open: true
+  require_receipts: true
+```
+
+Expected behavior:
+
+- broader local file and shell access may be allowed,
+- receipts remain mandatory,
+- secrets are still redacted,
+- immutable path writes still require explicit override,
+- and direct memory writes still require a memory write grant.
+
+### Automation
+
+Profile for CI and unattended workflows.
+
+```yaml
+policy:
+  mode: automation
+  fail_open: false
+```
+
+Expected behavior:
+
+- deterministic grants,
+- no interactive approval requirement,
+- no broad shell access unless granted,
+- no direct memory writes unless granted,
+- and failures should stop execution instead of widening permissions.
+
 ## Capability Grants
 
 Agents should not receive ambient authority.
@@ -42,6 +127,63 @@ Examples:
 - create GitHub comments,
 - write Stigmem facts in a specific scope.
 
+## Secret Handling And Redaction
+
+Craik should treat secrets as toxic runtime data.
+
+Secret storage:
+
+- store local secrets under `~/.craik/secrets/` by default,
+- support environment variables for CI and agent-runner workflows,
+- use owner-only file permissions where supported,
+- and avoid writing secrets to project-local state.
+
+Redaction requirements:
+
+- centralize redaction in a shared runtime utility,
+- redact known tokens, API keys, bearer headers, auth URLs, and configured secret patterns,
+- apply redaction before writing logs, receipts, handoffs, case files, memory proposals, errors, and work graph events,
+- preserve enough shape to debug without exposing raw secret values,
+- and treat redaction failures as security bugs.
+
+Secrets must not be written to Stigmem facts.
+
+## Capability-Gated Actions
+
+The following actions require explicit grants:
+
+- file writes,
+- file deletion,
+- shell command execution,
+- Git branch mutation,
+- Git commit creation,
+- Git push,
+- GitHub issue/PR/comment creation or mutation,
+- Stigmem direct fact writes,
+- contradiction resolution that invalidates facts,
+- plugin execution with side effects,
+- and runner actions that invoke tools outside read-only context.
+
+Read-only actions may still require grants when they can expose sensitive data.
+
+## Immutable Path Protection
+
+Project profiles may define immutable paths.
+
+Examples:
+
+- ADR directories,
+- signed release artifacts,
+- generated audit records,
+- historical migration records.
+
+Immutable paths are denied by default. A write to an immutable path requires:
+
+- explicit immutable-path override,
+- user or maintainer approval,
+- receipt,
+- and handoff note explaining why the override was used.
+
 ## Capability Receipts
 
 Important actions produce receipts.
@@ -61,6 +203,8 @@ Receipt fields:
 - and links to artifacts.
 
 Receipts are not meant to replace logs. They are concise accountability records for actions that matter.
+
+Receipts must record when a task runs under a fail-open policy profile or when a capability grant widens access beyond strict defaults.
 
 ## Memory Write Policy
 

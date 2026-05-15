@@ -166,7 +166,11 @@ Acceptance criteria:
 Build:
 
 - policy envelope generation,
+- strict, trusted-local, and automation policy profiles,
+- explicit fail-open profile handling,
 - capability grant model,
+- immutable path protection,
+- central redaction utility,
 - receipt store,
 - policy denial receipts,
 - shell command receipt wrapper,
@@ -180,8 +184,12 @@ Commands:
 
 Acceptance criteria:
 
+- strict mode is default,
+- fail-open is available only through named policy profiles,
 - denied writes are blocked,
 - allowed actions create receipts,
+- fail-open decisions create receipts,
+- receipts are redacted before persistence,
 - shell command results are summarized,
 - and receipts link back to task and policy envelope.
 
@@ -435,6 +443,12 @@ These should be decided before coding starts, but they should not block the plan
 - Default local home: `~/.craik`.
 - Local home override: `CRAIK_HOME`.
 - Project-local metadata: opt-in only.
+- Default policy profile: strict.
+- Fail-open behavior: allowed only through explicit named policy profiles.
+- Trusted local profile: opt-in fail-open with mandatory receipts.
+- Automation profile: fail-closed.
+- Memory writes: proposals by default.
+- Secrets: stored under `~/.craik/secrets/` or environment variables, redacted before persistence.
 - Initial CLI framework: Typer.
 - Contract validation: Pydantic.
 - Local state: SQLite.
