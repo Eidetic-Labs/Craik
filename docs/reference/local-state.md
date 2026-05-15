@@ -39,5 +39,6 @@ Directory purposes:
 
 On POSIX systems, Craik creates these directories with owner-only permissions where supported.
 
-Project-local `.craik/` directories are opt-in only. Resolving local state paths never creates project-local metadata inside a repository.
+The SQLite local store lives at `state/craik.sqlite3`. It is the persistence foundation for users who run Craik without Stigmem, but it remains single-node local state rather than shared Stigmem-backed truth.
 
+Project-local `.craik/` directories are opt-in only. Resolving local state paths never creates project-local metadata inside a repository.

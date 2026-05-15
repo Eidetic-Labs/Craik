@@ -65,6 +65,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [CLI Reference](docs/reference/cli.md)
 - [Schema Reference](docs/reference/schemas.md)
 - [Local State Layout](docs/reference/local-state.md)
+- [Local Store](docs/reference/local-store.md)
 - [Secrets](docs/security/secrets.md)
 - [Limitations](docs/limitations.md)
 
