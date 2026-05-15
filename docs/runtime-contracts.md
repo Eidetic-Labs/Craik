@@ -4,6 +4,8 @@ Craik should be built around stable, versioned contracts. The contracts are the 
 
 Contract examples below use JSON-like shapes for clarity. The final implementation should define them as typed schemas with validation.
 
+The initial typed implementation lives in `src/craik/contracts/` and is documented in [Schema Reference](reference/schemas.md).
+
 ## Versioning
 
 Every persisted contract should include:

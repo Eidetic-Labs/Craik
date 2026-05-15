@@ -62,6 +62,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Quickstart](docs/guides/quickstart.md)
 - [Development Checks](docs/guides/development.md)
 - [CLI Reference](docs/reference/cli.md)
+- [Schema Reference](docs/reference/schemas.md)
 - [Limitations](docs/limitations.md)
 
 ## Current Status
