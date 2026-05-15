@@ -115,3 +115,26 @@ Without Stigmem:
 - and trust tiers may be advisory.
 
 The product should be explicit about unavailable capabilities.
+
+## Local State Governance
+
+Craik uses `~/.craik` as the default local home, with `CRAIK_HOME` as the primary override.
+
+Local state should keep data classes separated:
+
+- `config/` for user-editable configuration,
+- `secrets/` for local credentials and tokens,
+- `state/` for SQLite databases and durable runtime state,
+- `cache/` for disposable data,
+- `logs/` for runtime logs,
+- `receipts/` for capability receipts,
+- `handoffs/` for durable handoff artifacts,
+- `case-files/` for assembled task context,
+- `projects/` for project registry metadata.
+
+Security expectations:
+
+- home and secrets paths should be owner-only where supported,
+- secret values should not appear in receipts, logs, handoffs, or case files,
+- path commands should make active local paths inspectable,
+- and project-local `.craik/` directories should be explicit opt-in only.

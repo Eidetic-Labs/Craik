@@ -90,6 +90,37 @@ Craik uses the same name across the public repository, Python package, import mo
 
 Live registry checks on 2026-05-15 showed `craik` available on both PyPI and npm. If a registry race occurs before publication, `craik-runtime` is the fallback distribution name while preserving `craik` as the CLI command and Python module.
 
+## Local State
+
+Craik uses a single product-home directory by default:
+
+```text
+~/.craik/
+```
+
+The location can be overridden with:
+
+```text
+CRAIK_HOME=/custom/path
+```
+
+Craik should keep different data classes separated inside that home:
+
+```text
+~/.craik/
+  config/
+  secrets/
+  state/
+  cache/
+  logs/
+  receipts/
+  handoffs/
+  case-files/
+  projects/
+```
+
+Project-local `.craik/` directories are opt-in only. Craik should not silently create project-local metadata inside repositories.
+
 ## License
 
 Craik is released under the [MIT License](LICENSE). The license choice is intended to match the permissive adoption pattern used by comparable agent frameworks while keeping Eidetic Labs trademarks and branding separate from the code license.

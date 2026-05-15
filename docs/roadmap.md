@@ -16,6 +16,7 @@ Goals:
 - document relationship to Stigmem,
 - define local degraded mode,
 - define Stigmem-backed full mode,
+- define `~/.craik` and `CRAIK_HOME` local state convention,
 - commit Stigmem documentation/state reconciliation as the first demo target,
 - and create the first working CLI skeleton.
 
@@ -25,6 +26,7 @@ Exit criteria:
 - initial governance files committed,
 - Python 3.12+ stack decision committed,
 - `craik` package, module, and CLI naming decision committed,
+- local state directory convention committed,
 - first demo target committed,
 - schemas committed,
 - local task creation works,

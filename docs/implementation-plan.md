@@ -46,6 +46,7 @@ craik/
     graph.py
   runtime/
     project_registry.py
+    paths.py
     case_assembler.py
     executor.py
     handoff_writer.py
@@ -103,9 +104,13 @@ Acceptance criteria:
 
 Build:
 
+- Craik home path resolver,
+- `CRAIK_HOME` override,
+- default `~/.craik` home,
+- structured home subdirectories,
+- secure permissions for home and secrets where supported,
 - SQLite local store,
 - project registry,
-- local config directory,
 - repo detection,
 - immutable path config,
 - local memory backend.
@@ -119,6 +124,11 @@ Commands:
 
 Acceptance criteria:
 
+- default home resolves to `~/.craik`,
+- `CRAIK_HOME` overrides the default,
+- `config`, `secrets`, `state`, `cache`, `logs`, `receipts`, `handoffs`, `case-files`, and `projects` directories are created as needed,
+- secrets files are owner-readable/writable where supported,
+- project-local `.craik/` is created only by explicit opt-in,
 - project can be registered from Git repo,
 - registry persists between commands,
 - project profile validates,
@@ -404,7 +414,6 @@ The scenario should explicitly validate:
 These should be decided before coding starts, but they should not block the planning docs:
 
 - hosted service posture,
-- default local state directory,
 - exact relationship to existing Eidetic auth,
 - and whether the first UI is built into Craik or kept separate.
 
@@ -423,6 +432,9 @@ These should be decided before coding starts, but they should not block the plan
 - Python module: `craik`.
 - CLI command: `craik`.
 - Future npm package, if needed: `craik`.
+- Default local home: `~/.craik`.
+- Local home override: `CRAIK_HOME`.
+- Project-local metadata: opt-in only.
 - Initial CLI framework: Typer.
 - Contract validation: Pydantic.
 - Local state: SQLite.
