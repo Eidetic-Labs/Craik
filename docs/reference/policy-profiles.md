@@ -57,6 +57,8 @@ Expected behavior:
 
 Every trusted-local fail-open decision must create a receipt.
 
+Trusted-local does not bypass immutable path protection. Immutable writes still require explicit override metadata and a matching immutable write grant.
+
 ## Automation
 
 `automation` is for CI and unattended workflows.
@@ -79,3 +81,4 @@ craik policy show --profile automation
 
 Fail-open profile use is visible in the policy envelope immediately. Later runtime layers must also preserve it in case files, receipts, and handoffs.
 
+Capability grants are evaluated separately from profile generation. Profiles define default allowed, denied, approval, and verification sets; grants authorize specific side-effect requests.

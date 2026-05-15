@@ -186,6 +186,8 @@ Immutable paths are denied by default. A write to an immutable path requires:
 - receipt,
 - and handoff note explaining why the override was used.
 
+In v0.1.0 grant checks, override metadata must include who approved the override and why. The override is still denied unless a matching immutable write grant is present.
+
 ## Capability Receipts
 
 Important actions produce receipts.
