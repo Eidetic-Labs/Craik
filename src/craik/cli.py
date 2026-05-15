@@ -10,6 +10,7 @@ import typer
 
 from craik import __version__
 from craik.contracts.registry import schema_model, schema_names
+from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 
 PACKAGE_NAME = "craik"
 
@@ -20,6 +21,8 @@ app = typer.Typer(
 )
 schema_app = typer.Typer(help="Inspect Craik runtime contract schemas.")
 app.add_typer(schema_app, name="schema")
+home_app = typer.Typer(help="Inspect and initialize Craik local state paths.")
+app.add_typer(home_app, name="home")
 
 
 def package_version() -> str:
@@ -74,6 +77,35 @@ def schema_show(name: str) -> None:
         raise typer.BadParameter(f"unknown schema {name!r}; known schemas: {known}") from None
 
     typer.echo(json.dumps(model.model_json_schema(), indent=2, sort_keys=True))
+
+
+@home_app.command("show")
+def home_show() -> None:
+    """Print resolved Craik local state paths without creating directories."""
+    paths = resolve_craik_paths()
+    typer.echo(json.dumps(_paths_payload(paths), indent=2, sort_keys=True))
+
+
+@home_app.command("init")
+def home_init() -> None:
+    """Create Craik local state directories."""
+    paths = ensure_craik_home()
+    typer.echo(json.dumps(_paths_payload(paths), indent=2, sort_keys=True))
+
+
+def _paths_payload(paths: CraikPaths) -> dict[str, str]:
+    return {
+        "cache": str(paths.cache),
+        "case_files": str(paths.case_files),
+        "config": str(paths.config),
+        "handoffs": str(paths.handoffs),
+        "home": str(paths.home),
+        "logs": str(paths.logs),
+        "projects": str(paths.projects),
+        "receipts": str(paths.receipts),
+        "secrets": str(paths.secrets),
+        "state": str(paths.state),
+    }
 
 
 def main() -> None:

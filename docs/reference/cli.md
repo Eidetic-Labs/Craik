@@ -18,5 +18,12 @@ List registered Craik runtime contract schemas.
 
 Print the JSON Schema for a registered runtime contract.
 
-Additional commands will be documented as they are implemented.
+## `craik home show`
 
+Print resolved Craik local state paths without creating directories.
+
+## `craik home init`
+
+Create Craik's local state directories.
+
+Additional commands will be documented as they are implemented.

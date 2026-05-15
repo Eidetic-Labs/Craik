@@ -60,9 +60,12 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Stigmem Integration](docs/stigmem-integration.md)
 - [Installation](docs/guides/installation.md)
 - [Quickstart](docs/guides/quickstart.md)
+- [Configuring Craik Home](docs/guides/configuring-craik-home.md)
 - [Development Checks](docs/guides/development.md)
 - [CLI Reference](docs/reference/cli.md)
 - [Schema Reference](docs/reference/schemas.md)
+- [Local State Layout](docs/reference/local-state.md)
+- [Secrets](docs/security/secrets.md)
 - [Limitations](docs/limitations.md)
 
 ## Current Status
