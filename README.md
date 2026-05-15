@@ -52,6 +52,10 @@ Craik is in planning. The immediate goal is to validate the product shape, defin
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 
+## License
+
+Craik is released under the [MIT License](LICENSE). The license choice is intended to match the permissive adoption pattern used by comparable agent frameworks while keeping Eidetic Labs trademarks and branding separate from the code license.
+
 ## Initial Build Target
 
 The first implementation should focus on a repository-aware CLI runtime:

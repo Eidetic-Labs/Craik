@@ -9,6 +9,7 @@ Goals:
 - finalize product thesis,
 - define initial schemas,
 - choose implementation language and package shape,
+- publish the MIT license,
 - document relationship to Stigmem,
 - define local degraded mode,
 - define Stigmem-backed full mode,
@@ -16,6 +17,7 @@ Goals:
 
 Exit criteria:
 
+- MIT license committed,
 - schemas committed,
 - local task creation works,
 - handoff schema validated,

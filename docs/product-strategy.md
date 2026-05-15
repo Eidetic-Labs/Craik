@@ -4,6 +4,20 @@ Craik should build on the strengths of OpenClaw and Hermes without becoming a cl
 
 The opportunity is to combine the approachable local-agent ergonomics of OpenClaw, the multi-agent decomposition patterns of Hermes, and Stigmem's durable memory/truth substrate into a new product category: a durable runtime for agent organizations.
 
+## License Strategy
+
+Craik uses the MIT License.
+
+The license choice supports:
+
+- low-friction adoption by individual developers, startups, and enterprises,
+- compatibility with the permissive norm set by comparable agent projects,
+- easier plugin and adapter growth,
+- commercial flexibility for hosted services and enterprise offerings,
+- and broader distribution of the Craik runtime concepts.
+
+The code license should remain separate from brand and trademark usage. Eidetic Labs should reserve the right to define how the Craik name, marks, and hosted service branding may be used.
+
 ## What To Borrow From OpenClaw
 
 OpenClaw's strongest lessons are operational and ergonomic.

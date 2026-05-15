@@ -354,10 +354,30 @@ This scenario should be automated as a fixture-driven integration test before br
 
 These should be decided before coding starts, but they should not block the planning docs:
 
-- license,
 - package name,
 - whether the public CLI command is `craik`,
 - hosted service posture,
 - default local state directory,
 - exact relationship to existing Eidetic auth,
 - and whether the first UI is built into Craik or kept separate.
+
+## Decided Project Defaults
+
+- License: MIT.
+- Public repository: `Eidetic-Labs/Craik`.
+- Product framing: durable agent runtime.
+- Reference memory substrate: Stigmem.
+- Initial interface: CLI-first.
+
+## Contribution And Trademark Follow-Up
+
+The MIT license governs code reuse. It does not define project governance, contribution terms, or trademark rights.
+
+Before broad external contribution, add:
+
+- `CONTRIBUTING.md`,
+- code of conduct decision,
+- DCO or CLA decision,
+- security disclosure policy,
+- trademark/brand usage note,
+- and maintainer/release policy.
