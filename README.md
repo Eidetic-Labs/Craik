@@ -52,6 +52,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Differentiators](docs/differentiators.md)
 - [Architecture](docs/architecture.md)
 - [Runtime Contracts](docs/runtime-contracts.md)
+- [Receipts](docs/concepts/receipts.md)
 - [Feature Specification](docs/features.md)
 - [MVP Plan](docs/mvp.md)
 - [Implementation Plan](docs/implementation-plan.md)
@@ -79,7 +80,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
-The Python package and `craik` CLI scaffold now exist. Runtime workflows such as project registration, case file assembly, governed execution, receipts, handoffs, and Stigmem-backed memory are still planned work.
+The Python package and `craik` CLI scaffold now exist. Project registration, local SQLite persistence, policy profile generation, capability grant checks, central redaction, and receipt storage are implemented. Runtime workflows such as case file assembly, governed execution wrappers, handoffs, and Stigmem-backed memory are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 

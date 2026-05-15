@@ -1,6 +1,14 @@
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+
 from typer.testing import CliRunner
 
 from craik.cli import app, package_version
+from craik.contracts.models import CapabilityReceipt, ReceiptResult
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.receipts import ReceiptStore
+from craik.runtime.store import LocalStore
 
 runner = CliRunner()
 
@@ -138,6 +146,63 @@ def test_policy_show_can_include_fail_open_receipt() -> None:
     assert '"capability": "policy.fail_open"' in result.stdout
 
 
+def test_receipts_commands_list_and_show_persisted_receipts(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_receipt(
+        home,
+        _receipt(
+            "receipt_docs",
+            task_id="task_docs",
+            metadata={
+                "policy_envelope_id": "policy_docs",
+                "handoff_ids": ["handoff_docs"],
+            },
+        ),
+    )
+    _seed_receipt(home, _receipt("receipt_other", task_id="task_other"))
+
+    listed = runner.invoke(
+        app,
+        ["receipts", "list", "--task-id", "task_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    shown = runner.invoke(
+        app,
+        ["receipts", "show", "receipt_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    by_policy = runner.invoke(
+        app,
+        ["receipts", "list", "--policy-id", "policy_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    by_handoff = runner.invoke(
+        app,
+        ["receipts", "list", "--handoff-id", "handoff_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert listed.exit_code == 0
+    assert shown.exit_code == 0
+    assert by_policy.exit_code == 0
+    assert by_handoff.exit_code == 0
+    assert [receipt["id"] for receipt in json.loads(listed.stdout)] == ["receipt_docs"]
+    assert json.loads(shown.stdout)["id"] == "receipt_docs"
+    assert [receipt["id"] for receipt in json.loads(by_policy.stdout)] == ["receipt_docs"]
+    assert [receipt["id"] for receipt in json.loads(by_handoff.stdout)] == ["receipt_docs"]
+
+
+def test_receipts_show_reports_missing_receipt(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["receipts", "show", "receipt_missing"],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code != 0
+    assert "unknown receipt: receipt_missing" in result.output
+
+
 def _run_git(repo, *args: str) -> None:
     import subprocess
 
@@ -151,4 +216,39 @@ def _run_git(repo, *args: str) -> None:
             "GIT_COMMITTER_EMAIL": "test@example.invalid",
             "GIT_COMMITTER_NAME": "Craik Test",
         },
+    )
+
+
+def _seed_receipt(home: Path, receipt: CapabilityReceipt) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(home)})
+    store = LocalStore.from_paths(paths)
+    try:
+        store.initialize()
+        ReceiptStore(store).record_receipt(receipt)
+    finally:
+        store.close()
+
+
+def _receipt(
+    receipt_id: str,
+    *,
+    task_id: str,
+    metadata: dict[str, object] | None = None,
+) -> CapabilityReceipt:
+    return CapabilityReceipt(
+        id=receipt_id,
+        task_id=task_id,
+        actor="agent:codex",
+        capability="shell.test",
+        target="uv run pytest",
+        policy_profile="strict",
+        fail_open=False,
+        reason="Validate receipt behavior.",
+        result=ReceiptResult(
+            status="passed",
+            summary="Command completed.",
+            metadata=metadata or {},
+        ),
+        redacted=True,
+        created_at=datetime(2026, 5, 15, 12, 0, tzinfo=UTC),
     )
