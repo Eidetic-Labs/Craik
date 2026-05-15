@@ -103,3 +103,22 @@ The first implementation should focus on a repository-aware CLI runtime:
 7. Propose fact updates for future agents.
 
 Multi-agent orchestration, work graph visualization, contradiction inbox, and plugin probation should be layered on after the single-agent durable workflow is working end to end.
+
+## First Demo Target
+
+Craik's first real demo target is Stigmem documentation and state reconciliation.
+
+The demo should:
+
+1. Register the Stigmem repository as a Craik project.
+2. Connect to a local Stigmem node.
+3. Create a docs reconciliation task.
+4. Assemble a case file from repository state, ADRs, public docs, GitHub issues/PRs, recent Stigmem facts, and prior handoffs.
+5. Identify stale or contradictory documentation.
+6. Produce proposed documentation updates.
+7. Record capability receipts for important actions.
+8. Generate a durable handoff.
+9. Propose or write new Stigmem facts.
+10. Export a work graph for the task.
+
+This target is intentionally based on a real workflow that already exposed the need for durable memory, public/internal doc boundaries, ADR constraints, and agent handoffs.

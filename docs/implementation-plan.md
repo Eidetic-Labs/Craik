@@ -342,7 +342,7 @@ Acceptance criteria:
 
 Target scenario:
 
-1. Register `Eidetic-Labs/stigmem`.
+1. Register `Eidetic-Labs/stigmem` as the first demo project.
 2. Connect to local Stigmem.
 3. Create a docs reconciliation task.
 4. Build a case file from repo docs, ADRs, facts, and GitHub state.
@@ -353,6 +353,15 @@ Target scenario:
 9. Export work graph for the task.
 
 This scenario should be automated as a fixture-driven integration test before broadening the platform.
+
+The scenario should explicitly validate:
+
+- ADRs are treated as immutable inputs,
+- public docs do not receive internal-only labels or implementation tracking terms,
+- stale docs are identified with evidence,
+- Stigmem facts are used as context with provenance,
+- memory writes are proposed or written according to policy,
+- and the final handoff can seed a follow-up task.
 
 ## Deferred Decisions
 
@@ -370,6 +379,7 @@ These should be decided before coding starts, but they should not block the plan
 - Product framing: durable agent runtime.
 - Reference memory substrate: Stigmem.
 - Initial interface: CLI-first.
+- First demo target: Stigmem documentation and state reconciliation.
 - Core implementation language: Python 3.12+.
 - PyPI distribution: `craik`.
 - Python module: `craik`.

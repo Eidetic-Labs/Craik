@@ -6,18 +6,32 @@ The MVP should prove one complete workflow instead of building a broad platform 
 
 Given a real software repository, Craik should assemble a task-specific project model, guide an agent through governed work, record capability receipts, and produce a durable handoff backed by memory.
 
-## Primary Demo
+## Accepted Primary Demo
+
+The accepted first demo target is Stigmem documentation and state reconciliation.
 
 1. Connect Craik to a GitHub repository.
-2. Ingest current repo state, docs, ADRs, issues, PRs, branch status, and recent Stigmem facts.
-3. Ask Craik to review whether documentation matches implementation state.
-4. Craik assembles a case file.
-5. An agent performs the review with scoped read/write capabilities.
-6. Craik records key tool-use receipts.
-7. The agent proposes doc updates and facts.
-8. Craik surfaces any contradictions or stale assumptions.
-9. The user approves changes.
-10. Craik creates a structured handoff and updates memory.
+2. Register the Stigmem repository as the project.
+3. Connect to a local Stigmem node.
+4. Ingest current repo state, docs, ADRs, issues, PRs, branch status, prior handoffs, and recent Stigmem facts.
+5. Ask Craik to review whether documentation matches implementation state.
+6. Craik assembles a case file.
+7. An agent performs the review with scoped read/write capabilities.
+8. Craik records key tool-use receipts.
+9. The agent proposes doc updates and facts.
+10. Craik surfaces any contradictions or stale assumptions.
+11. The user approves changes.
+12. Craik creates a structured handoff, updates memory, and exports the work graph.
+
+This demo is the first proof point because it exercises the problems Craik is designed to solve:
+
+- stale documentation,
+- public/internal documentation boundaries,
+- immutable ADR constraints,
+- live GitHub state,
+- Stigmem facts,
+- multi-agent handoff continuity,
+- and verifiable tool use.
 
 ## MVP Components
 
@@ -166,3 +180,12 @@ The MVP succeeds if a new agent can:
 - and create memory updates that future agents can use.
 
 The MVP should be evaluated on real project workflows, not toy examples.
+
+For the accepted Stigmem docs reconciliation demo, success also requires:
+
+- the case file clearly identifies ADR constraints and public/internal documentation boundaries,
+- stale documentation findings include evidence,
+- proposed updates avoid immutable ADR edits,
+- receipts capture meaningful file, shell, GitHub, and memory actions,
+- the handoff is useful to a later agent without relying on chat history,
+- and Stigmem receives appropriate fact proposals or fact writes.
