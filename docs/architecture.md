@@ -177,4 +177,4 @@ Craik should define stable schemas for:
 - verification results,
 - and work graph events.
 
-These contracts are more important than the first implementation language. They are the basis for interoperability with Codex, Claude Code, OpenClaw-like environments, GitHub, CI, and Stigmem.
+These contracts are more important than any single adapter language. Craik core will start as a Python 3.12+ CLI runtime, while the contracts remain the basis for interoperability with Codex, Claude Code, OpenClaw-like environments, GitHub, CI, TypeScript gateways, UI surfaces, and Stigmem.

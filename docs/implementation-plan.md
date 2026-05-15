@@ -2,14 +2,14 @@
 
 This plan turns the Craik concept into a buildable sequence.
 
-## Recommended Stack
+## Accepted Stack
 
 The initial implementation should optimize for fast, testable CLI development.
 
-Recommended default:
+Accepted default:
 
 - Python 3.12+,
-- Typer or Click for CLI,
+- Typer for CLI,
 - Pydantic for schema validation,
 - SQLite for local persistent state,
 - `httpx` for Stigmem and GitHub API calls,
@@ -19,9 +19,13 @@ Recommended default:
 Rationale:
 
 - Stigmem already has Python surfaces.
+- Hermes uses Python for its primary agent runtime, so Python keeps Craik close to agent-runtime conventions.
+- OpenClaw's Node/TypeScript gateway pattern remains relevant for future adapters and UI, but Craik's core differentiator is durable state, policy, and memory integration.
 - Pydantic makes versioned contracts straightforward.
 - SQLite is enough for local task, receipt, handoff, and work graph state.
 - CLI-first keeps the MVP focused.
+
+Dependency management should favor reproducibility. The project should use exact pins for runtime dependencies once implementation begins, with lockfile updates reviewed intentionally. Optional provider, browser, UI, or adapter dependencies should remain extras rather than core dependencies.
 
 ## Repository Shape
 
@@ -368,6 +372,12 @@ These should be decided before coding starts, but they should not block the plan
 - Product framing: durable agent runtime.
 - Reference memory substrate: Stigmem.
 - Initial interface: CLI-first.
+- Core implementation language: Python 3.12+.
+- Initial CLI framework: Typer.
+- Contract validation: Pydantic.
+- Local state: SQLite.
+- API client: `httpx`.
+- Test and quality gates: `pytest`, `ruff`, and `mypy`.
 
 ## Contribution And Trademark Follow-Up
 

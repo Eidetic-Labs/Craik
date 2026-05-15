@@ -8,7 +8,7 @@ Goals:
 
 - finalize product thesis,
 - define initial schemas,
-- choose implementation language and package shape,
+- implement the accepted Python 3.12+ CLI-first package shape,
 - publish the MIT license,
 - publish lightweight contribution, conduct, security, trademark, and maintainer policies,
 - document relationship to Stigmem,
@@ -20,6 +20,7 @@ Exit criteria:
 
 - MIT license committed,
 - initial governance files committed,
+- Python 3.12+ stack decision committed,
 - schemas committed,
 - local task creation works,
 - handoff schema validated,
