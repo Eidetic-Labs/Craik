@@ -358,8 +358,6 @@ This scenario should be automated as a fixture-driven integration test before br
 
 These should be decided before coding starts, but they should not block the planning docs:
 
-- package name,
-- whether the public CLI command is `craik`,
 - hosted service posture,
 - default local state directory,
 - exact relationship to existing Eidetic auth,
@@ -373,11 +371,17 @@ These should be decided before coding starts, but they should not block the plan
 - Reference memory substrate: Stigmem.
 - Initial interface: CLI-first.
 - Core implementation language: Python 3.12+.
+- PyPI distribution: `craik`.
+- Python module: `craik`.
+- CLI command: `craik`.
+- Future npm package, if needed: `craik`.
 - Initial CLI framework: Typer.
 - Contract validation: Pydantic.
 - Local state: SQLite.
 - API client: `httpx`.
 - Test and quality gates: `pytest`, `ruff`, and `mypy`.
+
+Live registry checks on 2026-05-15 returned 404 for both `https://pypi.org/pypi/craik/json` and `https://registry.npmjs.org/craik`, indicating the names appeared available at that time. Because registry availability can change, publication should happen early once package metadata is ready. If the plain distribution name is lost before publication, fallback to `craik-runtime` while preserving `craik` for the module and CLI command.
 
 ## Contribution And Trademark Follow-Up
 

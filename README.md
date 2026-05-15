@@ -66,6 +66,18 @@ Craik core will be implemented in Python 3.12+ with a CLI-first package shape. T
 
 TypeScript remains appropriate for future UI, gateway adapters, and OpenClaw-style integrations, but it is not the initial core runtime stack.
 
+## Package and CLI Naming
+
+Craik uses the same name across the public repository, Python package, import module, and CLI command:
+
+- GitHub repository: `Eidetic-Labs/Craik`
+- PyPI distribution: `craik`
+- Python module: `craik`
+- CLI command: `craik`
+- Future npm package, if needed: `craik`
+
+Live registry checks on 2026-05-15 showed `craik` available on both PyPI and npm. If a registry race occurs before publication, `craik-runtime` is the fallback distribution name while preserving `craik` as the CLI command and Python module.
+
 ## License
 
 Craik is released under the [MIT License](LICENSE). The license choice is intended to match the permissive adoption pattern used by comparable agent frameworks while keeping Eidetic Labs trademarks and branding separate from the code license.
