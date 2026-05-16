@@ -327,12 +327,26 @@ def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
         ["memory", "search", "local proposals"],
         env={"CRAIK_HOME": str(home)},
     )
+    diff = runner.invoke(
+        app,
+        ["memory", "diff", "task_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    preview = runner.invoke(
+        app,
+        ["memory", "preview", "task_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
 
     assert proposed.exit_code == 0
     assert approved.exit_code == 0
+    assert diff.exit_code == 0
+    assert preview.exit_code == 0
     assert json.loads(approved.stdout)["status"] == "approved"
     assert [proposal["id"] for proposal in json.loads(listed.stdout)] == [proposal_id]
     assert json.loads(searched.stdout)[0]["value"] == "Local proposals require review."
+    assert json.loads(diff.stdout)["proposals_approved"] == [proposal_id]
+    assert json.loads(preview.stdout)["scope_summary"] == {"local": 1}
 
 
 def test_policy_show_defaults_to_strict() -> None:

@@ -183,6 +183,14 @@ Options:
 
 Search approved local memory facts.
 
+## `craik memory diff <task-id>`
+
+Print and persist a run-scoped memory diff for local proposal activity.
+
+## `craik memory preview <task-id>`
+
+Print and persist a memory impact preview before promotion or direct writes.
+
 ## `craik policy show`
 
 Print a generated policy envelope.

@@ -195,6 +195,55 @@
     },
     "checked_at": "2026-05-15T22:42:00Z"
   },
+  "craik.memory_diff": {
+    "schema": "craik.memory_diff",
+    "version": "0.1.0",
+    "id": "memdiff_task_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "proposals_created": ["memprop_contract_surface"],
+    "proposals_approved": [],
+    "proposals_rejected": [],
+    "facts_written": [],
+    "write_failures": [],
+    "facts_read": [
+      {
+        "id": "fact_docs_reconcile_demo",
+        "cid": "sha256:example",
+        "entity": "repo:Eidetic-Labs/Craik",
+        "relation": "craik:current_state",
+        "value": "Docs reconciliation is the first demo target.",
+        "source": "docs/roadmap.md",
+        "scope": "team",
+        "trust_class": "observed"
+      }
+    ],
+    "created_at": "2026-05-15T22:43:00Z"
+  },
+  "craik.memory_impact_preview": {
+    "schema": "craik.memory_impact_preview",
+    "version": "0.1.0",
+    "id": "mempreview_task_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "facts_to_add": [
+      {
+        "id": null,
+        "cid": null,
+        "entity": "repo:Eidetic-Labs/Craik",
+        "relation": "craik:contract_surface",
+        "value": "Craik defines v0.1.0 runtime contracts as Pydantic schemas.",
+        "source": "src/craik/contracts/models.py",
+        "scope": "team",
+        "trust_class": "observed"
+      }
+    ],
+    "facts_to_invalidate": [],
+    "likely_contradictions": [],
+    "evidence_missing": ["memprop_contract_surface"],
+    "scope_summary": {
+      "team": 1
+    },
+    "created_at": "2026-05-15T22:44:00Z"
+  },
   "craik.memory_proposal": {
     "schema": "craik.memory_proposal",
     "version": "0.1.0",

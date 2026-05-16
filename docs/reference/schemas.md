@@ -38,6 +38,8 @@ craik schema show craik.task_request
 | `craik.handoff` | Summarizes durable run state for future agents. |
 | `craik.intent_lock` | Preserves task intent and scope boundaries. |
 | `craik.memory_backend_capabilities` | Records detected memory backend support. |
+| `craik.memory_diff` | Explains run-scoped memory reads, proposals, writes, and failures. |
+| `craik.memory_impact_preview` | Previews memory additions, invalidations, evidence gaps, and likely contradictions. |
 | `craik.memory_proposal` | Describes reviewable memory updates. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
@@ -65,4 +67,3 @@ Rules:
 - Runtime code should reject unknown fields by default.
 - Durable memory writes should preserve source, confidence, scope, and trust metadata.
 - Policy and receipt contracts should preserve profile, fail-open, redaction, and approval metadata.
-

@@ -70,6 +70,8 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Scope Control](docs/guides/scope-control.md)
 - [Writing Handoffs](docs/guides/writing-handoffs.md)
 - [Memory Proposals](docs/guides/memory-proposals.md)
+- [Memory Diffs](docs/guides/memory-diffs.md)
+- [Memory Impact Preview](docs/guides/memory-impact-preview.md)
 - [Connecting Stigmem](docs/guides/connecting-stigmem.md)
 - [Evidence And Assumptions](docs/guides/evidence-and-assumptions.md)
 - [Context Budgeting](docs/guides/context-budgeting.md)
