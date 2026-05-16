@@ -36,6 +36,7 @@ project.
 - [Running Policy Tests](guides/running-policy-tests.md)
 - [Runner Preview Workflows](guides/runner-preview-workflows.md)
 - [Single-Agent Fixture Loop](guides/single-agent-fixture-loop.md)
+- [Community Skills](guides/community-skills.md)
 - [Development Checks](guides/development.md)
 
 ## Reference
