@@ -43,6 +43,18 @@ AdjudicationDecision = Literal["accepted", "rejected", "revised", "deferred"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
+InstructionSourceKind = Literal[
+    "agents_md",
+    "claude_md",
+    "gemini_md",
+    "hermes_md",
+    "skills_md",
+    "cursor_rules",
+    "github_copilot_instructions",
+    "codex_instructions",
+    "policy_doc",
+]
+InstructionTrustBoundary = Literal["project", "repository", "organization", "user", "external"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -711,6 +723,88 @@ class ScopeChangeResult(CraikModel):
         """Accepted scope changes must point at the updated intent lock."""
         if self.decision == "accepted" and not self.updated_intent_lock_id:
             raise ValueError("accepted scope changes require updated_intent_lock_id")
+        return self
+
+
+INSTRUCTION_SOURCE_DEFAULT_PATHS: dict[InstructionSourceKind, str] = {
+    "agents_md": "AGENTS.md",
+    "claude_md": "CLAUDE.md",
+    "gemini_md": "GEMINI.md",
+    "hermes_md": "HERMES.md",
+    "skills_md": "SKILLS.md",
+    "cursor_rules": ".cursorrules",
+    "github_copilot_instructions": ".github/copilot-instructions.md",
+    "codex_instructions": ".codex/instructions.md",
+    "policy_doc": "",
+}
+
+
+class InstructionSource(CraikModel):
+    """Declared source file for runtime instruction distillation."""
+
+    schema_: Literal["craik.instruction_source"] = Field(
+        default="craik.instruction_source",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    kind: InstructionSourceKind
+    path: str
+    owner: str
+    trust_boundary: InstructionTrustBoundary = "project"
+    active: bool = True
+    declared_by: str
+    policy_envelope_id: str | None = None
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_declared_path(self) -> InstructionSource:
+        """Ensure standard source kinds use their canonical paths."""
+        expected_path = INSTRUCTION_SOURCE_DEFAULT_PATHS[self.kind]
+        if expected_path and self.path != expected_path:
+            raise ValueError(f"{self.kind} instruction source path must be {expected_path!r}")
+        if self.kind == "policy_doc" and not self.path:
+            raise ValueError("policy_doc instruction sources require a declared path")
+        return self
+
+
+class InstructionSourceRegistry(CraikModel):
+    """Project registry of declared instruction sources."""
+
+    schema_: Literal["craik.instruction_source_registry"] = Field(
+        default="craik.instruction_source_registry",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    sources: list[InstructionSource] = Field(default_factory=list)
+    active_source_ids: list[str] = Field(default_factory=list)
+    declared_policy_doc_paths: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_registry_links(self) -> InstructionSourceRegistry:
+        """Require active source ids to refer to active registered sources."""
+        source_by_id = {source.id: source for source in self.sources}
+        unknown = sorted(set(self.active_source_ids) - set(source_by_id))
+        if unknown:
+            raise ValueError(f"unknown active instruction source ids: {unknown}")
+        inactive = sorted(
+            source_id
+            for source_id in self.active_source_ids
+            if not source_by_id[source_id].active
+        )
+        if inactive:
+            raise ValueError(f"inactive instruction source ids marked active: {inactive}")
+        policy_paths = sorted(
+            source.path for source in self.sources if source.kind == "policy_doc"
+        )
+        if sorted(self.declared_policy_doc_paths) != policy_paths:
+            raise ValueError("declared policy doc paths must match policy_doc sources")
         return self
 
 
