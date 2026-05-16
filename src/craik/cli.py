@@ -73,6 +73,7 @@ from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.runners import default_runner_capability_matrices, get_runner_capability_matrix
 from craik.runtime.store import LocalStore
 from craik.runtime.tasks import create_task
+from craik.runtime.update_guidance import update_guidance_payload
 
 PACKAGE_NAME = "craik"
 
@@ -219,6 +220,13 @@ def doctor_command() -> None:
     """Run read-only diagnostics for local and gateway readiness."""
     paths = resolve_craik_paths()
     payload = run_doctor(paths, env=dict(os.environ))
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@app.command("update")
+def update_command() -> None:
+    """Print safe update guidance without modifying the installation."""
+    payload = update_guidance_payload(installed_version=package_version())
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
