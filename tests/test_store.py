@@ -13,6 +13,7 @@ from craik.contracts.models import (
     ContradictionReport,
     DebateSummary,
     DebateTurn,
+    DistilledInstructionProposal,
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
@@ -129,6 +130,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     instruction_provenance = InstructionProvenance.model_validate(
         fixtures["craik.instruction_provenance"]
     )
+    distilled_instruction = DistilledInstructionProposal.model_validate(
+        fixtures["craik.distilled_instruction_proposal"]
+    )
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -156,6 +160,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_instruction_source_registry(instruction_registry)
     store.put_instruction_source_snapshot(instruction_snapshot)
     store.put_instruction_provenance(instruction_provenance)
+    store.put_distilled_instruction_proposal(distilled_instruction)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -186,6 +191,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_instruction_source_registry(instruction_registry.id) == instruction_registry
     assert store.get_instruction_source_snapshot(instruction_snapshot.id) == instruction_snapshot
     assert store.get_instruction_provenance(instruction_provenance.id) == instruction_provenance
+    assert (
+        store.get_distilled_instruction_proposal(distilled_instruction.id)
+        == distilled_instruction
+    )
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -208,6 +217,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_instruction_source_registries() == [instruction_registry]
     assert store.list_instruction_source_snapshots() == [instruction_snapshot]
     assert store.list_instruction_provenance() == [instruction_provenance]
+    assert store.list_distilled_instruction_proposals() == [distilled_instruction]
 
 
 def test_persists_supported_contract_types(
@@ -224,6 +234,7 @@ def test_persists_supported_contract_types(
         "craik.contradiction_report",
         "craik.debate_summary",
         "craik.debate_turn",
+        "craik.distilled_instruction_proposal",
         "craik.review_request",
         "craik.review_result",
         "craik.adjudication_outcome",

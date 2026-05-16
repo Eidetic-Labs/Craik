@@ -40,6 +40,7 @@ craik schema show craik.task_request
 | `craik.contradiction_report` | Captures incompatible assertions for review. |
 | `craik.debate_summary` | Summarizes agreement, unresolved disagreement, or contradiction escalation for a bounded agent debate. |
 | `craik.debate_turn` | Captures one role-linked debate contribution with evidence, assumptions, and contradiction links. |
+| `craik.distilled_instruction_proposal` | Captures a reviewable instruction distilled from declared instruction sources. |
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
 | `craik.handoff` | Summarizes durable run state for future agents. |
 | `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |

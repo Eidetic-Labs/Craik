@@ -22,6 +22,7 @@ from craik.contracts.models import (
     ContradictionReport,
     DebateSummary,
     DebateTurn,
+    DistilledInstructionProposal,
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
@@ -66,6 +67,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.contradiction_report": "contradictions",
     "craik.debate_summary": "debate_summaries",
     "craik.debate_turn": "debate_turns",
+    "craik.distilled_instruction_proposal": "distilled_instruction_proposals",
     "craik.handoff": "handoffs",
     "craik.human_delegation_point": "human_delegations",
     "craik.instruction_source": "instruction_sources",
@@ -399,6 +401,25 @@ class LocalStore:
         return _cast_list(
             InstructionProvenance,
             self.list_contracts("craik.instruction_provenance"),
+        )
+
+    def put_distilled_instruction_proposal(
+        self,
+        proposal: DistilledInstructionProposal,
+    ) -> None:
+        self.put_contract(proposal)
+
+    def get_distilled_instruction_proposal(
+        self,
+        proposal_id: str,
+    ) -> DistilledInstructionProposal | None:
+        contract = self.get_contract("craik.distilled_instruction_proposal", proposal_id)
+        return _cast_optional(DistilledInstructionProposal, contract)
+
+    def list_distilled_instruction_proposals(self) -> list[DistilledInstructionProposal]:
+        return _cast_list(
+            DistilledInstructionProposal,
+            self.list_contracts("craik.distilled_instruction_proposal"),
         )
 
     def put_task(self, task: TaskRequest) -> None:

@@ -32,6 +32,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `receipts` | `craik.capability_receipt` |
 | `case_files` | `craik.case_file` |
 | `contradictions` | `craik.contradiction_report` |
+| `distilled_instruction_proposals` | `craik.distilled_instruction_proposal` |
 | `handoffs` | `craik.handoff` |
 | `human_delegations` | `craik.human_delegation_point` |
 | `instruction_provenance` | `craik.instruction_provenance` |
