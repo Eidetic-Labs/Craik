@@ -68,6 +68,7 @@ DistilledInstructionCategory = Literal[
     "stale_risk",
 ]
 DistilledInstructionPromotionStatus = Literal["proposed", "approved", "rejected", "deferred"]
+InstructionPromotionDecision = Literal["approved", "rejected", "deferred"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -927,6 +928,62 @@ class DistilledInstructionProposal(CraikModel):
                 )
         if self.category in {"policy", "security_rule"} and not self.evidence_ids:
             raise ValueError("policy and security-rule distillations require evidence ids")
+        return self
+
+
+class PromotedInstructionConstraint(CraikModel):
+    """Approved distilled instruction that can be used as an active runtime constraint."""
+
+    schema_: Literal["craik.promoted_instruction_constraint"] = Field(
+        default="craik.promoted_instruction_constraint",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    proposal_id: str
+    source_id: str
+    snapshot_id: str
+    category: DistilledInstructionCategory
+    statement: str
+    provenance_ids: list[str] = Field(min_length=1)
+    evidence_ids: list[str] = Field(default_factory=list)
+    policy_envelope_id: str | None = None
+    receipt_ids: list[str] = Field(default_factory=list)
+    memory_proposal_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    active: bool = True
+    created_at: datetime
+
+
+class InstructionPromotionReview(CraikModel):
+    """Auditable human or policy decision for distilled instruction promotion."""
+
+    schema_: Literal["craik.instruction_promotion_review"] = Field(
+        default="craik.instruction_promotion_review",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    proposal_id: str
+    decision: InstructionPromotionDecision
+    decided_by: str
+    rationale: str
+    promoted_constraint_id: str | None = None
+    policy_envelope_id: str | None = None
+    receipt_ids: list[str] = Field(default_factory=list)
+    memory_proposal_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_decision_links(self) -> InstructionPromotionReview:
+        """Approved reviews must link the active promoted constraint."""
+        if self.decision == "approved" and not self.promoted_constraint_id:
+            raise ValueError("approved promotion reviews require promoted_constraint_id")
+        if self.decision != "approved" and self.promoted_constraint_id is not None:
+            raise ValueError("unapproved promotion reviews must not link active constraints")
         return self
 
 

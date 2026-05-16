@@ -17,6 +17,7 @@ from craik.contracts.models import (
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionPromotionReview,
     InstructionProvenance,
     InstructionSource,
     InstructionSourceRegistry,
@@ -24,6 +25,7 @@ from craik.contracts.models import (
     IntentLock,
     MemoryProposal,
     ProjectProfile,
+    PromotedInstructionConstraint,
     ReviewRequest,
     ReviewResult,
     RunOutput,
@@ -133,6 +135,12 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     distilled_instruction = DistilledInstructionProposal.model_validate(
         fixtures["craik.distilled_instruction_proposal"]
     )
+    promotion_review = InstructionPromotionReview.model_validate(
+        fixtures["craik.instruction_promotion_review"]
+    )
+    promoted_constraint = PromotedInstructionConstraint.model_validate(
+        fixtures["craik.promoted_instruction_constraint"]
+    )
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -161,6 +169,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_instruction_source_snapshot(instruction_snapshot)
     store.put_instruction_provenance(instruction_provenance)
     store.put_distilled_instruction_proposal(distilled_instruction)
+    store.put_instruction_promotion_review(promotion_review)
+    store.put_promoted_instruction_constraint(promoted_constraint)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -195,6 +205,11 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
         store.get_distilled_instruction_proposal(distilled_instruction.id)
         == distilled_instruction
     )
+    assert store.get_instruction_promotion_review(promotion_review.id) == promotion_review
+    assert (
+        store.get_promoted_instruction_constraint(promoted_constraint.id)
+        == promoted_constraint
+    )
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -218,6 +233,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_instruction_source_snapshots() == [instruction_snapshot]
     assert store.list_instruction_provenance() == [instruction_provenance]
     assert store.list_distilled_instruction_proposals() == [distilled_instruction]
+    assert store.list_instruction_promotion_reviews() == [promotion_review]
+    assert store.list_promoted_instruction_constraints() == [promoted_constraint]
 
 
 def test_persists_supported_contract_types(
@@ -235,6 +252,8 @@ def test_persists_supported_contract_types(
         "craik.debate_summary",
         "craik.debate_turn",
         "craik.distilled_instruction_proposal",
+        "craik.instruction_promotion_review",
+        "craik.promoted_instruction_constraint",
         "craik.review_request",
         "craik.review_result",
         "craik.adjudication_outcome",

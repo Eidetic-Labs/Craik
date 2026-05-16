@@ -101,3 +101,15 @@ the contradiction is reviewed. Preference and stale-risk disagreements are kept
 as reviewable proposals, but they do not automatically become contradiction
 reports because they may represent tolerable local variation rather than
 mutually exclusive runtime authority.
+
+## Promotion Reviews
+
+`craik.instruction_promotion_review` records approved, rejected, and deferred
+promotion decisions. Reviews link policy envelopes, receipts, memory proposals,
+and handoffs so promotion is auditable.
+
+Approved reviews create `craik.promoted_instruction_constraint` records. Active
+constraints retain the proposal ID, source ID, source snapshot ID, provenance
+IDs, evidence IDs, and review links. Rejected and deferred reviews do not create
+active constraints, and unapproved distilled proposals must not affect case-file
+or policy behavior.

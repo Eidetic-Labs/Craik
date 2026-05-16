@@ -45,6 +45,7 @@ craik schema show craik.task_request
 | `craik.handoff` | Summarizes durable run state for future agents. |
 | `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |
 | `craik.instruction_provenance` | Links distilled instruction material to source-level or line/range provenance. |
+| `craik.instruction_promotion_review` | Records approved, rejected, or deferred promotion decisions for distilled instructions. |
 | `craik.instruction_source` | Declares one runtime instruction source file or policy doc. |
 | `craik.instruction_source_registry` | Registers declared instruction sources for a project. |
 | `craik.instruction_source_snapshot` | Records source hash state for one observed instruction source. |
@@ -55,6 +56,7 @@ craik schema show craik.task_request
 | `craik.memory_proposal` | Describes reviewable memory updates. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
+| `craik.promoted_instruction_constraint` | Captures an approved distilled instruction as an active runtime constraint. |
 | `craik.review_request` | Requests bounded cross-agent review of worker results or debate summaries. |
 | `craik.review_result` | Captures specialist reviewer decisions, evidence, and preserved reviewer role kind. |
 | `craik.run_output` | Stores redacted observed output captured from one runner step. |

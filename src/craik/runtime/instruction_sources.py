@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from craik.contracts.models import (
     ContradictionReport,
     DistilledInstructionProposal,
+    InstructionPromotionDecision,
+    InstructionPromotionReview,
     InstructionProvenance,
     InstructionSourceSnapshot,
+    PromotedInstructionConstraint,
 )
 from craik.runtime.contradictions import ContradictionManager
 from craik.runtime.store import LocalStore
@@ -163,6 +168,77 @@ def detect_instruction_contradictions(
     return sorted(reports, key=lambda report: report.id)
 
 
+def review_instruction_promotion(
+    store: LocalStore,
+    *,
+    proposal_id: str,
+    decision: str,
+    decided_by: str,
+    rationale: str,
+    policy_envelope_id: str | None = None,
+    receipt_ids: list[str] | None = None,
+    memory_proposal_ids: list[str] | None = None,
+    handoff_ids: list[str] | None = None,
+) -> InstructionPromotionReview:
+    """Persist a promotion review and update the proposal/constraint state."""
+    proposal = store.get_distilled_instruction_proposal(proposal_id)
+    if proposal is None:
+        raise InstructionPromotionError(f"unknown distilled instruction proposal: {proposal_id}")
+    now = proposal.created_at
+    normalized_decision = cast(InstructionPromotionDecision, decision)
+    constraint_id = f"constraint_{proposal.id}" if normalized_decision == "approved" else None
+    if normalized_decision == "approved":
+        if proposal.snapshot_id is None:
+            raise InstructionPromotionError("approved promotions require source snapshot")
+        active_constraint_id = f"constraint_{proposal.id}"
+        constraint = PromotedInstructionConstraint(
+            id=active_constraint_id,
+            project_id=proposal.project_id,
+            proposal_id=proposal.id,
+            source_id=proposal.source_id,
+            snapshot_id=proposal.snapshot_id,
+            category=proposal.category,
+            statement=proposal.statement,
+            provenance_ids=proposal.provenance_ids,
+            evidence_ids=proposal.evidence_ids,
+            policy_envelope_id=policy_envelope_id,
+            receipt_ids=receipt_ids or [],
+            memory_proposal_ids=memory_proposal_ids or [],
+            handoff_ids=handoff_ids or [],
+            created_at=now,
+        )
+        store.put_promoted_instruction_constraint(constraint)
+    review = InstructionPromotionReview(
+        id=f"promotion_review_{proposal.id}",
+        project_id=proposal.project_id,
+        proposal_id=proposal.id,
+        decision=normalized_decision,
+        decided_by=decided_by,
+        rationale=rationale,
+        promoted_constraint_id=constraint_id,
+        policy_envelope_id=policy_envelope_id,
+        receipt_ids=receipt_ids or [],
+        memory_proposal_ids=memory_proposal_ids or [],
+        handoff_ids=handoff_ids or [],
+        created_at=now,
+    )
+    store.put_instruction_promotion_review(review)
+    updated = proposal.model_copy(
+        update={
+            "promotion_status": decision,
+            "promoted_constraint_id": constraint_id,
+            "decided_by": decided_by,
+            "decided_at": now,
+        }
+    )
+    store.put_distilled_instruction_proposal(
+        DistilledInstructionProposal.model_validate(
+            updated.model_dump(mode="json", by_alias=True)
+        )
+    )
+    return review
+
+
 def _bullet_lines(values: list[str]) -> list[str]:
     if not values:
         return ["  - None"]
@@ -220,6 +296,10 @@ def _normalized_negative(statement: str) -> str:
 
 def _normalize_statement(statement: str) -> str:
     return " ".join(statement.lower().rstrip(".").split())
+
+
+class InstructionPromotionError(RuntimeError):
+    """Raised when a distilled instruction cannot be reviewed for promotion."""
 
 
 def _stale_source_ids(
