@@ -46,6 +46,7 @@ project.
 - [Agent Roles](reference/agent-roles.md)
 - [Worker Results](reference/worker-results.md)
 - [Structured Debates](reference/debates.md)
+- [Cross-Agent Review](reference/cross-agent-review.md)
 - [Runner Adapter Contract](reference/runner-adapter-contract.md)
 - [Runner Step Contracts](reference/runner-step-contracts.md)
 - [Codex Runner Adapter](reference/codex-runner-adapter.md)

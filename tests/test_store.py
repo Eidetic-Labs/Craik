@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from craik.contracts.models import (
+    AdjudicationOutcome,
     Assumption,
     CapabilityReceipt,
     CaseFile,
@@ -17,6 +18,8 @@ from craik.contracts.models import (
     IntentLock,
     MemoryProposal,
     ProjectProfile,
+    ReviewRequest,
+    ReviewResult,
     RunOutput,
     TaskRequest,
     TaskRun,
@@ -97,6 +100,11 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     worker_result = WorkerResult.model_validate(fixtures["craik.worker_result"])
     debate_turn = DebateTurn.model_validate(fixtures["craik.debate_turn"])
     debate_summary = DebateSummary.model_validate(fixtures["craik.debate_summary"])
+    review_request = ReviewRequest.model_validate(fixtures["craik.review_request"])
+    review_result = ReviewResult.model_validate(fixtures["craik.review_result"])
+    adjudication = AdjudicationOutcome.model_validate(
+        fixtures["craik.adjudication_outcome"]
+    )
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -114,6 +122,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_worker_result(worker_result)
     store.put_debate_turn(debate_turn)
     store.put_debate_summary(debate_summary)
+    store.put_review_request(review_request)
+    store.put_review_result(review_result)
+    store.put_adjudication_outcome(adjudication)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -134,6 +145,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_worker_result(worker_result.id) == worker_result
     assert store.get_debate_turn(debate_turn.id) == debate_turn
     assert store.get_debate_summary(debate_summary.id) == debate_summary
+    assert store.get_review_request(review_request.id) == review_request
+    assert store.get_review_result(review_result.id) == review_result
+    assert store.get_adjudication_outcome(adjudication.id) == adjudication
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -146,6 +160,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_worker_results() == [worker_result]
     assert store.list_debate_turns() == [debate_turn]
     assert store.list_debate_summaries() == [debate_summary]
+    assert store.list_review_requests() == [review_request]
+    assert store.list_review_results() == [review_result]
+    assert store.list_adjudication_outcomes() == [adjudication]
 
 
 def test_persists_supported_contract_types(
@@ -162,6 +179,9 @@ def test_persists_supported_contract_types(
         "craik.contradiction_report",
         "craik.debate_summary",
         "craik.debate_turn",
+        "craik.review_request",
+        "craik.review_result",
+        "craik.adjudication_outcome",
         "craik.handoff",
         "craik.intent_lock",
         "craik.memory_proposal",
