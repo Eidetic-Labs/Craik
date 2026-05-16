@@ -40,6 +40,9 @@ DebateOutcome = Literal["agreement", "unresolved_disagreement", "contradiction_o
 ReviewRequestStatus = Literal["open", "completed", "cancelled"]
 ReviewDecision = Literal["approved", "changes_requested", "blocked", "deferred"]
 AdjudicationDecision = Literal["accepted", "rejected", "revised", "deferred"]
+HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
+HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
+ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -616,6 +619,101 @@ class AdjudicationOutcome(CraikModel):
         return self
 
 
+class HumanDelegationPoint(CraikModel):
+    """Human decision point that requires agent stop, clarification, or transfer."""
+
+    schema_: Literal["craik.human_delegation_point"] = Field(
+        default="craik.human_delegation_point",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    kind: HumanDelegationKind
+    status: HumanDelegationStatus = "open"
+    summary: str
+    requested_decision: str
+    requested_by: str
+    owner: str | None = None
+    role_id: str | None = None
+    intent_lock_id: str | None = None
+    policy_envelope_id: str | None = None
+    contradiction_ids: list[str] = Field(default_factory=list)
+    scope_change_request_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+    resolved_at: datetime | None = None
+    resolution: str | None = None
+
+    @model_validator(mode="after")
+    def validate_resolution(self) -> HumanDelegationPoint:
+        """Require resolution details when a delegation point is resolved."""
+        if self.status == "resolved" and not self.resolution:
+            raise ValueError("resolved delegation points require resolution text")
+        return self
+
+
+class ScopeChangeRequest(CraikModel):
+    """Request to change a task's accepted intent or authority boundary."""
+
+    schema_: Literal["craik.scope_change_request"] = Field(
+        default="craik.scope_change_request",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    intent_lock_id: str
+    requested_by: str
+    reason: str
+    current_scope: list[str] = Field(default_factory=list)
+    proposed_scope: list[str] = Field(default_factory=list)
+    policy_envelope_id: str | None = None
+    delegation_id: str | None = None
+    contradiction_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    status: ScopeChangeStatus = "pending"
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_scope_delta(self) -> ScopeChangeRequest:
+        """Require proposed scope for meaningful scope-change requests."""
+        if not self.proposed_scope:
+            raise ValueError("scope change requests require proposed scope")
+        return self
+
+
+class ScopeChangeResult(CraikModel):
+    """Human decision for a requested scope change."""
+
+    schema_: Literal["craik.scope_change_result"] = Field(
+        default="craik.scope_change_result",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    scope_change_request_id: str
+    decision: Literal["accepted", "rejected"]
+    decided_by: str
+    rationale: str
+    updated_intent_lock_id: str | None = None
+    policy_envelope_id: str | None = None
+    contradiction_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_accepted_scope_change(self) -> ScopeChangeResult:
+        """Accepted scope changes must point at the updated intent lock."""
+        if self.decision == "accepted" and not self.updated_intent_lock_id:
+            raise ValueError("accepted scope changes require updated_intent_lock_id")
+        return self
+
+
 class RunnerStepRequest(CraikModel):
     """Normalized input for one governed runner loop step."""
 
@@ -980,6 +1078,9 @@ class Handoff(CraikModel):
     contradictions_opened: list[str] = Field(default_factory=list)
     adjudication_ids: list[str] = Field(default_factory=list)
     unresolved_disagreements: list[str] = Field(default_factory=list)
+    open_human_delegation_ids: list[str] = Field(default_factory=list)
+    scope_change_request_ids: list[str] = Field(default_factory=list)
+    scope_change_result_ids: list[str] = Field(default_factory=list)
     risks: list[str] = Field(default_factory=list)
     next_steps: list[str] = Field(default_factory=list)
     receipt_ids: list[str] = Field(default_factory=list)
