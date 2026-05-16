@@ -204,6 +204,14 @@ Options:
 
 - `--task-id <id>`: only export graph objects for this task.
 
+## `craik run list`
+
+List persisted single-agent runs.
+
+Options:
+
+- `--task-id <id>`: only include runs for one task.
+
 ## `craik run inspect <run-id-or-task-id>`
 
 Inspect a persisted single-agent run. The command prints the task run, linked

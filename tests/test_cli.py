@@ -5,7 +5,13 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from craik.cli import app, package_version
-from craik.contracts.models import CapabilityReceipt, ReceiptResult
+from craik.contracts.models import (
+    CapabilityReceipt,
+    ReceiptResult,
+    RunOutput,
+    TaskRun,
+    TaskRunStatus,
+)
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.receipts import ReceiptStore
 from craik.runtime.store import LocalStore
@@ -601,6 +607,64 @@ def test_receipts_show_reports_missing_receipt(tmp_path: Path) -> None:
     assert "unknown receipt: receipt_missing" in result.output
 
 
+def test_run_commands_inspect_persisted_run_state(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="interrupted")
+
+    listed = runner.invoke(app, ["run", "list"], env={"CRAIK_HOME": str(home)})
+    shown = runner.invoke(
+        app,
+        ["run", "inspect", "run_docs", "--include-outputs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert listed.exit_code == 0
+    assert shown.exit_code == 0
+    assert [item["id"] for item in json.loads(listed.stdout)] == ["run_docs"]
+    payload = json.loads(shown.stdout)
+    assert payload["run"]["id"] == "run_docs"
+    assert payload["next_allowed_action"] == "recover from the last safe boundary"
+    assert payload["outputs"][0]["observed_output"] == {"status": "interrupted"}
+    assert payload["receipts"][0]["id"] == "receipt_docs"
+
+
+def test_run_recover_prints_plan_for_interrupted_run(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="interrupted")
+
+    result = runner.invoke(
+        app,
+        ["run", "recover", "task_docs", "--dry-run", "--reason", "continue docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["recoverable"] is True
+    assert payload["dry_run"] is True
+    assert payload["resume_phase"] == "continue"
+    assert payload["required_checks"] == [
+        "reload task run state",
+        "re-check policy grants",
+        "re-check intent-lock stop conditions",
+        "verify max-iteration budget",
+    ]
+
+
+def test_run_recover_refuses_non_interrupted_run(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="completed")
+
+    result = runner.invoke(
+        app,
+        ["run", "recover", "run_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code != 0
+    assert "only interrupted runs can be recovered" in result.output
+
+
 def _run_git(repo, *args: str) -> None:
     import subprocess
 
@@ -623,6 +687,50 @@ def _seed_receipt(home: Path, receipt: CapabilityReceipt) -> None:
     try:
         store.initialize()
         ReceiptStore(store).record_receipt(receipt)
+    finally:
+        store.close()
+
+
+def _seed_run_state(home: Path, *, status: TaskRunStatus) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(home)})
+    store = LocalStore.from_paths(paths)
+    try:
+        store.initialize()
+        store.put_task_run(
+            TaskRun(
+                id="run_docs",
+                task_id="task_docs",
+                case_file_id="case_docs",
+                policy_envelope_id="policy_docs",
+                runner_id="runner_fixture",
+                runner_mode="fixture",
+                status=status,
+                phase="evaluate",
+                iteration=2,
+                max_iterations=5,
+                started_at=datetime(2026, 5, 16, 12, 0, tzinfo=UTC),
+                phase_started_at=datetime(2026, 5, 16, 12, 1, tzinfo=UTC),
+                updated_at=datetime(2026, 5, 16, 12, 2, tzinfo=UTC),
+                ended_at=datetime(2026, 5, 16, 12, 2, tzinfo=UTC),
+                stop_reason=f"run {status}",
+                receipt_ids=["receipt_docs"],
+                runner_metadata=[{"runner_id": "runner_fixture", "execution_mode": "fixture"}],
+            )
+        )
+        store.put_run_output(
+            RunOutput(
+                id="runout_docs",
+                run_id="run_docs",
+                step_result_id="runner_step_result_docs",
+                task_id="task_docs",
+                phase="evaluate",
+                summary="Run output.",
+                observed_output={"status": status},
+                receipt_ids=["receipt_docs"],
+                created_at=datetime(2026, 5, 16, 12, 2, tzinfo=UTC),
+            )
+        )
+        ReceiptStore(store).record_receipt(_receipt("receipt_docs", task_id="task_docs"))
     finally:
         store.close()
 
