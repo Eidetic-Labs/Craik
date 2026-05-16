@@ -16,7 +16,7 @@ $CRAIK_HOME/state/craik.sqlite3
 
 The local store is the persistence foundation for local and degraded operation. Users who opt out of Stigmem can still keep durable local records for projects, tasks, receipts, handoffs, memory proposals, assumptions, evidence, and work graph events.
 
-This is not full Stigmem-equivalent shared memory. Local SQLite is single-node state. It does not provide federation, shared team truth, source attestation, or cross-node conflict resolution. The user-facing local memory backend is implemented separately from this storage substrate.
+This is not full Stigmem-equivalent shared memory. Local SQLite is single-node state. It does not provide federation, shared team truth, source attestation, or cross-node conflict resolution. The user-facing local memory backend uses local memory proposals and exposes approved proposals as searchable local facts.
 
 ## Stored Records
 

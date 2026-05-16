@@ -285,6 +285,56 @@ def test_handoff_commands_create_and_show_json_and_markdown(tmp_path: Path) -> N
     assert "- [x] Validation recorded" in shown.stdout
 
 
+def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+
+    proposed = runner.invoke(
+        app,
+        [
+            "memory",
+            "propose",
+            "task_docs",
+            "--entity",
+            "repo:example",
+            "--relation",
+            "craik:memory",
+            "--value",
+            "Local proposals require review.",
+            "--source",
+            "README.md",
+            "--evidence-source",
+            "README.md",
+            "--evidence-locator",
+            "README.md#memory",
+            "--evidence-summary",
+            "README documents local proposals.",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    proposal_id = json.loads(proposed.stdout)["id"]
+    approved = runner.invoke(
+        app,
+        ["memory", "approve", proposal_id, "--decided-by", "user:reviewer"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    listed = runner.invoke(
+        app,
+        ["memory", "list", "--task-id", "task_docs", "--status", "approved"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    searched = runner.invoke(
+        app,
+        ["memory", "search", "local proposals"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert proposed.exit_code == 0
+    assert approved.exit_code == 0
+    assert json.loads(approved.stdout)["status"] == "approved"
+    assert [proposal["id"] for proposal in json.loads(listed.stdout)] == [proposal_id]
+    assert json.loads(searched.stdout)[0]["value"] == "Local proposals require review."
+
+
 def test_policy_show_defaults_to_strict() -> None:
     result = runner.invoke(app, ["policy", "show"])
 

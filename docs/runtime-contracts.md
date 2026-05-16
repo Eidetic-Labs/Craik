@@ -286,7 +286,11 @@ Agents propose memory updates through a reviewable structure.
     "trust_class": "observed|reported|inferred|policy|external|stale-risk"
   },
   "evidence": [],
-  "requires_approval": false
+  "requires_approval": true,
+  "status": "pending|approved|rejected",
+  "decision_reason": null,
+  "decided_by": null,
+  "decided_at": null
 }
 ```
 
