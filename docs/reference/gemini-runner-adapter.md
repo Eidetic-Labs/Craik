@@ -48,6 +48,14 @@ request = request_from_compiled_prompt(
 )
 ```
 
+## Smoke Test
+
+Use the workflow in [Runner Preview Workflows](../guides/runner-preview-workflows.md)
+to run completed, blocked, and failed fixture paths. Check
+`outputs.runner_metadata`, `outputs.receipt_inputs`, and
+`outputs.handoff_input` before promoting any adapter output into receipts or
+handoffs.
+
 ## Limitations
 
 The preview adapter does not invoke an external Gemini process or verify Gemini

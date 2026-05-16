@@ -33,6 +33,7 @@ project.
 - [Contradiction Inbox](guides/contradiction-inbox.md)
 - [Connecting Stigmem](guides/connecting-stigmem.md)
 - [Running Policy Tests](guides/running-policy-tests.md)
+- [Runner Preview Workflows](guides/runner-preview-workflows.md)
 - [Development Checks](guides/development.md)
 
 ## Reference

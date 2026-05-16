@@ -54,3 +54,6 @@ need explicit grants for side effects, and unsupported runner capabilities shoul
 not be requested. Omitted context, assumptions, and stale risks are surfaced so a
 runner can stop or ask for more context instead of treating missing context as
 evidence.
+
+See [Runner Preview Workflows](../guides/runner-preview-workflows.md) for the
+full compile, fixture, receipt, and handoff flow.
