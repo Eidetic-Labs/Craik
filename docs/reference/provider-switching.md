@@ -51,3 +51,6 @@ Provider routing should check budget and quota status before dispatch. See
 Provider routing may fall back to another provider only through an explicit
 [Provider Failover](provider-failover.md) policy that preserves policy envelope
 boundaries and records the failover decision for audit.
+
+For the full provider, MCP, sandbox, and receipt workflow, see
+[Provider Routing And Sandboxes](../guides/provider-routing.md).
