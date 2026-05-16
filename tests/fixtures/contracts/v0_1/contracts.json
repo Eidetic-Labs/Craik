@@ -425,6 +425,78 @@
     },
     "policies": ["policy_no_adr_edits"]
   },
+  "craik.runner_adapter_request": {
+    "schema": "craik.runner_adapter_request",
+    "version": "0.1.0",
+    "id": "runner_request_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "runner": {
+      "schema": "craik.runner_metadata",
+      "version": "0.1.0",
+      "id": "runner_fixture",
+      "name": "Fixture Runner",
+      "adapter": "fixture",
+      "adapter_version": "0.1.0",
+      "mode": "fixture",
+      "capabilities": ["prompt.read", "result.structured"],
+      "metadata": {
+        "contract_test": true
+      }
+    },
+    "task_request_id": "task_docs_reconcile",
+    "case_file_id": "case_docs_reconcile",
+    "policy_envelope_id": "policy_docs_reconcile",
+    "capability_grant_ids": ["grant_repo_read"],
+    "expected_output_schemas": ["craik.runner_adapter_result", "craik.handoff"],
+    "context": {
+      "prompt": "Review docs against implementation state."
+    },
+    "created_at": "2026-05-16T03:30:00Z"
+  },
+  "craik.runner_adapter_result": {
+    "schema": "craik.runner_adapter_result",
+    "version": "0.1.0",
+    "id": "runner_result_docs_reconcile",
+    "request_id": "runner_request_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "runner": {
+      "schema": "craik.runner_metadata",
+      "version": "0.1.0",
+      "id": "runner_fixture",
+      "name": "Fixture Runner",
+      "adapter": "fixture",
+      "adapter_version": "0.1.0",
+      "mode": "fixture",
+      "capabilities": ["prompt.read", "result.structured"],
+      "metadata": {
+        "contract_test": true
+      }
+    },
+    "status": "completed",
+    "summary": "Fixture runner produced normalized output.",
+    "outputs": {
+      "handoff_summary": "Docs review completed."
+    },
+    "receipt_ids": ["receipt_runner_fixture"],
+    "handoff_id": "handoff_docs_reconcile",
+    "memory_proposal_ids": ["memprop_docs_reconcile"],
+    "artifacts": ["case_docs_reconcile"],
+    "diagnostics": [],
+    "created_at": "2026-05-16T03:31:00Z"
+  },
+  "craik.runner_metadata": {
+    "schema": "craik.runner_metadata",
+    "version": "0.1.0",
+    "id": "runner_fixture",
+    "name": "Fixture Runner",
+    "adapter": "fixture",
+    "adapter_version": "0.1.0",
+    "mode": "fixture",
+    "capabilities": ["prompt.read", "result.structured"],
+    "metadata": {
+      "contract_test": true
+    }
+  },
   "craik.task_request": {
     "schema": "craik.task_request",
     "version": "0.1.0",
