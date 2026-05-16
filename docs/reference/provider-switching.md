@@ -47,3 +47,7 @@ Unsupported modes are rejected before a selection payload is produced.
 
 Provider routing should check budget and quota status before dispatch. See
 [Model Providers](model-providers.md) for budget and quota decision behavior.
+
+Provider routing may fall back to another provider only through an explicit
+[Provider Failover](provider-failover.md) policy that preserves policy envelope
+boundaries and records the failover decision for audit.
