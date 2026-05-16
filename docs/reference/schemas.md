@@ -39,11 +39,13 @@ craik schema show craik.task_request
 | `craik.compiled_prompt` | Captures a deterministic policy-aware runner prompt. |
 | `craik.contradiction_report` | Captures incompatible assertions for review. |
 | `craik.context_debt_record` | Tracks omitted, stale, unresolved, or missing context with owner and next action. |
+| `craik.context_request` | Requests missing context and links it to handoffs, recovery, or unknowns. |
 | `craik.debate_summary` | Summarizes agreement, unresolved disagreement, or contradiction escalation for a bounded agent debate. |
 | `craik.debate_turn` | Captures one role-linked debate contribution with evidence, assumptions, and contradiction links. |
 | `craik.distilled_instruction_proposal` | Captures a reviewable instruction distilled from declared instruction sources. |
 | `craik.evidence_coverage_score` | Scores whether expected evidence links are present for a handoff or output. |
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
+| `craik.exit_discipline_check` | Verifies validation, handoff, risks, next steps, and context links before exit. |
 | `craik.handoff` | Summarizes durable run state for future agents. |
 | `craik.handoff_quality_score` | Scores handoff completeness, validation, evidence links, debt, and risks. |
 | `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |
