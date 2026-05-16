@@ -82,3 +82,15 @@ craik policy show --profile automation
 Fail-open profile use is visible in the policy envelope immediately. Later runtime layers must also preserve it in case files, receipts, and handoffs.
 
 Capability grants are evaluated separately from profile generation. Profiles define default allowed, denied, approval, and verification sets; grants authorize specific side-effect requests.
+
+## Regression Gate
+
+Run the policy regression harness before release-sensitive changes:
+
+```sh
+craik policy test
+```
+
+The gate verifies immutable path protection, memory proposal defaults,
+trusted-local fail-open receipts, automation fail-closed behavior, runner grant
+boundary tracking, and redaction for policy-relevant payload shapes.

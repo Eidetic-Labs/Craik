@@ -12,5 +12,6 @@ Current limitations:
 - Handoffs currently derive context debt from local case files only; they do not yet include runner result normalization or remote artifact upload.
 - Agent onboarding summarizes local state and configured Stigmem environment presence, but it does not perform live Stigmem backend discovery.
 - Case files currently load local project/task/repo/docs context and read-only GitHub state when configured; Stigmem facts, recent handoffs, and local contradiction report loading are not wired into case assembly yet.
+- Policy tests cover current policy primitives and keep runner grant boundaries visible, but runner adapters are not implemented yet.
 - The CLI does not request tool authority or write runtime state.
 - Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.

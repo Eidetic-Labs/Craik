@@ -88,10 +88,12 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Stigmem Compatibility](docs/reference/stigmem-compatibility.md)
 - [Fail-Open](docs/guides/fail-open.md)
 - [Capability Grants](docs/guides/capability-grants.md)
+- [Running Policy Tests](docs/guides/running-policy-tests.md)
 - [Redaction](docs/reference/redaction.md)
 - [Local State Layout](docs/reference/local-state.md)
 - [Local Store](docs/reference/local-store.md)
 - [Project Profile](docs/reference/project-profile.md)
+- [Policy Tests](docs/reference/policy-tests.md)
 - [GitHub Config](docs/reference/github-config.md)
 - [Graph Export](docs/reference/graph-export.md)
 - [Self-Audit](docs/reference/self-audit.md)
@@ -102,7 +104,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
-The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, agent onboarding, read-only GitHub context, work graph export, handoff writing, local contradiction reports, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
+The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, agent onboarding, read-only GitHub context, work graph export, handoff writing, local contradiction reports, policy profile generation, policy regression tests, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 

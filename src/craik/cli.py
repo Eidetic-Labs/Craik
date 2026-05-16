@@ -56,6 +56,7 @@ from craik.runtime.policy import (
     fail_open_receipt,
     generate_policy_envelope,
 )
+from craik.runtime.policy_tests import PolicyTestHarness
 from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
 from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.store import LocalStore
@@ -986,6 +987,22 @@ def policy_show(
         )
         payload["receipt"] = receipt.model_dump(mode="json", by_alias=True)
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@policy_app.command("test")
+def policy_test() -> None:
+    """Run policy regression checks required for release gates."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        report = PolicyTestHarness(store).run()
+    finally:
+        store.close()
+
+    payload = report.to_payload()
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+    if report.status != "passed":
+        raise typer.Exit(code=1)
 
 
 @receipts_app.command("list")
