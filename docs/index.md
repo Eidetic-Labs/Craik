@@ -73,6 +73,7 @@ project.
 - [Gateway Receipts](reference/gateway-receipts.md)
 - [Model Providers](reference/model-providers.md)
 - [Provider Switching](reference/provider-switching.md)
+- [Provider Failover](reference/provider-failover.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
