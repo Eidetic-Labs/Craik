@@ -343,6 +343,53 @@
     "memory_proposal_ids": [],
     "created_at": "2026-05-15T22:50:00Z"
   },
+  "craik.handoff_quality_score": {
+    "schema": "craik.handoff_quality_score",
+    "version": "0.1.0",
+    "id": "handoff_quality_handoff_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "handoff_id": "handoff_docs_reconcile",
+    "score": 1.0,
+    "band": "excellent",
+    "components": [
+      {
+        "name": "summary",
+        "score": 1.0,
+        "weight": 0.12,
+        "rationale": "Handoff includes a summary."
+      },
+      {
+        "name": "validation_records",
+        "score": 1.0,
+        "weight": 0.18,
+        "rationale": "Handoff records validation and self-audit confirms it."
+      },
+      {
+        "name": "receipt_links",
+        "score": 1.0,
+        "weight": 0.14,
+        "rationale": "Handoff links receipts and self-audit confirms review."
+      }
+    ],
+    "blocking_reasons": [],
+    "created_at": "2026-05-16T08:50:00Z"
+  },
+  "craik.evidence_coverage_score": {
+    "schema": "craik.evidence_coverage_score",
+    "version": "0.1.0",
+    "id": "evidence_coverage_handoff_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "handoff_id": "handoff_docs_reconcile",
+    "score": 1.0,
+    "band": "excellent",
+    "evidence_ids": ["receipt_pytest", "evidence_readme_status"],
+    "required_evidence_ids": ["receipt_pytest", "evidence_readme_status"],
+    "missing_evidence_ids": [],
+    "weak_claims": [],
+    "created_at": "2026-05-16T08:50:00Z"
+  },
   "craik.intent_lock": {
     "schema": "craik.intent_lock",
     "version": "0.1.0",

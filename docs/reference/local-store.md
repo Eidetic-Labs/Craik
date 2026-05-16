@@ -49,8 +49,10 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `memory_previews` | `craik.memory_impact_preview` |
 | `assumptions` | `craik.assumption` |
 | `evidence` | `craik.evidence_reference` |
+| `evidence_coverage_scores` | `craik.evidence_coverage_score` |
 | `graph_exports` | `craik.work_graph_export` |
 | `graph_events` | `craik.work_graph_event` |
+| `handoff_quality_scores` | `craik.handoff_quality_score` |
 | `worker_results` | `craik.worker_result` |
 | `review_requests` | `craik.review_request` |
 | `review_results` | `craik.review_result` |

@@ -14,8 +14,10 @@ from craik.contracts.models import (
     DebateSummary,
     DebateTurn,
     DistilledInstructionProposal,
+    EvidenceCoverageScore,
     EvidenceReference,
     Handoff,
+    HandoffQualityScore,
     HumanDelegationPoint,
     InstructionPromotionReview,
     InstructionProvenance,
@@ -109,6 +111,12 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     contradiction = ContradictionReport.model_validate(fixtures["craik.contradiction_report"])
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
+    handoff_quality_score = HandoffQualityScore.model_validate(
+        fixtures["craik.handoff_quality_score"]
+    )
+    evidence_coverage_score = EvidenceCoverageScore.model_validate(
+        fixtures["craik.evidence_coverage_score"]
+    )
     event = WorkGraphEvent.model_validate(fixtures["craik.work_graph_event"])
     export = WorkGraphExport.model_validate(fixtures["craik.work_graph_export"])
     worker_result = WorkerResult.model_validate(fixtures["craik.worker_result"])
@@ -163,6 +171,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_contradiction(contradiction)
     store.put_assumption(assumption)
     store.put_evidence(evidence)
+    store.put_handoff_quality_score(handoff_quality_score)
+    store.put_evidence_coverage_score(evidence_coverage_score)
     store.put_graph_event(event)
     store.put_contract(export)
     store.put_worker_result(worker_result)
@@ -200,6 +210,11 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_contradiction(contradiction.id) == contradiction
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
+    assert store.get_handoff_quality_score(handoff_quality_score.id) == handoff_quality_score
+    assert (
+        store.get_evidence_coverage_score(evidence_coverage_score.id)
+        == evidence_coverage_score
+    )
     assert store.get_graph_event(event.id) == event
     assert store.get_contract("craik.work_graph_export", export.id) == export
     assert store.get_worker_result(worker_result.id) == worker_result
@@ -236,6 +251,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_contradictions() == [contradiction]
     assert store.list_assumptions() == [assumption]
     assert store.list_evidence() == [evidence]
+    assert store.list_handoff_quality_scores() == [handoff_quality_score]
+    assert store.list_evidence_coverage_scores() == [evidence_coverage_score]
     assert store.list_graph_events() == [event]
     assert store.list_worker_results() == [worker_result]
     assert store.list_debate_turns() == [debate_turn]
@@ -274,7 +291,9 @@ def test_persists_supported_contract_types(
         "craik.debate_summary",
         "craik.debate_turn",
         "craik.distilled_instruction_proposal",
+        "craik.evidence_coverage_score",
         "craik.instruction_promotion_review",
+        "craik.handoff_quality_score",
         "craik.promoted_instruction_constraint",
         "craik.red_team_finding",
         "craik.recovery_session",

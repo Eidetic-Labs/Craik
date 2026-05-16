@@ -41,8 +41,10 @@ craik schema show craik.task_request
 | `craik.debate_summary` | Summarizes agreement, unresolved disagreement, or contradiction escalation for a bounded agent debate. |
 | `craik.debate_turn` | Captures one role-linked debate contribution with evidence, assumptions, and contradiction links. |
 | `craik.distilled_instruction_proposal` | Captures a reviewable instruction distilled from declared instruction sources. |
+| `craik.evidence_coverage_score` | Scores whether expected evidence links are present for a handoff or output. |
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
 | `craik.handoff` | Summarizes durable run state for future agents. |
+| `craik.handoff_quality_score` | Scores handoff completeness, validation, evidence links, debt, and risks. |
 | `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |
 | `craik.instruction_provenance` | Links distilled instruction material to source-level or line/range provenance. |
 | `craik.instruction_promotion_review` | Records approved, rejected, or deferred promotion decisions for distilled instructions. |
