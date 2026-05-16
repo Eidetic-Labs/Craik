@@ -49,6 +49,7 @@ project.
 - [Cross-Agent Review](reference/cross-agent-review.md)
 - [Context Debt](reference/context-debt.md)
 - [Tool Attestations And Freshness](reference/freshness.md)
+- [Known Traps And Negative Knowledge](reference/known-traps.md)
 - [Human Delegation](reference/human-delegation.md)
 - [Instruction Sources](reference/instruction-sources.md)
 - [Instruction Distillation Workflow](reference/instruction-distillation-workflow.md)

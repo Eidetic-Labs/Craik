@@ -36,9 +36,11 @@ from craik.contracts.models import (
     InstructionSourceSnapshot,
     IntentLock,
     KnowledgeFreshnessProbe,
+    KnownTrap,
     MemoryDiff,
     MemoryImpactPreview,
     MemoryProposal,
+    NegativeKnowledge,
     PolicyEnvelope,
     ProjectProfile,
     PromotedInstructionConstraint,
@@ -89,7 +91,9 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.instruction_source_snapshot": "instruction_source_snapshots",
     "craik.intent_lock": "intent_locks",
     "craik.knowledge_freshness_probe": "knowledge_freshness_probes",
+    "craik.known_trap": "known_traps",
     "craik.memory_proposal": "proposals",
+    "craik.negative_knowledge": "negative_knowledge",
     "craik.memory_diff": "memory_diffs",
     "craik.memory_impact_preview": "memory_previews",
     "craik.assumption": "assumptions",
@@ -635,6 +639,26 @@ class LocalStore:
             KnowledgeFreshnessProbe,
             self.list_contracts("craik.knowledge_freshness_probe"),
         )
+
+    def put_known_trap(self, trap: KnownTrap) -> None:
+        self.put_contract(trap)
+
+    def get_known_trap(self, trap_id: str) -> KnownTrap | None:
+        contract = self.get_contract("craik.known_trap", trap_id)
+        return _cast_optional(KnownTrap, contract)
+
+    def list_known_traps(self) -> list[KnownTrap]:
+        return _cast_list(KnownTrap, self.list_contracts("craik.known_trap"))
+
+    def put_negative_knowledge(self, knowledge: NegativeKnowledge) -> None:
+        self.put_contract(knowledge)
+
+    def get_negative_knowledge(self, knowledge_id: str) -> NegativeKnowledge | None:
+        contract = self.get_contract("craik.negative_knowledge", knowledge_id)
+        return _cast_optional(NegativeKnowledge, contract)
+
+    def list_negative_knowledge(self) -> list[NegativeKnowledge]:
+        return _cast_list(NegativeKnowledge, self.list_contracts("craik.negative_knowledge"))
 
     def put_handoff(self, handoff: Handoff) -> None:
         self.put_contract(handoff)

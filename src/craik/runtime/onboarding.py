@@ -21,6 +21,7 @@ from craik.runtime.instruction_sources import (
     active_instruction_context,
     instruction_stale_risk_warnings,
 )
+from craik.runtime.known_traps import known_trap_summaries
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.project_registry import ProjectRegistry
 from craik.runtime.redaction import redact
@@ -96,7 +97,7 @@ class AgentOnboardingBuilder:
             stale_risk_warnings=stale_warnings,
             validation_commands=_validation_commands(Path(project.repo.local_path)),
             stigmem_backend_status=_stigmem_backend_status(project),
-            known_traps=_known_traps(project),
+            known_traps=[*_known_traps(project), *known_trap_summaries(self.store, project.id)],
             allowed_next_actions=_allowed_next_actions(tasks, contradictions),
             created_at=datetime.now(UTC),
         )

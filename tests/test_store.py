@@ -27,7 +27,9 @@ from craik.contracts.models import (
     InstructionSourceSnapshot,
     IntentLock,
     KnowledgeFreshnessProbe,
+    KnownTrap,
     MemoryProposal,
+    NegativeKnowledge,
     ProjectProfile,
     PromotedInstructionConstraint,
     RecoverySession,
@@ -116,6 +118,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     freshness_probe = KnowledgeFreshnessProbe.model_validate(
         fixtures["craik.knowledge_freshness_probe"]
     )
+    known_trap = KnownTrap.model_validate(fixtures["craik.known_trap"])
+    negative_knowledge = NegativeKnowledge.model_validate(fixtures["craik.negative_knowledge"])
     proposal = MemoryProposal.model_validate(fixtures["craik.memory_proposal"])
     contradiction = ContradictionReport.model_validate(fixtures["craik.contradiction_report"])
     context_debt = ContextDebtRecord.model_validate(fixtures["craik.context_debt_record"])
@@ -179,6 +183,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_intent_lock(intent_lock)
     store.put_tool_result_attestation(attestation)
     store.put_knowledge_freshness_probe(freshness_probe)
+    store.put_known_trap(known_trap)
+    store.put_negative_knowledge(negative_knowledge)
     store.put_proposal(proposal)
     store.put_contradiction(contradiction)
     store.put_context_debt_record(context_debt)
@@ -221,6 +227,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_intent_lock(intent_lock.id) == intent_lock
     assert store.get_tool_result_attestation(attestation.id) == attestation
     assert store.get_knowledge_freshness_probe(freshness_probe.id) == freshness_probe
+    assert store.get_known_trap(known_trap.id) == known_trap
+    assert store.get_negative_knowledge(negative_knowledge.id) == negative_knowledge
     assert store.get_proposal(proposal.id) == proposal
     assert store.get_contradiction(contradiction.id) == contradiction
     assert store.get_context_debt_record(context_debt.id) == context_debt
@@ -265,6 +273,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_intent_locks() == [intent_lock]
     assert store.list_tool_result_attestations() == [attestation]
     assert store.list_knowledge_freshness_probes() == [freshness_probe]
+    assert store.list_known_traps() == [known_trap]
+    assert store.list_negative_knowledge() == [negative_knowledge]
     assert store.list_proposals() == [proposal]
     assert store.list_contradictions() == [contradiction]
     assert store.list_context_debt_records() == [context_debt]
@@ -332,7 +342,9 @@ def test_persists_supported_contract_types(
         "craik.handoff",
         "craik.intent_lock",
         "craik.knowledge_freshness_probe",
+        "craik.known_trap",
         "craik.memory_proposal",
+        "craik.negative_knowledge",
         "craik.assumption",
         "craik.evidence_reference",
         "craik.work_graph_export",

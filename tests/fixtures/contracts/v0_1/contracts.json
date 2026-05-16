@@ -532,6 +532,37 @@
     "stale_risk_warning": null,
     "evidence_ids": ["evidence_readme_status"]
   },
+  "craik.known_trap": {
+    "schema": "craik.known_trap",
+    "version": "0.1.0",
+    "id": "trap_stale_github_state",
+    "project_id": "project_stigmem",
+    "task_id": "task_docs_reconcile",
+    "kind": "tool",
+    "status": "active",
+    "statement": "GitHub state can become stale during a run.",
+    "avoidance": "Refresh issue and pull request state before relying on it.",
+    "evidence_ids": ["evidence_readme_status"],
+    "handoff_ids": ["handoff_docs_reconcile"],
+    "contradiction_ids": [],
+    "created_at": "2026-05-16T09:40:00Z",
+    "expires_at": "2026-05-17T09:40:00Z"
+  },
+  "craik.negative_knowledge": {
+    "schema": "craik.negative_knowledge",
+    "version": "0.1.0",
+    "id": "negative_no_runtime_ui",
+    "project_id": "project_stigmem",
+    "task_id": "task_docs_reconcile",
+    "statement": "No runtime UI implementation is present in the fixture scope.",
+    "scope": "repository",
+    "trust_class": "observed",
+    "evidence_ids": ["evidence_readme_status"],
+    "handoff_ids": ["handoff_docs_reconcile"],
+    "contradiction_ids": [],
+    "created_at": "2026-05-16T09:40:00Z",
+    "expires_at": "2026-05-17T09:40:00Z"
+  },
   "craik.memory_proposal": {
     "schema": "craik.memory_proposal",
     "version": "0.1.0",
