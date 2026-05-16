@@ -1,0 +1,131 @@
+"""Task run state helpers for governed single-agent execution."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import UTC, datetime
+
+from craik.contracts.models import RunnerMode, TaskRun, TaskRunPhase, TaskRunStatus
+from craik.runtime.store import LocalStore
+
+TERMINAL_RUN_STATUSES: frozenset[TaskRunStatus] = frozenset(
+    {"completed", "blocked", "failed", "interrupted"}
+)
+
+
+class TaskRunError(RuntimeError):
+    """Base error for task run state failures."""
+
+
+class TaskRunNotFoundError(TaskRunError):
+    """Raised when a task run cannot be found."""
+
+
+class TaskRunTransitionError(TaskRunError):
+    """Raised when a run transition would make state inconsistent."""
+
+
+class TaskRunIterationLimitError(TaskRunTransitionError):
+    """Raised when a transition exceeds a run iteration limit."""
+
+
+@dataclass(frozen=True)
+class RunTransition:
+    """Requested run state mutation."""
+
+    status: TaskRunStatus | None = None
+    phase: TaskRunPhase | None = None
+    iteration: int | None = None
+    receipt_id: str | None = None
+    handoff_id: str | None = None
+    stop_reason: str | None = None
+    at: datetime | None = None
+
+
+class TaskRunManager:
+    """Create and update durable task run state."""
+
+    def __init__(self, store: LocalStore) -> None:
+        self.store = store
+
+    def create(
+        self,
+        *,
+        task_id: str,
+        case_file_id: str,
+        policy_envelope_id: str,
+        runner_id: str,
+        runner_mode: RunnerMode,
+        intent_lock_id: str | None = None,
+        run_id: str | None = None,
+        max_iterations: int = 5,
+        runner_metadata: list[dict[str, object]] | None = None,
+        created_at: datetime | None = None,
+    ) -> TaskRun:
+        now = created_at or datetime.now(UTC)
+        run = TaskRun(
+            id=run_id or task_run_id(task_id),
+            task_id=task_id,
+            case_file_id=case_file_id,
+            policy_envelope_id=policy_envelope_id,
+            intent_lock_id=intent_lock_id,
+            runner_id=runner_id,
+            runner_mode=runner_mode,
+            max_iterations=max_iterations,
+            started_at=now,
+            phase_started_at=now,
+            updated_at=now,
+            runner_metadata=list(runner_metadata or []),
+        )
+        self.store.put_task_run(run)
+        return run
+
+    def get(self, run_id: str) -> TaskRun | None:
+        return self.store.get_task_run(run_id)
+
+    def require(self, run_id: str) -> TaskRun:
+        run = self.get(run_id)
+        if run is None:
+            raise TaskRunNotFoundError(f"unknown task run: {run_id}")
+        return run
+
+    def transition(self, run_id: str, transition: RunTransition) -> TaskRun:
+        run = self.require(run_id)
+        if run.status in TERMINAL_RUN_STATUSES:
+            raise TaskRunTransitionError(f"task run is already terminal: {run_id}")
+
+        now = transition.at or datetime.now(UTC)
+        status = transition.status or run.status
+        phase = transition.phase or run.phase
+        iteration = transition.iteration if transition.iteration is not None else run.iteration
+
+        if iteration > run.max_iterations:
+            message = f"task run iteration {iteration} exceeds max {run.max_iterations}"
+            raise TaskRunIterationLimitError(message)
+
+        receipt_ids = list(run.receipt_ids)
+        if transition.receipt_id is not None and transition.receipt_id not in receipt_ids:
+            receipt_ids.append(transition.receipt_id)
+
+        ended_at = now if status in TERMINAL_RUN_STATUSES else run.ended_at
+        phase_started_at = now if phase != run.phase else run.phase_started_at
+        updated = run.model_copy(
+            update={
+                "status": status,
+                "phase": phase,
+                "iteration": iteration,
+                "phase_started_at": phase_started_at,
+                "updated_at": now,
+                "ended_at": ended_at,
+                "stop_reason": transition.stop_reason or run.stop_reason,
+                "receipt_ids": receipt_ids,
+                "handoff_id": transition.handoff_id or run.handoff_id,
+            }
+        )
+        self.store.put_task_run(updated)
+        return updated
+
+
+def task_run_id(task_id: str) -> str:
+    """Return the deterministic default run id for a task."""
+    return f"run_{task_id.removeprefix('task_')}"

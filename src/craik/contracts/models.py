@@ -30,6 +30,8 @@ WorkGraphEventType = Literal[
 ]
 ReceiptStatus = Literal["passed", "failed", "blocked", "denied", "skipped"]
 RunStatus = Literal["completed", "incomplete", "blocked", "failed"]
+TaskRunPhase = Literal["plan", "act", "observe", "evaluate", "continue", "stop"]
+TaskRunStatus = Literal["pending", "running", "completed", "blocked", "failed", "interrupted"]
 RunnerMode = Literal["fixture", "prompt-handoff", "live"]
 RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
@@ -648,3 +650,29 @@ class Handoff(CraikModel):
     memory_proposal_ids: list[str] = Field(default_factory=list)
     runner_metadata: list[dict[str, Any]] = Field(default_factory=list)
     created_at: datetime
+
+
+class TaskRun(CraikModel):
+    """Durable state for one governed single-agent task run."""
+
+    schema_: Literal["craik.task_run"] = Field(default="craik.task_run", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    case_file_id: str
+    policy_envelope_id: str
+    intent_lock_id: str | None = None
+    runner_id: str
+    runner_mode: RunnerMode
+    status: TaskRunStatus = "pending"
+    phase: TaskRunPhase = "plan"
+    iteration: int = Field(default=0, ge=0)
+    max_iterations: int = Field(default=5, ge=1)
+    started_at: datetime
+    phase_started_at: datetime
+    updated_at: datetime
+    ended_at: datetime | None = None
+    stop_reason: str | None = None
+    receipt_ids: list[str] = Field(default_factory=list)
+    handoff_id: str | None = None
+    runner_metadata: list[dict[str, Any]] = Field(default_factory=list)

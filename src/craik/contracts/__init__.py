@@ -22,6 +22,7 @@ from craik.contracts.models import (
     RunnerMetadata,
     RunnerTrustProfile,
     TaskRequest,
+    TaskRun,
     WorkGraphEvent,
     WorkGraphExport,
 )
@@ -47,6 +48,7 @@ __all__ = [
     "RunnerCapabilityMatrix",
     "RunnerMetadata",
     "RunnerTrustProfile",
+    "TaskRun",
     "TaskRequest",
     "WorkGraphExport",
     "WorkGraphEvent",

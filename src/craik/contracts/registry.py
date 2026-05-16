@@ -26,6 +26,7 @@ from craik.contracts.models import (
     RunnerCapabilityMatrix,
     RunnerMetadata,
     TaskRequest,
+    TaskRun,
     WorkGraphEvent,
     WorkGraphExport,
 )
@@ -53,6 +54,7 @@ CONTRACT_REGISTRY: dict[str, ContractModel] = {
     "craik.runner_adapter_result": RunnerAdapterResult,
     "craik.runner_capability_matrix": RunnerCapabilityMatrix,
     "craik.runner_metadata": RunnerMetadata,
+    "craik.task_run": TaskRun,
     "craik.task_request": TaskRequest,
     "craik.work_graph_export": WorkGraphExport,
     "craik.work_graph_event": WorkGraphEvent,

@@ -49,6 +49,7 @@ craik schema show craik.task_request
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |
 | `craik.runner_capability_matrix` | Defines runner capability support, trust boundary, and default grant posture. |
 | `craik.runner_metadata` | Defines stable runner identity, mode, and capability summary. |
+| `craik.task_run` | Tracks durable single-agent run status, phase, linked artifacts, receipts, and handoff. |
 | `craik.task_request` | Defines requested work. |
 | `craik.work_graph_export` | Exports connected graph nodes and edges. |
 | `craik.work_graph_event` | Updates the work graph. |
