@@ -54,6 +54,7 @@ project.
 - [Budget And Quota View](reference/budget-quota-view.md)
 - [Instruction Distillation View](reference/instruction-distillation-view.md)
 - [Quality Gate View](reference/quality-gate-view.md)
+- [Memory Impact Preview View](reference/memory-impact-preview-view.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
