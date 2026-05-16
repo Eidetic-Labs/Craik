@@ -86,6 +86,37 @@ Options:
 
 Print one persisted case file by case id or task id.
 
+## `craik handoff create <task-id>`
+
+Create and persist a structured handoff for a task.
+
+Required options:
+
+- `--summary <text>`: handoff summary.
+
+Options:
+
+- `--agent <identity>`: agent identity; defaults to `agent:local`.
+- `--status <name>`: `completed`, `incomplete`, `blocked`, or `failed`.
+- `--completed-action <text>`: completed action; may be repeated.
+- `--file-changed <path>`: changed file; may be repeated.
+- `--artifact <path-or-id>`: artifact path or id; may be repeated.
+- `--command-run <command>`: command run; may be repeated.
+- `--test-run <command-or-name>`: validation run; may be repeated.
+- `--risk <text>`: residual risk; may be repeated.
+- `--next-step <text>`: next step; may be repeated.
+- `--policy-exception <text>`: policy exception or fail-open note; may be repeated.
+- `--self-audit-note <text>`: self-audit note; may be repeated.
+- `--markdown`: print Markdown instead of JSON after creating the handoff.
+
+## `craik handoff show <handoff-id-or-task-id>`
+
+Print one persisted handoff by handoff id or task id.
+
+Options:
+
+- `--markdown`: print Markdown instead of JSON.
+
 ## `craik policy show`
 
 Print a generated policy envelope.

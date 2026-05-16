@@ -235,18 +235,32 @@ The durable run summary.
   "project_id": "project_...",
   "intent_lock_id": "intent_...",
   "agent": "agent:...",
+  "status": "completed|incomplete|blocked|failed",
   "summary": "...",
+  "self_audit": {
+    "schema_validated": true,
+    "redaction_reviewed": true,
+    "receipts_reviewed": true,
+    "assumptions_reviewed": true,
+    "validation_recorded": true,
+    "policy_exceptions_disclosed": true,
+    "notes": []
+  },
   "completed_actions": [],
   "files_changed": [],
   "artifacts": [],
   "commands_run": [],
   "tests_run": [],
+  "assumptions": [],
+  "context_debt": [],
+  "policy_exceptions": [],
   "facts_learned": [],
   "facts_invalidated": [],
   "contradictions_opened": [],
   "risks": [],
   "next_steps": [],
   "receipt_ids": [],
+  "memory_proposal_ids": [],
   "created_at": "..."
 }
 ```

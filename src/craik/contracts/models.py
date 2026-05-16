@@ -27,6 +27,7 @@ WorkGraphEventType = Literal[
     "blocks",
 ]
 ReceiptStatus = Literal["passed", "failed", "blocked", "denied", "skipped"]
+RunStatus = Literal["completed", "incomplete", "blocked", "failed"]
 
 
 class CraikModel(BaseModel):
@@ -341,6 +342,18 @@ class CaseFile(CraikModel):
     context_budget: dict[str, Any] = Field(default_factory=dict)
 
 
+class SelfAudit(CraikModel):
+    """Required handoff self-audit checklist."""
+
+    schema_validated: bool
+    redaction_reviewed: bool
+    receipts_reviewed: bool
+    assumptions_reviewed: bool
+    validation_recorded: bool
+    policy_exceptions_disclosed: bool
+    notes: list[str] = Field(default_factory=list)
+
+
 class Handoff(CraikModel):
     """Durable run summary for future agents."""
 
@@ -351,12 +364,17 @@ class Handoff(CraikModel):
     project_id: str
     intent_lock_id: str | None = None
     agent: str
+    status: RunStatus = "completed"
     summary: str
+    self_audit: SelfAudit
     completed_actions: list[str] = Field(default_factory=list)
     files_changed: list[str] = Field(default_factory=list)
     artifacts: list[str] = Field(default_factory=list)
     commands_run: list[str] = Field(default_factory=list)
     tests_run: list[str] = Field(default_factory=list)
+    assumptions: list[str] = Field(default_factory=list)
+    context_debt: list[str] = Field(default_factory=list)
+    policy_exceptions: list[str] = Field(default_factory=list)
     facts_learned: list[str] = Field(default_factory=list)
     facts_invalidated: list[str] = Field(default_factory=list)
     contradictions_opened: list[str] = Field(default_factory=list)
