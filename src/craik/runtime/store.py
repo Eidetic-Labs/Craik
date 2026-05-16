@@ -29,6 +29,8 @@ from craik.contracts.models import (
     EvidenceCoverageScore,
     EvidenceReference,
     ExitDisciplineCheck,
+    GatewayConfig,
+    GatewayRuntimeState,
     Handoff,
     HandoffQualityScore,
     HumanDelegationPoint,
@@ -119,6 +121,8 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.evidence_reference": "evidence",
     "craik.exit_discipline_check": "exit_discipline_checks",
     "craik.evidence_coverage_score": "evidence_coverage_scores",
+    "craik.gateway_config": "gateway_configs",
+    "craik.gateway_runtime_state": "gateway_runtime_states",
     "craik.work_graph_export": "graph_exports",
     "craik.handoff_quality_score": "handoff_quality_scores",
     "craik.work_graph_event": "graph_events",
@@ -274,6 +278,35 @@ class LocalStore:
         except sqlite3.DatabaseError as error:
             raise LocalStoreCorruptError(f"cannot list contracts {schema_name}: {error}") from error
         return [_parse_payload(model, str(row["payload_json"])) for row in rows]
+
+    def put_gateway_config(self, config: GatewayConfig) -> None:
+        """Persist a gateway configuration record."""
+        self.put_contract(config)
+
+    def get_gateway_config(self, config_id: str) -> GatewayConfig | None:
+        """Load a gateway configuration by id."""
+        contract = self.get_contract("craik.gateway_config", config_id)
+        return _cast_optional(GatewayConfig, contract)
+
+    def list_gateway_configs(self) -> list[GatewayConfig]:
+        """List gateway configurations."""
+        return _cast_list(GatewayConfig, self.list_contracts("craik.gateway_config"))
+
+    def put_gateway_runtime_state(self, state: GatewayRuntimeState) -> None:
+        """Persist gateway runtime state."""
+        self.put_contract(state)
+
+    def get_gateway_runtime_state(self, state_id: str) -> GatewayRuntimeState | None:
+        """Load gateway runtime state by id."""
+        contract = self.get_contract("craik.gateway_runtime_state", state_id)
+        return _cast_optional(GatewayRuntimeState, contract)
+
+    def list_gateway_runtime_states(self) -> list[GatewayRuntimeState]:
+        """List gateway runtime states."""
+        return _cast_list(
+            GatewayRuntimeState,
+            self.list_contracts("craik.gateway_runtime_state"),
+        )
 
     def put_project(self, project: ProjectProfile) -> None:
         self.put_contract(project)
