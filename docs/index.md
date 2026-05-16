@@ -97,6 +97,7 @@ project.
 - [Skill Packages](reference/skill-packages.md)
 - [Skill Registries](reference/skill-registries.md)
 - [Skill Invocation Contexts](reference/skill-contexts.md)
+- [Skill Telemetry](reference/skill-telemetry.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
