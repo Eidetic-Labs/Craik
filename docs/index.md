@@ -44,6 +44,7 @@ project.
 
 - [CLI](reference/cli.md)
 - [Config](reference/config.md)
+- [Operator Surface](reference/operator-surface.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
