@@ -50,3 +50,29 @@ become active runtime constraints.
 optional snapshot. Provenance can use a precise line range when available or a
 source-level fallback when the extractor cannot identify stable lines. Partial
 line ranges are invalid because they make review ambiguous.
+
+## Distilled Instruction Categories
+
+`craik.distilled_instruction_proposal` keeps extracted instructions reviewable.
+Every proposal must cite provenance and remain inactive until a later promotion
+decision approves it.
+
+Supported categories:
+
+| Category | Meaning |
+| --- | --- |
+| `instruction` | General runtime guidance for agents. |
+| `policy` | Governance, approval, or authority requirement. |
+| `preference` | Stable user, team, or project preference. |
+| `command` | Command or validation instruction. |
+| `boundary` | Scope, ownership, or authority boundary. |
+| `handoff_rule` | Requirement for durable handoff content or timing. |
+| `memory_rule` | Rule for memory reads, writes, proposals, or promotion. |
+| `security_rule` | Security, secret, or safety-sensitive requirement. |
+| `stale_risk` | Warning that prior context may become stale or unsafe. |
+
+Policy and security-rule proposals require evidence IDs in addition to
+provenance. Approved proposals must include a promoted constraint ID plus
+reviewer and decision time. Rejected and deferred proposals also preserve
+reviewer and decision time so future agents can see that extraction did not
+silently become active runtime behavior.

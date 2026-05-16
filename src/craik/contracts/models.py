@@ -56,6 +56,18 @@ InstructionSourceKind = Literal[
 ]
 InstructionTrustBoundary = Literal["project", "repository", "organization", "user", "external"]
 InstructionSourceHashStatus = Literal["unchanged", "changed", "missing", "new"]
+DistilledInstructionCategory = Literal[
+    "instruction",
+    "policy",
+    "preference",
+    "command",
+    "boundary",
+    "handoff_rule",
+    "memory_rule",
+    "security_rule",
+    "stale_risk",
+]
+DistilledInstructionPromotionStatus = Literal["proposed", "approved", "rejected", "deferred"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -873,6 +885,48 @@ class InstructionProvenance(CraikModel):
             raise ValueError(
                 "instruction provenance column ranges require start_column and end_column"
             )
+        return self
+
+
+class DistilledInstructionProposal(CraikModel):
+    """Reviewable instruction distilled from declared runtime instruction sources."""
+
+    schema_: Literal["craik.distilled_instruction_proposal"] = Field(
+        default="craik.distilled_instruction_proposal",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    task_id: str | None = None
+    source_id: str
+    snapshot_id: str | None = None
+    category: DistilledInstructionCategory
+    statement: str
+    rationale: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    provenance_ids: list[str] = Field(min_length=1)
+    evidence_ids: list[str] = Field(default_factory=list)
+    assumption_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    promotion_status: DistilledInstructionPromotionStatus = "proposed"
+    promoted_constraint_id: str | None = None
+    decided_by: str | None = None
+    decided_at: datetime | None = None
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_promotion_review(self) -> DistilledInstructionProposal:
+        """Keep distilled instructions reviewable until a decision is recorded."""
+        if self.promotion_status == "approved" and not self.promoted_constraint_id:
+            raise ValueError("approved distilled instructions require promoted_constraint_id")
+        if self.promotion_status in {"approved", "rejected", "deferred"}:
+            if not self.decided_by or self.decided_at is None:
+                raise ValueError(
+                    "decided distilled instructions require reviewer and decision time"
+                )
+        if self.category in {"policy", "security_rule"} and not self.evidence_ids:
+            raise ValueError("policy and security-rule distillations require evidence ids")
         return self
 
 
