@@ -102,6 +102,7 @@ project.
 - [Skill Telemetry](reference/skill-telemetry.md)
 - [Skill Proposals](reference/skill-proposals.md)
 - [Skill Replay](reference/skill-replay.md)
+- [Skill Promotion Gates](reference/skill-promotion-gates.md)
 - [Learning Receipts](reference/learning-receipts.md)
 - [Training Trajectory Exports](reference/trajectory-exports.md)
 - [Skill Rollbacks](reference/skill-rollbacks.md)
