@@ -46,3 +46,6 @@ separate so policy can audit each boundary independently.
 
 For host process execution boundaries, see
 [Local Process Backend](local-process-backend.md).
+
+For SSH and remote command boundaries, see
+[Remote Shell Backend](remote-shell-backend.md).
