@@ -63,6 +63,7 @@ craik schema show craik.task_request
 | `craik.memory_proposal` | Describes reviewable memory updates. |
 | `craik.negative_knowledge` | Records evidence-backed negative statements with scope and freshness boundaries. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
+| `craik.plugin_capability_grant` | Defines least-privilege plugin-scoped capability grants with policy, approval, expiry, evidence, and receipt links. |
 | `craik.plugin_descriptor` | Defines governed plugin identity, entrypoints, capability declarations, docs, security metadata, and compatibility without granting authority. |
 | `craik.plugin_probation` | Tracks probationary plugin criteria, compatibility checks, evidence, receipts, and promotion, rejection, or expiration decisions. |
 | `craik.plugin_receipt` | Records redacted plugin actions and outputs with descriptor, grant, evidence, handoff, and trust-boundary links. |

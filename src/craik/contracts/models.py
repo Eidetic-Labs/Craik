@@ -138,6 +138,7 @@ PluginCapabilityRisk = Literal["low", "medium", "high", "critical"]
 PluginCompatibilityStatus = Literal["supported", "experimental", "unsupported"]
 PluginProbationStatus = Literal["probationary", "promoted", "rejected", "expired"]
 PluginProbationDecisionKind = Literal["promote", "reject", "expire"]
+PluginGrantStatus = Literal["allowed", "denied", "expired", "approval_required"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -2205,6 +2206,50 @@ class PluginReceipt(CraikModel):
             raise ValueError("successful plugin receipts require capability grants")
         if self.result.status == "denied" and not self.result.summary:
             raise ValueError("denied plugin receipts require a denial summary")
+        return self
+
+
+class PluginCapabilityGrant(CraikModel):
+    """Least-privilege capability grant scoped to one plugin descriptor."""
+
+    schema_: Literal["craik.plugin_capability_grant"] = Field(
+        default="craik.plugin_capability_grant",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    plugin_descriptor_id: str
+    policy_envelope_id: str
+    capability: str
+    target: CapabilityTarget
+    operations: list[str] = Field(min_length=1)
+    status: PluginGrantStatus
+    approval_required: bool = False
+    approved_by: str | None = None
+    expires_at: datetime | None = None
+    reason: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_plugin_capability_grant(self) -> PluginCapabilityGrant:
+        """Validate plugin grant state and least-privilege approval boundaries."""
+        if self.status == "allowed":
+            if self.approval_required and not self.approved_by:
+                raise ValueError("approval-required allowed plugin grants require approved_by")
+            if self.expires_at is None:
+                raise ValueError("allowed plugin grants require expires_at")
+        if self.status == "denied" and self.approved_by is not None:
+            raise ValueError("denied plugin grants must not include approved_by")
+        if self.status == "expired" and self.expires_at is None:
+            raise ValueError("expired plugin grants require expires_at")
+        if self.status == "approval_required":
+            if not self.approval_required:
+                raise ValueError("approval_required grants must set approval_required")
+            if self.approved_by is not None:
+                raise ValueError("approval_required grants must not include approved_by")
         return self
 
 
