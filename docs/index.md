@@ -29,6 +29,7 @@ project.
 - [Setup Wizard](guides/setup.md)
 - [Doctor Diagnostics](guides/doctor.md)
 - [Updating Craik](guides/updating.md)
+- [Gateway Troubleshooting](guides/gateway-troubleshooting.md)
 - [Project Registry](guides/project-registry.md)
 - [Using Case Files](guides/using-case-files.md)
 - [Agent Onboarding](guides/agent-onboarding.md)
