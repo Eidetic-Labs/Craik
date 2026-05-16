@@ -49,3 +49,6 @@ For host process execution boundaries, see
 
 For SSH and remote command boundaries, see
 [Remote Shell Backend](remote-shell-backend.md).
+
+For browser automation and tool execution boundaries, see
+[Browser Tool Boundary](browser-tool-boundary.md).
