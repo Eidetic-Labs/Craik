@@ -15,6 +15,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
     WorkGraphEvent,
+    WorkGraphExport,
 )
 
 __all__ = [
@@ -31,6 +32,6 @@ __all__ = [
     "PolicyEnvelope",
     "ProjectProfile",
     "TaskRequest",
+    "WorkGraphExport",
     "WorkGraphEvent",
 ]
-

@@ -68,6 +68,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Project Registry](docs/guides/project-registry.md)
 - [Using Case Files](docs/guides/using-case-files.md)
 - [GitHub Adapter](docs/guides/github-adapter.md)
+- [Work Graph](docs/concepts/work-graph.md)
 - [Scope Control](docs/guides/scope-control.md)
 - [Writing Handoffs](docs/guides/writing-handoffs.md)
 - [Memory Proposals](docs/guides/memory-proposals.md)
@@ -89,6 +90,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Local Store](docs/reference/local-store.md)
 - [Project Profile](docs/reference/project-profile.md)
 - [GitHub Config](docs/reference/github-config.md)
+- [Graph Export](docs/reference/graph-export.md)
 - [Self-Audit](docs/reference/self-audit.md)
 - [Secrets](docs/security/secrets.md)
 - [Limitations](docs/limitations.md)
@@ -97,7 +99,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
-The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, read-only GitHub context, handoff writing, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
+The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, read-only GitHub context, work graph export, handoff writing, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 

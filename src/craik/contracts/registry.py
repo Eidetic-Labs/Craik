@@ -21,6 +21,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
     WorkGraphEvent,
+    WorkGraphExport,
 )
 
 type ContractModel = type[BaseModel]
@@ -41,6 +42,7 @@ CONTRACT_REGISTRY: dict[str, ContractModel] = {
     "craik.policy_envelope": PolicyEnvelope,
     "craik.project_profile": ProjectProfile,
     "craik.task_request": TaskRequest,
+    "craik.work_graph_export": WorkGraphExport,
     "craik.work_graph_event": WorkGraphEvent,
 }
 

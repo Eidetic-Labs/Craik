@@ -97,6 +97,14 @@ Options:
 - `--api-key <key>`: bearer API key. Prefer `CRAIK_STIGMEM_API_KEY`.
 - `--timeout <seconds>`: request timeout. Can also be set with `CRAIK_STIGMEM_TIMEOUT`.
 
+## `craik graph export`
+
+Export the local work graph as deterministic JSON.
+
+Options:
+
+- `--task-id <id>`: only export graph objects for this task.
+
 ## `craik handoff create <task-id>`
 
 Create and persist a structured handoff for a task.

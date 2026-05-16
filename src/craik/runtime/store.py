@@ -45,6 +45,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.memory_impact_preview": "memory_previews",
     "craik.assumption": "assumptions",
     "craik.evidence_reference": "evidence",
+    "craik.work_graph_export": "graph_exports",
     "craik.work_graph_event": "graph_events",
 }
 
@@ -196,6 +197,9 @@ class LocalStore:
 
     def get_task(self, task_id: str) -> TaskRequest | None:
         return _cast_optional(TaskRequest, self.get_contract("craik.task_request", task_id))
+
+    def list_tasks(self) -> list[TaskRequest]:
+        return _cast_list(TaskRequest, self.list_contracts("craik.task_request"))
 
     def put_receipt(self, receipt: CapabilityReceipt) -> None:
         self.put_contract(receipt)
