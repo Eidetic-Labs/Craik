@@ -30,6 +30,8 @@ WorkGraphEventType = Literal[
 ]
 ReceiptStatus = Literal["passed", "failed", "blocked", "denied", "skipped"]
 RunStatus = Literal["completed", "incomplete", "blocked", "failed"]
+RunnerMode = Literal["fixture", "prompt-handoff", "live"]
+RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 
 
 class CraikModel(BaseModel):
@@ -220,6 +222,66 @@ class CapabilityReceipt(CraikModel):
     reason: str
     result: ReceiptResult
     redacted: bool = True
+    created_at: datetime
+
+
+class RunnerMetadata(CraikModel):
+    """Stable identity and capability summary for a runner adapter."""
+
+    schema_: Literal["craik.runner_metadata"] = Field(
+        default="craik.runner_metadata",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    name: str
+    adapter: str
+    adapter_version: str
+    mode: RunnerMode
+    capabilities: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RunnerAdapterRequest(CraikModel):
+    """Normalized input handed from Craik core to a runner adapter."""
+
+    schema_: Literal["craik.runner_adapter_request"] = Field(
+        default="craik.runner_adapter_request",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    runner: RunnerMetadata
+    task_request_id: str
+    case_file_id: str
+    policy_envelope_id: str
+    capability_grant_ids: list[str] = Field(default_factory=list)
+    expected_output_schemas: list[str] = Field(default_factory=list)
+    context: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+
+
+class RunnerAdapterResult(CraikModel):
+    """Normalized output returned from a runner adapter to Craik core."""
+
+    schema_: Literal["craik.runner_adapter_result"] = Field(
+        default="craik.runner_adapter_result",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    request_id: str
+    task_id: str
+    runner: RunnerMetadata
+    status: RunnerResultStatus
+    summary: str
+    outputs: dict[str, Any] = Field(default_factory=dict)
+    receipt_ids: list[str] = Field(default_factory=list)
+    handoff_id: str | None = None
+    memory_proposal_ids: list[str] = Field(default_factory=list)
+    artifacts: list[str] = Field(default_factory=list)
+    diagnostics: list[str] = Field(default_factory=list)
     created_at: datetime
 
 
