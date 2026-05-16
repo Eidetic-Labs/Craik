@@ -793,6 +793,37 @@
     "docs": ["docs/reference/model-providers.md"],
     "created_at": "2026-05-16T19:40:00Z"
   },
+  "craik.sandbox_backend": {
+    "schema": "craik.sandbox_backend",
+    "version": "0.1.0",
+    "id": "sandbox_backend_local_fixture",
+    "name": "Fixture Local Process Sandbox",
+    "kind": "local_process",
+    "isolation_mode": "process",
+    "capabilities": [
+      {
+        "name": "shell.execute",
+        "operations": ["run"],
+        "grant_required": true,
+        "receipt_required": true,
+        "description": "Execute local process commands under policy."
+      }
+    ],
+    "policy": {
+      "policy_envelope_required": true,
+      "capability_grant_required": true,
+      "receipt_required": true,
+      "redaction_required": true,
+      "secrets_in_config_allowed": false,
+      "notes": ["Fixture backend requires operator-controlled policy."]
+    },
+    "runtime_ref": "craik.runtime.sandbox.local_process",
+    "metadata": {
+      "platforms": ["darwin", "linux"]
+    },
+    "docs": ["docs/reference/sandbox-backends.md"],
+    "created_at": "2026-05-16T20:10:00Z"
+  },
   "craik.negative_knowledge": {
     "schema": "craik.negative_knowledge",
     "version": "0.1.0",
