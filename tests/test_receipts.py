@@ -74,6 +74,33 @@ def test_receipt_links_include_policy_profile_and_fail_open() -> None:
         "fail_open": True,
         "policy_envelope_id": "policy_docs",
         "handoff_ids": ["handoff_docs"],
+        "runner_metadata": None,
+    }
+
+
+def test_receipt_links_include_redacted_runner_metadata() -> None:
+    receipt = _receipt(
+        "receipt_runner",
+        task_id="task_docs",
+        metadata={
+            "runner_metadata": {
+                "runner_id": "codex",
+                "adapter": "codex",
+                "adapter_version": "0.2.0-preview",
+                "execution_mode": "fixture",
+                "runner_specific": {"api_token": "redaction-fixture-value"},
+            },
+        },
+    )
+
+    links = receipt_links(receipt)
+
+    assert links["runner_metadata"] == {
+        "runner_id": "codex",
+        "adapter": "codex",
+        "adapter_version": "0.2.0-preview",
+        "execution_mode": "fixture",
+        "runner_specific": {"api_token": "[REDACTED]"},
     }
 
 

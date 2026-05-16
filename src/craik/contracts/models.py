@@ -646,4 +646,5 @@ class Handoff(CraikModel):
     next_steps: list[str] = Field(default_factory=list)
     receipt_ids: list[str] = Field(default_factory=list)
     memory_proposal_ids: list[str] = Field(default_factory=list)
+    runner_metadata: list[dict[str, Any]] = Field(default_factory=list)
     created_at: datetime

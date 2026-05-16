@@ -19,5 +19,6 @@ Current limitations:
 - The Codex runner adapter does not invoke an external Codex process or finalize receipts from live side effects in v0.2.0.
 - The Claude runner adapter does not invoke an external Claude process, capture live transcripts, or finalize receipts from live side effects in v0.2.0.
 - The Gemini runner adapter does not invoke an external Gemini process, capture live responses, or finalize receipts from live side effects in v0.2.0.
+- Runner metadata in receipts and handoffs is descriptive and redacted. It does not prove live execution or replace policy receipts for concrete side effects.
 - The CLI does not request tool authority or write runtime state.
 - Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.

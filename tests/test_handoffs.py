@@ -51,6 +51,49 @@ def test_handoff_writer_creates_structured_handoff(store: LocalStore, tmp_path: 
     assert store.get_handoff(handoff.id) == handoff
 
 
+def test_handoff_preserves_runner_metadata_from_receipts(
+    store: LocalStore,
+    tmp_path: Path,
+) -> None:
+    task_id = _seed_case(store, tmp_path)
+    ReceiptStore(store).record_receipt(
+        _receipt(
+            task_id,
+            metadata={
+                "runner_metadata": {
+                    "runner_id": "codex",
+                    "adapter": "codex",
+                    "adapter_version": "0.2.0-preview",
+                    "execution_mode": "fixture",
+                    "trust_profile": {"level": "medium"},
+                    "runner_specific": {"api_token": "[REDACTED]"},
+                },
+            },
+        )
+    )
+
+    handoff = HandoffWriter(store).create(
+        task_id=task_id,
+        agent="runner:codex",
+        summary="Adapter completed.",
+        tests_run=["pytest"],
+    )
+    markdown = render_markdown(handoff)
+
+    assert handoff.runner_metadata == [
+        {
+            "runner_id": "codex",
+            "adapter": "codex",
+            "adapter_version": "0.2.0-preview",
+            "execution_mode": "fixture",
+            "trust_profile": {"level": "medium"},
+            "runner_specific": {"api_token": "[REDACTED]"},
+        }
+    ]
+    assert "## Runner Metadata" in markdown
+    assert "- codex: adapter=codex; version=0.2.0-preview; mode=fixture; trust=medium" in markdown
+
+
 def test_incomplete_handoff_records_missing_validation_and_policy_exception(
     store: LocalStore,
     tmp_path: Path,
@@ -117,7 +160,7 @@ def _seed_case(store: LocalStore, tmp_path: Path) -> str:
     return task.id
 
 
-def _receipt(task_id: str) -> CapabilityReceipt:
+def _receipt(task_id: str, metadata: dict[str, object] | None = None) -> CapabilityReceipt:
     from datetime import UTC, datetime
 
     return CapabilityReceipt(
@@ -129,7 +172,7 @@ def _receipt(task_id: str) -> CapabilityReceipt:
         policy_profile="strict",
         fail_open=False,
         reason="Validate handoff.",
-        result=ReceiptResult(status="passed", summary="Tests passed."),
+        result=ReceiptResult(status="passed", summary="Tests passed.", metadata=metadata or {}),
         redacted=True,
         created_at=datetime(2026, 5, 15, 12, 0, tzinfo=UTC),
     )

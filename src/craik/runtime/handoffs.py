@@ -4,12 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from typing import Any
 
-from craik.contracts.models import CaseFile, Handoff, RunStatus, SelfAudit
+from craik.contracts.models import CapabilityReceipt, CaseFile, Handoff, RunStatus, SelfAudit
 from craik.runtime.case_files import CaseFileAssembler
 from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.receipts import ReceiptStore
 from craik.runtime.redaction import redact
+from craik.runtime.runner_metadata import (
+    runner_metadata_from_receipt_metadata,
+    unique_runner_metadata,
+)
 from craik.runtime.store import LocalStore
 
 
@@ -49,6 +54,7 @@ class HandoffWriter:
         risks: list[str] | None = None,
         next_steps: list[str] | None = None,
         memory_proposal_ids: list[str] | None = None,
+        runner_metadata: list[dict[str, Any]] | None = None,
         policy_exceptions: list[str] | None = None,
         self_audit_notes: list[str] | None = None,
     ) -> Handoff:
@@ -101,6 +107,7 @@ class HandoffWriter:
             next_steps=_redacted_strings(next_steps),
             receipt_ids=[receipt.id for receipt in receipts],
             memory_proposal_ids=proposals,
+            runner_metadata=_runner_metadata(receipts, runner_metadata),
             created_at=datetime.now(UTC),
         )
         self.store.put_handoff(handoff)
@@ -167,6 +174,10 @@ def render_markdown(handoff: Handoff) -> str:
         "",
         *_bullets(handoff.memory_proposal_ids),
         "",
+        "## Runner Metadata",
+        "",
+        *_runner_metadata_bullets(handoff.runner_metadata),
+        "",
         "## Next Steps",
         "",
         *_bullets(handoff.next_steps),
@@ -219,6 +230,37 @@ def _context_debt(case_file: CaseFile | None) -> list[str]:
     if not case_file.facts:
         debt.append("No memory facts were loaded into the case file.")
     return debt
+
+
+def _runner_metadata(
+    receipts: list[CapabilityReceipt],
+    explicit: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    if explicit is not None:
+        return unique_runner_metadata([redact(item).value for item in explicit])
+    snapshots = [
+        snapshot
+        for receipt in receipts
+        if (snapshot := runner_metadata_from_receipt_metadata(receipt.result.metadata)) is not None
+    ]
+    return unique_runner_metadata(snapshots)
+
+
+def _runner_metadata_bullets(metadata: list[dict[str, Any]]) -> list[str]:
+    if not metadata:
+        return ["- none"]
+    bullets: list[str] = []
+    for item in metadata:
+        runner_id = item.get("runner_id", "unknown")
+        adapter = item.get("adapter", "unknown")
+        version = item.get("adapter_version", "unknown")
+        mode = item.get("execution_mode", "unknown")
+        trust = item.get("trust_profile", {})
+        trust_level = trust.get("level", "unknown") if isinstance(trust, dict) else "unknown"
+        bullets.append(
+            f"- {runner_id}: adapter={adapter}; version={version}; mode={mode}; trust={trust_level}"
+        )
+    return bullets
 
 
 def _checklist(audit: SelfAudit) -> list[str]:
