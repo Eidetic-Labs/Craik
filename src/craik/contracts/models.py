@@ -35,6 +35,8 @@ TaskRunStatus = Literal["pending", "running", "completed", "blocked", "failed", 
 RunnerMode = Literal["fixture", "prompt-handoff", "live"]
 RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 WorkerResultStatus = Literal["completed", "blocked", "failed", "partial"]
+DebateTurnPosition = Literal["supports", "opposes", "clarifies", "questions", "blocks"]
+DebateOutcome = Literal["agreement", "unresolved_disagreement", "contradiction_opened"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -448,6 +450,58 @@ class WorkerResult(CraikModel):
     diagnostics: list[str] = Field(default_factory=list)
     redacted: bool = True
     created_at: datetime
+
+
+class DebateTurn(CraikModel):
+    """One structured contribution to an agent debate."""
+
+    schema_: Literal["craik.debate_turn"] = Field(default="craik.debate_turn", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    debate_id: str
+    role_id: str
+    role_kind: AgentRoleKind
+    worker_result_id: str | None = None
+    position: DebateTurnPosition
+    claim: str
+    rationale: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    assumption_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+
+class DebateSummary(CraikModel):
+    """Deterministic outcome summary for a bounded agent debate."""
+
+    schema_: Literal["craik.debate_summary"] = Field(
+        default="craik.debate_summary",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    debate_id: str
+    topic: str
+    turn_ids: list[str] = Field(default_factory=list)
+    outcome: DebateOutcome
+    summary: str
+    agreements: list[str] = Field(default_factory=list)
+    unresolved_disagreements: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_outcome_links(self) -> DebateSummary:
+        """Require explicit disagreement or contradiction links for non-agreement outcomes."""
+        if self.outcome == "unresolved_disagreement" and not self.unresolved_disagreements:
+            raise ValueError("unresolved debate summaries require unresolved disagreement text")
+        if self.outcome == "contradiction_opened" and not self.contradiction_ids:
+            raise ValueError("contradiction debate summaries require contradiction ids")
+        return self
 
 
 class RunnerStepRequest(CraikModel):
