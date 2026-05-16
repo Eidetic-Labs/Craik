@@ -30,3 +30,6 @@ or API keys.
 Use telemetry for learning-loop evidence, not as authority to change a skill.
 Later proposals and promotion gates should cite telemetry alongside receipts,
 evidence, and review decisions.
+
+Use [Skill Proposals](skill-proposals.md) to draft reviewable changes from
+telemetry.
