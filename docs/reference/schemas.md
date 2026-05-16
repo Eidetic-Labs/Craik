@@ -74,3 +74,4 @@ Rules:
 - Runtime code should reject unknown fields by default.
 - Durable memory writes should preserve source, confidence, scope, and trust metadata.
 - Policy and receipt contracts should preserve profile, fail-open, redaction, and approval metadata.
+- Adapter-produced receipts and handoffs should preserve stable runner metadata while keeping provider-specific details nested and redacted.

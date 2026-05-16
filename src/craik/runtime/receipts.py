@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from typing import Any, TypedDict
 
 from craik.contracts.models import CapabilityReceipt
+from craik.runtime.runner_metadata import runner_metadata_from_receipt_metadata
 from craik.runtime.store import LocalStore
 
 
@@ -17,6 +18,7 @@ class ReceiptLinks(TypedDict):
     fail_open: bool
     policy_envelope_id: str | None
     handoff_ids: list[str]
+    runner_metadata: dict[str, Any] | None
 
 
 class ReceiptStoreError(RuntimeError):
@@ -84,6 +86,7 @@ def receipt_links(receipt: CapabilityReceipt) -> ReceiptLinks:
         "fail_open": receipt.fail_open,
         "policy_envelope_id": _optional_string(metadata.get("policy_envelope_id")),
         "handoff_ids": _string_list(metadata.get("handoff_ids")),
+        "runner_metadata": runner_metadata_from_receipt_metadata(metadata),
     }
 
 

@@ -133,3 +133,7 @@ Adapters own:
 
 Runner-specific details should stay inside the `metadata`, `outputs`, or
 `diagnostics` fields unless they become stable cross-runner contract fields.
+Adapter-produced receipts and handoff inputs should include the stable
+[Runner Metadata](runner-metadata.md) snapshot so downstream agents can see the
+runner id, adapter version, execution mode, trust profile, and capability
+profile involved in the work.

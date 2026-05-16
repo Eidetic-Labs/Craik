@@ -68,7 +68,8 @@ Supported lookup paths:
 - receipts linked to a policy envelope id,
 - and receipts linked to a handoff id.
 
-Policy envelope and handoff links are read from receipt result metadata keys `policy_envelope_id` and `handoff_ids`.
+Policy envelope, handoff, and runner links are read from receipt result metadata
+keys `policy_envelope_id`, `handoff_ids`, and `runner_metadata`.
 
 ## Backup And Cleanup
 

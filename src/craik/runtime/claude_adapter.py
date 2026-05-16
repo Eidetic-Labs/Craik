@@ -13,6 +13,7 @@ from craik.contracts.models import (
     RunnerMetadata,
     RunnerResultStatus,
 )
+from craik.runtime.runner_metadata import runner_metadata_snapshot
 from craik.runtime.runners import get_runner_capability_matrix
 
 CLAUDE_RUNNER_ID = "claude"
@@ -68,9 +69,10 @@ class ClaudeRunnerAdapter:
         status = _status_from_context(request.context, self.fixture_status)
         summary = _summary_from_context(request.context, status)
         diagnostics = _diagnostics(request.context, self.live_available)
-        receipt_inputs = _receipt_inputs(request, status, summary)
-        handoff_input = _handoff_input(request, status, summary)
         metadata = self.metadata
+        metadata_snapshot = runner_metadata_snapshot(metadata)
+        receipt_inputs = _receipt_inputs(request, status, summary, metadata_snapshot)
+        handoff_input = _handoff_input(request, status, summary, metadata_snapshot)
 
         return RunnerAdapterResult(
             id=f"runner_result_{request.id}",
@@ -86,7 +88,7 @@ class ClaudeRunnerAdapter:
                 },
                 "handoff_input": handoff_input,
                 "receipt_inputs": receipt_inputs,
-                "runner_metadata": metadata.model_dump(mode="json", by_alias=True),
+                "runner_metadata": metadata_snapshot,
             },
             receipt_ids=_string_list(request.context.get("receipt_ids")),
             handoff_id=_optional_string(request.context.get("handoff_id")),
@@ -166,6 +168,7 @@ def _receipt_inputs(
     request: RunnerAdapterRequest,
     status: RunnerResultStatus,
     summary: str,
+    runner_metadata: dict[str, Any],
 ) -> list[dict[str, Any]]:
     return [
         {
@@ -175,7 +178,11 @@ def _receipt_inputs(
             "capability_grant_id": grant_id,
             "capability": "runner.claude",
             "target": request.case_file_id,
-            "result": {"status": _receipt_status(status), "summary": summary},
+            "result": {
+                "status": _receipt_status(status),
+                "summary": summary,
+                "metadata": {"runner_metadata": runner_metadata},
+            },
         }
         for index, grant_id in enumerate(request.capability_grant_ids, start=1)
     ]
@@ -185,6 +192,7 @@ def _handoff_input(
     request: RunnerAdapterRequest,
     status: RunnerResultStatus,
     summary: str,
+    runner_metadata: dict[str, Any],
 ) -> dict[str, Any]:
     return {
         "task_id": request.task_id,
@@ -195,6 +203,7 @@ def _handoff_input(
         "tests_run": _string_list(request.context.get("tests_run")),
         "risks": _string_list(request.context.get("risks")),
         "next_steps": _string_list(request.context.get("next_steps")),
+        "runner_metadata": [runner_metadata],
     }
 
 
