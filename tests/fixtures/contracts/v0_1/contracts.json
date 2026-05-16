@@ -1276,6 +1276,30 @@
     "runtime_authority": false,
     "created_at": "2026-05-16T15:45:00Z"
   },
+  "craik.plugin_probation": {
+    "schema": "craik.plugin_probation",
+    "version": "0.1.0",
+    "id": "plugin_probation_docs_reconcile",
+    "plugin_descriptor_id": "plugin_docs_reconcile",
+    "policy_envelope_id": "policy_docs_reconcile",
+    "status": "probationary",
+    "criteria": [
+      {
+        "name": "security_review",
+        "required": true,
+        "passed": false,
+        "summary": "Review plugin security posture.",
+        "evidence_ids": ["evidence_readme_status"]
+      }
+    ],
+    "compatibility_check_ids": ["freshness_github_state"],
+    "evidence_ids": ["evidence_readme_status"],
+    "receipt_ids": ["receipt_runner_fixture"],
+    "decision": null,
+    "expires_at": "2026-06-16T16:10:00Z",
+    "durable_trust_granted": false,
+    "created_at": "2026-05-16T16:10:00Z"
+  },
   "craik.instruction_source": {
     "schema": "craik.instruction_source",
     "version": "0.1.0",

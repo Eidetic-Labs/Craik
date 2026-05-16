@@ -136,6 +136,8 @@ SkillScope = Literal["project", "global"]
 PluginEntrypointKind = Literal["command", "module", "workflow", "service", "docs"]
 PluginCapabilityRisk = Literal["low", "medium", "high", "critical"]
 PluginCompatibilityStatus = Literal["supported", "experimental", "unsupported"]
+PluginProbationStatus = Literal["probationary", "promoted", "rejected", "expired"]
+PluginProbationDecisionKind = Literal["promote", "reject", "expire"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -2095,6 +2097,80 @@ class PluginDescriptor(CraikModel):
                 raise ValueError("high-risk plugin capabilities require explicit grants")
         if self.runtime_authority is not False:
             raise ValueError("plugin descriptors must not carry runtime authority")
+        return self
+
+
+class PluginProbationCriterion(CraikModel):
+    """One review criterion for probationary plugin governance."""
+
+    name: str
+    required: bool = True
+    passed: bool = False
+    summary: str
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class PluginProbationDecision(CraikModel):
+    """Promotion, rejection, or expiration decision for plugin probation."""
+
+    decision: PluginProbationDecisionKind
+    decided_by: str
+    rationale: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    decided_at: datetime
+
+
+class PluginProbation(CraikModel):
+    """Governance record for probationary plugin review."""
+
+    schema_: Literal["craik.plugin_probation"] = Field(
+        default="craik.plugin_probation",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    plugin_descriptor_id: str
+    policy_envelope_id: str
+    status: PluginProbationStatus = "probationary"
+    criteria: list[PluginProbationCriterion] = Field(min_length=1)
+    compatibility_check_ids: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    decision: PluginProbationDecision | None = None
+    expires_at: datetime | None = None
+    durable_trust_granted: bool = False
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_plugin_probation(self) -> PluginProbation:
+        """Require review evidence before promotion and deny durable trust by default."""
+        if self.status == "probationary":
+            if self.decision is not None:
+                raise ValueError("probationary plugin records must not include a decision")
+            if self.durable_trust_granted:
+                raise ValueError("probationary plugins must not receive durable trust")
+        if self.status == "promoted":
+            if self.decision is None or self.decision.decision != "promote":
+                raise ValueError("promoted plugin records require a promote decision")
+            failed_required = [
+                criterion.name
+                for criterion in self.criteria
+                if criterion.required and not criterion.passed
+            ]
+            if failed_required:
+                raise ValueError("promoted plugin records require required criteria to pass")
+            if not self.compatibility_check_ids:
+                raise ValueError("promoted plugin records require compatibility checks")
+        if self.status == "rejected":
+            if self.decision is None or self.decision.decision != "reject":
+                raise ValueError("rejected plugin records require a reject decision")
+        if self.status == "expired":
+            if self.decision is None or self.decision.decision != "expire":
+                raise ValueError("expired plugin records require an expire decision")
+            if self.expires_at is None:
+                raise ValueError("expired plugin records require expires_at")
+        if self.status != "promoted" and self.durable_trust_granted:
+            raise ValueError("only promoted plugin records may grant durable trust")
         return self
 
 

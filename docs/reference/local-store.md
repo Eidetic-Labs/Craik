@@ -46,6 +46,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `knowledge_freshness_probes` | `craik.knowledge_freshness_probe` |
 | `known_traps` | `craik.known_trap` |
 | `plugin_descriptors` | `craik.plugin_descriptor` |
+| `plugin_probations` | `craik.plugin_probation` |
 | `proposals` | `craik.memory_proposal` |
 | `negative_knowledge` | `craik.negative_knowledge` |
 | `promoted_instruction_constraints` | `craik.promoted_instruction_constraint` |
