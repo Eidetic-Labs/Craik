@@ -1,4 +1,121 @@
 {
+  "craik.agent_onboarding": {
+    "schema": "craik.agent_onboarding",
+    "version": "0.1.0",
+    "id": "onboarding_stigmem",
+    "project_id": "project_stigmem",
+    "project_model": {
+      "id": "project_stigmem",
+      "name": "stigmem",
+      "repo": {
+        "local_path": "/workspace/stigmem",
+        "remote": "git@github.com:Eidetic-Labs/stigmem.git",
+        "default_branch": "main",
+        "branch": "main",
+        "head": "abc1234",
+        "dirty": false,
+        "status": "clean"
+      },
+      "docs": {
+        "paths": ["README.md", "docs/"],
+        "immutable_paths": ["docs/adr/"]
+      },
+      "memory": {
+        "backend": "stigmem",
+        "scope": "team"
+      },
+      "policies": ["policy_no_adr_edits"],
+      "task_count": 1,
+      "open_task_ids": ["task_docs_reconcile"]
+    },
+    "active_policy": {
+      "schema": "craik.policy_envelope",
+      "version": "0.1.0",
+      "id": "policy_onboard_project_stigmem",
+      "task_id": "onboard_project_stigmem",
+      "actor": "agent:onboarding",
+      "profile": "strict",
+      "fail_open": false,
+      "allowed_capabilities": ["repo.read", "memory.read", "receipt.write"],
+      "denied_capabilities": [
+        "repo.write",
+        "repo.write.immutable",
+        "shell.execute",
+        "git.mutate",
+        "github.write",
+        "memory.write"
+      ],
+      "approval_required": ["repo.write.docs", "shell.test", "github.create_pr", "memory.write"],
+      "verification_required": ["git.diff_check"],
+      "handoff_required": true,
+      "receipt_required": true,
+      "redaction_required": true
+    },
+    "docs_boundaries": {
+      "mutable_paths": ["README.md", "docs/"],
+      "immutable_paths": ["docs/adr/"],
+      "missing_mutable_paths": [],
+      "missing_immutable_paths": [],
+      "adr_policy": "Treat immutable paths as read-only evidence unless explicit approval exists."
+    },
+    "recent_handoffs": [
+      {
+        "id": "handoff_docs_reconcile",
+        "task_id": "task_docs_reconcile",
+        "status": "completed",
+        "summary": "Contract schema work completed with tests and docs.",
+        "next_steps": ["Implement project registry."],
+        "created_at": "2026-05-15T22:50:00+00:00"
+      }
+    ],
+    "unresolved_contradictions": [
+      {
+        "schema": "craik.contradiction_report",
+        "version": "0.1.0",
+        "id": "contradiction_docs_status",
+        "task_id": "task_docs_reconcile",
+        "facts": ["fact_docs_planned", "fact_cli_implemented"],
+        "summary": "Docs say the CLI is planned while implementation shows it exists.",
+        "affected_artifacts": ["README.md", "docs/guides/quickstart.md"],
+        "evidence_ids": ["evidence_readme_status"],
+        "proposed_resolution": "Update docs to pre-0.1.0 implementation language.",
+        "status": "open",
+        "owner": "user:maintainer",
+        "stigmem_conflict_id": null,
+        "created_at": "2026-05-15T22:41:00Z",
+        "resolved_at": null
+      }
+    ],
+    "stale_risk_warnings": ["Unresolved contradiction reports require review before promotion to fact."],
+    "validation_commands": [
+      "uv run --python 3.12 --extra dev ruff check .",
+      "uv run --python 3.12 --extra dev mypy",
+      "uv run --python 3.12 --extra dev pytest"
+    ],
+    "stigmem_backend_status": {
+      "backend": "stigmem",
+      "scope": "team",
+      "status": "configured_not_checked",
+      "node_url_configured": true,
+      "api_key_configured": true
+    },
+    "known_traps": [
+      "Do not edit immutable documentation paths without explicit approval.",
+      "Do not treat assumptions or stale-risk warnings as facts.",
+      "Do not print or persist secrets from environment variables or credentials.",
+      "Create a handoff before ending non-trivial work.",
+      "Direct Stigmem writes require policy approval and evidence."
+    ],
+    "allowed_next_actions": [
+      "Read this onboarding report and preserve its boundaries in the run plan.",
+      "Inspect cited project docs and immutable paths as evidence.",
+      "Run the listed validation commands after making changes.",
+      "Record a structured handoff with residual risks and next steps.",
+      "Build or refresh a case file for the active task before implementation.",
+      "Review unresolved contradictions before changing related docs or facts."
+    ],
+    "created_at": "2026-05-15T22:55:00Z"
+  },
   "craik.assumption": {
     "schema": "craik.assumption",
     "version": "0.1.0",

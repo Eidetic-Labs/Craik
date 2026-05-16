@@ -49,6 +49,7 @@ from craik.runtime.memory import (
     evidence_reference,
     preview_memory_impact,
 )
+from craik.runtime.onboarding import AgentOnboardingBuilder, OnboardingProjectNotFoundError
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy import (
     FailOpenNotAllowedError,
@@ -437,6 +438,49 @@ def connect_stigmem(
     typer.echo(
         json.dumps(capabilities.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
     )
+
+
+@app.command("onboard")
+def onboard(
+    project: Annotated[
+        str,
+        typer.Option("--project", help="Registered project id or name to onboard."),
+    ],
+    policy_profile: Annotated[
+        str,
+        typer.Option(
+            "--policy-profile",
+            help="Policy profile: strict, trusted-local, or automation.",
+        ),
+    ] = "strict",
+    trusted_local_fail_open: Annotated[
+        bool,
+        typer.Option(
+            "--trusted-local-fail-open",
+            help="Explicitly opt in to trusted-local fail-open semantics.",
+        ),
+    ] = False,
+    max_recent_handoffs: Annotated[
+        int,
+        typer.Option("--max-recent-handoffs", min=0, help="Recent handoffs to include."),
+    ] = 5,
+) -> None:
+    """Print runner-readable onboarding context for a project."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        report = AgentOnboardingBuilder(store).build(
+            project,
+            policy_profile=_policy_profile(policy_profile),
+            trusted_local_fail_open=trusted_local_fail_open,
+            max_recent_handoffs=max_recent_handoffs,
+        )
+    except (OnboardingProjectNotFoundError, FailOpenNotAllowedError) as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(report.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
 
 
 @contradictions_app.command("open")
