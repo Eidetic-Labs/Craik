@@ -52,6 +52,7 @@ project.
 - [Known Traps And Negative Knowledge](reference/known-traps.md)
 - [Scratchpad And Unknowns](reference/scratchpad-and-unknowns.md)
 - [Context Requests And Exit Discipline](reference/exit-discipline.md)
+- [Skill Packages](reference/skill-packages.md)
 - [Human Delegation](reference/human-delegation.md)
 - [Instruction Sources](reference/instruction-sources.md)
 - [Instruction Distillation Workflow](reference/instruction-distillation-workflow.md)
