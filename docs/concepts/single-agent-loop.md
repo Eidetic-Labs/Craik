@@ -68,3 +68,15 @@ Recovery starts by inspecting the persisted run, receipts, outputs, memory
 proposals, and handoff. Recovery should not replay side effects blindly. A
 recovered run must re-check policy, intent-lock stop conditions, and iteration
 limits before issuing another step request.
+
+## Handoffs
+
+Run handoffs summarize the terminal outcome in the existing `craik.handoff`
+contract. A handoff should include the run status, last phase, captured outputs,
+runner metadata, receipt ids, memory proposal ids, diagnostics, residual risks,
+and next steps.
+
+Completed runs should point reviewers to receipts and proposals. Blocked runs
+should explain the missing approval, context, or intent boundary. Failed and
+interrupted runs should preserve diagnostics and recovery guidance without
+claiming that work completed.

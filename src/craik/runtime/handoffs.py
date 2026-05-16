@@ -6,7 +6,16 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
-from craik.contracts.models import CapabilityReceipt, CaseFile, Handoff, RunStatus, SelfAudit
+from craik.contracts.models import (
+    CapabilityReceipt,
+    CaseFile,
+    Handoff,
+    RunOutput,
+    RunStatus,
+    SelfAudit,
+    TaskRun,
+    TaskRunStatus,
+)
 from craik.runtime.case_files import CaseFileAssembler
 from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.receipts import ReceiptStore
@@ -28,6 +37,10 @@ class HandoffNotFoundError(HandoffError):
 
 class HandoffContextError(HandoffError):
     """Raised when required handoff context is missing."""
+
+
+class RunHandoffContextError(HandoffContextError):
+    """Raised when required run handoff context is missing."""
 
 
 @dataclass(frozen=True)
@@ -113,6 +126,55 @@ class HandoffWriter:
         self.store.put_handoff(handoff)
         return handoff
 
+    def create_from_run(
+        self,
+        run_id: str,
+        *,
+        agent: str | None = None,
+        tests_run: list[str] | None = None,
+        commands_run: list[str] | None = None,
+    ) -> Handoff:
+        """Create a handoff from a persisted task run and captured outputs."""
+        run = self.store.get_task_run(run_id)
+        if run is None:
+            raise RunHandoffContextError(f"unknown task run: {run_id}")
+        outputs = _outputs_for_run(self.store.list_run_outputs(), run.id)
+        diagnostics = _run_diagnostics(outputs)
+        output_receipt_ids = [receipt for output in outputs for receipt in output.receipt_ids]
+        receipt_ids = _unique([*run.receipt_ids, *output_receipt_ids])
+        proposals = _unique(
+            [proposal for output in outputs for proposal in output.memory_proposal_ids]
+        )
+        runner_metadata = run.runner_metadata or [
+            {
+                "runner_id": run.runner_id,
+                "execution_mode": run.runner_mode,
+            }
+        ]
+        handoff = self.create(
+            task_id=run.task_id,
+            agent=agent or f"runner:{run.runner_id}",
+            summary=_run_summary(run, outputs),
+            status=_handoff_status(run.status),
+            completed_actions=_run_completed_actions(run, outputs),
+            artifacts=_unique([output.id for output in outputs]),
+            commands_run=commands_run,
+            tests_run=tests_run,
+            memory_proposal_ids=proposals,
+            runner_metadata=runner_metadata,
+            risks=_run_risks(run, diagnostics),
+            next_steps=_run_next_steps(run),
+            self_audit_notes=diagnostics,
+        )
+        self.store.put_task_run(run.model_copy(update={"handoff_id": handoff.id}))
+        for receipt_id in receipt_ids:
+            if receipt_id not in handoff.receipt_ids:
+                handoff = handoff.model_copy(
+                    update={"receipt_ids": [*handoff.receipt_ids, receipt_id]}
+                )
+                self.store.put_handoff(handoff)
+        return handoff
+
     def get(self, handoff_id_or_task_id: str) -> Handoff | None:
         """Load a handoff by handoff id or task id."""
         handoff = self.store.get_handoff(handoff_id_or_task_id)
@@ -189,6 +251,70 @@ def render_markdown(handoff: Handoff) -> str:
 def handoff_id(task_id: str) -> str:
     """Return the stable handoff id for a task id."""
     return f"handoff_{task_id.removeprefix('task_')}"
+
+
+def _handoff_status(status: TaskRunStatus) -> RunStatus:
+    if status == "completed":
+        return "completed"
+    if status == "blocked":
+        return "blocked"
+    if status == "failed":
+        return "failed"
+    return "incomplete"
+
+
+def _outputs_for_run(outputs: list[RunOutput], run_id: str) -> list[RunOutput]:
+    return sorted(
+        [output for output in outputs if output.run_id == run_id],
+        key=lambda output: (output.created_at, output.id),
+    )
+
+
+def _run_summary(run: TaskRun, outputs: list[RunOutput]) -> str:
+    reason = f" Stop reason: {run.stop_reason}" if run.stop_reason else ""
+    return str(redact(
+        f"Run {run.id} ended with status {run.status} at phase {run.phase} "
+        f"after {run.iteration} iteration(s). Captured {len(outputs)} output(s).{reason}"
+    ).value)
+
+
+def _run_completed_actions(run: TaskRun, outputs: list[RunOutput]) -> list[str]:
+    actions = [
+        f"Recorded run {run.id} with status {run.status}.",
+        f"Last phase: {run.phase}.",
+    ]
+    actions.extend(f"Captured output {output.id}: {output.summary}" for output in outputs)
+    return _redacted_strings(actions)
+
+
+def _run_diagnostics(outputs: list[RunOutput]) -> list[str]:
+    return _redacted_strings(
+        [diagnostic for output in outputs for diagnostic in output.diagnostics]
+    )
+
+
+def _run_risks(run: TaskRun, diagnostics: list[str]) -> list[str]:
+    risks: list[str] = []
+    if run.status in {"blocked", "failed", "interrupted"}:
+        risks.append(run.stop_reason or f"Run ended as {run.status}.")
+    risks.extend(diagnostics)
+    return _redacted_strings(risks)
+
+
+def _run_next_steps(run: TaskRun) -> list[str]:
+    if run.status == "completed":
+        return ["Review receipts, memory proposals, and merged handoff state."]
+    if run.status == "blocked":
+        return ["Resolve the blocking approval, context, or intent-lock condition."]
+    if run.status == "failed":
+        return ["Inspect diagnostics and decide whether recovery is appropriate."]
+    if run.status == "interrupted":
+        return ["Inspect run state and recover from the last safe boundary."]
+    return ["Inspect run state before continuing."]
+
+
+def _unique(values: list[str]) -> list[str]:
+    return sorted(dict.fromkeys(values))
 
 
 def _self_audit(
