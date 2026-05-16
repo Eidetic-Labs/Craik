@@ -33,6 +33,9 @@ loop receipts.
 Use [Skill Replay](skill-replay.md) to compare current skill behavior against
 redacted fixtures before promotion.
 
+Use [Skill Rollbacks](skill-rollbacks.md) when a promoted skill version needs a
+reviewable path back to a prior promoted version.
+
 ## Improvement Plans
 
 `SkillImprovementPlan` adds structured review details:
