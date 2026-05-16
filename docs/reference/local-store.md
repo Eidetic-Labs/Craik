@@ -53,6 +53,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `proposals` | `craik.memory_proposal` |
 | `negative_knowledge` | `craik.negative_knowledge` |
 | `promoted_instruction_constraints` | `craik.promoted_instruction_constraint` |
+| `reference_integrations` | `craik.reference_integration` |
 | `red_team_findings` | `craik.red_team_finding` |
 | `recovery_sessions` | `craik.recovery_session` |
 | `memory_diffs` | `craik.memory_diff` |

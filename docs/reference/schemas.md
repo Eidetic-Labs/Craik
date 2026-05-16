@@ -70,6 +70,7 @@ craik schema show craik.task_request
 | `craik.plugin_receipt` | Records redacted plugin actions and outputs with descriptor, grant, evidence, handoff, and trust-boundary links. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.promoted_instruction_constraint` | Captures an approved distilled instruction as an active runtime constraint. |
+| `craik.reference_integration` | Describes safe reproducible sample skill, plugin, or adapter paths with docs, fixtures, checks, receipts, compatibility, and provenance. |
 | `craik.red_team_finding` | Captures reviewable adversarial findings and blockers for high-risk work. |
 | `craik.recovery_session` | Summarizes resume readiness and required recovery actions for an agent. |
 | `craik.review_request` | Requests bounded cross-agent review of worker results or debate summaries. |
