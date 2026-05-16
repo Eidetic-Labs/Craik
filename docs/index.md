@@ -66,6 +66,7 @@ project.
 - [Channel Identity Pairing](reference/channel-identity-pairing.md)
 - [Channel Allowlists](reference/channel-allowlists.md)
 - [Channel Policy Envelopes](reference/channel-policy-envelopes.md)
+- [Webhook Ingress](reference/webhook-ingress.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
