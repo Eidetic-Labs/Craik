@@ -15,6 +15,7 @@ from craik.contracts.models import (
     IntentLock,
     MemoryProposal,
     ProjectProfile,
+    RunOutput,
     TaskRequest,
     TaskRun,
     WorkGraphEvent,
@@ -79,6 +80,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
 ) -> None:
     task = TaskRequest.model_validate(fixtures["craik.task_request"])
     task_run = TaskRun.model_validate(fixtures["craik.task_run"])
+    run_output = RunOutput.model_validate(fixtures["craik.run_output"])
     receipt = CapabilityReceipt.model_validate(fixtures["craik.capability_receipt"])
     case_file = CaseFile.model_validate(fixtures["craik.case_file"])
     handoff = Handoff.model_validate(fixtures["craik.handoff"])
@@ -92,6 +94,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
 
     store.put_task(task)
     store.put_task_run(task_run)
+    store.put_run_output(run_output)
     store.put_receipt(receipt)
     store.put_case_file(case_file)
     store.put_handoff(handoff)
@@ -105,8 +108,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
+    assert store.get_run_output(run_output.id) == run_output
     assert store.list_tasks() == [task]
     assert store.list_task_runs() == [task_run]
+    assert store.list_run_outputs() == [run_output]
     assert store.get_receipt(receipt.id) == receipt
     assert store.get_case_file(case_file.id) == case_file
     assert store.get_handoff(handoff.id) == handoff
@@ -134,6 +139,7 @@ def test_persists_supported_contract_types(
 ) -> None:
     for schema_name in (
         "craik.project_profile",
+        "craik.run_output",
         "craik.task_request",
         "craik.task_run",
         "craik.capability_receipt",

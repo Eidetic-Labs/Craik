@@ -401,6 +401,26 @@ class RunnerStepResult(CraikModel):
     created_at: datetime
 
 
+class RunOutput(CraikModel):
+    """Inspectable observed output captured from one runner step."""
+
+    schema_: Literal["craik.run_output"] = Field(default="craik.run_output", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    run_id: str
+    step_result_id: str
+    task_id: str
+    phase: TaskRunPhase
+    summary: str
+    observed_output: dict[str, Any] = Field(default_factory=dict)
+    diagnostics: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    memory_proposal_ids: list[str] = Field(default_factory=list)
+    artifacts: list[str] = Field(default_factory=list)
+    redacted: bool = True
+    created_at: datetime
+
+
 class FactValue(CraikModel):
     """Proposed fact payload for memory updates."""
 
@@ -423,6 +443,9 @@ class MemoryProposal(CraikModel):
     version: Literal["0.1.0"] = "0.1.0"
     id: str
     task_id: str
+    run_id: str | None = None
+    step_id: str | None = None
+    handoff_id: str | None = None
     operation: ProposalOperation
     fact: FactValue
     evidence: list[EvidenceReference] = Field(default_factory=list)
