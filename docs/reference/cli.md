@@ -97,6 +97,25 @@ Options:
 - `--api-key <key>`: bearer API key. Prefer `CRAIK_STIGMEM_API_KEY`.
 - `--timeout <seconds>`: request timeout. Can also be set with `CRAIK_STIGMEM_TIMEOUT`.
 
+## `craik onboard`
+
+Print runner-readable project onboarding context.
+
+Required options:
+
+- `--project <id-or-name>`: registered project id or name.
+
+Options:
+
+- `--policy-profile <name>`: `strict`, `trusted-local`, or `automation`; defaults to `strict`.
+- `--trusted-local-fail-open`: explicitly opt in to trusted-local fail-open semantics.
+- `--max-recent-handoffs <count>`: recent handoffs to include; defaults to `5`.
+
+The command prints a `craik.agent_onboarding` JSON payload with the project
+model, active policy, docs boundaries, recent handoffs, unresolved
+contradictions, stale-risk warnings, validation commands, Stigmem backend status,
+known traps, and allowed next actions.
+
 ## `craik contradictions open`
 
 Open and persist a local contradiction report.

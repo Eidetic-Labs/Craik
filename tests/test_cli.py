@@ -220,6 +220,38 @@ def test_contradiction_commands_open_list_show(tmp_path: Path) -> None:
     assert json.loads(shown.stdout)["contradiction"]["id"] == report_id
 
 
+def test_onboard_command_prints_runner_readable_project_context(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    (repo / "docs" / "adr").mkdir(parents=True)
+    (repo / "README.md").write_text("# Repo\n")
+    (repo / "docs" / "adr" / "0001-record.md").write_text("# ADR\n")
+    (repo / "pyproject.toml").write_text("[project]\nname = \"repo\"\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md", "docs", "pyproject.toml")
+    _run_git(repo, "commit", "-m", "initial")
+    home = tmp_path / "home"
+
+    added = runner.invoke(
+        app,
+        ["project", "add", str(repo), "--name", "Example"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    onboarded = runner.invoke(
+        app,
+        ["onboard", "--project", "Example"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert added.exit_code == 0
+    assert onboarded.exit_code == 0
+    payload = json.loads(onboarded.stdout)
+    assert payload["schema"] == "craik.agent_onboarding"
+    assert payload["project_id"] == "project_example"
+    assert payload["active_policy"]["profile"] == "strict"
+    assert payload["docs_boundaries"]["immutable_paths"] == ["docs/adr/"]
+    assert payload["validation_commands"][-1] == "uv run --python 3.12 --extra dev pytest"
+
+
 def test_intent_show_reports_task_intent_lock(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

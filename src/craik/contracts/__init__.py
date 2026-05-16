@@ -1,6 +1,7 @@
 """Versioned runtime contracts for Craik."""
 
 from craik.contracts.models import (
+    AgentOnboarding,
     Assumption,
     CapabilityGrant,
     CapabilityReceipt,
@@ -19,6 +20,7 @@ from craik.contracts.models import (
 )
 
 __all__ = [
+    "AgentOnboarding",
     "Assumption",
     "CapabilityGrant",
     "CapabilityReceipt",

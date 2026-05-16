@@ -453,6 +453,29 @@ class CaseFile(CraikModel):
     context_budget: dict[str, Any] = Field(default_factory=dict)
 
 
+class AgentOnboarding(CraikModel):
+    """Runner-readable project context for an agent starting work."""
+
+    schema_: Literal["craik.agent_onboarding"] = Field(
+        default="craik.agent_onboarding",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    project_model: dict[str, Any]
+    active_policy: PolicyEnvelope
+    docs_boundaries: dict[str, Any]
+    recent_handoffs: list[dict[str, Any]] = Field(default_factory=list)
+    unresolved_contradictions: list[ContradictionReport] = Field(default_factory=list)
+    stale_risk_warnings: list[str] = Field(default_factory=list)
+    validation_commands: list[str] = Field(default_factory=list)
+    stigmem_backend_status: dict[str, Any] = Field(default_factory=dict)
+    known_traps: list[str] = Field(default_factory=list)
+    allowed_next_actions: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+
 class SelfAudit(CraikModel):
     """Required handoff self-audit checklist."""
 

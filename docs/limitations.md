@@ -10,6 +10,7 @@ Current limitations:
 - Stigmem direct writes require explicit `memory.write` grants; proposal review remains the default path.
 - Memory diffs and impact previews currently derive from local proposal state and approved local facts; runner-normalized fact reads, direct Stigmem write receipts, and write-failure ingestion are not wired into full workflows yet.
 - Handoffs currently derive context debt from local case files only; they do not yet include runner result normalization or remote artifact upload.
+- Agent onboarding summarizes local state and configured Stigmem environment presence, but it does not perform live Stigmem backend discovery.
 - Case files currently load local project/task/repo/docs context and read-only GitHub state when configured; Stigmem facts, recent handoffs, and local contradiction report loading are not wired into case assembly yet.
 - The CLI does not request tool authority or write runtime state.
 - Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.

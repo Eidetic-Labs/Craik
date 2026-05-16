@@ -5,6 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from craik.contracts.models import (
+    AgentOnboarding,
     Assumption,
     CapabilityGrant,
     CapabilityReceipt,
@@ -27,6 +28,7 @@ from craik.contracts.models import (
 type ContractModel = type[BaseModel]
 
 CONTRACT_REGISTRY: dict[str, ContractModel] = {
+    "craik.agent_onboarding": AgentOnboarding,
     "craik.assumption": Assumption,
     "craik.capability_grant": CapabilityGrant,
     "craik.capability_receipt": CapabilityReceipt,
