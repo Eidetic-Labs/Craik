@@ -76,6 +76,7 @@ craik schema show craik.task_request
 | `craik.scratchpad_record` | Stores expiring temporary working notes that must not become durable context by default. |
 | `craik.scope_change_request` | Requests a human decision to change accepted task scope. |
 | `craik.scope_change_result` | Records accepted or rejected human scope-change decisions. |
+| `craik.skill_invocation_context` | Captures policy-linked, redacted inputs, outputs, omissions, evidence, and receipts for one skill run. |
 | `craik.skill_package` | Defines reusable skill metadata, entrypoints, docs, assets, and schema expectations. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |

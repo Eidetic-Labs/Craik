@@ -1163,6 +1163,39 @@
     "runtime_authority": false,
     "created_at": "2026-05-16T15:30:00Z"
   },
+  "craik.skill_invocation_context": {
+    "schema": "craik.skill_invocation_context",
+    "version": "0.1.0",
+    "id": "skill_context_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "skill_package_id": "skill_docs_reconcile",
+    "policy_envelope_id": "policy_docs_reconcile",
+    "handoff_id": "handoff_docs_reconcile",
+    "inputs": [
+      {
+        "schema_name": "craik.case_file",
+        "contract_id": "case_docs_reconcile",
+        "required": true,
+        "summary": "Task case file supplied to the skill.",
+        "evidence_ids": ["evidence_readme_status"]
+      }
+    ],
+    "outputs": [
+      {
+        "schema_name": "craik.worker_result",
+        "contract_id": "worker_result_docs_reconcile_verifier",
+        "required": true,
+        "produced": true,
+        "summary": "Worker result produced by the skill.",
+        "evidence_ids": ["evidence_worker_result_docs_reconcile"]
+      }
+    ],
+    "omissions": [],
+    "evidence_ids": ["evidence_readme_status"],
+    "receipt_ids": ["receipt_runner_fixture"],
+    "redacted": true,
+    "created_at": "2026-05-16T15:50:00Z"
+  },
   "craik.plugin_descriptor": {
     "schema": "craik.plugin_descriptor",
     "version": "0.1.0",
