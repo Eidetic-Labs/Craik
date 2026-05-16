@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+
 from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
@@ -14,6 +16,39 @@ from craik.contracts.models import (
     WorkGraphExport,
     WorkGraphNode,
 )
+
+
+@dataclass(frozen=True)
+class BudgetQuotaSnapshot:
+    """Operator-visible budget and quota state."""
+
+    configured_limits: dict[str, float | int | str] = field(default_factory=dict)
+    usage: dict[str, float | int | str] = field(default_factory=dict)
+    missing: list[str] = field(default_factory=list)
+    exceeded: list[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
+
+
+def format_budget_quota_view(snapshot: BudgetQuotaSnapshot) -> list[str]:
+    """Format budget and quota state without inventing missing data."""
+    return [
+        "Budget And Quota",
+        "",
+        "Configured Limits",
+        *_format_mapping(snapshot.configured_limits),
+        "",
+        "Usage",
+        *_format_mapping(snapshot.usage),
+        "",
+        "Missing Data",
+        *_format_items(snapshot.missing),
+        "",
+        "Exceeded",
+        *_format_items(snapshot.exceeded),
+        "",
+        "Notes",
+        *_format_items(snapshot.notes),
+    ]
 
 
 def format_delegation_queue(delegations: list[HumanDelegationPoint]) -> list[str]:
@@ -208,6 +243,12 @@ def _format_items(items: list[str]) -> list[str]:
     if not items:
         return ["- none"]
     return [f"- {item}" for item in items]
+
+
+def _format_mapping(items: dict[str, float | int | str]) -> list[str]:
+    if not items:
+        return ["- none"]
+    return [f"- {key}: {items[key]}" for key in sorted(items)]
 
 
 def _join_or_none(items: list[str]) -> str:
