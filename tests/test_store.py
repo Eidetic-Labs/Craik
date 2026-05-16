@@ -41,9 +41,11 @@ from craik.contracts.models import (
     RuntimeCriticFinding,
     ScopeChangeRequest,
     ScopeChangeResult,
+    ScratchpadRecord,
     TaskRequest,
     TaskRun,
     ToolResultAttestation,
+    UnknownRecord,
     WorkerResult,
     WorkGraphEvent,
     WorkGraphExport,
@@ -173,6 +175,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
         fixtures["craik.runtime_critic_finding"]
     )
     red_team_finding = RedTeamFinding.model_validate(fixtures["craik.red_team_finding"])
+    scratchpad = ScratchpadRecord.model_validate(fixtures["craik.scratchpad_record"])
+    unknown = UnknownRecord.model_validate(fixtures["craik.unknown_record"])
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -214,6 +218,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_recovery_session(recovery_session)
     store.put_runtime_critic_finding(critic_finding)
     store.put_red_team_finding(red_team_finding)
+    store.put_scratchpad_record(scratchpad)
+    store.put_unknown_record(unknown)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -267,6 +273,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_recovery_session(recovery_session.id) == recovery_session
     assert store.get_runtime_critic_finding(critic_finding.id) == critic_finding
     assert store.get_red_team_finding(red_team_finding.id) == red_team_finding
+    assert store.get_scratchpad_record(scratchpad.id) == scratchpad
+    assert store.get_unknown_record(unknown.id) == unknown
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -303,6 +311,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_recovery_sessions() == [recovery_session]
     assert store.list_runtime_critic_findings() == [critic_finding]
     assert store.list_red_team_findings() == [red_team_finding]
+    assert store.list_scratchpad_records() == [scratchpad]
+    assert store.list_unknown_records() == [unknown]
 
 
 def test_persists_supported_contract_types(
@@ -331,6 +341,7 @@ def test_persists_supported_contract_types(
         "craik.review_result",
         "craik.run_delta",
         "craik.runtime_critic_finding",
+        "craik.scratchpad_record",
         "craik.adjudication_outcome",
         "craik.human_delegation_point",
         "craik.instruction_source",
@@ -351,6 +362,7 @@ def test_persists_supported_contract_types(
         "craik.work_graph_event",
         "craik.worker_result",
         "craik.tool_result_attestation",
+        "craik.unknown_record",
     ):
         model = CONTRACT_REGISTRY[schema_name]
         contract = model.model_validate(fixtures[schema_name])

@@ -563,6 +563,35 @@
     "created_at": "2026-05-16T09:40:00Z",
     "expires_at": "2026-05-17T09:40:00Z"
   },
+  "craik.scratchpad_record": {
+    "schema": "craik.scratchpad_record",
+    "version": "0.1.0",
+    "id": "scratchpad_docs_reconcile_note",
+    "task_id": "task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "owner": "agent:codex",
+    "status": "active",
+    "note": "Temporary fixture note that must expire before durable promotion.",
+    "evidence_ids": ["evidence_readme_status"],
+    "created_at": "2026-05-16T10:00:00Z",
+    "expires_at": "2026-05-16T11:00:00Z"
+  },
+  "craik.unknown_record": {
+    "schema": "craik.unknown_record",
+    "version": "0.1.0",
+    "id": "unknown_external_release_state",
+    "task_id": "task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "owner": "agent:codex",
+    "status": "unresolved",
+    "question": "Did external release state change after the fixture was captured?",
+    "needed_resolution": "external_wait",
+    "next_action": "Refresh external release state before relying on prior absence.",
+    "evidence_ids": ["evidence_readme_status"],
+    "resolved_answer": null,
+    "created_at": "2026-05-16T10:00:00Z",
+    "resolved_at": null
+  },
   "craik.memory_proposal": {
     "schema": "craik.memory_proposal",
     "version": "0.1.0",

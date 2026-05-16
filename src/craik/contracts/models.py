@@ -108,6 +108,17 @@ KnownTrapKind = Literal[
     "security",
     "other",
 ]
+ScratchpadStatus = Literal["active", "expired", "promoted", "discarded"]
+UnknownStatus = Literal["unresolved", "resolved"]
+UnknownResolutionSource = Literal[
+    "user_input",
+    "web_access",
+    "repo_inspection",
+    "tool_access",
+    "memory_query",
+    "external_wait",
+    "other",
+]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1670,6 +1681,63 @@ class NegativeKnowledge(CraikModel):
             raise ValueError("negative knowledge requires evidence_ids")
         if self.expires_at is not None and self.expires_at <= self.created_at:
             raise ValueError("negative knowledge expires_at must be after created_at")
+        return self
+
+
+class ScratchpadRecord(CraikModel):
+    """Temporary working note that must expire before it becomes durable context."""
+
+    schema_: Literal["craik.scratchpad_record"] = Field(
+        default="craik.scratchpad_record",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    owner: str
+    status: ScratchpadStatus = "active"
+    note: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+    expires_at: datetime
+
+    @model_validator(mode="after")
+    def validate_scratchpad_expiry(self) -> ScratchpadRecord:
+        """Require scratchpad entries to have a future expiry at creation time."""
+        if self.expires_at <= self.created_at:
+            raise ValueError("scratchpad expires_at must be after created_at")
+        return self
+
+
+class UnknownRecord(CraikModel):
+    """First-class unknown that identifies what is needed to resolve it."""
+
+    schema_: Literal["craik.unknown_record"] = Field(
+        default="craik.unknown_record",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    owner: str | None = None
+    status: UnknownStatus = "unresolved"
+    question: str
+    needed_resolution: UnknownResolutionSource
+    next_action: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    resolved_answer: str | None = None
+    created_at: datetime
+    resolved_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_unknown_status(self) -> UnknownRecord:
+        """Require resolved unknowns to carry answer and timestamp."""
+        if self.status == "resolved" and (not self.resolved_answer or self.resolved_at is None):
+            raise ValueError("resolved unknowns require resolved_answer and resolved_at")
+        if self.status == "unresolved" and self.resolved_at is not None:
+            raise ValueError("unresolved unknowns must not set resolved_at")
         return self
 
 

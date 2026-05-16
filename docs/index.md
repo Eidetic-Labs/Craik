@@ -50,6 +50,7 @@ project.
 - [Context Debt](reference/context-debt.md)
 - [Tool Attestations And Freshness](reference/freshness.md)
 - [Known Traps And Negative Knowledge](reference/known-traps.md)
+- [Scratchpad And Unknowns](reference/scratchpad-and-unknowns.md)
 - [Human Delegation](reference/human-delegation.md)
 - [Instruction Sources](reference/instruction-sources.md)
 - [Instruction Distillation Workflow](reference/instruction-distillation-workflow.md)

@@ -53,9 +53,11 @@ from craik.contracts.models import (
     RuntimeCriticFinding,
     ScopeChangeRequest,
     ScopeChangeResult,
+    ScratchpadRecord,
     TaskRequest,
     TaskRun,
     ToolResultAttestation,
+    UnknownRecord,
     WorkerResult,
     WorkGraphEvent,
 )
@@ -112,7 +114,9 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.scope_change_result": "scope_change_results",
     "craik.run_delta": "run_deltas",
     "craik.runtime_critic_finding": "runtime_critic_findings",
+    "craik.scratchpad_record": "scratchpad_records",
     "craik.tool_result_attestation": "tool_result_attestations",
+    "craik.unknown_record": "unknown_records",
 }
 
 
@@ -659,6 +663,26 @@ class LocalStore:
 
     def list_negative_knowledge(self) -> list[NegativeKnowledge]:
         return _cast_list(NegativeKnowledge, self.list_contracts("craik.negative_knowledge"))
+
+    def put_scratchpad_record(self, record: ScratchpadRecord) -> None:
+        self.put_contract(record)
+
+    def get_scratchpad_record(self, record_id: str) -> ScratchpadRecord | None:
+        contract = self.get_contract("craik.scratchpad_record", record_id)
+        return _cast_optional(ScratchpadRecord, contract)
+
+    def list_scratchpad_records(self) -> list[ScratchpadRecord]:
+        return _cast_list(ScratchpadRecord, self.list_contracts("craik.scratchpad_record"))
+
+    def put_unknown_record(self, record: UnknownRecord) -> None:
+        self.put_contract(record)
+
+    def get_unknown_record(self, record_id: str) -> UnknownRecord | None:
+        contract = self.get_contract("craik.unknown_record", record_id)
+        return _cast_optional(UnknownRecord, contract)
+
+    def list_unknown_records(self) -> list[UnknownRecord]:
+        return _cast_list(UnknownRecord, self.list_contracts("craik.unknown_record"))
 
     def put_handoff(self, handoff: Handoff) -> None:
         self.put_contract(handoff)

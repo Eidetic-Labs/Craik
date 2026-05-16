@@ -25,6 +25,7 @@ from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.known_traps import known_trap_summaries
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.redaction import redact
+from craik.runtime.scratchpad import unknown_summaries
 from craik.runtime.store import LocalStore
 
 
@@ -137,6 +138,7 @@ class CaseFileAssembler:
             *_stale_risks(repo_state, discovered.docs, assumptions),
             *instruction_stale_risk_warnings(self.store, project.id),
             *known_trap_summaries(self.store, project.id),
+            *unknown_summaries(self.store, task.id),
         ]
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
         active_instructions = active_instruction_context(self.store, project.id)

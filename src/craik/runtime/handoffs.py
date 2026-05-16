@@ -25,6 +25,7 @@ from craik.runtime.runner_metadata import (
     runner_metadata_from_receipt_metadata,
     unique_runner_metadata,
 )
+from craik.runtime.scratchpad import unknown_summaries
 from craik.runtime.store import LocalStore
 
 
@@ -96,6 +97,7 @@ class HandoffWriter:
             handoff_id=handoff_id(task_id),
         )
         context_debt = context_debt_summaries(debt_records)
+        context_debt.extend(unknown_summaries(self.store, task_id))
         audit = _self_audit(
             receipts_reviewed=bool(receipts),
             assumptions_reviewed=bool(case_file),
