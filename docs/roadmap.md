@@ -154,6 +154,7 @@ Required outcome:
 
 Required capabilities:
 
+- repository context discovery defaults with project/user overrides,
 - runner adapter interface,
 - Codex adapter,
 - Claude adapter,
@@ -164,6 +165,23 @@ Required capabilities:
 - runner metadata in receipts and handoffs,
 - runner trust boundaries,
 - runner-specific onboarding output.
+
+Context discovery defaults are part of `v0.2.0` because runner adapters depend on
+bounded, inspectable case-file context. The `v0.3.0` loop validates that clean
+context under live execution, but the discovery and override mechanics should be
+available before runners consume case files.
+
+Tracking issues:
+
+- #48: repository context discovery defaults.
+- #49: runner adapter contract.
+- #50: runner capability matrix and trust profiles.
+- #51: policy-aware prompt compiler.
+- #52: Codex runner adapter preview.
+- #53: Claude runner adapter preview.
+- #54: Gemini runner adapter preview.
+- #55: runner metadata in receipts and handoffs.
+- #56: runner adapter preview documentation.
 
 ### v0.3.0 Gate: Single-Agent Execution Loop
 
