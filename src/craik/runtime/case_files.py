@@ -14,6 +14,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
 )
+from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.redaction import redact
 from craik.runtime.store import LocalStore
@@ -53,11 +54,13 @@ class CaseFileAssembler:
         assumptions = _assumptions(task, project, docs, omitted_docs)
         stale_risks = _stale_risks(repo_state, docs, assumptions)
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
+        intent_lock = IntentLockManager(self.store).ensure_for_task(task)
         case_file = CaseFile(
             id=f"case_{task.id.removeprefix('task_')}",
             task_id=task.id,
             objective=task.objective,
             policy_envelope_id=policy.id,
+            intent_lock_id=intent_lock.id,
             facts=[],
             evidence=evidence,
             assumptions=assumptions,

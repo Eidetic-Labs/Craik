@@ -57,6 +57,7 @@
     "task_id": "task_docs_reconcile",
     "objective": "Find stale docs and propose updates.",
     "policy_envelope_id": "policy_docs_reconcile",
+    "intent_lock_id": "intent_docs_reconcile",
     "facts": [
       {
         "entity": "repo:Eidetic-Labs/stigmem",
@@ -126,6 +127,7 @@
     "id": "handoff_docs_reconcile",
     "task_id": "task_docs_reconcile",
     "project_id": "project_stigmem",
+    "intent_lock_id": "intent_docs_reconcile",
     "agent": "agent:codex",
     "summary": "Contract schema work completed with tests and docs.",
     "completed_actions": ["Added schemas.", "Validated fixtures."],
@@ -147,9 +149,14 @@
     "version": "0.1.0",
     "id": "intent_docs_reconcile",
     "task_id": "task_docs_reconcile",
+    "original_request": "Review documentation against implementation state",
     "objective": "Define contract schemas without adding runtime authority.",
+    "accepted_interpretation": "Define contract schemas, fixtures, and schema docs only.",
     "in_scope": ["Pydantic schemas", "fixtures", "schema docs"],
     "out_of_scope": ["Policy enforcement", "memory writes"],
+    "allowed_autonomy": ["Edit contract files", "Update tests", "Update schema docs"],
+    "stop_conditions": ["The task requires runtime authority changes"],
+    "scope_change_rules": ["Ask before adding policy enforcement or memory writes"],
     "created_at": "2026-05-15T22:35:00Z"
   },
   "craik.memory_backend_capabilities": {

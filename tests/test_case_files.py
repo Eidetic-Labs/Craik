@@ -48,6 +48,7 @@ def test_case_file_build_is_deterministic_and_persisted(
     )
     assert first.id == "case_review_docs"
     assert first.policy_envelope_id == "policy_task_review_docs"
+    assert first.intent_lock_id == "intent_review_docs"
     assert first.docs == ["README.md", "docs/guide.md"]
     assert first.adrs == ["docs/adr/0001-record.md"]
     assert first.repo_state["status"] == "clean"

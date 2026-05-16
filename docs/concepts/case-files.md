@@ -6,6 +6,7 @@ A case file gives the next runtime step a durable view of:
 
 - the task objective,
 - the policy envelope id,
+- the intent lock id,
 - repository state,
 - relevant docs and immutable docs,
 - evidence references,
@@ -27,6 +28,7 @@ craik case build task_docs_reconcile
 The local assembler includes:
 
 - Git branch, head, clean/dirty status, default branch, remote or local repo identifier, and immutable path configuration,
+- an intent lock id for accepted scope boundaries,
 - documentation files discovered from the project profile,
 - ADR or immutable documentation files labeled separately,
 - evidence references for the task, project, repo status, docs, and immutable docs,
