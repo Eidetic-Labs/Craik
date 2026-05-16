@@ -1,3 +1,4 @@
+import os
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
@@ -132,9 +133,17 @@ def _repo(tmp_path: Path) -> Path:
 
 def _run_git(repo: Path, *args: str) -> None:
     subprocess_args = ["git", *args]
+    env = {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "Craik Tests",
+        "GIT_AUTHOR_EMAIL": "tests@craik.local",
+        "GIT_COMMITTER_NAME": "Craik Tests",
+        "GIT_COMMITTER_EMAIL": "tests@craik.local",
+    }
     subprocess.run(
         subprocess_args,
         cwd=repo,
+        env=env,
         check=True,
         capture_output=True,
         text=True,
