@@ -1686,6 +1686,8 @@ class ModelProvider(CraikModel):
     trust_boundary: ModelProviderTrustBoundary
     config_refs: list[str] = Field(default_factory=list)
     secret_ref_names: list[str] = Field(default_factory=list)
+    budget_ref: str | None = None
+    quota_ref: str | None = None
     runtime_path: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     docs: list[str] = Field(min_length=1)
