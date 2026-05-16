@@ -78,6 +78,7 @@ project.
 - [MCP Client](reference/mcp-client.md)
 - [Sandbox Backends](reference/sandbox-backends.md)
 - [Local Process Backend](reference/local-process-backend.md)
+- [Remote Shell Backend](reference/remote-shell-backend.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
