@@ -62,6 +62,7 @@ project.
 - [Run Delta View](reference/run-delta-view.md)
 - [Gateway Daemon Mode](reference/gateway-daemon.md)
 - [Channel Adapter Contract](reference/channel-adapter-contract.md)
+- [Messaging Channel Adapter](reference/messaging-channel-adapter.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)

@@ -76,3 +76,6 @@ Channel adapter contracts require:
 Future channel adapters can add delivery-specific behavior, but they must keep
 authorization, identity pairing, redaction, and receipt emission visible at this
 contract boundary.
+
+The first concrete fixture is the
+[Messaging Channel Adapter](messaging-channel-adapter.md).
