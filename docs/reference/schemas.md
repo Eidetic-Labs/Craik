@@ -53,6 +53,7 @@ craik schema show craik.task_request
 | `craik.instruction_source_registry` | Registers declared instruction sources for a project. |
 | `craik.instruction_source_snapshot` | Records source hash state for one observed instruction source. |
 | `craik.intent_lock` | Preserves task intent and scope boundaries. |
+| `craik.knowledge_freshness_probe` | Tracks fresh, expiring, expired, or missing knowledge for stale-risk warnings. |
 | `craik.memory_backend_capabilities` | Records detected memory backend support. |
 | `craik.memory_diff` | Explains run-scoped memory reads, proposals, writes, and failures. |
 | `craik.memory_impact_preview` | Previews memory additions, invalidations, evidence gaps, and likely contradictions. |
@@ -77,6 +78,7 @@ craik schema show craik.task_request
 | `craik.runner_step_result` | Captures one governed loop-step result, diagnostics, receipts, and proposals. |
 | `craik.task_run` | Tracks durable single-agent run status, phase, linked artifacts, receipts, and handoff. |
 | `craik.task_request` | Defines requested work. |
+| `craik.tool_result_attestation` | Records observed tool or command output with trust and expiry boundaries. |
 | `craik.work_graph_export` | Exports connected graph nodes and edges. |
 | `craik.work_graph_event` | Updates the work graph. |
 | `craik.worker_result` | Captures typed specialist worker output for multi-agent coordination. |

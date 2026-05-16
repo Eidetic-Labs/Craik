@@ -87,6 +87,17 @@ ContextDebtKind = Literal[
     "other",
 ]
 ContextDebtStatus = Literal["created", "carried_forward", "resolved"]
+ToolAttestationStatus = Literal["attested", "missing", "expired"]
+FreshnessProbeStatus = Literal["fresh", "expiring", "expired", "missing"]
+FreshnessProbeKind = Literal[
+    "github_state",
+    "documentation",
+    "memory_fact",
+    "tool_result",
+    "external_state",
+    "instruction_source",
+    "other",
+]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1520,6 +1531,75 @@ class ContextDebtRecord(CraikModel):
             raise ValueError("resolved context debt requires resolved_at")
         if self.status != "resolved" and self.resolved_at is not None:
             raise ValueError("unresolved context debt must not set resolved_at")
+        return self
+
+
+class ToolResultAttestation(CraikModel):
+    """Observed tool or command result with freshness and trust boundaries."""
+
+    schema_: Literal["craik.tool_result_attestation"] = Field(
+        default="craik.tool_result_attestation",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    tool_name: str
+    tool_identity: str
+    command: str | None = None
+    observed_output_summary: str
+    trust_class: TrustClass
+    status: ToolAttestationStatus = "attested"
+    evidence_ids: list[str] = Field(default_factory=list)
+    receipt_id: str | None = None
+    captured_at: datetime
+    expires_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_attestation_window(self) -> ToolResultAttestation:
+        """Keep attestation expiry and missing state explicit."""
+        if self.expires_at is not None and self.expires_at <= self.captured_at:
+            raise ValueError("tool result attestation expires_at must be after captured_at")
+        if self.status == "missing" and (self.evidence_ids or self.receipt_id):
+            raise ValueError("missing attestations must not include evidence or receipt links")
+        if self.status == "attested" and not self.evidence_ids and self.receipt_id is None:
+            raise ValueError("attested tool results require evidence_ids or receipt_id")
+        return self
+
+
+class KnowledgeFreshnessProbe(CraikModel):
+    """Freshness probe for knowledge that can become stale or expire."""
+
+    schema_: Literal["craik.knowledge_freshness_probe"] = Field(
+        default="craik.knowledge_freshness_probe",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    target: str
+    kind: FreshnessProbeKind
+    status: FreshnessProbeStatus
+    trust_class: TrustClass
+    observed_output_summary: str
+    attestation_id: str | None = None
+    captured_at: datetime | None = None
+    expires_at: datetime | None = None
+    stale_risk_warning: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_freshness_state(self) -> KnowledgeFreshnessProbe:
+        """Require stale-risk warnings for non-fresh probe states."""
+        if self.expires_at is not None and self.captured_at is not None:
+            if self.expires_at <= self.captured_at:
+                raise ValueError("freshness probe expires_at must be after captured_at")
+        if self.status in {"expiring", "expired", "missing"} and not self.stale_risk_warning:
+            raise ValueError("non-fresh freshness probes require stale_risk_warning")
+        if self.status == "missing" and self.attestation_id is not None:
+            raise ValueError("missing freshness probes must not link an attestation")
         return self
 
 
