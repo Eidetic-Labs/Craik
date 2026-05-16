@@ -47,3 +47,6 @@ without storing message text.
 Channel allowlists do not pair identities, grant tool authority, or bypass
 policy envelopes. They only decide whether a normalized external event can
 continue to later gateway stages.
+
+See [Channel Policy Envelopes](channel-policy-envelopes.md) for the scoped
+policy selected after pairing and allowlist checks pass.
