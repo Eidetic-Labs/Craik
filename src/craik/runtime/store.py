@@ -59,6 +59,7 @@ from craik.contracts.models import (
     ScratchpadRecord,
     SkillInvocationContext,
     SkillPackage,
+    SkillRegistry,
     TaskRequest,
     TaskRun,
     ToolResultAttestation,
@@ -122,6 +123,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.scope_change_result": "scope_change_results",
     "craik.skill_invocation_context": "skill_invocation_contexts",
     "craik.skill_package": "skill_packages",
+    "craik.skill_registry": "skill_registries",
     "craik.run_delta": "run_deltas",
     "craik.runtime_critic_finding": "runtime_critic_findings",
     "craik.scratchpad_record": "scratchpad_records",
@@ -394,6 +396,16 @@ class LocalStore:
 
     def list_skill_packages(self) -> list[SkillPackage]:
         return _cast_list(SkillPackage, self.list_contracts("craik.skill_package"))
+
+    def put_skill_registry(self, registry: SkillRegistry) -> None:
+        self.put_contract(registry)
+
+    def get_skill_registry(self, registry_id: str) -> SkillRegistry | None:
+        contract = self.get_contract("craik.skill_registry", registry_id)
+        return _cast_optional(SkillRegistry, contract)
+
+    def list_skill_registries(self) -> list[SkillRegistry]:
+        return _cast_list(SkillRegistry, self.list_contracts("craik.skill_registry"))
 
     def put_skill_invocation_context(self, context: SkillInvocationContext) -> None:
         self.put_contract(context)

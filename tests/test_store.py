@@ -47,6 +47,7 @@ from craik.contracts.models import (
     ScratchpadRecord,
     SkillInvocationContext,
     SkillPackage,
+    SkillRegistry,
     TaskRequest,
     TaskRun,
     ToolResultAttestation,
@@ -156,6 +157,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     scope_request = ScopeChangeRequest.model_validate(fixtures["craik.scope_change_request"])
     scope_result = ScopeChangeResult.model_validate(fixtures["craik.scope_change_result"])
     skill_package = SkillPackage.model_validate(fixtures["craik.skill_package"])
+    skill_registry = SkillRegistry.model_validate(fixtures["craik.skill_registry"])
     skill_context = SkillInvocationContext.model_validate(
         fixtures["craik.skill_invocation_context"]
     )
@@ -222,6 +224,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_scope_change_request(scope_request)
     store.put_scope_change_result(scope_result)
     store.put_skill_package(skill_package)
+    store.put_skill_registry(skill_registry)
     store.put_skill_invocation_context(skill_context)
     store.put_plugin_descriptor(plugin_descriptor)
     store.put_instruction_source(instruction_source)
@@ -276,6 +279,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_scope_change_request(scope_request.id) == scope_request
     assert store.get_scope_change_result(scope_result.id) == scope_result
     assert store.get_skill_package(skill_package.id) == skill_package
+    assert store.get_skill_registry(skill_registry.id) == skill_registry
     assert store.get_skill_invocation_context(skill_context.id) == skill_context
     assert store.get_plugin_descriptor(plugin_descriptor.id) == plugin_descriptor
     assert store.get_instruction_source(instruction_source.id) == instruction_source
@@ -325,6 +329,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_scope_change_requests() == [scope_request]
     assert store.list_scope_change_results() == [scope_result]
     assert store.list_skill_packages() == [skill_package]
+    assert store.list_skill_registries() == [skill_registry]
     assert store.list_skill_invocation_contexts() == [skill_context]
     assert store.list_plugin_descriptors() == [plugin_descriptor]
     assert store.list_instruction_sources() == [instruction_source]
@@ -379,6 +384,7 @@ def test_persists_supported_contract_types(
         "craik.scope_change_request",
         "craik.scope_change_result",
         "craik.skill_package",
+        "craik.skill_registry",
         "craik.skill_invocation_context",
         "craik.plugin_descriptor",
         "craik.handoff",

@@ -78,6 +78,7 @@ craik schema show craik.task_request
 | `craik.scope_change_result` | Records accepted or rejected human scope-change decisions. |
 | `craik.skill_invocation_context` | Captures policy-linked, redacted inputs, outputs, omissions, evidence, and receipts for one skill run. |
 | `craik.skill_package` | Defines reusable skill metadata, entrypoints, docs, assets, and schema expectations. |
+| `craik.skill_registry` | Registers project-local and global skill entries with trust boundaries, precedence, and provenance. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |
 | `craik.runner_capability_matrix` | Defines runner capability support, trust boundary, and default grant posture. |
