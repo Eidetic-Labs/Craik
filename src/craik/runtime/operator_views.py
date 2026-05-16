@@ -2,7 +2,52 @@
 
 from __future__ import annotations
 
-from craik.contracts.models import Handoff, WorkGraphEdge, WorkGraphExport, WorkGraphNode
+from craik.contracts.models import (
+    CapabilityReceipt,
+    Handoff,
+    PluginReceipt,
+    WorkGraphEdge,
+    WorkGraphExport,
+    WorkGraphNode,
+)
+
+
+def format_receipt_viewer(receipt: CapabilityReceipt | PluginReceipt) -> list[str]:
+    """Format a redacted capability or plugin receipt."""
+    if isinstance(receipt, PluginReceipt):
+        lines = [
+            f"Plugin Receipt: {receipt.id}",
+            f"Task: {receipt.task_id}",
+            f"Actor: {receipt.actor}",
+            f"Plugin: {receipt.plugin_descriptor_id}",
+            f"Action: {receipt.action}",
+            f"Trust Boundary: {receipt.trust_boundary}",
+            f"Status: {receipt.result.status}",
+            f"Summary: {receipt.result.summary}",
+            f"Redacted: {receipt.redacted}",
+            "",
+            "Capability Grants",
+            *_format_items(receipt.capability_grant_ids),
+            "",
+            "Evidence",
+            *_format_items(receipt.evidence_ids),
+            "",
+            "Handoffs",
+            *_format_items(receipt.handoff_ids),
+        ]
+        return lines
+    return [
+        f"Capability Receipt: {receipt.id}",
+        f"Task: {receipt.task_id}",
+        f"Actor: {receipt.actor}",
+        f"Capability: {receipt.capability}",
+        f"Target: {receipt.target}",
+        f"Policy: {receipt.policy_profile}",
+        f"Status: {receipt.result.status}",
+        f"Reason: {receipt.reason}",
+        f"Summary: {receipt.result.summary}",
+        f"Redacted: {receipt.redacted}",
+    ]
 
 
 def format_handoff_viewer(handoff: Handoff) -> list[str]:
