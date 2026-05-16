@@ -63,6 +63,7 @@ craik schema show craik.task_request
 | `craik.memory_proposal` | Describes reviewable memory updates. |
 | `craik.negative_knowledge` | Records evidence-backed negative statements with scope and freshness boundaries. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
+| `craik.plugin_descriptor` | Defines governed plugin identity, entrypoints, capability declarations, docs, security metadata, and compatibility without granting authority. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.promoted_instruction_constraint` | Captures an approved distilled instruction as an active runtime constraint. |
 | `craik.red_team_finding` | Captures reviewable adversarial findings and blockers for high-risk work. |

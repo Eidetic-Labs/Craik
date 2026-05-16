@@ -1163,6 +1163,49 @@
     "runtime_authority": false,
     "created_at": "2026-05-16T15:30:00Z"
   },
+  "craik.plugin_descriptor": {
+    "schema": "craik.plugin_descriptor",
+    "version": "0.1.0",
+    "id": "plugin_docs_reconcile",
+    "name": "Docs Reconcile Plugin",
+    "plugin_version": "0.1.0",
+    "description": "Adds governed docs reconciliation workflow entrypoints.",
+    "publisher": "Eidetic Labs",
+    "entrypoints": [
+      {
+        "id": "entry_workflow",
+        "kind": "workflow",
+        "path": "plugin.py:run",
+        "description": "Runs the docs reconciliation workflow."
+      }
+    ],
+    "capabilities": [
+      {
+        "capability": "repo.read",
+        "description": "Read project source and documentation files.",
+        "required": true,
+        "grant_required": true,
+        "risk": "medium",
+        "operations": ["read"],
+        "targets": ["repo"]
+      }
+    ],
+    "docs": ["README.md", "docs/plugin.md"],
+    "compatibility": {
+      "craik_versions": ["0.7"],
+      "python_versions": ["3.12"],
+      "platforms": ["darwin", "linux"],
+      "status": "supported",
+      "notes": "Fixture descriptor for contract validation."
+    },
+    "security_notes": [
+      "Descriptor declares capability needs only; runtime authority requires grants."
+    ],
+    "skill_package_ids": ["skill_docs_reconcile"],
+    "provenance_ids": ["evidence_readme_status"],
+    "runtime_authority": false,
+    "created_at": "2026-05-16T15:45:00Z"
+  },
   "craik.instruction_source": {
     "schema": "craik.instruction_source",
     "version": "0.1.0",

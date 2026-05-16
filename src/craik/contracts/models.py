@@ -131,6 +131,9 @@ ContextRequestKind = Literal[
 ]
 ExitDisciplineStatus = Literal["complete", "blocked"]
 SkillEntrypointKind = Literal["prompt", "script", "module", "workflow", "docs"]
+PluginEntrypointKind = Literal["command", "module", "workflow", "service", "docs"]
+PluginCapabilityRisk = Literal["low", "medium", "high", "critical"]
+PluginCompatibilityStatus = Literal["supported", "experimental", "unsupported"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1868,6 +1871,73 @@ class SkillPackage(CraikModel):
             raise ValueError("skill packages require docs")
         if self.runtime_authority is not False:
             raise ValueError("skill packages must not carry runtime authority")
+        return self
+
+
+class PluginEntrypoint(CraikModel):
+    """One declared entrypoint inside a governed plugin descriptor."""
+
+    id: str
+    kind: PluginEntrypointKind
+    path: str
+    description: str
+
+
+class PluginCapabilityDeclaration(CraikModel):
+    """Capability a plugin may request, without granting runtime authority."""
+
+    capability: str
+    description: str
+    required: bool = True
+    grant_required: bool = True
+    risk: PluginCapabilityRisk
+    operations: list[str] = Field(default_factory=list)
+    targets: list[str] = Field(default_factory=list)
+
+
+class PluginCompatibility(CraikModel):
+    """Runtime and platform compatibility metadata for a plugin descriptor."""
+
+    craik_versions: list[str] = Field(min_length=1)
+    python_versions: list[str] = Field(default_factory=list)
+    platforms: list[str] = Field(default_factory=list)
+    status: PluginCompatibilityStatus
+    notes: str | None = None
+
+
+class PluginDescriptor(CraikModel):
+    """Governed plugin metadata that declares needs but grants no authority."""
+
+    schema_: Literal["craik.plugin_descriptor"] = Field(
+        default="craik.plugin_descriptor",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    name: str
+    plugin_version: str
+    description: str
+    publisher: str
+    entrypoints: list[PluginEntrypoint] = Field(min_length=1)
+    capabilities: list[PluginCapabilityDeclaration] = Field(min_length=1)
+    docs: list[str] = Field(min_length=1)
+    compatibility: PluginCompatibility
+    security_notes: list[str] = Field(min_length=1)
+    skill_package_ids: list[str] = Field(default_factory=list)
+    provenance_ids: list[str] = Field(default_factory=list)
+    runtime_authority: Literal[False] = False
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_plugin_descriptor(self) -> PluginDescriptor:
+        """Require versioned descriptors and grant separation for risky capabilities."""
+        if "." not in self.plugin_version:
+            raise ValueError("plugin plugin_version must be semantic-version-like")
+        for capability in self.capabilities:
+            if capability.risk in {"high", "critical"} and not capability.grant_required:
+                raise ValueError("high-risk plugin capabilities require explicit grants")
+        if self.runtime_authority is not False:
+            raise ValueError("plugin descriptors must not carry runtime authority")
         return self
 
 
