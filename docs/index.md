@@ -43,6 +43,7 @@ project.
 - [CLI](reference/cli.md)
 - [Config](reference/config.md)
 - [Schemas](reference/schemas.md)
+- [Agent Roles](reference/agent-roles.md)
 - [Runner Adapter Contract](reference/runner-adapter-contract.md)
 - [Runner Step Contracts](reference/runner-step-contracts.md)
 - [Codex Runner Adapter](reference/codex-runner-adapter.md)

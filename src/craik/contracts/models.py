@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SCHEMA_VERSION = "0.1.0"
 
@@ -37,6 +37,17 @@ RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
+AgentRoleKind = Literal[
+    "orchestrator",
+    "implementer",
+    "verifier",
+    "adversarial_reviewer",
+    "policy_reviewer",
+    "docs_reviewer",
+    "memory_curator",
+    "adjudicator",
+]
+AgentRoleAuthority = Literal["coordinate", "read", "propose", "review", "adjudicate", "implement"]
 
 
 class CraikModel(BaseModel):
@@ -279,6 +290,51 @@ class RunnerCapabilityMatrix(CraikModel):
     trust: RunnerTrustProfile
     capabilities: list[RunnerCapability] = Field(default_factory=list)
     policy_notes: list[str] = Field(default_factory=list)
+
+
+class AgentRole(CraikModel):
+    """Policy-aware role definition for multi-agent coordination."""
+
+    schema_: Literal["craik.agent_role"] = Field(default="craik.agent_role", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    kind: AgentRoleKind
+    name: str
+    description: str
+    runner_id: str | None = None
+    runner_mode: RunnerMode | None = None
+    authority: list[AgentRoleAuthority] = Field(default_factory=list)
+    allowed_capabilities: list[str] = Field(default_factory=list)
+    denied_capabilities: list[str] = Field(default_factory=list)
+    policy_envelope_id: str | None = None
+    expected_input_schemas: list[str] = Field(default_factory=list)
+    expected_output_schemas: list[str] = Field(default_factory=list)
+    handoff_required: bool = True
+    receipt_required: bool = True
+    redaction_required: bool = True
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_role_contract(self) -> AgentRole:
+        """Ensure roles carry enough authority and output boundary information."""
+        if not self.authority:
+            raise ValueError("agent roles require at least one authority value")
+        if not self.expected_output_schemas:
+            raise ValueError("agent roles require at least one expected output schema")
+        required_authority: dict[AgentRoleKind, AgentRoleAuthority] = {
+            "orchestrator": "coordinate",
+            "implementer": "implement",
+            "verifier": "review",
+            "adversarial_reviewer": "review",
+            "policy_reviewer": "review",
+            "docs_reviewer": "review",
+            "memory_curator": "review",
+            "adjudicator": "adjudicate",
+        }
+        authority = required_authority[self.kind]
+        if authority not in self.authority:
+            raise ValueError(f"{self.kind} role requires {authority!r} authority")
+        return self
 
 
 class PromptSection(CraikModel):

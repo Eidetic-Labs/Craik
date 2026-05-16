@@ -116,6 +116,40 @@
     ],
     "created_at": "2026-05-15T22:55:00Z"
   },
+  "craik.agent_role": {
+    "schema": "craik.agent_role",
+    "version": "0.1.0",
+    "id": "role_orchestrator_fixture",
+    "kind": "orchestrator",
+    "name": "Fixture Orchestrator",
+    "description": "Coordinates fixture specialists without widening runtime authority.",
+    "runner_id": "runner_fixture",
+    "runner_mode": "fixture",
+    "authority": ["coordinate", "review"],
+    "allowed_capabilities": ["memory.read", "receipt.write"],
+    "denied_capabilities": ["memory.write", "git.mutate"],
+    "policy_envelope_id": "policy_docs_reconcile",
+    "expected_input_schemas": ["craik.case_file", "craik.task_request"],
+    "expected_output_schemas": [
+      "craik.worker_result",
+      "craik.contradiction_report",
+      "craik.handoff"
+    ],
+    "handoff_required": true,
+    "receipt_required": true,
+    "redaction_required": true,
+    "metadata": {
+      "specialist_roles": [
+        "implementer",
+        "verifier",
+        "adversarial_reviewer",
+        "policy_reviewer",
+        "docs_reviewer",
+        "memory_curator",
+        "adjudicator"
+      ]
+    }
+  },
   "craik.assumption": {
     "schema": "craik.assumption",
     "version": "0.1.0",

@@ -30,6 +30,7 @@ craik schema show craik.task_request
 | Schema | Purpose |
 | --- | --- |
 | `craik.agent_onboarding` | Summarizes runner-readable project context before an agent starts work. |
+| `craik.agent_role` | Defines a policy-aware orchestrator or specialist role for multi-agent coordination. |
 | `craik.assumption` | Tracks unresolved assumptions that need evidence before promotion to fact. |
 | `craik.capability_grant` | Defines scoped permission for an action family. |
 | `craik.capability_receipt` | Records an auditable action result under a policy profile. |
