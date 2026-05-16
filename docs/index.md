@@ -75,6 +75,7 @@ project.
 - [Provider Switching](reference/provider-switching.md)
 - [Provider Failover](reference/provider-failover.md)
 - [MCP Export Boundary](reference/mcp-export-boundary.md)
+- [Sandbox Backends](reference/sandbox-backends.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)

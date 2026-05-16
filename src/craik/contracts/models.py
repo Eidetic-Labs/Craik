@@ -179,6 +179,8 @@ ChannelPairingStatus = Literal["unpaired", "paired", "revoked"]
 ChannelAllowlistAction = Literal["allow", "deny"]
 ModelProviderMode = Literal["chat", "completion", "embedding", "tool", "runner"]
 ModelProviderTrustBoundary = Literal["local", "self-hosted", "hosted", "third-party"]
+SandboxBackendKind = Literal["local_process", "container", "remote_shell", "browser_tool"]
+SandboxIsolationMode = Literal["none", "process", "container", "remote", "browser"]
 RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
 RunDeltaEntityType = Literal[
     "handoff",
@@ -1706,6 +1708,89 @@ class ModelProvider(CraikModel):
             normalized = key.lower().replace("-", "_")
             if any(token in normalized for token in secret_tokens):
                 raise ValueError("provider metadata must not contain secret-like keys")
+        return self
+
+
+class SandboxBackendCapability(CraikModel):
+    """One provider-neutral capability exposed by a sandbox backend."""
+
+    name: str
+    operations: list[str] = Field(min_length=1)
+    grant_required: bool = True
+    receipt_required: bool = True
+    description: str
+
+
+class SandboxBackendPolicy(CraikModel):
+    """Policy controls required before a sandbox backend can execute."""
+
+    policy_envelope_required: bool = True
+    capability_grant_required: bool = True
+    receipt_required: bool = True
+    redaction_required: bool = True
+    secrets_in_config_allowed: Literal[False] = False
+    notes: list[str] = Field(default_factory=list)
+
+
+class SandboxBackend(CraikModel):
+    """Provider-neutral execution environment backend contract."""
+
+    schema_: Literal["craik.sandbox_backend"] = Field(
+        default="craik.sandbox_backend",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    name: str
+    kind: SandboxBackendKind
+    isolation_mode: SandboxIsolationMode
+    capabilities: list[SandboxBackendCapability] = Field(min_length=1)
+    policy: SandboxBackendPolicy = Field(default_factory=SandboxBackendPolicy)
+    runtime_ref: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    docs: list[str] = Field(min_length=1)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_sandbox_backend(self) -> SandboxBackend:
+        """Keep sandbox backends provider-neutral and policy-bound."""
+        expected_isolation: dict[SandboxBackendKind, SandboxIsolationMode] = {
+            "local_process": "process",
+            "container": "container",
+            "remote_shell": "remote",
+            "browser_tool": "browser",
+        }
+        expected = expected_isolation[self.kind]
+        if self.isolation_mode != expected:
+            raise ValueError(f"{self.kind} backends require {expected!r} isolation")
+        if not self.policy.policy_envelope_required:
+            raise ValueError("sandbox backends require policy envelopes")
+        if not self.policy.capability_grant_required:
+            raise ValueError("sandbox backends require capability grants")
+        if not self.policy.receipt_required:
+            raise ValueError("sandbox backends require receipts")
+        if not self.policy.redaction_required:
+            raise ValueError("sandbox backends require redaction")
+        for capability in self.capabilities:
+            if not capability.grant_required:
+                raise ValueError("sandbox backend capabilities require grants")
+            if not capability.receipt_required:
+                raise ValueError("sandbox backend capabilities require receipts")
+        forbidden_tokens = (
+            "secret",
+            "token",
+            "api_key",
+            "apikey",
+            "password",
+            "credential",
+            "provider_id",
+        )
+        for key in self.metadata:
+            normalized = key.lower().replace("-", "_")
+            if any(token in normalized for token in forbidden_tokens):
+                raise ValueError(
+                    "sandbox backend metadata must not contain secret or provider keys"
+                )
         return self
 
 
