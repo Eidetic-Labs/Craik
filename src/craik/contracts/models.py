@@ -118,6 +118,8 @@ class DocsProfile(CraikModel):
 
     paths: list[str] = Field(default_factory=list)
     immutable_paths: list[str] = Field(default_factory=list)
+    discovery_include: list[str] = Field(default_factory=list)
+    discovery_exclude: list[str] = Field(default_factory=list)
 
 
 class MemoryProfile(CraikModel):

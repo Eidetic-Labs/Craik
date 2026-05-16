@@ -41,6 +41,8 @@ class ProjectRegistry:
         name: str | None = None,
         docs_paths: tuple[str, ...] = (),
         immutable_paths: tuple[str, ...] = (),
+        discovery_include: tuple[str, ...] = (),
+        discovery_exclude: tuple[str, ...] = (),
         memory_backend: MemoryBackend = "local",
         memory_scope: MemoryScope = "local",
     ) -> ProjectProfile:
@@ -61,7 +63,12 @@ class ProjectRegistry:
                 remote=remote,
                 default_branch=default_branch,
             ),
-            docs=DocsProfile(paths=list(docs), immutable_paths=list(immutable)),
+            docs=DocsProfile(
+                paths=list(docs),
+                immutable_paths=list(immutable),
+                discovery_include=list(discovery_include),
+                discovery_exclude=list(discovery_exclude),
+            ),
             memory=MemoryProfile(backend=memory_backend, scope=memory_scope),
             policies=[],
         )

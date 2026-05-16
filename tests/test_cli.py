@@ -87,6 +87,10 @@ def test_project_commands_round_trip_registered_repo(tmp_path) -> None:
             "README.md",
             "--immutable-path",
             "docs/adr/",
+            "--discovery-include",
+            "docs/archive/**",
+            "--discovery-exclude",
+            "docs/build/**",
         ],
         env={"CRAIK_HOME": str(home)},
     )
@@ -98,6 +102,8 @@ def test_project_commands_round_trip_registered_repo(tmp_path) -> None:
     assert shown.exit_code == 0
     assert '"id": "project_example"' in shown.stdout
     assert '"immutable_paths": [' in shown.stdout
+    assert '"discovery_include": [' in shown.stdout
+    assert '"discovery_exclude": [' in shown.stdout
     assert not (repo / ".craik").exists()
 
 
@@ -146,7 +152,7 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
     )
     built = runner.invoke(
         app,
-        ["case", "build", "task_review_docs"],
+        ["case", "build", "task_review_docs", "--discovery-exclude", "docs/guide.md"],
         env={"CRAIK_HOME": str(home)},
     )
     shown = runner.invoke(
@@ -169,6 +175,7 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
     assert task_payload["task"]["id"] == "task_review_docs"
     assert task_payload["intent_lock"]["id"] == "intent_review_docs"
     assert json.loads(built.stdout)["intent_lock_id"] == "intent_review_docs"
+    assert "docs/guide.md" not in json.loads(built.stdout)["docs"]
     assert json.loads(built.stdout)["adrs"] == ["docs/adr/0001-record.md"]
     assert json.loads(shown.stdout)["id"] == "case_review_docs"
     graph_payload = json.loads(graph.stdout)

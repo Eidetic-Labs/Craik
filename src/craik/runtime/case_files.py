@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import fnmatch
+import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -33,6 +35,60 @@ class ProjectNotFoundError(CaseFileError):
     """Raised when a task references an unknown project."""
 
 
+DEFAULT_DISCOVERY_EXCLUDE = (
+    ".git/**",
+    ".hg/**",
+    ".svn/**",
+    ".mypy_cache/**",
+    ".pytest_cache/**",
+    ".ruff_cache/**",
+    ".tox/**",
+    ".venv/**",
+    "__pycache__/**",
+    "build/**",
+    "coverage/**",
+    "dist/**",
+    "generated/**",
+    "archive/**",
+    "docs/archive/**",
+    "docs/build/**",
+    "node_modules/**",
+    "site/**",
+    "vendor/**",
+    "**/.git/**",
+    "**/.mypy_cache/**",
+    "**/.pytest_cache/**",
+    "**/.ruff_cache/**",
+    "**/__pycache__/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/generated/**",
+    "**/archive/**",
+    "**/node_modules/**",
+    "**/vendor/**",
+)
+
+
+@dataclass(frozen=True)
+class DiscoveryOverrides:
+    """One-off user overrides for repository context discovery."""
+
+    include: tuple[str, ...] = ()
+    exclude: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DiscoveredDocs:
+    """Documentation discovered for a case file."""
+
+    docs: list[str]
+    adrs: list[str]
+    omitted: list[str]
+    excluded: list[dict[str, str]]
+    rules: dict[str, list[str]]
+
+
 @dataclass(frozen=True)
 class CaseFileAssembler:
     """Build deterministic case files from local project and task contracts."""
@@ -40,7 +96,13 @@ class CaseFileAssembler:
     store: LocalStore
     github_adapter: GitHubReadAdapter | None = None
 
-    def build(self, task_id: str, *, max_tokens: int = 24000) -> CaseFile:
+    def build(
+        self,
+        task_id: str,
+        *,
+        max_tokens: int = 24000,
+        discovery_overrides: DiscoveryOverrides | None = None,
+    ) -> CaseFile:
         """Build and persist a case file for a task."""
         task = self.store.get_task(task_id)
         if task is None:
@@ -50,12 +112,23 @@ class CaseFileAssembler:
             raise ProjectNotFoundError(f"unknown project for task {task_id}: {task.project_id}")
 
         repo_root = Path(project.repo.local_path)
-        docs, adrs, omitted_docs = _discover_docs(project, repo_root, max_tokens=max_tokens)
+        discovered = _discover_docs(
+            project,
+            repo_root,
+            max_tokens=max_tokens,
+            overrides=discovery_overrides or DiscoveryOverrides(),
+        )
         repo_state = _repo_state(project, repo_root)
         github_state = _github_state(self.github_adapter, project, repo_state)
-        evidence = _evidence(task, project, docs, adrs, repo_state)
-        assumptions = _assumptions(task, project, docs, omitted_docs, github_state)
-        stale_risks = _stale_risks(repo_state, docs, assumptions)
+        evidence = _evidence(task, project, discovered.docs, discovered.adrs, repo_state)
+        assumptions = _assumptions(
+            task,
+            project,
+            discovered.docs,
+            discovered.omitted,
+            github_state,
+        )
+        stale_risks = _stale_risks(repo_state, discovered.docs, assumptions)
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
         intent_lock = IntentLockManager(self.store).ensure_for_task(task)
         case_file = CaseFile(
@@ -67,8 +140,8 @@ class CaseFileAssembler:
             facts=[],
             evidence=evidence,
             assumptions=assumptions,
-            docs=docs,
-            adrs=adrs,
+            docs=discovered.docs,
+            adrs=discovered.adrs,
             repo_state=repo_state,
             github_state=github_state,
             recent_handoffs=[],
@@ -77,9 +150,11 @@ class CaseFileAssembler:
             verification_plan=_verification_plan(task),
             context_budget=_context_budget(
                 max_tokens=max_tokens,
-                docs=docs,
-                adrs=adrs,
-                omitted_docs=omitted_docs,
+                docs=discovered.docs,
+                adrs=discovered.adrs,
+                omitted_docs=discovered.omitted,
+                excluded_docs=discovered.excluded,
+                discovery_rules=discovered.rules,
                 evidence=evidence,
                 assumptions=assumptions,
             ),
@@ -101,19 +176,26 @@ def _discover_docs(
     repo_root: Path,
     *,
     max_tokens: int,
-) -> tuple[list[str], list[str], list[str]]:
+    overrides: DiscoveryOverrides,
+) -> DiscoveredDocs:
     docs: list[str] = []
     adrs: list[str] = []
     omitted: list[str] = []
+    excluded: dict[str, str] = {}
     budget_chars = max_tokens * 4
     used_chars = 0
     immutable_prefixes = tuple(_normalize_path(path) for path in project.docs.immutable_paths)
+    rules = _discovery_rules(project, overrides)
 
     for configured in sorted(project.docs.paths):
         path = repo_root / configured
-        candidates = _doc_candidates(repo_root, path)
+        candidates = _doc_candidates(repo_root, path, rules=rules, excluded=excluded)
         for candidate in candidates:
             relative = _relative(repo_root, candidate)
+            reason = _exclusion_reason(relative, rules)
+            if reason is not None:
+                excluded.setdefault(relative, reason)
+                continue
             size = candidate.stat().st_size
             if used_chars + size > budget_chars:
                 omitted.append(relative)
@@ -124,19 +206,107 @@ def _discover_docs(
             else:
                 docs.append(relative)
 
-    return sorted(set(docs)), sorted(set(adrs)), sorted(set(omitted))
+    return DiscoveredDocs(
+        docs=sorted(set(docs)),
+        adrs=sorted(set(adrs)),
+        omitted=sorted(set(omitted)),
+        excluded=[
+            {"path": path, "reason": reason}
+            for path, reason in sorted(excluded.items(), key=lambda item: item[0])
+        ],
+        rules={
+            "default_exclude": list(DEFAULT_DISCOVERY_EXCLUDE),
+            "project_include": list(project.docs.discovery_include),
+            "project_exclude": list(project.docs.discovery_exclude),
+            "user_include": list(overrides.include),
+            "user_exclude": list(overrides.exclude),
+        },
+    )
 
 
-def _doc_candidates(repo_root: Path, path: Path) -> list[Path]:
+def _discovery_rules(
+    project: ProjectProfile,
+    overrides: DiscoveryOverrides,
+) -> dict[str, tuple[str, ...]]:
+    return {
+        "include": tuple(
+            _normalize_path(pattern)
+            for pattern in (*project.docs.discovery_include, *overrides.include)
+        ),
+        "exclude": tuple(
+            _normalize_path(pattern)
+            for pattern in (
+                *DEFAULT_DISCOVERY_EXCLUDE,
+                *project.docs.discovery_exclude,
+                *overrides.exclude,
+            )
+        ),
+    }
+
+
+def _doc_candidates(
+    repo_root: Path,
+    path: Path,
+    *,
+    rules: dict[str, tuple[str, ...]],
+    excluded: dict[str, str],
+) -> list[Path]:
     if path.is_file():
         return [path]
     if not path.is_dir():
         return []
-    return sorted(
-        candidate
-        for candidate in path.rglob("*")
-        if candidate.is_file() and candidate.suffix.lower() in {".md", ".mdx", ".txt"}
-    )
+    candidates: list[Path] = []
+    include_rules = rules["include"]
+    for root, dirs, files in os.walk(path):
+        current = Path(root)
+        if not include_rules:
+            kept_dirs: list[str] = []
+            for dirname in dirs:
+                directory = current / dirname
+                relative = _relative(repo_root, directory)
+                reason = _exclusion_reason(f"{relative}/", rules)
+                if reason is None:
+                    kept_dirs.append(dirname)
+                else:
+                    excluded.setdefault(relative, reason)
+            dirs[:] = kept_dirs
+        for filename in files:
+            candidate = current / filename
+            if candidate.suffix.lower() in {".md", ".mdx", ".txt"}:
+                candidates.append(candidate)
+    return sorted(candidates)
+
+
+def _exclusion_reason(path: str, rules: dict[str, tuple[str, ...]]) -> str | None:
+    normalized = _normalize_path(path)
+    if _matches_any(normalized, rules["include"]):
+        return None
+    for pattern in rules["exclude"]:
+        if _path_matches(pattern, normalized):
+            return f"excluded by discovery rule: {pattern}"
+    return None
+
+
+def _matches_any(path: str, patterns: tuple[str, ...]) -> bool:
+    return any(_path_matches(pattern, path) for pattern in patterns)
+
+
+def _path_matches(pattern: str, path: str) -> bool:
+    normalized_pattern = _normalize_path(pattern)
+    normalized_path = _normalize_path(path)
+    if fnmatch.fnmatchcase(normalized_path, normalized_pattern):
+        return True
+    if normalized_pattern.startswith("**/") and normalized_pattern.endswith("/**"):
+        directory = normalized_pattern.removeprefix("**/").removesuffix("/**")
+        return (
+            normalized_path == directory
+            or normalized_path.endswith(f"/{directory}")
+            or f"/{directory}/" in normalized_path
+        )
+    if normalized_pattern.endswith("/**"):
+        prefix = normalized_pattern.removesuffix("/**")
+        return normalized_path == prefix or normalized_path.startswith(f"{prefix}/")
+    return False
 
 
 def _repo_state(project: ProjectProfile, repo_root: Path) -> dict[str, Any]:
@@ -314,6 +484,8 @@ def _context_budget(
     docs: list[str],
     adrs: list[str],
     omitted_docs: list[str],
+    excluded_docs: list[dict[str, str]],
+    discovery_rules: dict[str, list[str]],
     evidence: list[EvidenceReference],
     assumptions: list[Assumption],
 ) -> dict[str, Any]:
@@ -323,6 +495,8 @@ def _context_budget(
         "docs_included": len(docs),
         "adrs_included": len(adrs),
         "docs_omitted": omitted_docs,
+        "docs_excluded": excluded_docs,
+        "discovery_rules": discovery_rules,
         "evidence_count": len(evidence),
         "assumption_count": len(assumptions),
     }
