@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+from typing import Any
+
 from craik.contracts.models import ModelProvider
 
 
@@ -46,3 +49,68 @@ class ModelProviderRegistry:
     def list(self) -> list[ModelProvider]:
         """Return registered providers in stable id order."""
         return [self._providers[key] for key in sorted(self._providers)]
+
+
+def default_model_provider_registry() -> ModelProviderRegistry:
+    """Return built-in provider metadata for local fixture workflows."""
+    return ModelProviderRegistry(
+        [
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_fixture_local",
+                    "name": "Fixture Local Provider",
+                    "provider": "fixture",
+                    "modes": ["chat", "runner"],
+                    "capabilities": [
+                        {
+                            "name": "model.chat",
+                            "mode": "chat",
+                            "description": "Fixture chat completion.",
+                            "grant_required": True,
+                        },
+                        {
+                            "name": "runner.execute",
+                            "mode": "runner",
+                            "description": "Fixture runner execution.",
+                            "grant_required": True,
+                        },
+                    ],
+                    "trust_boundary": "local",
+                    "config_refs": ["CRAIK_PROVIDER_FIXTURE_MODE"],
+                    "secret_ref_names": ["CRAIK_PROVIDER_FIXTURE_TOKEN"],
+                    "runtime_path": "craik.runtime.fixture_provider",
+                    "metadata": {"notes": "Fixture provider metadata only."},
+                    "docs": ["docs/reference/model-providers.md"],
+                    "created_at": datetime.now(UTC),
+                }
+            )
+        ]
+    )
+
+
+def provider_selection_payload(
+    provider: ModelProvider,
+    *,
+    mode: str,
+    policy_envelope_id: str | None = None,
+    receipt_ids: list[str] | None = None,
+) -> dict[str, Any]:
+    """Return a redacted provider selection payload for operator output."""
+    if mode not in provider.modes:
+        supported = ", ".join(provider.modes)
+        raise ValueError(
+            f"provider {provider.id} does not support mode {mode!r}; supported: {supported}"
+        )
+    return {
+        "provider_id": provider.id,
+        "provider": provider.provider,
+        "name": provider.name,
+        "mode": mode,
+        "trust_boundary": provider.trust_boundary,
+        "runtime_path": provider.runtime_path,
+        "config_refs": provider.config_refs,
+        "secret_ref_names": provider.secret_ref_names,
+        "policy_envelope_id": policy_envelope_id,
+        "receipt_ids": receipt_ids or [],
+        "redacted": True,
+    }

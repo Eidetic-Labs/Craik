@@ -72,6 +72,7 @@ project.
 - [Scheduled Automations](reference/scheduled-automations.md)
 - [Gateway Receipts](reference/gateway-receipts.md)
 - [Model Providers](reference/model-providers.md)
+- [Provider Switching](reference/provider-switching.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)

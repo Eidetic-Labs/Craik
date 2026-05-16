@@ -55,6 +55,11 @@ from craik.runtime.memory import (
     evidence_reference,
     preview_memory_impact,
 )
+from craik.runtime.model_providers import (
+    ModelProviderNotFoundError,
+    default_model_provider_registry,
+    provider_selection_payload,
+)
 from craik.runtime.onboarding import AgentOnboardingBuilder, OnboardingProjectNotFoundError
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy import (
@@ -116,6 +121,8 @@ runners_app = typer.Typer(help="Inspect runner capabilities and trust profiles."
 app.add_typer(runners_app, name="runners")
 prompt_app = typer.Typer(help="Compile runner-ready prompts from Craik runtime state.")
 app.add_typer(prompt_app, name="prompt")
+provider_app = typer.Typer(help="Inspect and select model providers.")
+app.add_typer(provider_app, name="provider")
 
 
 def package_version() -> str:
@@ -272,6 +279,60 @@ def runners_matrix(
         except KeyError as error:
             raise typer.BadParameter(str(error)) from None
 
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@provider_app.command("list")
+def provider_list() -> None:
+    """Print registered model providers as JSON."""
+    registry = default_model_provider_registry()
+    payload = [
+        provider.model_dump(mode="json", by_alias=True)
+        for provider in registry.list()
+    ]
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@provider_app.command("show")
+def provider_show(provider_id: str) -> None:
+    """Print one model provider as JSON."""
+    registry = default_model_provider_registry()
+    try:
+        provider = registry.require(provider_id)
+    except ModelProviderNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    payload = provider.model_dump(mode="json", by_alias=True)
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@provider_app.command("select")
+def provider_select(
+    provider_id: str,
+    mode: Annotated[
+        str,
+        typer.Option("--mode", help="Provider mode to select."),
+    ] = "chat",
+    policy_envelope_id: Annotated[
+        str | None,
+        typer.Option("--policy-envelope-id", help="Policy envelope linked to this selection."),
+    ] = None,
+    receipt_id: Annotated[
+        list[str] | None,
+        typer.Option("--receipt-id", help="Receipt id linked to this selection."),
+    ] = None,
+) -> None:
+    """Print a redacted provider selection payload."""
+    registry = default_model_provider_registry()
+    try:
+        provider = registry.require(provider_id)
+        payload = provider_selection_payload(
+            provider,
+            mode=mode,
+            policy_envelope_id=policy_envelope_id,
+            receipt_ids=receipt_id,
+        )
+    except (ModelProviderNotFoundError, ValueError) as error:
+        raise typer.BadParameter(str(error)) from None
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
