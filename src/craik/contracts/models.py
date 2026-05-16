@@ -175,6 +175,7 @@ GatewayMode = Literal["foreground", "daemon"]
 GatewayRuntimeStatus = Literal["stopped", "starting", "running", "stopping", "failed"]
 ChannelKind = Literal["messaging", "webhook", "scheduler", "voice", "custom"]
 ChannelCapabilityDirection = Literal["inbound", "outbound", "bidirectional"]
+ChannelPairingStatus = Literal["unpaired", "paired", "revoked"]
 RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
 RunDeltaEntityType = Literal[
     "handoff",
@@ -1527,6 +1528,76 @@ class ChannelAdapterContract(CraikModel):
             raise ValueError("channel adapter contracts require receipts")
         if not self.trust_boundary.policy_envelope_required:
             raise ValueError("channel adapter contracts require policy envelopes")
+        return self
+
+
+class ChannelExternalAccount(CraikModel):
+    """External account observed at a channel boundary."""
+
+    channel: ChannelKind
+    external_id: str
+    service: str | None = None
+    display_name: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ChannelIdentityPairing(CraikModel):
+    """Pairing state between an external channel account and a Craik subject."""
+
+    schema_: Literal["craik.channel_identity_pairing"] = Field(
+        default="craik.channel_identity_pairing",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    external_account: ChannelExternalAccount
+    status: ChannelPairingStatus
+    subject: str | None = None
+    policy_envelope_id: str | None = None
+    paired_at: datetime | None = None
+    paired_by: str | None = None
+    revoked_at: datetime | None = None
+    revoked_by: str | None = None
+    revocation_reason: str | None = None
+    audit_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+    updated_at: datetime
+
+    @model_validator(mode="after")
+    def validate_channel_identity_pairing(self) -> ChannelIdentityPairing:
+        """Require explicit pairing and revocation evidence."""
+        if self.status == "unpaired":
+            forbidden = {
+                "subject": self.subject,
+                "policy_envelope_id": self.policy_envelope_id,
+                "paired_at": self.paired_at,
+                "paired_by": self.paired_by,
+                "revoked_at": self.revoked_at,
+                "revoked_by": self.revoked_by,
+                "revocation_reason": self.revocation_reason,
+            }
+            if any(value is not None for value in forbidden.values()):
+                raise ValueError("unpaired channel identities must not carry authority fields")
+        if self.status == "paired":
+            if not self.subject:
+                raise ValueError("paired channel identities require subject")
+            if not self.policy_envelope_id:
+                raise ValueError("paired channel identities require policy_envelope_id")
+            if self.paired_at is None or not self.paired_by:
+                raise ValueError("paired channel identities require paired_at and paired_by")
+            if not self.audit_ids:
+                raise ValueError("paired channel identities require audit_ids")
+            if self.revoked_at is not None or self.revoked_by or self.revocation_reason:
+                raise ValueError("paired channel identities must not carry revocation fields")
+        if self.status == "revoked":
+            if not self.subject:
+                raise ValueError("revoked channel identities preserve subject")
+            if self.paired_at is None or not self.paired_by:
+                raise ValueError("revoked channel identities preserve pairing audit fields")
+            if self.revoked_at is None or not self.revoked_by or not self.revocation_reason:
+                raise ValueError("revoked channel identities require revocation audit fields")
+            if not self.audit_ids:
+                raise ValueError("revoked channel identities require audit_ids")
         return self
 
 

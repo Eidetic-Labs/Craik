@@ -63,6 +63,7 @@ project.
 - [Gateway Daemon Mode](reference/gateway-daemon.md)
 - [Channel Adapter Contract](reference/channel-adapter-contract.md)
 - [Messaging Channel Adapter](reference/messaging-channel-adapter.md)
+- [Channel Identity Pairing](reference/channel-identity-pairing.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
