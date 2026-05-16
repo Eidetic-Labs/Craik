@@ -1,3 +1,5 @@
+from datetime import UTC, datetime, timedelta
+
 from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
@@ -12,8 +14,10 @@ from craik.contracts.models import (
     InstructionProvenance,
     InstructionSource,
     InstructionSourceSnapshot,
+    KnownTrap,
     MemoryImpactPreview,
     MemoryProposal,
+    NegativeKnowledge,
     PluginReceipt,
     RedTeamFinding,
     RuntimeCriticFinding,
@@ -24,6 +28,7 @@ from craik.contracts.models import (
 from craik.runtime.operator_views import (
     BudgetQuotaSnapshot,
     InstructionDistillationSnapshot,
+    KnownTrapsSnapshot,
     MemoryImpactPreviewSnapshot,
     QualityGateSnapshot,
     format_budget_quota_view,
@@ -32,11 +37,14 @@ from craik.runtime.operator_views import (
     format_evidence_assumption_view,
     format_handoff_viewer,
     format_instruction_distillation_view,
+    format_known_traps_view,
     format_memory_impact_preview_view,
     format_quality_gate_view,
     format_receipt_viewer,
     format_work_graph_explorer,
 )
+
+NOW = datetime(2026, 5, 16, 17, 55, tzinfo=UTC)
 
 
 def test_work_graph_explorer_formats_nodes_and_edges() -> None:
@@ -699,6 +707,63 @@ def test_memory_impact_preview_view_empty_preview_sections() -> None:
     assert lines.count("- none") == 6
 
 
+def test_known_traps_view_formats_active_expired_and_contradicted_states() -> None:
+    active = _known_trap("trap_active", "active")
+    expired = _known_trap(
+        "trap_expired",
+        "active",
+        created_at=NOW - timedelta(days=2),
+        expires_at=NOW - timedelta(days=1),
+    )
+    contradicted = _known_trap(
+        "trap_contradicted",
+        "contradicted",
+        contradiction_ids=["contradiction_trap"],
+    )
+    negative_active = _negative_knowledge("negative_active")
+    negative_expired = _negative_knowledge(
+        "negative_expired",
+        created_at=NOW - timedelta(days=2),
+        expires_at=NOW - timedelta(days=1),
+    )
+    negative_contradicted = _negative_knowledge(
+        "negative_contradicted",
+        contradiction_ids=["contradiction_negative"],
+    )
+
+    lines = format_known_traps_view(
+        KnownTrapsSnapshot(
+            known_traps=[contradicted, expired, active],
+            negative_knowledge=[negative_contradicted, negative_expired, negative_active],
+            now=NOW,
+        )
+    )
+
+    assert lines[:2] == ["Known Traps", ""]
+    assert "- trap_active [active/tool]" in lines
+    assert "- trap_expired [expired/tool]" in lines
+    assert "- trap_contradicted [contradicted/tool]" in lines
+    assert "  Project: project_traps" in lines
+    assert "  Task: task_traps" in lines
+    assert "  Avoidance: Refresh state before relying on it." in lines
+    assert "  Evidence: evidence_trap" in lines
+    assert "  Contradictions: contradiction_trap" in lines
+    assert "- negative_active [active] scope=repository trust=observed" in lines
+    assert "- negative_expired [expired] scope=repository trust=observed" in lines
+    assert "- negative_contradicted [contradicted] scope=repository trust=observed" in lines
+
+
+def test_known_traps_view_empty_state() -> None:
+    assert format_known_traps_view(KnownTrapsSnapshot()) == [
+        "Known Traps",
+        "",
+        "- none",
+        "",
+        "Negative Knowledge",
+        "- none",
+    ]
+
+
 def _delegation(
     delegation_id: str,
     status: str,
@@ -722,6 +787,56 @@ def _delegation(
             "created_at": "2026-05-16T17:20:00Z",
             "resolved_at": "2026-05-16T17:25:00Z" if resolution else None,
             "resolution": resolution,
+        }
+    )
+
+
+def _known_trap(
+    trap_id: str,
+    status: str,
+    *,
+    created_at: datetime = NOW,
+    expires_at: datetime | None = None,
+    contradiction_ids: list[str] | None = None,
+) -> KnownTrap:
+    return KnownTrap.model_validate(
+        {
+            "id": trap_id,
+            "project_id": "project_traps",
+            "task_id": "task_traps",
+            "kind": "tool",
+            "status": status,
+            "statement": "GitHub state can become stale during a run.",
+            "avoidance": "Refresh state before relying on it.",
+            "evidence_ids": ["evidence_trap"],
+            "handoff_ids": ["handoff_traps"],
+            "contradiction_ids": contradiction_ids or [],
+            "created_at": created_at,
+            "expires_at": expires_at,
+        }
+    )
+
+
+def _negative_knowledge(
+    knowledge_id: str,
+    *,
+    created_at: datetime = NOW,
+    expires_at: datetime | None = None,
+    contradiction_ids: list[str] | None = None,
+) -> NegativeKnowledge:
+    return NegativeKnowledge.model_validate(
+        {
+            "id": knowledge_id,
+            "project_id": "project_traps",
+            "task_id": "task_traps",
+            "statement": "No browser dashboard exists in v0.8.0.",
+            "scope": "repository",
+            "trust_class": "observed",
+            "evidence_ids": ["evidence_tree"],
+            "handoff_ids": ["handoff_traps"],
+            "contradiction_ids": contradiction_ids or [],
+            "created_at": created_at,
+            "expires_at": expires_at,
         }
     )
 
