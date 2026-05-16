@@ -55,6 +55,7 @@ InstructionSourceKind = Literal[
     "policy_doc",
 ]
 InstructionTrustBoundary = Literal["project", "repository", "organization", "user", "external"]
+InstructionSourceHashStatus = Literal["unchanged", "changed", "missing", "new"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -805,6 +806,73 @@ class InstructionSourceRegistry(CraikModel):
         )
         if sorted(self.declared_policy_doc_paths) != policy_paths:
             raise ValueError("declared policy doc paths must match policy_doc sources")
+        return self
+
+
+class InstructionSourceSnapshot(CraikModel):
+    """Hash identity for one observed instruction source state."""
+
+    schema_: Literal["craik.instruction_source_snapshot"] = Field(
+        default="craik.instruction_source_snapshot",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    source_id: str
+    path: str
+    hash_algorithm: Literal["sha256"] = "sha256"
+    content_hash: str | None = None
+    hash_status: InstructionSourceHashStatus
+    byte_count: int | None = Field(default=None, ge=0)
+    line_count: int | None = Field(default=None, ge=0)
+    captured_at: datetime
+
+    @model_validator(mode="after")
+    def validate_hash_state(self) -> InstructionSourceSnapshot:
+        """Require hashes for present sources and omit hashes for missing sources."""
+        if self.hash_status == "missing" and self.content_hash is not None:
+            raise ValueError("missing instruction sources must not include content_hash")
+        if self.hash_status != "missing" and not self.content_hash:
+            raise ValueError("present instruction sources require content_hash")
+        return self
+
+
+class InstructionProvenance(CraikModel):
+    """Line/range provenance for distilled instruction material."""
+
+    schema_: Literal["craik.instruction_provenance"] = Field(
+        default="craik.instruction_provenance",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    source_id: str
+    snapshot_id: str | None = None
+    path: str
+    start_line: int | None = Field(default=None, ge=1)
+    end_line: int | None = Field(default=None, ge=1)
+    start_column: int | None = Field(default=None, ge=1)
+    end_column: int | None = Field(default=None, ge=1)
+    summary: str
+    excerpt_hash: str | None = None
+    captured_at: datetime
+
+    @model_validator(mode="after")
+    def validate_range(self) -> InstructionProvenance:
+        """Allow source-level provenance or complete line ranges."""
+        has_any_line = self.start_line is not None or self.end_line is not None
+        if has_any_line and (self.start_line is None or self.end_line is None):
+            raise ValueError("instruction provenance line ranges require start_line and end_line")
+        if self.start_line is not None and self.end_line is not None:
+            if self.end_line < self.start_line:
+                raise ValueError("instruction provenance end_line must be >= start_line")
+        has_any_column = self.start_column is not None or self.end_column is not None
+        if has_any_column and (self.start_column is None or self.end_column is None):
+            raise ValueError(
+                "instruction provenance column ranges require start_column and end_column"
+            )
         return self
 
 

@@ -25,8 +25,10 @@ from craik.contracts.models import (
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionProvenance,
     InstructionSource,
     InstructionSourceRegistry,
+    InstructionSourceSnapshot,
     IntentLock,
     MemoryDiff,
     MemoryImpactPreview,
@@ -67,7 +69,9 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.handoff": "handoffs",
     "craik.human_delegation_point": "human_delegations",
     "craik.instruction_source": "instruction_sources",
+    "craik.instruction_provenance": "instruction_provenance",
     "craik.instruction_source_registry": "instruction_source_registries",
+    "craik.instruction_source_snapshot": "instruction_source_snapshots",
     "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
     "craik.memory_diff": "memory_diffs",
@@ -366,6 +370,35 @@ class LocalStore:
         return _cast_list(
             InstructionSourceRegistry,
             self.list_contracts("craik.instruction_source_registry"),
+        )
+
+    def put_instruction_source_snapshot(self, snapshot: InstructionSourceSnapshot) -> None:
+        self.put_contract(snapshot)
+
+    def get_instruction_source_snapshot(
+        self,
+        snapshot_id: str,
+    ) -> InstructionSourceSnapshot | None:
+        contract = self.get_contract("craik.instruction_source_snapshot", snapshot_id)
+        return _cast_optional(InstructionSourceSnapshot, contract)
+
+    def list_instruction_source_snapshots(self) -> list[InstructionSourceSnapshot]:
+        return _cast_list(
+            InstructionSourceSnapshot,
+            self.list_contracts("craik.instruction_source_snapshot"),
+        )
+
+    def put_instruction_provenance(self, provenance: InstructionProvenance) -> None:
+        self.put_contract(provenance)
+
+    def get_instruction_provenance(self, provenance_id: str) -> InstructionProvenance | None:
+        contract = self.get_contract("craik.instruction_provenance", provenance_id)
+        return _cast_optional(InstructionProvenance, contract)
+
+    def list_instruction_provenance(self) -> list[InstructionProvenance]:
+        return _cast_list(
+            InstructionProvenance,
+            self.list_contracts("craik.instruction_provenance"),
         )
 
     def put_task(self, task: TaskRequest) -> None:

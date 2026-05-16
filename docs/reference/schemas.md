@@ -43,8 +43,10 @@ craik schema show craik.task_request
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
 | `craik.handoff` | Summarizes durable run state for future agents. |
 | `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |
+| `craik.instruction_provenance` | Links distilled instruction material to source-level or line/range provenance. |
 | `craik.instruction_source` | Declares one runtime instruction source file or policy doc. |
 | `craik.instruction_source_registry` | Registers declared instruction sources for a project. |
+| `craik.instruction_source_snapshot` | Records source hash state for one observed instruction source. |
 | `craik.intent_lock` | Preserves task intent and scope boundaries. |
 | `craik.memory_backend_capabilities` | Records detected memory backend support. |
 | `craik.memory_diff` | Explains run-scoped memory reads, proposals, writes, and failures. |
