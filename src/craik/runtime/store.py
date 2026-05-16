@@ -20,12 +20,14 @@ from craik.contracts.models import (
     CaseFile,
     CompiledPrompt,
     ContextDebtRecord,
+    ContextRequest,
     ContradictionReport,
     DebateSummary,
     DebateTurn,
     DistilledInstructionProposal,
     EvidenceCoverageScore,
     EvidenceReference,
+    ExitDisciplineCheck,
     Handoff,
     HandoffQualityScore,
     HumanDelegationPoint,
@@ -81,6 +83,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.case_file": "case_files",
     "craik.contradiction_report": "contradictions",
     "craik.context_debt_record": "context_debt_records",
+    "craik.context_request": "context_requests",
     "craik.debate_summary": "debate_summaries",
     "craik.debate_turn": "debate_turns",
     "craik.distilled_instruction_proposal": "distilled_instruction_proposals",
@@ -100,6 +103,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.memory_impact_preview": "memory_previews",
     "craik.assumption": "assumptions",
     "craik.evidence_reference": "evidence",
+    "craik.exit_discipline_check": "exit_discipline_checks",
     "craik.evidence_coverage_score": "evidence_coverage_scores",
     "craik.work_graph_export": "graph_exports",
     "craik.handoff_quality_score": "handoff_quality_scores",
@@ -763,6 +767,16 @@ class LocalStore:
             self.list_contracts("craik.context_debt_record"),
         )
 
+    def put_context_request(self, request: ContextRequest) -> None:
+        self.put_contract(request)
+
+    def get_context_request(self, request_id: str) -> ContextRequest | None:
+        contract = self.get_contract("craik.context_request", request_id)
+        return _cast_optional(ContextRequest, contract)
+
+    def list_context_requests(self) -> list[ContextRequest]:
+        return _cast_list(ContextRequest, self.list_contracts("craik.context_request"))
+
     def put_assumption(self, assumption: Assumption) -> None:
         self.put_contract(assumption)
 
@@ -794,6 +808,19 @@ class LocalStore:
         return _cast_list(
             EvidenceCoverageScore,
             self.list_contracts("craik.evidence_coverage_score"),
+        )
+
+    def put_exit_discipline_check(self, check: ExitDisciplineCheck) -> None:
+        self.put_contract(check)
+
+    def get_exit_discipline_check(self, check_id: str) -> ExitDisciplineCheck | None:
+        contract = self.get_contract("craik.exit_discipline_check", check_id)
+        return _cast_optional(ExitDisciplineCheck, contract)
+
+    def list_exit_discipline_checks(self) -> list[ExitDisciplineCheck]:
+        return _cast_list(
+            ExitDisciplineCheck,
+            self.list_contracts("craik.exit_discipline_check"),
         )
 
     def put_graph_event(self, event: WorkGraphEvent) -> None:

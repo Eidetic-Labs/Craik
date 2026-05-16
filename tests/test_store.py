@@ -11,12 +11,14 @@ from craik.contracts.models import (
     CapabilityReceipt,
     CaseFile,
     ContextDebtRecord,
+    ContextRequest,
     ContradictionReport,
     DebateSummary,
     DebateTurn,
     DistilledInstructionProposal,
     EvidenceCoverageScore,
     EvidenceReference,
+    ExitDisciplineCheck,
     Handoff,
     HandoffQualityScore,
     HumanDelegationPoint,
@@ -125,8 +127,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     proposal = MemoryProposal.model_validate(fixtures["craik.memory_proposal"])
     contradiction = ContradictionReport.model_validate(fixtures["craik.contradiction_report"])
     context_debt = ContextDebtRecord.model_validate(fixtures["craik.context_debt_record"])
+    context_request = ContextRequest.model_validate(fixtures["craik.context_request"])
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
+    exit_check = ExitDisciplineCheck.model_validate(fixtures["craik.exit_discipline_check"])
     handoff_quality_score = HandoffQualityScore.model_validate(
         fixtures["craik.handoff_quality_score"]
     )
@@ -192,8 +196,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_proposal(proposal)
     store.put_contradiction(contradiction)
     store.put_context_debt_record(context_debt)
+    store.put_context_request(context_request)
     store.put_assumption(assumption)
     store.put_evidence(evidence)
+    store.put_exit_discipline_check(exit_check)
     store.put_handoff_quality_score(handoff_quality_score)
     store.put_evidence_coverage_score(evidence_coverage_score)
     store.put_graph_event(event)
@@ -238,8 +244,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_proposal(proposal.id) == proposal
     assert store.get_contradiction(contradiction.id) == contradiction
     assert store.get_context_debt_record(context_debt.id) == context_debt
+    assert store.get_context_request(context_request.id) == context_request
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
+    assert store.get_exit_discipline_check(exit_check.id) == exit_check
     assert store.get_handoff_quality_score(handoff_quality_score.id) == handoff_quality_score
     assert (
         store.get_evidence_coverage_score(evidence_coverage_score.id)
@@ -286,8 +294,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_proposals() == [proposal]
     assert store.list_contradictions() == [contradiction]
     assert store.list_context_debt_records() == [context_debt]
+    assert store.list_context_requests() == [context_request]
     assert store.list_assumptions() == [assumption]
     assert store.list_evidence() == [evidence]
+    assert store.list_exit_discipline_checks() == [exit_check]
     assert store.list_handoff_quality_scores() == [handoff_quality_score]
     assert store.list_evidence_coverage_scores() == [evidence_coverage_score]
     assert store.list_graph_events() == [event]
@@ -328,6 +338,7 @@ def test_persists_supported_contract_types(
         "craik.case_file",
         "craik.contradiction_report",
         "craik.context_debt_record",
+        "craik.context_request",
         "craik.debate_summary",
         "craik.debate_turn",
         "craik.distilled_instruction_proposal",
@@ -358,6 +369,7 @@ def test_persists_supported_contract_types(
         "craik.negative_knowledge",
         "craik.assumption",
         "craik.evidence_reference",
+        "craik.exit_discipline_check",
         "craik.work_graph_export",
         "craik.work_graph_event",
         "craik.worker_result",

@@ -119,6 +119,17 @@ UnknownResolutionSource = Literal[
     "external_wait",
     "other",
 ]
+ContextRequestStatus = Literal["open", "fulfilled", "cancelled"]
+ContextRequestKind = Literal[
+    "user_input",
+    "repo_inspection",
+    "web_access",
+    "tool_access",
+    "memory_query",
+    "external_state",
+    "other",
+]
+ExitDisciplineStatus = Literal["complete", "blocked"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1738,6 +1749,79 @@ class UnknownRecord(CraikModel):
             raise ValueError("resolved unknowns require resolved_answer and resolved_at")
         if self.status == "unresolved" and self.resolved_at is not None:
             raise ValueError("unresolved unknowns must not set resolved_at")
+        return self
+
+
+class ContextRequest(CraikModel):
+    """Structured request for context needed before work can continue safely."""
+
+    schema_: Literal["craik.context_request"] = Field(
+        default="craik.context_request",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    requester: str
+    kind: ContextRequestKind
+    status: ContextRequestStatus = "open"
+    question: str
+    needed_for: str
+    handoff_id: str | None = None
+    recovery_session_id: str | None = None
+    unknown_id: str | None = None
+    fulfilled_by: str | None = None
+    fulfilled_at: datetime | None = None
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_context_request_status(self) -> ContextRequest:
+        """Require fulfillment details only for fulfilled requests."""
+        if self.status == "fulfilled" and (not self.fulfilled_by or self.fulfilled_at is None):
+            raise ValueError("fulfilled context requests require fulfilled_by and fulfilled_at")
+        if self.status != "fulfilled" and (self.fulfilled_by or self.fulfilled_at is not None):
+            raise ValueError("open context requests must not include fulfillment details")
+        return self
+
+
+class ExitDisciplineCheck(CraikModel):
+    """Checks that an agent exit includes validation, handoff, risks, and next steps."""
+
+    schema_: Literal["craik.exit_discipline_check"] = Field(
+        default="craik.exit_discipline_check",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    handoff_id: str | None = None
+    status: ExitDisciplineStatus
+    validation_recorded: bool
+    handoff_recorded: bool
+    residual_risks_recorded: bool
+    next_steps_recorded: bool
+    blocking_reasons: list[str] = Field(default_factory=list)
+    context_request_ids: list[str] = Field(default_factory=list)
+    unknown_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_exit_status(self) -> ExitDisciplineCheck:
+        """Require blocking reasons for blocked exits and complete checklist for complete exits."""
+        complete = all(
+            [
+                self.validation_recorded,
+                self.handoff_recorded,
+                self.residual_risks_recorded,
+                self.next_steps_recorded,
+            ]
+        )
+        if self.status == "complete" and (not complete or self.blocking_reasons):
+            raise ValueError("complete exit discipline checks require all checks and no blockers")
+        if self.status == "blocked" and not self.blocking_reasons:
+            raise ValueError("blocked exit discipline checks require blocking_reasons")
         return self
 
 

@@ -51,6 +51,7 @@ project.
 - [Tool Attestations And Freshness](reference/freshness.md)
 - [Known Traps And Negative Knowledge](reference/known-traps.md)
 - [Scratchpad And Unknowns](reference/scratchpad-and-unknowns.md)
+- [Context Requests And Exit Discipline](reference/exit-discipline.md)
 - [Human Delegation](reference/human-delegation.md)
 - [Instruction Sources](reference/instruction-sources.md)
 - [Instruction Distillation Workflow](reference/instruction-distillation-workflow.md)
