@@ -36,3 +36,6 @@ reference field.
 The helper in `craik.runtime.local_process_backend` does not execute commands.
 It returns an allowed or denied decision that can be recorded in receipts before
 the caller dispatches through a governed execution path.
+
+Use [Environment Receipts](environment-receipts.md) to record allowed and denied
+local process decisions.

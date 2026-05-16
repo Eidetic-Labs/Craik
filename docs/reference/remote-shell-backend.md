@@ -43,3 +43,6 @@ They do not provide container isolation, local filesystem protection, network
 egress filtering, or credential brokering. Store SSH keys, passwords, tokens,
 and host secrets outside Craik configuration and refer to them by auth reference
 name.
+
+Use [Environment Receipts](environment-receipts.md) to record allowed and denied
+remote shell decisions.
