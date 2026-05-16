@@ -19,6 +19,8 @@ from craik.contracts.models import (
     CaseFile,
     CompiledPrompt,
     ContradictionReport,
+    DebateSummary,
+    DebateTurn,
     EvidenceReference,
     Handoff,
     IntentLock,
@@ -51,6 +53,8 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.compiled_prompt": "compiled_prompts",
     "craik.case_file": "case_files",
     "craik.contradiction_report": "contradictions",
+    "craik.debate_summary": "debate_summaries",
+    "craik.debate_turn": "debate_turns",
     "craik.handoff": "handoffs",
     "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
@@ -226,6 +230,26 @@ class LocalStore:
 
     def list_worker_results(self) -> list[WorkerResult]:
         return _cast_list(WorkerResult, self.list_contracts("craik.worker_result"))
+
+    def put_debate_turn(self, turn: DebateTurn) -> None:
+        self.put_contract(turn)
+
+    def get_debate_turn(self, turn_id: str) -> DebateTurn | None:
+        contract = self.get_contract("craik.debate_turn", turn_id)
+        return _cast_optional(DebateTurn, contract)
+
+    def list_debate_turns(self) -> list[DebateTurn]:
+        return _cast_list(DebateTurn, self.list_contracts("craik.debate_turn"))
+
+    def put_debate_summary(self, summary: DebateSummary) -> None:
+        self.put_contract(summary)
+
+    def get_debate_summary(self, summary_id: str) -> DebateSummary | None:
+        contract = self.get_contract("craik.debate_summary", summary_id)
+        return _cast_optional(DebateSummary, contract)
+
+    def list_debate_summaries(self) -> list[DebateSummary]:
+        return _cast_list(DebateSummary, self.list_contracts("craik.debate_summary"))
 
     def put_task(self, task: TaskRequest) -> None:
         self.put_contract(task)
