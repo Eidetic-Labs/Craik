@@ -164,7 +164,34 @@ Required capabilities:
 - runner trust boundaries,
 - runner-specific onboarding output.
 
-### v0.3.0 Gate: Multi-Agent Review And Coordination
+### v0.3.0 Gate: Single-Agent Execution Loop
+
+Required outcome:
+
+> Craik can drive one agent through a governed plan/act/observe/evaluate loop without relying on an untracked chat transcript.
+
+Required capabilities:
+
+- task run state machine,
+- run id and run status model,
+- plan/act/observe/evaluate/continue/stop phases,
+- runner step contract,
+- max-iteration controls,
+- time and budget controls,
+- intent-lock stop-condition enforcement,
+- policy approval checks before each side effect,
+- receipts per action or step,
+- observed output capture,
+- memory proposal creation during or after the loop,
+- handoff on completion, block, failure, or interruption,
+- resumable interrupted runs,
+- run inspection command,
+- run recovery command,
+- agent exit discipline.
+
+The LLM remains the reasoning engine, but Craik owns the loop boundary, persistence, policy gates, receipts, and stop conditions.
+
+### v0.4.0 Gate: Multi-Agent Review And Coordination
 
 Required outcome:
 
@@ -183,7 +210,7 @@ Required capabilities:
 - cross-agent review protocol,
 - scope-change protocol.
 
-### v0.4.0 Gate: Runtime Instruction Distillation
+### v0.5.0 Gate: Runtime Instruction Distillation
 
 Required outcome:
 
@@ -200,7 +227,7 @@ Required capabilities:
 - contradiction reports between instruction sources,
 - approval flow for promoted constraints.
 
-### v0.5.0 Gate: Quality, Continuity, And Recovery
+### v0.6.0 Gate: Quality, Continuity, And Recovery
 
 Required outcome:
 
@@ -225,7 +252,7 @@ Required capabilities:
 - "what changed since last time" deltas,
 - agent exit discipline.
 
-### v0.6.0 Gate: Skills, Plugins, And Ecosystem Foundations
+### v0.7.0 Gate: Skills, Plugins, And Ecosystem Foundations
 
 Required outcome:
 
@@ -245,7 +272,7 @@ Required capabilities:
 - community skills docs,
 - community plugins docs.
 
-### v0.7.0 Gate: Operator Experience
+### v0.8.0 Gate: Operator Experience
 
 Required outcome:
 
@@ -267,7 +294,7 @@ Required capabilities:
 - known traps view,
 - run delta view.
 
-### v0.8.0 Gate: Operator Integrations And Always-On Gateway
+### v0.9.0 Gate: Operator Integrations And Always-On Gateway
 
 Required outcome:
 
@@ -297,7 +324,7 @@ Explicitly deferred until this phase or later:
 - open inbound DM behavior,
 - and mobile companion surfaces.
 
-### v0.9.0 Gate: Execution Environments, Sandboxes, And Provider Routing
+### v0.10.0 Gate: Execution Environments, Sandboxes, And Provider Routing
 
 Required outcome:
 
@@ -320,7 +347,7 @@ Required capabilities:
 - sandbox policy tests,
 - provider routing docs.
 
-### v0.10.0 Gate: Self-Improving Skills And Learning Loops
+### v0.11.0 Gate: Self-Improving Skills And Learning Loops
 
 Required outcome:
 
@@ -343,7 +370,7 @@ Required capabilities:
 
 This phase should build on instruction distillation and the skill/plugin system. Agents may propose changes to skills, but those changes must remain reviewable until policy allows promotion.
 
-### v0.11.0 Gate: Multimodal And Companion Surfaces
+### v0.12.0 Gate: Multimodal And Companion Surfaces
 
 Required outcome:
 
@@ -365,7 +392,7 @@ Required capabilities:
 
 This phase is optional unless Craik deliberately competes with personal-assistant surfaces. It should not block server-side software-delivery workflows.
 
-### v0.12.0 Gate: Migration, Internationalization, And Ecosystem Compatibility
+### v0.13.0 Gate: Migration, Internationalization, And Ecosystem Compatibility
 
 Required outcome:
 
@@ -765,7 +792,47 @@ Docs required:
 - prompt compiler reference,
 - runner capability matrix reference.
 
-### 11. Multi-Agent Coordination
+### 11. Single-Agent Execution Loop
+
+Scope:
+
+- run id and run status model,
+- task run state machine,
+- plan/act/observe/evaluate/continue/stop phases,
+- runner step contract,
+- max-iteration limit,
+- timeout and budget limits,
+- intent-lock stop-condition enforcement,
+- approval and grant checks before side effects,
+- step receipts,
+- observed output capture,
+- memory proposal hooks,
+- handoff on completion/block/failure/interruption,
+- run resume,
+- run recovery,
+- agent exit discipline.
+
+Validation:
+
+- state-machine transition tests,
+- max-iteration and timeout tests,
+- budget exhaustion tests,
+- stop-condition enforcement tests,
+- approval-block tests,
+- receipt-per-step tests,
+- interrupted run resume tests,
+- handoff-on-failure tests,
+- runner fixture tests.
+
+Docs required:
+
+- single-agent execution loop concept doc,
+- running tasks guide,
+- run state reference,
+- resume and recovery guide,
+- loop policy guide.
+
+### 12. Multi-Agent Coordination
 
 Scope:
 
@@ -793,7 +860,7 @@ Docs required:
 - review protocol guide,
 - structured debate guide.
 
-### 12. Runtime Instruction Distillation
+### 13. Runtime Instruction Distillation
 
 Scope:
 
@@ -822,7 +889,7 @@ Docs required:
 - distillation review guide,
 - instruction categories reference.
 
-### 13. Quality Gates And Freshness
+### 14. Quality Gates And Freshness
 
 Scope:
 
@@ -854,7 +921,7 @@ Docs required:
 - memory hygiene guide,
 - decision record suggestion guide.
 
-### 14. Budgets, Quotas, And Operational Bounds
+### 15. Budgets, Quotas, And Operational Bounds
 
 Scope:
 
@@ -883,7 +950,7 @@ Docs required:
 - policy budget reference,
 - troubleshooting budget exhaustion.
 
-### 15. Recovery And Continuity
+### 16. Recovery And Continuity
 
 Scope:
 
@@ -909,7 +976,7 @@ Docs required:
 - run deltas guide,
 - interruption handling reference.
 
-### 16. Artifact And Documentation Intelligence
+### 17. Artifact And Documentation Intelligence
 
 Scope:
 
@@ -935,7 +1002,7 @@ Docs required:
 - public/internal boundary guide,
 - docs maintenance guide.
 
-### 17. Skills, Plugins, And Community Ecosystem
+### 18. Skills, Plugins, And Community Ecosystem
 
 Scope:
 
@@ -969,7 +1036,7 @@ Docs required:
 - plugin security guide,
 - marketplace/index guide.
 
-### 18. Operator Experience
+### 19. Operator Experience
 
 Scope:
 
@@ -1001,7 +1068,7 @@ Docs required:
 - view reference,
 - troubleshooting guide.
 
-### 19. Operator Integrations And Always-On Gateway
+### 20. Operator Integrations And Always-On Gateway
 
 Scope:
 
@@ -1038,7 +1105,7 @@ Docs required:
 - scheduler guide,
 - gateway security guide.
 
-### 20. Execution Environments, Sandboxes, And Provider Routing
+### 21. Execution Environments, Sandboxes, And Provider Routing
 
 Scope:
 
@@ -1073,7 +1140,7 @@ Docs required:
 - sandbox backend reference,
 - execution environment security guide.
 
-### 21. Self-Improving Skills And Learning Loops
+### 22. Self-Improving Skills And Learning Loops
 
 Scope:
 
@@ -1107,7 +1174,7 @@ Docs required:
 - trajectory export reference,
 - rollback guide.
 
-### 22. Multimodal And Companion Surfaces
+### 23. Multimodal And Companion Surfaces
 
 Scope:
 
@@ -1137,7 +1204,7 @@ Docs required:
 - visual workspace guide,
 - accessibility checklist.
 
-### 23. Migration, Internationalization, And Ecosystem Compatibility
+### 24. Migration, Internationalization, And Ecosystem Compatibility
 
 Scope:
 
