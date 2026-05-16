@@ -62,7 +62,9 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `review_results` | `craik.review_result` |
 | `run_deltas` | `craik.run_delta` |
 | `runtime_critic_findings` | `craik.runtime_critic_finding` |
+| `scratchpad_records` | `craik.scratchpad_record` |
 | `tool_result_attestations` | `craik.tool_result_attestation` |
+| `unknown_records` | `craik.unknown_record` |
 | `scope_change_requests` | `craik.scope_change_request` |
 | `scope_change_results` | `craik.scope_change_result` |
 

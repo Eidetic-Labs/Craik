@@ -70,6 +70,7 @@ craik schema show craik.task_request
 | `craik.run_delta` | Records continuity-relevant changes since the previous usable handoff. |
 | `craik.run_output` | Stores redacted observed output captured from one runner step. |
 | `craik.runtime_critic_finding` | Captures reviewable non-authoritative quality findings from a critic pass. |
+| `craik.scratchpad_record` | Stores expiring temporary working notes that must not become durable context by default. |
 | `craik.scope_change_request` | Requests a human decision to change accepted task scope. |
 | `craik.scope_change_result` | Records accepted or rejected human scope-change decisions. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
@@ -81,6 +82,7 @@ craik schema show craik.task_request
 | `craik.task_run` | Tracks durable single-agent run status, phase, linked artifacts, receipts, and handoff. |
 | `craik.task_request` | Defines requested work. |
 | `craik.tool_result_attestation` | Records observed tool or command output with trust and expiry boundaries. |
+| `craik.unknown_record` | Tracks first-class unknowns, required resolution source, and resolved answers. |
 | `craik.work_graph_export` | Exports connected graph nodes and edges. |
 | `craik.work_graph_event` | Updates the work graph. |
 | `craik.worker_result` | Captures typed specialist worker output for multi-agent coordination. |
