@@ -39,10 +39,12 @@ from craik.contracts.models import (
     ProjectProfile,
     PromotedInstructionConstraint,
     RecoverySession,
+    RedTeamFinding,
     ReviewRequest,
     ReviewResult,
     RunDelta,
     RunOutput,
+    RuntimeCriticFinding,
     ScopeChangeRequest,
     ScopeChangeResult,
     TaskRequest,
@@ -91,10 +93,12 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.review_request": "review_requests",
     "craik.review_result": "review_results",
     "craik.promoted_instruction_constraint": "promoted_instruction_constraints",
+    "craik.red_team_finding": "red_team_findings",
     "craik.recovery_session": "recovery_sessions",
     "craik.scope_change_request": "scope_change_requests",
     "craik.scope_change_result": "scope_change_results",
     "craik.run_delta": "run_deltas",
+    "craik.runtime_critic_finding": "runtime_critic_findings",
 }
 
 
@@ -484,6 +488,32 @@ class LocalStore:
 
     def list_recovery_sessions(self) -> list[RecoverySession]:
         return _cast_list(RecoverySession, self.list_contracts("craik.recovery_session"))
+
+    def put_runtime_critic_finding(self, finding: RuntimeCriticFinding) -> None:
+        self.put_contract(finding)
+
+    def get_runtime_critic_finding(
+        self,
+        finding_id: str,
+    ) -> RuntimeCriticFinding | None:
+        contract = self.get_contract("craik.runtime_critic_finding", finding_id)
+        return _cast_optional(RuntimeCriticFinding, contract)
+
+    def list_runtime_critic_findings(self) -> list[RuntimeCriticFinding]:
+        return _cast_list(
+            RuntimeCriticFinding,
+            self.list_contracts("craik.runtime_critic_finding"),
+        )
+
+    def put_red_team_finding(self, finding: RedTeamFinding) -> None:
+        self.put_contract(finding)
+
+    def get_red_team_finding(self, finding_id: str) -> RedTeamFinding | None:
+        contract = self.get_contract("craik.red_team_finding", finding_id)
+        return _cast_optional(RedTeamFinding, contract)
+
+    def list_red_team_findings(self) -> list[RedTeamFinding]:
+        return _cast_list(RedTeamFinding, self.list_contracts("craik.red_team_finding"))
 
     def put_task(self, task: TaskRequest) -> None:
         self.put_contract(task)
