@@ -17,7 +17,10 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
 )
-from craik.runtime.instruction_sources import instruction_stale_risk_warnings
+from craik.runtime.instruction_sources import (
+    active_instruction_context,
+    instruction_stale_risk_warnings,
+)
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.project_registry import ProjectRegistry
 from craik.runtime.redaction import redact
@@ -80,7 +83,12 @@ class AgentOnboardingBuilder:
         payload = AgentOnboarding(
             id=f"onboarding_{project.id.removeprefix('project_')}",
             project_id=project.id,
-            project_model=_project_model(project, tasks, repo_state),
+            project_model=_project_model(
+                project,
+                tasks,
+                repo_state,
+                active_instruction_context(self.store, project.id),
+            ),
             active_policy=active_policy,
             docs_boundaries=docs_boundaries,
             recent_handoffs=[_handoff_summary(handoff) for handoff in handoffs],
@@ -143,6 +151,7 @@ def _project_model(
     project: ProjectProfile,
     tasks: list[TaskRequest],
     repo_state: dict[str, Any],
+    active_instruction_constraints: list[dict[str, object]],
 ) -> dict[str, Any]:
     return {
         "id": project.id,
@@ -153,6 +162,7 @@ def _project_model(
         "policies": list(project.policies),
         "task_count": len(tasks),
         "open_task_ids": [task.id for task in tasks],
+        "active_instruction_constraints": active_instruction_constraints,
     }
 
 

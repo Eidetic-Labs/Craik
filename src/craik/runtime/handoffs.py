@@ -355,6 +355,13 @@ def _context_debt(case_file: CaseFile | None) -> list[str]:
         debt.append("GitHub state was not loaded into the case file.")
     if not case_file.facts:
         debt.append("No memory facts were loaded into the case file.")
+    active_constraints = case_file.context_budget.get("active_instruction_constraints", [])
+    if isinstance(active_constraints, list) and active_constraints:
+        ids = ", ".join(
+            str(item.get("id", item)) if isinstance(item, dict) else str(item)
+            for item in active_constraints
+        )
+        debt.append(f"Active instruction constraints carried forward: {ids}")
     return debt
 
 

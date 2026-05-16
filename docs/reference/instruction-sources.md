@@ -113,3 +113,18 @@ constraints retain the proposal ID, source ID, source snapshot ID, provenance
 IDs, evidence IDs, and review links. Rejected and deferred reviews do not create
 active constraints, and unapproved distilled proposals must not affect case-file
 or policy behavior.
+
+## Runtime Consumption
+
+Case files include active promoted constraints in
+`context_budget.active_instruction_constraints`. Prompt compilation renders
+those statements in the context section so runners can apply them with the same
+care as other case-file context.
+
+Onboarding reports include active instruction summaries in the project model.
+Handoffs carry active instruction constraint IDs forward as context debt so the
+next agent can audit which promoted distillations influenced the run.
+
+Only active `craik.promoted_instruction_constraint` records linked to approved,
+non-contradicted proposals are consumed. Proposed, rejected, deferred, stale, or
+contradicted distillations remain visible for review but inactive.
