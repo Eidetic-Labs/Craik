@@ -46,6 +46,7 @@ project.
 - [Claude Runner Adapter](reference/claude-runner-adapter.md)
 - [Gemini Runner Adapter](reference/gemini-runner-adapter.md)
 - [Runner Metadata](reference/runner-metadata.md)
+- [Run State](reference/run-state.md)
 - [Prompt Compiler](reference/prompt-compiler.md)
 - [Policy Profiles](reference/policy-profiles.md)
 - [Policy Tests](reference/policy-tests.md)

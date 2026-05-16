@@ -28,6 +28,7 @@ from craik.contracts.models import (
     PolicyEnvelope,
     ProjectProfile,
     TaskRequest,
+    TaskRun,
     WorkGraphEvent,
 )
 from craik.contracts.registry import CONTRACT_REGISTRY, ContractModel
@@ -40,6 +41,7 @@ DATABASE_NAME = "craik.sqlite3"
 CONTRACT_KINDS: dict[str, str] = {
     "craik.project_profile": "projects",
     "craik.task_request": "tasks",
+    "craik.task_run": "task_runs",
     "craik.policy_envelope": "policies",
     "craik.capability_grant": "grants",
     "craik.capability_receipt": "receipts",
@@ -209,6 +211,16 @@ class LocalStore:
 
     def list_tasks(self) -> list[TaskRequest]:
         return _cast_list(TaskRequest, self.list_contracts("craik.task_request"))
+
+    def put_task_run(self, run: TaskRun) -> None:
+        self.put_contract(run)
+
+    def get_task_run(self, run_id: str) -> TaskRun | None:
+        contract = self.get_contract("craik.task_run", run_id)
+        return _cast_optional(TaskRun, contract)
+
+    def list_task_runs(self) -> list[TaskRun]:
+        return _cast_list(TaskRun, self.list_contracts("craik.task_run"))
 
     def put_receipt(self, receipt: CapabilityReceipt) -> None:
         self.put_contract(receipt)
