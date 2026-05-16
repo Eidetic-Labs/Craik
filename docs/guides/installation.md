@@ -1,6 +1,7 @@
 # Installation
 
-Craik is not published to PyPI yet. During pre-0.1.0 development, install it from a local checkout:
+Craik is not published to PyPI yet. During pre-0.1.0 development, install it from
+a local checkout:
 
 ```sh
 python3.12 -m pip install -e ".[dev]"
@@ -14,3 +15,10 @@ craik --version
 
 Craik requires Python 3.12 or newer.
 
+For reproducible source-tree commands, use `uv`:
+
+```sh
+uv run --python 3.12 --extra dev craik --version
+```
+
+Runtime state is stored under `~/.craik` unless `CRAIK_HOME` is set.
