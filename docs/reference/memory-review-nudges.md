@@ -26,3 +26,6 @@ underlying fact through the normal memory proposal workflow.
 
 Review nudges are reminders, not memory writes. They do not alter facts,
 resolve contradictions, or promote inferred preferences.
+
+Use [Preference Facts](preference-facts.md) to keep inferred user and team
+preferences reviewable before approval.
