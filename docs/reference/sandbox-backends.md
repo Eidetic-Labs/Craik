@@ -52,3 +52,6 @@ For SSH and remote command boundaries, see
 
 For browser automation and tool execution boundaries, see
 [Browser Tool Boundary](browser-tool-boundary.md).
+
+For containerized execution boundaries, see
+[Docker Sandbox Backend](docker-sandbox-backend.md).
