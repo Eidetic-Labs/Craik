@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Annotated, Any, cast
 
 import typer
+from pydantic import ValidationError
 
 from craik import __version__
 from craik.contracts.models import (
@@ -31,6 +32,7 @@ from craik.runtime.case_files import (
 )
 from craik.runtime.contradictions import ContradictionManager, ContradictionNotFoundError
 from craik.runtime.demos import StigmemDocsDemo
+from craik.runtime.gateway import default_gateway_config
 from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
 from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
 from craik.runtime.handoffs import (
@@ -147,6 +149,68 @@ def root(
 def version_command() -> None:
     """Print the installed Craik version."""
     typer.echo(package_version())
+
+
+@app.command("setup")
+def setup_command(
+    project_id: Annotated[
+        str | None,
+        typer.Option("--project-id", help="Optional project id for gateway configuration."),
+    ] = None,
+    gateway_enabled: Annotated[
+        bool,
+        typer.Option(
+            "--enable-gateway/--disable-gateway",
+            help="Enable or disable the persisted gateway configuration.",
+        ),
+    ] = False,
+    gateway_bind_host: Annotated[
+        str,
+        typer.Option("--gateway-bind-host", help="Gateway bind host. Defaults to local only."),
+    ] = "127.0.0.1",
+    gateway_port: Annotated[
+        int,
+        typer.Option("--gateway-port", help="Gateway port."),
+    ] = 8765,
+    policy_envelope_id: Annotated[
+        str | None,
+        typer.Option("--policy-envelope-id", help="Policy envelope for gateway authority."),
+    ] = None,
+) -> None:
+    """Initialize local state and write non-secret gateway setup output."""
+    paths = ensure_craik_home()
+    store = LocalStore.from_paths(paths)
+    try:
+        store.initialize()
+        config = default_gateway_config(
+            project_id=project_id,
+            policy_envelope_id=policy_envelope_id,
+        ).model_copy(
+            update={
+                "bind_host": gateway_bind_host,
+                "port": gateway_port,
+                "enabled": gateway_enabled,
+            }
+        )
+        try:
+            config = type(config).model_validate(config.model_dump(mode="json", by_alias=True))
+        except ValidationError as error:
+            raise typer.BadParameter(str(error)) from None
+        store.put_gateway_config(config)
+        payload = {
+            "home": _paths_payload(paths),
+            "gateway_config": config.model_dump(mode="json", by_alias=True),
+            "secrets_written": False,
+            "next_steps": [
+                "Review gateway_config before enabling external ingress.",
+                "Store channel secrets outside Craik config files.",
+                "Run gateway diagnostics before starting the daemon.",
+            ],
+        }
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
 @schema_app.command("list")

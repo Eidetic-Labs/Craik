@@ -10,6 +10,20 @@ Print the installed Craik package version.
 
 Print the installed Craik package version.
 
+## `craik setup`
+
+Initialize the local home layout, local store, and default gateway
+configuration. The command writes no secrets and prints the persisted
+configuration as JSON.
+
+Options:
+
+- `--project-id <id>`: optional project id for the gateway configuration.
+- `--enable-gateway` / `--disable-gateway`: persist gateway enabled state.
+- `--gateway-bind-host <host>`: gateway bind host; defaults to `127.0.0.1`.
+- `--gateway-port <port>`: gateway port; defaults to `8765`.
+- `--policy-envelope-id <id>`: policy envelope for gateway authority.
+
 ## `craik schema list`
 
 List registered Craik runtime contract schemas.
