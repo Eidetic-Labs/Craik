@@ -56,6 +56,7 @@ from craik.contracts.models import (
     ScopeChangeRequest,
     ScopeChangeResult,
     ScratchpadRecord,
+    SkillPackage,
     TaskRequest,
     TaskRun,
     ToolResultAttestation,
@@ -116,6 +117,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.recovery_session": "recovery_sessions",
     "craik.scope_change_request": "scope_change_requests",
     "craik.scope_change_result": "scope_change_results",
+    "craik.skill_package": "skill_packages",
     "craik.run_delta": "run_deltas",
     "craik.runtime_critic_finding": "runtime_critic_findings",
     "craik.scratchpad_record": "scratchpad_records",
@@ -378,6 +380,16 @@ class LocalStore:
             ScopeChangeResult,
             self.list_contracts("craik.scope_change_result"),
         )
+
+    def put_skill_package(self, package: SkillPackage) -> None:
+        self.put_contract(package)
+
+    def get_skill_package(self, package_id: str) -> SkillPackage | None:
+        contract = self.get_contract("craik.skill_package", package_id)
+        return _cast_optional(SkillPackage, contract)
+
+    def list_skill_packages(self) -> list[SkillPackage]:
+        return _cast_list(SkillPackage, self.list_contracts("craik.skill_package"))
 
     def put_instruction_source(self, source: InstructionSource) -> None:
         self.put_contract(source)

@@ -1137,6 +1137,32 @@
     "receipt_ids": ["receipt_runner_fixture"],
     "created_at": "2026-05-16T06:38:00Z"
   },
+  "craik.skill_package": {
+    "schema": "craik.skill_package",
+    "version": "0.1.0",
+    "id": "skill_docs_reconcile",
+    "name": "Docs Reconcile",
+    "package_version": "0.1.0",
+    "description": "Review docs against implementation state.",
+    "entrypoints": [
+      {
+        "id": "entry_prompt",
+        "kind": "prompt",
+        "path": "SKILL.md",
+        "description": "Skill instructions.",
+        "expected_input_schemas": ["craik.case_file"],
+        "expected_output_schemas": ["craik.worker_result"]
+      }
+    ],
+    "docs": ["SKILL.md"],
+    "assets": ["fixtures/example.md"],
+    "expected_input_schemas": ["craik.case_file"],
+    "expected_output_schemas": ["craik.worker_result"],
+    "provenance_ids": ["evidence_readme_status"],
+    "plugin_descriptor_id": null,
+    "runtime_authority": false,
+    "created_at": "2026-05-16T15:30:00Z"
+  },
   "craik.instruction_source": {
     "schema": "craik.instruction_source",
     "version": "0.1.0",

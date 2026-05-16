@@ -130,6 +130,7 @@ ContextRequestKind = Literal[
     "other",
 ]
 ExitDisciplineStatus = Literal["complete", "blocked"]
+SkillEntrypointKind = Literal["prompt", "script", "module", "workflow", "docs"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1822,6 +1823,51 @@ class ExitDisciplineCheck(CraikModel):
             raise ValueError("complete exit discipline checks require all checks and no blockers")
         if self.status == "blocked" and not self.blocking_reasons:
             raise ValueError("blocked exit discipline checks require blocking_reasons")
+        return self
+
+
+class SkillEntrypoint(CraikModel):
+    """One callable or readable entrypoint inside a skill package."""
+
+    id: str
+    kind: SkillEntrypointKind
+    path: str
+    description: str
+    expected_input_schemas: list[str] = Field(default_factory=list)
+    expected_output_schemas: list[str] = Field(default_factory=list)
+
+
+class SkillPackage(CraikModel):
+    """Reusable skill package metadata without plugin runtime authority."""
+
+    schema_: Literal["craik.skill_package"] = Field(
+        default="craik.skill_package",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    name: str
+    package_version: str
+    description: str
+    entrypoints: list[SkillEntrypoint] = Field(min_length=1)
+    docs: list[str] = Field(default_factory=list)
+    assets: list[str] = Field(default_factory=list)
+    expected_input_schemas: list[str] = Field(default_factory=list)
+    expected_output_schemas: list[str] = Field(default_factory=list)
+    provenance_ids: list[str] = Field(default_factory=list)
+    plugin_descriptor_id: str | None = None
+    runtime_authority: Literal[False] = False
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_skill_package(self) -> SkillPackage:
+        """Require versioned packages with docs and at least one entrypoint."""
+        if "." not in self.package_version:
+            raise ValueError("skill package_version must be semantic-version-like")
+        if not self.docs:
+            raise ValueError("skill packages require docs")
+        if self.runtime_authority is not False:
+            raise ValueError("skill packages must not carry runtime authority")
         return self
 
 
