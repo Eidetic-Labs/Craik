@@ -17,6 +17,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
 )
+from craik.runtime.instruction_sources import instruction_stale_risk_warnings
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.project_registry import ProjectRegistry
 from craik.runtime.redaction import redact
@@ -73,6 +74,7 @@ class AgentOnboardingBuilder:
             repo_state=repo_state,
             docs_boundaries=docs_boundaries,
             case_risks=case_risks,
+            instruction_risks=instruction_stale_risk_warnings(self.store, project.id),
         )
 
         payload = AgentOnboarding(
@@ -198,6 +200,7 @@ def _stale_warnings(
     repo_state: dict[str, Any],
     docs_boundaries: dict[str, Any],
     case_risks: list[str],
+    instruction_risks: list[str],
 ) -> list[str]:
     warnings: list[str] = []
     if repo_state["dirty"]:
@@ -213,6 +216,7 @@ def _stale_warnings(
     if project.memory.backend == "stigmem" and not os.environ.get("CRAIK_STIGMEM_URL"):
         warnings.append("Project is configured for Stigmem but CRAIK_STIGMEM_URL is not set.")
     warnings.extend(case_risks)
+    warnings.extend(instruction_risks)
     return sorted(set(warnings))
 
 
