@@ -47,6 +47,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 ## Planning Docs
 
+- [Documentation Index](docs/index.md)
 - [Vision](docs/vision.md)
 - [Product Strategy](docs/product-strategy.md)
 - [Differentiators](docs/differentiators.md)
@@ -54,6 +55,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Runtime Contracts](docs/runtime-contracts.md)
 - [Case Files](docs/concepts/case-files.md)
 - [Project Model](docs/concepts/project-model.md)
+- [Governance](docs/concepts/governance.md)
 - [Intent Locks](docs/concepts/intent-locks.md)
 - [Handoffs](docs/concepts/handoffs.md)
 - [Receipts](docs/concepts/receipts.md)
@@ -86,6 +88,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Schema Reference](docs/reference/schemas.md)
 - [Policy Profiles](docs/reference/policy-profiles.md)
 - [Memory Backends](docs/reference/memory-backends.md)
+- [Memory And Stigmem](docs/concepts/memory-and-stigmem.md)
 - [Stigmem Compatibility](docs/reference/stigmem-compatibility.md)
 - [Fail-Open](docs/guides/fail-open.md)
 - [Capability Grants](docs/guides/capability-grants.md)
@@ -93,6 +96,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Redaction](docs/reference/redaction.md)
 - [Local State Layout](docs/reference/local-state.md)
 - [Local Store](docs/reference/local-store.md)
+- [Config Reference](docs/reference/config.md)
 - [Project Profile](docs/reference/project-profile.md)
 - [Policy Tests](docs/reference/policy-tests.md)
 - [GitHub Config](docs/reference/github-config.md)
