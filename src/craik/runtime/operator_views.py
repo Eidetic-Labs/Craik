@@ -8,9 +8,14 @@ from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
     ContradictionReport,
+    DistilledInstructionProposal,
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionPromotionReview,
+    InstructionProvenance,
+    InstructionSource,
+    InstructionSourceSnapshot,
     PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
@@ -27,6 +32,98 @@ class BudgetQuotaSnapshot:
     missing: list[str] = field(default_factory=list)
     exceeded: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class InstructionDistillationSnapshot:
+    """Operator-visible instruction distillation review state."""
+
+    sources: list[InstructionSource] = field(default_factory=list)
+    snapshots: list[InstructionSourceSnapshot] = field(default_factory=list)
+    provenance: list[InstructionProvenance] = field(default_factory=list)
+    proposals: list[DistilledInstructionProposal] = field(default_factory=list)
+    reviews: list[InstructionPromotionReview] = field(default_factory=list)
+
+
+def format_instruction_distillation_view(
+    snapshot: InstructionDistillationSnapshot,
+) -> list[str]:
+    """Format instruction distillation state without promoting proposals."""
+    lines = [
+        "Instruction Distillation",
+        "",
+        "Sources",
+    ]
+    if not snapshot.sources:
+        lines.append("- none")
+    else:
+        for source in sorted(snapshot.sources, key=lambda item: item.id):
+            active = "active" if source.active else "inactive"
+            lines.append(
+                f"- {source.id} [{source.kind}/{active}] path={source.path} "
+                f"owner={source.owner} trust={source.trust_boundary}"
+            )
+
+    lines.extend(["", "Snapshots"])
+    if not snapshot.snapshots:
+        lines.append("- none")
+    else:
+        for source_snapshot in sorted(snapshot.snapshots, key=lambda item: item.id):
+            lines.append(
+                f"- {source_snapshot.id} source={source_snapshot.source_id} "
+                f"status={source_snapshot.hash_status} path={source_snapshot.path}"
+            )
+
+    lines.extend(["", "Provenance"])
+    if not snapshot.provenance:
+        lines.append("- none")
+    else:
+        for provenance in sorted(snapshot.provenance, key=lambda item: item.id):
+            lines.append(
+                f"- {provenance.id} source={provenance.source_id} "
+                f"snapshot={provenance.snapshot_id or 'none'} "
+                f"range={_format_line_range(provenance)}: {provenance.summary}"
+            )
+
+    lines.extend(["", "Distilled Proposals"])
+    if not snapshot.proposals:
+        lines.append("- none")
+    else:
+        for proposal in sorted(
+            snapshot.proposals,
+            key=lambda item: (item.promotion_status, item.id),
+        ):
+            lines.extend(
+                [
+                    f"- {proposal.id} [{proposal.promotion_status}/{proposal.category}]",
+                    f"  Source: {proposal.source_id}",
+                    f"  Snapshot: {proposal.snapshot_id or 'none'}",
+                    f"  Active Constraint: {proposal.promoted_constraint_id or 'none'}",
+                    f"  Provenance: {_join_or_none(proposal.provenance_ids)}",
+                    f"  Evidence: {_join_or_none(proposal.evidence_ids)}",
+                    f"  Contradictions: {_join_or_none(proposal.contradiction_ids)}",
+                    f"  Statement: {proposal.statement}",
+                ]
+            )
+
+    lines.extend(["", "Promotion Reviews"])
+    if not snapshot.reviews:
+        lines.append("- none")
+    else:
+        for review in sorted(snapshot.reviews, key=lambda item: (item.decision, item.id)):
+            lines.extend(
+                [
+                    f"- {review.id} [{review.decision}] proposal={review.proposal_id}",
+                    f"  Reviewer: {review.decided_by}",
+                    f"  Active Constraint: {review.promoted_constraint_id or 'none'}",
+                    f"  Policy: {review.policy_envelope_id or 'none'}",
+                    f"  Receipts: {_join_or_none(review.receipt_ids)}",
+                    f"  Handoffs: {_join_or_none(review.handoff_ids)}",
+                    f"  Rationale: {review.rationale}",
+                ]
+            )
+
+    return lines
 
 
 def format_budget_quota_view(snapshot: BudgetQuotaSnapshot) -> list[str]:
@@ -249,6 +346,14 @@ def _format_mapping(items: dict[str, float | int | str]) -> list[str]:
     if not items:
         return ["- none"]
     return [f"- {key}: {items[key]}" for key in sorted(items)]
+
+
+def _format_line_range(provenance: InstructionProvenance) -> str:
+    if provenance.start_line is None or provenance.end_line is None:
+        return "source"
+    if provenance.start_line == provenance.end_line:
+        return f"L{provenance.start_line}"
+    return f"L{provenance.start_line}-L{provenance.end_line}"
 
 
 def _join_or_none(items: list[str]) -> str:

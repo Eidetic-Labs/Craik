@@ -2,9 +2,14 @@ from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
     ContradictionReport,
+    DistilledInstructionProposal,
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionPromotionReview,
+    InstructionProvenance,
+    InstructionSource,
+    InstructionSourceSnapshot,
     PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
@@ -12,11 +17,13 @@ from craik.contracts.models import (
 )
 from craik.runtime.operator_views import (
     BudgetQuotaSnapshot,
+    InstructionDistillationSnapshot,
     format_budget_quota_view,
     format_contradiction_inbox,
     format_delegation_queue,
     format_evidence_assumption_view,
     format_handoff_viewer,
+    format_instruction_distillation_view,
     format_receipt_viewer,
     format_work_graph_explorer,
 )
@@ -306,6 +313,152 @@ def test_budget_quota_view_empty_state_does_not_infer_costs() -> None:
 
     assert lines.count("- none") == 4
     assert "- cost_usd" in lines
+
+
+def test_instruction_distillation_view_formats_sources_proposals_and_reviews() -> None:
+    source = InstructionSource.model_validate(
+        {
+            "id": "instruction_source_agents_md",
+            "project_id": "project_craik",
+            "kind": "agents_md",
+            "path": "AGENTS.md",
+            "owner": "team:platform",
+            "trust_boundary": "repository",
+            "active": True,
+            "declared_by": "user:maintainer",
+            "created_at": "2026-05-16T17:30:00Z",
+        }
+    )
+    source_snapshot = InstructionSourceSnapshot.model_validate(
+        {
+            "id": "snapshot_agents_md",
+            "project_id": "project_craik",
+            "source_id": "instruction_source_agents_md",
+            "path": "AGENTS.md",
+            "content_hash": "abc123",
+            "hash_status": "unchanged",
+            "captured_at": "2026-05-16T17:31:00Z",
+        }
+    )
+    provenance = InstructionProvenance.model_validate(
+        {
+            "id": "provenance_agents_review",
+            "project_id": "project_craik",
+            "source_id": "instruction_source_agents_md",
+            "snapshot_id": "snapshot_agents_md",
+            "path": "AGENTS.md",
+            "start_line": 10,
+            "end_line": 12,
+            "summary": "Review instructions before promotion.",
+            "captured_at": "2026-05-16T17:32:00Z",
+        }
+    )
+    approved = DistilledInstructionProposal.model_validate(
+        {
+            "id": "proposal_review_before_promotion",
+            "project_id": "project_craik",
+            "source_id": "instruction_source_agents_md",
+            "snapshot_id": "snapshot_agents_md",
+            "category": "policy",
+            "statement": "Review distilled instructions before promotion.",
+            "rationale": "Instruction files are evidence, not automatic authority.",
+            "confidence": 0.9,
+            "provenance_ids": ["provenance_agents_review"],
+            "evidence_ids": ["evidence_agents_md"],
+            "promotion_status": "approved",
+            "promoted_constraint_id": "constraint_review_before_promotion",
+            "decided_by": "user:maintainer",
+            "decided_at": "2026-05-16T17:35:00Z",
+            "created_at": "2026-05-16T17:33:00Z",
+        }
+    )
+    deferred = DistilledInstructionProposal.model_validate(
+        {
+            "id": "proposal_stale_instruction",
+            "project_id": "project_craik",
+            "source_id": "instruction_source_agents_md",
+            "snapshot_id": "snapshot_agents_md",
+            "category": "stale_risk",
+            "statement": "Prior context may be stale after instruction changes.",
+            "rationale": "Snapshot changed after extraction.",
+            "confidence": 0.7,
+            "provenance_ids": ["provenance_agents_review"],
+            "promotion_status": "deferred",
+            "decided_by": "user:maintainer",
+            "decided_at": "2026-05-16T17:36:00Z",
+            "created_at": "2026-05-16T17:34:00Z",
+        }
+    )
+    review = InstructionPromotionReview.model_validate(
+        {
+            "id": "review_review_before_promotion",
+            "project_id": "project_craik",
+            "proposal_id": "proposal_review_before_promotion",
+            "decision": "approved",
+            "decided_by": "user:maintainer",
+            "rationale": "Promotion keeps trust boundary explicit.",
+            "promoted_constraint_id": "constraint_review_before_promotion",
+            "policy_envelope_id": "policy_instruction_review",
+            "receipt_ids": ["receipt_instruction_review"],
+            "handoff_ids": ["handoff_instruction_review"],
+            "created_at": "2026-05-16T17:37:00Z",
+        }
+    )
+
+    lines = format_instruction_distillation_view(
+        InstructionDistillationSnapshot(
+            sources=[source],
+            snapshots=[source_snapshot],
+            provenance=[provenance],
+            proposals=[deferred, approved],
+            reviews=[review],
+        )
+    )
+
+    assert lines[:3] == ["Instruction Distillation", "", "Sources"]
+    assert (
+        "- instruction_source_agents_md [agents_md/active] path=AGENTS.md "
+        "owner=team:platform trust=repository"
+    ) in lines
+    assert any(
+        line.startswith(
+            "- snapshot_agents_md source=instruction_source_agents_md status=unchanged"
+        )
+        for line in lines
+    )
+    assert any(
+        "range=L10-L12: Review instructions before promotion." in line for line in lines
+    )
+    assert "- proposal_review_before_promotion [approved/policy]" in lines
+    assert "  Active Constraint: constraint_review_before_promotion" in lines
+    assert "- proposal_stale_instruction [deferred/stale_risk]" in lines
+    assert "  Active Constraint: none" in lines
+    assert "- review_review_before_promotion [approved]" in lines[-7]
+    assert "  Receipts: receipt_instruction_review" in lines
+    assert "  Handoffs: handoff_instruction_review" in lines
+
+
+def test_instruction_distillation_view_empty_state() -> None:
+    lines = format_instruction_distillation_view(InstructionDistillationSnapshot())
+
+    assert lines == [
+        "Instruction Distillation",
+        "",
+        "Sources",
+        "- none",
+        "",
+        "Snapshots",
+        "- none",
+        "",
+        "Provenance",
+        "- none",
+        "",
+        "Distilled Proposals",
+        "- none",
+        "",
+        "Promotion Reviews",
+        "- none",
+    ]
 
 
 def _delegation(
