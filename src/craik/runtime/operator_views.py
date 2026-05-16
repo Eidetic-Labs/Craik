@@ -9,14 +9,18 @@ from craik.contracts.models import (
     CapabilityReceipt,
     ContradictionReport,
     DistilledInstructionProposal,
+    EvidenceCoverageScore,
     EvidenceReference,
     Handoff,
+    HandoffQualityScore,
     HumanDelegationPoint,
     InstructionPromotionReview,
     InstructionProvenance,
     InstructionSource,
     InstructionSourceSnapshot,
     PluginReceipt,
+    RedTeamFinding,
+    RuntimeCriticFinding,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
@@ -35,6 +39,16 @@ class BudgetQuotaSnapshot:
 
 
 @dataclass(frozen=True)
+class QualityGateSnapshot:
+    """Operator-visible quality gate review state."""
+
+    handoff_scores: list[HandoffQualityScore] = field(default_factory=list)
+    evidence_scores: list[EvidenceCoverageScore] = field(default_factory=list)
+    critic_findings: list[RuntimeCriticFinding] = field(default_factory=list)
+    red_team_findings: list[RedTeamFinding] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class InstructionDistillationSnapshot:
     """Operator-visible instruction distillation review state."""
 
@@ -43,6 +57,92 @@ class InstructionDistillationSnapshot:
     provenance: list[InstructionProvenance] = field(default_factory=list)
     proposals: list[DistilledInstructionProposal] = field(default_factory=list)
     reviews: list[InstructionPromotionReview] = field(default_factory=list)
+
+
+def format_quality_gate_view(snapshot: QualityGateSnapshot) -> list[str]:
+    """Format quality gate state while keeping findings non-authoritative."""
+    lines = [
+        f"Quality Gate: {_quality_gate_state(snapshot)}",
+        "",
+        "Handoff Quality Scores",
+    ]
+    if not snapshot.handoff_scores:
+        lines.append("- none")
+    else:
+        for score in sorted(snapshot.handoff_scores, key=lambda item: item.id):
+            lines.extend(
+                [
+                    f"- {score.id} [{score.band}] score={score.score:.2f} "
+                    f"handoff={score.handoff_id}",
+                    f"  Blocking Reasons: {_join_or_none(score.blocking_reasons)}",
+                    f"  Components: {_format_score_components(score)}",
+                ]
+            )
+
+    lines.extend(["", "Evidence Coverage Scores"])
+    if not snapshot.evidence_scores:
+        lines.append("- none")
+    else:
+        for coverage_score in sorted(snapshot.evidence_scores, key=lambda item: item.id):
+            lines.extend(
+                [
+                    f"- {coverage_score.id} [{coverage_score.band}] "
+                    f"score={coverage_score.score:.2f} "
+                    f"handoff={coverage_score.handoff_id or 'none'}",
+                    f"  Evidence: {_join_or_none(coverage_score.evidence_ids)}",
+                    "  Missing Evidence: "
+                    f"{_join_or_none(coverage_score.missing_evidence_ids)}",
+                    f"  Weak Claims: {_join_or_none(coverage_score.weak_claims)}",
+                ]
+            )
+
+    lines.extend(["", "Critic Findings"])
+    if not snapshot.critic_findings:
+        lines.append("- none")
+    else:
+        for finding in sorted(
+            snapshot.critic_findings,
+            key=lambda item: (item.review_status, item.severity, item.id),
+        ):
+            lines.extend(
+                [
+                    f"- {finding.id} [{finding.review_status}/{finding.severity}] "
+                    f"type={finding.finding_type}",
+                    f"  Authoritative: {finding.authoritative}",
+                    f"  Adjudication: {finding.adjudication_id or 'none'}",
+                    f"  Affected Artifacts: {_join_or_none(finding.affected_artifacts)}",
+                    f"  Evidence: {_join_or_none(finding.evidence_ids)}",
+                    f"  Proposed Actions: {_join_or_none(finding.proposed_actions)}",
+                    f"  Summary: {finding.summary}",
+                ]
+            )
+
+    lines.extend(["", "Red-Team Findings"])
+    if not snapshot.red_team_findings:
+        lines.append("- none")
+    else:
+        for red_team_finding in sorted(
+            snapshot.red_team_findings,
+            key=lambda item: (not item.blocking, item.review_status, item.severity, item.id),
+        ):
+            lines.extend(
+                [
+                    f"- {red_team_finding.id} "
+                    f"[{red_team_finding.review_status}/{red_team_finding.severity}] "
+                    f"type={red_team_finding.finding_type} "
+                    f"blocking={red_team_finding.blocking}",
+                    f"  Authoritative: {red_team_finding.authoritative}",
+                    f"  Adjudication: {red_team_finding.adjudication_id or 'none'}",
+                    "  Affected Artifacts: "
+                    f"{_join_or_none(red_team_finding.affected_artifacts)}",
+                    f"  Evidence: {_join_or_none(red_team_finding.evidence_ids)}",
+                    "  Proposed Actions: "
+                    f"{_join_or_none(red_team_finding.proposed_actions)}",
+                    f"  Summary: {red_team_finding.summary}",
+                ]
+            )
+
+    return lines
 
 
 def format_instruction_distillation_view(
@@ -354,6 +454,35 @@ def _format_line_range(provenance: InstructionProvenance) -> str:
     if provenance.start_line == provenance.end_line:
         return f"L{provenance.start_line}"
     return f"L{provenance.start_line}-L{provenance.end_line}"
+
+
+def _quality_gate_state(snapshot: QualityGateSnapshot) -> str:
+    if any(score.band == "poor" for score in snapshot.handoff_scores):
+        return "blocked"
+    if any(score.band == "poor" for score in snapshot.evidence_scores):
+        return "blocked"
+    if any(
+        finding.blocking and finding.review_status != "adjudicated"
+        for finding in snapshot.red_team_findings
+    ):
+        return "blocked"
+    if any(
+        finding.review_status == "reviewable"
+        and finding.severity in {"high", "critical"}
+        for finding in snapshot.critic_findings
+    ):
+        return "reviewable"
+    if any(score.band == "adequate" for score in snapshot.handoff_scores):
+        return "reviewable"
+    if any(score.band == "adequate" for score in snapshot.evidence_scores):
+        return "reviewable"
+    return "clear"
+
+
+def _format_score_components(score: HandoffQualityScore) -> str:
+    return ", ".join(
+        f"{component.name}={component.score:.2f}" for component in score.components
+    )
 
 
 def _join_or_none(items: list[str]) -> str:
