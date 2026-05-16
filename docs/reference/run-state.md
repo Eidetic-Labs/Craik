@@ -48,3 +48,16 @@ exposes typed helpers:
 rules: terminal runs cannot transition again, iteration counts cannot exceed
 `max_iterations`, phase changes refresh `phase_started_at`, and terminal
 statuses set `ended_at`.
+
+## Execution Loop
+
+`SingleAgentLoopExecutor` drives fixture-compatible single-agent runs through
+bounded steps. Before each step it checks intent-lock stop conditions, verifies
+policy for configured side effects, records denial or pass receipts, sends a
+`craik.runner_step_request` to the runner boundary, captures the
+`craik.runner_step_result` as `craik.run_output`, and advances task-run state.
+
+The default deterministic loop uses `plan`, `act`, `observe`, and `evaluate`.
+The `act` phase is treated as a side-effect step and requires a matching policy
+grant. Reaching `max_iterations`, a runner failure, a blocked runner result, or
+an intent stop condition stops the run before additional side effects.
