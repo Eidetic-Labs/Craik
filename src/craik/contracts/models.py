@@ -279,6 +279,35 @@ class RunnerCapabilityMatrix(CraikModel):
     policy_notes: list[str] = Field(default_factory=list)
 
 
+class PromptSection(CraikModel):
+    """Named deterministic section in a compiled runner prompt."""
+
+    title: str
+    body: str
+
+
+class CompiledPrompt(CraikModel):
+    """Policy-aware runner prompt compiled from Craik runtime state."""
+
+    schema_: Literal["craik.compiled_prompt"] = Field(
+        default="craik.compiled_prompt",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    case_file_id: str
+    policy_envelope_id: str
+    runner_id: str
+    runner_mode: RunnerMode
+    capability_grant_ids: list[str] = Field(default_factory=list)
+    expected_output_schemas: list[str] = Field(default_factory=list)
+    context_omissions: list[str] = Field(default_factory=list)
+    stop_conditions: list[str] = Field(default_factory=list)
+    sections: list[PromptSection] = Field(default_factory=list)
+    prompt: str
+
+
 class RunnerAdapterRequest(CraikModel):
     """Normalized input handed from Craik core to a runner adapter."""
 

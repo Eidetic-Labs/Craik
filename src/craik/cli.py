@@ -60,6 +60,11 @@ from craik.runtime.policy import (
 )
 from craik.runtime.policy_tests import PolicyTestHarness
 from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
+from craik.runtime.prompts import (
+    PromptCaseFileNotFoundError,
+    PromptCompiler,
+    PromptTaskNotFoundError,
+)
 from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.runners import default_runner_capability_matrices, get_runner_capability_matrix
 from craik.runtime.store import LocalStore
@@ -102,6 +107,8 @@ receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
 app.add_typer(receipts_app, name="receipts")
 runners_app = typer.Typer(help="Inspect runner capabilities and trust profiles.")
 app.add_typer(runners_app, name="runners")
+prompt_app = typer.Typer(help="Compile runner-ready prompts from Craik runtime state.")
+app.add_typer(prompt_app, name="prompt")
 
 
 def package_version() -> str:
@@ -182,6 +189,42 @@ def runners_matrix(
             raise typer.BadParameter(str(error)) from None
 
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@prompt_app.command("compile")
+def prompt_compile(
+    task_id: str,
+    runner_id: Annotated[
+        str,
+        typer.Option("--runner", help="Runner id from `craik runners matrix`."),
+    ],
+    expected_output_schema: Annotated[
+        list[str] | None,
+        typer.Option("--expected-output-schema", help="Expected output schema. May repeat."),
+    ] = None,
+) -> None:
+    """Compile a deterministic policy-aware prompt for a task and runner."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        try:
+            compiled = PromptCompiler(store).compile(
+                task_id,
+                runner_id=runner_id,
+                expected_output_schemas=expected_output_schema,
+            )
+        except PromptTaskNotFoundError as error:
+            raise typer.BadParameter(str(error)) from None
+        except PromptCaseFileNotFoundError as error:
+            raise typer.BadParameter(str(error)) from None
+        except KeyError as error:
+            raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(compiled.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
 
 
 @home_app.command("show")

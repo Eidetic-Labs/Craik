@@ -34,6 +34,7 @@ craik schema show craik.task_request
 | `craik.capability_grant` | Defines scoped permission for an action family. |
 | `craik.capability_receipt` | Records an auditable action result under a policy profile. |
 | `craik.case_file` | Captures task-specific context assembled before execution. |
+| `craik.compiled_prompt` | Captures a deterministic policy-aware runner prompt. |
 | `craik.contradiction_report` | Captures incompatible assertions for review. |
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
 | `craik.handoff` | Summarizes durable run state for future agents. |

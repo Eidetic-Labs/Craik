@@ -99,6 +99,9 @@ Future prompt compilation and policy decisions should consume
 `craik.runner_capability_matrix` rather than inferring authority from a runner
 name or free-form metadata.
 
+The [Prompt Compiler](prompt-compiler.md) uses these matrices to include
+runner-specific capability notes and policy boundaries in deterministic prompts.
+
 ## Boundaries
 
 Craik core owns:

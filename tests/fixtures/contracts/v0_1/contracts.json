@@ -216,6 +216,31 @@
       "max_tokens": 24000
     }
   },
+  "craik.compiled_prompt": {
+    "schema": "craik.compiled_prompt",
+    "version": "0.1.0",
+    "id": "prompt_docs_reconcile_codex",
+    "task_id": "task_docs_reconcile",
+    "case_file_id": "case_docs_reconcile",
+    "policy_envelope_id": "policy_docs_reconcile",
+    "runner_id": "codex",
+    "runner_mode": "live",
+    "capability_grant_ids": ["grant_docs_write"],
+    "expected_output_schemas": ["craik.runner_adapter_result", "craik.handoff"],
+    "context_omissions": ["Memory facts were not loaded into the case file."],
+    "stop_conditions": ["Stop if requested work exceeds the intent lock or policy envelope."],
+    "sections": [
+      {
+        "title": "Task",
+        "body": "Task id: task_docs_reconcile\nObjective: Find stale docs and propose updates."
+      },
+      {
+        "title": "Policy",
+        "body": "Policy id: policy_docs_reconcile\nProfile: strict"
+      }
+    ],
+    "prompt": "## Task\nTask id: task_docs_reconcile\nObjective: Find stale docs and propose updates.\n\n## Policy\nPolicy id: policy_docs_reconcile\nProfile: strict"
+  },
   "craik.contradiction_report": {
     "schema": "craik.contradiction_report",
     "version": "0.1.0",

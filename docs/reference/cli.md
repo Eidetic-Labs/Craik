@@ -27,6 +27,15 @@ Options:
 - `--runner <id>`: print one runner matrix. Known preview ids are `codex`,
   `claude`, `gemini`, and `fixture`.
 
+## `craik prompt compile <task-id>`
+
+Compile a deterministic policy-aware prompt for a task and runner.
+
+Options:
+
+- `--runner <id>`: runner id from `craik runners matrix`.
+- `--expected-output-schema <schema>`: expected output schema. May be repeated.
+
 ## `craik home show`
 
 Print resolved Craik local state paths without creating directories.
