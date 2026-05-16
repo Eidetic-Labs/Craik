@@ -41,6 +41,7 @@ project.
 - [Config](reference/config.md)
 - [Schemas](reference/schemas.md)
 - [Runner Adapter Contract](reference/runner-adapter-contract.md)
+- [Codex Runner Adapter](reference/codex-runner-adapter.md)
 - [Prompt Compiler](reference/prompt-compiler.md)
 - [Policy Profiles](reference/policy-profiles.md)
 - [Policy Tests](reference/policy-tests.md)
