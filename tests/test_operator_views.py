@@ -4,6 +4,7 @@ from craik.contracts.models import (
     ContradictionReport,
     EvidenceReference,
     Handoff,
+    HumanDelegationPoint,
     PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
@@ -11,6 +12,7 @@ from craik.contracts.models import (
 )
 from craik.runtime.operator_views import (
     format_contradiction_inbox,
+    format_delegation_queue,
     format_evidence_assumption_view,
     format_handoff_viewer,
     format_receipt_viewer,
@@ -253,6 +255,56 @@ def test_evidence_assumption_view_empty_state() -> None:
         "",
         "- none",
     ]
+
+
+def test_delegation_queue_formats_open_resolved_and_cancelled() -> None:
+    delegations = [
+        _delegation("delegation_open", "open", "approval"),
+        _delegation("delegation_resolved", "resolved", "clarification", resolution="Approved."),
+        _delegation("delegation_cancelled", "cancelled", "escalation", owner=None),
+    ]
+
+    lines = format_delegation_queue(delegations)
+
+    assert lines[0] == "Delegation Queue: 3"
+    assert "- delegation_cancelled [cancelled/escalation]" in lines
+    assert "- delegation_open [open/approval]" in lines
+    assert "- delegation_resolved [resolved/clarification]" in lines
+    assert "  Owner: unassigned" in lines
+    assert "  Policy: policy_docs_reconcile" in lines
+    assert "  Receipts: receipt_pytest" in lines
+    assert "  Resolution: Approved." in lines
+
+
+def test_delegation_queue_empty_state() -> None:
+    assert format_delegation_queue([]) == ["Delegation Queue: 0", "", "- none"]
+
+
+def _delegation(
+    delegation_id: str,
+    status: str,
+    kind: str,
+    *,
+    owner: str | None = "user:maintainer",
+    resolution: str | None = None,
+) -> HumanDelegationPoint:
+    return HumanDelegationPoint.model_validate(
+        {
+            "id": delegation_id,
+            "task_id": "task_docs_reconcile",
+            "kind": kind,
+            "status": status,
+            "summary": "Human review required.",
+            "requested_decision": "Approve fixture update.",
+            "requested_by": "agent:codex",
+            "owner": owner,
+            "policy_envelope_id": "policy_docs_reconcile",
+            "receipt_ids": ["receipt_pytest"],
+            "created_at": "2026-05-16T17:20:00Z",
+            "resolved_at": "2026-05-16T17:25:00Z" if resolution else None,
+            "resolution": resolution,
+        }
+    )
 
 
 def _contradiction(

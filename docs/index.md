@@ -50,6 +50,7 @@ project.
 - [Receipt Viewer](reference/receipt-viewer.md)
 - [Contradiction Inbox View](reference/contradiction-inbox-view.md)
 - [Evidence And Assumption View](reference/evidence-assumption-view.md)
+- [Delegation Queue View](reference/delegation-queue-view.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)

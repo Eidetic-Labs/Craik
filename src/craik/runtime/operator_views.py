@@ -8,11 +8,34 @@ from craik.contracts.models import (
     ContradictionReport,
     EvidenceReference,
     Handoff,
+    HumanDelegationPoint,
     PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
 )
+
+
+def format_delegation_queue(delegations: list[HumanDelegationPoint]) -> list[str]:
+    """Format a read-only human delegation queue."""
+    lines = [f"Delegation Queue: {len(delegations)}", ""]
+    if not delegations:
+        return [*lines, "- none"]
+    for delegation in sorted(delegations, key=lambda item: (item.status, item.id)):
+        lines.extend(
+            [
+                f"- {delegation.id} [{delegation.status}/{delegation.kind}]",
+                f"  Task: {delegation.task_id}",
+                f"  Owner: {delegation.owner or 'unassigned'}",
+                f"  Requested By: {delegation.requested_by}",
+                f"  Decision: {delegation.requested_decision}",
+                f"  Summary: {delegation.summary}",
+                f"  Policy: {delegation.policy_envelope_id or 'none'}",
+                f"  Receipts: {_join_or_none(delegation.receipt_ids)}",
+                f"  Resolution: {delegation.resolution or 'none'}",
+            ]
+        )
+    return lines
 
 
 def format_evidence_assumption_view(
