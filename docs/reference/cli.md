@@ -40,6 +40,9 @@ The Codex adapter preview consumes compiled prompts through the Python runtime
 API. See [Codex Runner Adapter](codex-runner-adapter.md) for fixture-mode setup,
 metadata, and limitations.
 
+The Claude adapter preview follows the same runtime API for Claude-compatible
+prompt handoff. See [Claude Runner Adapter](claude-runner-adapter.md).
+
 ## `craik home show`
 
 Print resolved Craik local state paths without creating directories.

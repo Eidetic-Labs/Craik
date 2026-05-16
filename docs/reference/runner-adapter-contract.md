@@ -78,6 +78,9 @@ credentials.
 
 The [Codex Runner Adapter Preview](codex-runner-adapter.md) implements this
 interface for Codex-compatible prompt handoff and deterministic fixture runs.
+The [Claude Runner Adapter Preview](claude-runner-adapter.md) implements the
+same interface for Claude-compatible prompt handoff and deterministic fixture
+runs.
 
 ## Capability Matrix
 
