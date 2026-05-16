@@ -10,12 +10,18 @@ from typing import Annotated, cast
 import typer
 
 from craik import __version__
-from craik.contracts.models import PolicyProfile, Priority, TaskMode
+from craik.contracts.models import PolicyProfile, Priority, RunStatus, TaskMode
 from craik.contracts.registry import schema_model, schema_names
 from craik.runtime.case_files import (
     CaseFileAssembler,
     ProjectNotFoundError,
     TaskNotFoundError,
+)
+from craik.runtime.handoffs import (
+    HandoffContextError,
+    HandoffNotFoundError,
+    HandoffWriter,
+    render_markdown,
 )
 from craik.runtime.intent_locks import IntentLockManager, IntentLockNotFoundError
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
@@ -48,6 +54,8 @@ intent_app = typer.Typer(help="Inspect task intent locks.")
 app.add_typer(intent_app, name="intent")
 case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
+handoff_app = typer.Typer(help="Create and inspect Craik handoffs.")
+app.add_typer(handoff_app, name="handoff")
 policy_app = typer.Typer(help="Inspect Craik policy profiles.")
 app.add_typer(policy_app, name="policy")
 receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
@@ -353,6 +361,115 @@ def case_show(case_or_task_id: str) -> None:
     )
 
 
+@handoff_app.command("create")
+def handoff_create(
+    task_id: Annotated[str, typer.Argument(help="Task id to create a handoff for.")],
+    summary: Annotated[str, typer.Option("--summary", help="Handoff summary.")],
+    agent: Annotated[str, typer.Option("--agent", help="Agent identity.")] = "agent:local",
+    status: Annotated[
+        str,
+        typer.Option("--status", help="Status: completed, incomplete, blocked, or failed."),
+    ] = "completed",
+    completed_action: Annotated[
+        list[str] | None,
+        typer.Option("--completed-action", help="Completed action. May be repeated."),
+    ] = None,
+    file_changed: Annotated[
+        list[str] | None,
+        typer.Option("--file-changed", help="Changed file. May be repeated."),
+    ] = None,
+    artifact: Annotated[
+        list[str] | None,
+        typer.Option("--artifact", help="Artifact path or id. May be repeated."),
+    ] = None,
+    command_run: Annotated[
+        list[str] | None,
+        typer.Option("--command-run", help="Command run. May be repeated."),
+    ] = None,
+    test_run: Annotated[
+        list[str] | None,
+        typer.Option("--test-run", help="Validation run. May be repeated."),
+    ] = None,
+    risk: Annotated[
+        list[str] | None,
+        typer.Option("--risk", help="Residual risk. May be repeated."),
+    ] = None,
+    next_step: Annotated[
+        list[str] | None,
+        typer.Option("--next-step", help="Next step. May be repeated."),
+    ] = None,
+    policy_exception: Annotated[
+        list[str] | None,
+        typer.Option("--policy-exception", help="Policy exception or fail-open note."),
+    ] = None,
+    self_audit_note: Annotated[
+        list[str] | None,
+        typer.Option("--self-audit-note", help="Self-audit note. May be repeated."),
+    ] = None,
+    markdown: Annotated[
+        bool,
+        typer.Option("--markdown", help="Print Markdown instead of JSON."),
+    ] = False,
+) -> None:
+    """Create a structured handoff for a task."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        writer = HandoffWriter(store)
+        handoff = writer.create(
+            task_id=task_id,
+            agent=agent,
+            summary=summary,
+            status=_run_status(status),
+            completed_actions=completed_action,
+            files_changed=file_changed,
+            artifacts=artifact,
+            commands_run=command_run,
+            tests_run=test_run,
+            risks=risk,
+            next_steps=next_step,
+            policy_exceptions=policy_exception,
+            self_audit_notes=self_audit_note,
+        )
+    except HandoffContextError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    if markdown:
+        typer.echo(render_markdown(handoff))
+    else:
+        typer.echo(
+            json.dumps(handoff.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+        )
+
+
+@handoff_app.command("show")
+def handoff_show(
+    handoff_or_task_id: str,
+    markdown: Annotated[
+        bool,
+        typer.Option("--markdown", help="Print Markdown instead of JSON."),
+    ] = False,
+) -> None:
+    """Show one persisted handoff by handoff id or task id."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        handoff = HandoffWriter(store).require(handoff_or_task_id)
+    except HandoffNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    if markdown:
+        typer.echo(render_markdown(handoff))
+    else:
+        typer.echo(
+            json.dumps(handoff.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+        )
+
+
 @policy_app.command("show")
 def policy_show(
     task_id: Annotated[
@@ -471,6 +588,12 @@ def _task_mode(value: str) -> TaskMode:
     if value in {"plan", "review", "implement", "verify"}:
         return cast(TaskMode, value)
     raise typer.BadParameter(f"unknown task mode: {value}")
+
+
+def _run_status(value: str) -> RunStatus:
+    if value in {"completed", "incomplete", "blocked", "failed"}:
+        return cast(RunStatus, value)
+    raise typer.BadParameter(f"unknown run status: {value}")
 
 
 def main() -> None:

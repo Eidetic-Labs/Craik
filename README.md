@@ -54,6 +54,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Runtime Contracts](docs/runtime-contracts.md)
 - [Case Files](docs/concepts/case-files.md)
 - [Intent Locks](docs/concepts/intent-locks.md)
+- [Handoffs](docs/concepts/handoffs.md)
 - [Receipts](docs/concepts/receipts.md)
 - [Feature Specification](docs/features.md)
 - [MVP Plan](docs/mvp.md)
@@ -67,6 +68,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Project Registry](docs/guides/project-registry.md)
 - [Using Case Files](docs/guides/using-case-files.md)
 - [Scope Control](docs/guides/scope-control.md)
+- [Writing Handoffs](docs/guides/writing-handoffs.md)
 - [Evidence And Assumptions](docs/guides/evidence-and-assumptions.md)
 - [Context Budgeting](docs/guides/context-budgeting.md)
 - [Development Checks](docs/guides/development.md)
@@ -79,6 +81,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Local State Layout](docs/reference/local-state.md)
 - [Local Store](docs/reference/local-store.md)
 - [Project Profile](docs/reference/project-profile.md)
+- [Self-Audit](docs/reference/self-audit.md)
 - [Secrets](docs/security/secrets.md)
 - [Limitations](docs/limitations.md)
 

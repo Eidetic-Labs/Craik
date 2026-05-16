@@ -223,6 +223,68 @@ def test_case_build_reports_missing_task(tmp_path: Path) -> None:
     assert "unknown task: task_missing" in result.output
 
 
+def test_handoff_commands_create_and_show_json_and_markdown(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Repo\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md")
+    _run_git(repo, "commit", "-m", "initial")
+    home = tmp_path / "home"
+    runner.invoke(
+        app,
+        ["project", "add", str(repo), "--name", "Example"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    runner.invoke(
+        app,
+        [
+            "task",
+            "create",
+            "--project",
+            "Example",
+            "--title",
+            "Review docs",
+            "--objective",
+            "Review docs against implementation.",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    runner.invoke(app, ["case", "build", "task_review_docs"], env={"CRAIK_HOME": str(home)})
+
+    created = runner.invoke(
+        app,
+        [
+            "handoff",
+            "create",
+            "task_review_docs",
+            "--summary",
+            "Completed docs review.",
+            "--agent",
+            "agent:codex",
+            "--completed-action",
+            "Reviewed docs.",
+            "--test-run",
+            "pytest",
+            "--next-step",
+            "Continue handoff work.",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    shown = runner.invoke(
+        app,
+        ["handoff", "show", "task_review_docs", "--markdown"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert created.exit_code == 0
+    assert json.loads(created.stdout)["id"] == "handoff_review_docs"
+    assert json.loads(created.stdout)["self_audit"]["validation_recorded"] is True
+    assert shown.exit_code == 0
+    assert shown.stdout.startswith("# Handoff: task_review_docs")
+    assert "- [x] Validation recorded" in shown.stdout
+
+
 def test_policy_show_defaults_to_strict() -> None:
     result = runner.invoke(app, ["policy", "show"])
 
