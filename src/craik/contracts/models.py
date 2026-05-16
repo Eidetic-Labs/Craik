@@ -131,6 +131,7 @@ ContextRequestKind = Literal[
 ]
 ExitDisciplineStatus = Literal["complete", "blocked"]
 SkillEntrypointKind = Literal["prompt", "script", "module", "workflow", "docs"]
+SkillOmissionSeverity = Literal["low", "medium", "high", "critical"]
 PluginEntrypointKind = Literal["command", "module", "workflow", "service", "docs"]
 PluginCapabilityRisk = Literal["low", "medium", "high", "critical"]
 PluginCompatibilityStatus = Literal["supported", "experimental", "unsupported"]
@@ -1871,6 +1872,78 @@ class SkillPackage(CraikModel):
             raise ValueError("skill packages require docs")
         if self.runtime_authority is not False:
             raise ValueError("skill packages must not carry runtime authority")
+        return self
+
+
+class SkillContextInput(CraikModel):
+    """Input contract made available to a skill invocation."""
+
+    schema_name: str
+    contract_id: str
+    required: bool = True
+    summary: str
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class SkillContextOutput(CraikModel):
+    """Output expected from or produced by a skill invocation."""
+
+    schema_name: str
+    contract_id: str | None = None
+    required: bool = True
+    produced: bool = False
+    summary: str
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class SkillContextOmission(CraikModel):
+    """Required or expected context omitted from a skill invocation."""
+
+    schema_name: str
+    reason: str
+    impact: str
+    severity: SkillOmissionSeverity
+    mitigation: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class SkillInvocationContext(CraikModel):
+    """Auditable context boundary for one skill invocation."""
+
+    schema_: Literal["craik.skill_invocation_context"] = Field(
+        default="craik.skill_invocation_context",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    skill_package_id: str
+    policy_envelope_id: str
+    handoff_id: str | None = None
+    inputs: list[SkillContextInput] = Field(min_length=1)
+    outputs: list[SkillContextOutput] = Field(default_factory=list)
+    omissions: list[SkillContextOmission] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    redacted: bool = True
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_skill_invocation_context(self) -> SkillInvocationContext:
+        """Require policy-linked, redacted skill context with tracked outputs."""
+        if not self.policy_envelope_id:
+            raise ValueError("skill invocation context requires a policy_envelope_id")
+        if not self.redacted:
+            raise ValueError("skill invocation context must be redacted")
+        if not self.outputs and not self.omissions:
+            raise ValueError("skill invocation context requires outputs or omissions")
+        missing_required_outputs = [
+            output.schema_name
+            for output in self.outputs
+            if output.required and not output.produced and not output.contract_id
+        ]
+        if missing_required_outputs and not self.omissions:
+            raise ValueError("missing required outputs must be explained by omissions")
         return self
 
 

@@ -70,6 +70,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `unknown_records` | `craik.unknown_record` |
 | `scope_change_requests` | `craik.scope_change_request` |
 | `scope_change_results` | `craik.scope_change_result` |
+| `skill_invocation_contexts` | `craik.skill_invocation_context` |
 | `skill_packages` | `craik.skill_package` |
 
 Every stored payload is validated through the Pydantic contract registry before persistence and again when loaded.
