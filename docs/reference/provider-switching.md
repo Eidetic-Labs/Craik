@@ -36,6 +36,7 @@ Prints a redacted selection payload with:
 - runtime path;
 - config references;
 - secret reference names;
+- budget and quota refs;
 - policy envelope id;
 - linked receipt ids.
 
@@ -43,3 +44,6 @@ Selection output is metadata-only. It does not contact providers, load secrets,
 or grant execution authority.
 
 Unsupported modes are rejected before a selection payload is produced.
+
+Provider routing should check budget and quota status before dispatch. See
+[Model Providers](model-providers.md) for budget and quota decision behavior.

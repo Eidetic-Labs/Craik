@@ -784,6 +784,8 @@
     "trust_boundary": "local",
     "config_refs": ["CRAIK_PROVIDER_FIXTURE_MODE"],
     "secret_ref_names": ["CRAIK_PROVIDER_FIXTURE_TOKEN"],
+    "budget_ref": "budget_fixture_monthly",
+    "quota_ref": "quota_fixture_daily",
     "runtime_path": "craik.runtime.fixture_provider",
     "metadata": {
       "notes": "Fixture provider metadata only."
