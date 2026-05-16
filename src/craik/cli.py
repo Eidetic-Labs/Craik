@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Annotated, cast
@@ -25,6 +26,7 @@ from craik.runtime.case_files import (
     ProjectNotFoundError,
     TaskNotFoundError,
 )
+from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
 from craik.runtime.handoffs import (
     HandoffContextError,
     HandoffNotFoundError,
@@ -350,12 +352,17 @@ def case_build(
         int,
         typer.Option("--max-tokens", min=1, help="Approximate context budget."),
     ] = 24000,
+    github: Annotated[
+        bool,
+        typer.Option("--github/--no-github", help="Load read-only GitHub context."),
+    ] = True,
 ) -> None:
     """Build and persist a deterministic case file for a task."""
     store = LocalStore.from_env()
     try:
         store.initialize()
-        assembler = CaseFileAssembler(store)
+        github_adapter = _github_adapter() if github else None
+        assembler = CaseFileAssembler(store, github_adapter=github_adapter)
         case_file = assembler.build(task_id, max_tokens=max_tokens)
     except (TaskNotFoundError, ProjectNotFoundError) as error:
         raise typer.BadParameter(str(error)) from None
@@ -365,6 +372,11 @@ def case_build(
     typer.echo(
         json.dumps(case_file.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
     )
+
+
+def _github_adapter() -> GitHubReadAdapter:
+    config = GitHubConfig.from_env(dict(os.environ))
+    return GitHubReadAdapter(GitHubClient(config))
 
 
 @case_app.command("show")

@@ -60,4 +60,4 @@ Agents should review assumptions before acting and avoid promoting them to facts
 
 ## Current Scope
 
-The local assembler does not yet load Stigmem facts, GitHub issues or pull requests, recent handoffs, or contradiction reports. Those are planned adapter layers that will extend the same case file contract.
+The local assembler can load read-only GitHub issues and pull requests when a GitHub remote is configured. It does not yet load Stigmem facts, recent handoffs, or contradiction reports. Those planned adapter layers will extend the same case file contract.

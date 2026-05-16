@@ -81,6 +81,7 @@ Build and persist a deterministic case file for a task.
 Options:
 
 - `--max-tokens <count>`: approximate context budget; defaults to `24000`.
+- `--github / --no-github`: load or skip read-only GitHub context.
 
 ## `craik case show <case-id-or-task-id>`
 

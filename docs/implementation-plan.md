@@ -12,7 +12,7 @@ Accepted default:
 - Typer for CLI,
 - Pydantic for schema validation,
 - SQLite for local persistent state,
-- `httpx` for Stigmem and GitHub API calls,
+- stdlib HTTP for the first Stigmem and GitHub API calls,
 - `pytest` for tests,
 - `ruff` and `mypy` for quality gates.
 
