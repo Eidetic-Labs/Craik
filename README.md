@@ -33,7 +33,7 @@ Craik core is runner-agnostic, but the first implementation should provide direc
 
 Each runner adapter should consume the same Craik contracts: project case file, policy envelope, capability grants, worker result, receipts, handoff, and memory proposals.
 
-OpenClaw is not a required dependency and is not the initial execution target. Craik borrows OpenClaw's useful gateway, workspace, session, tool, and skill ergonomics, while reserving a possible future bridge for teams that want OpenClaw-style channel integrations.
+Craik is not built as a dependency layer on another agent framework. It borrows broadly useful product patterns such as gateway ergonomics, workspace identity, persistent sessions, typed tools, skills, and channel integrations while keeping Craik's first agent path focused on direct runner adapters.
 
 ## Core Ideas
 
@@ -125,7 +125,7 @@ Craik core will be implemented in Python 3.12+ with a CLI-first package shape. T
 - `pytest` for tests
 - `ruff` and `mypy` for quality gates
 
-TypeScript remains appropriate for future UI, gateway adapters, and OpenClaw-style integrations, but it is not the initial core runtime stack.
+TypeScript remains appropriate for future UI, gateway adapters, and channel integrations, but it is not the initial core runtime stack.
 
 ## Package and CLI Naming
 
