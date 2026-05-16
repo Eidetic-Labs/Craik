@@ -6,11 +6,13 @@ from craik.contracts.models import (
     ReceiptResult,
     RunnerMetadata,
     RunnerStepResult,
+    TaskRunPhase,
 )
 from craik.runtime.trajectory_exports import (
     LOCAL_PATH_REDACTION,
     TRAJECTORY_EXPORT_FORMAT,
     build_training_trajectory_export,
+    compress_training_trajectory,
 )
 
 NOW = datetime(2026, 5, 16, 16, 50, tzinfo=UTC)
@@ -80,19 +82,101 @@ def test_training_trajectory_export_redacts_secrets_private_payloads_and_paths()
     assert payload["redacted_paths"]
 
 
+def test_compress_training_trajectory_preserves_review_and_replay_links() -> None:
+    export = build_training_trajectory_export(
+        export_id="trajectory_export_docs_reconcile",
+        task_id="task_docs_reconcile",
+        steps=[
+            _step(
+                observed_output={
+                    "decision": "plan",
+                    "evidence_ids": ["evidence_docs_reconcile"],
+                    "policy_envelope_id": "policy_learning",
+                    "replay_fixture_ids": ["skill_replay_docs_fixture"],
+                    "replay_result_ids": ["skill_replay_docs_fixture_result"],
+                    "unresolved_risk_ids": ["risk_docs_regression"],
+                },
+            ),
+            _step(step_id="runner_step_result_docs_reconcile_evaluate", phase="evaluate"),
+        ],
+        receipts=[_receipt(metadata={"policy_envelope_id": "policy_learning"})],
+        evidence=[_evidence()],
+        outcome="completed",
+        created_at=NOW,
+    )
+
+    summary = compress_training_trajectory(
+        summary_id="trajectory_summary_docs_reconcile",
+        export=export,
+        max_summary_lines=1,
+        created_at=NOW,
+    )
+    payload = summary.model_dump(by_alias=True, mode="json")
+
+    assert payload["schema"] == "craik.training_trajectory_summary"
+    assert payload["source_export_id"] == "trajectory_export_docs_reconcile"
+    assert payload["decision_count"] == 2
+    assert payload["phase_counts"] == {"plan": 1, "evaluate": 1}
+    assert payload["status_counts"] == {"completed": 2}
+    assert payload["summary_lines"] == ["plan:completed: Step completed."]
+    assert payload["omitted_decision_ids"] == [
+        "trajectory_decision_runner_step_result_docs_reconcile_evaluate"
+    ]
+    assert payload["receipt_ids"] == ["receipt_runner_fixture"]
+    assert payload["evidence_ids"] == ["evidence_docs_reconcile"]
+    assert payload["policy_envelope_ids"] == ["policy_learning"]
+    assert payload["replay_fixture_ids"] == ["skill_replay_docs_fixture"]
+    assert payload["replay_result_ids"] == ["skill_replay_docs_fixture_result"]
+    assert payload["unresolved_risk_ids"] == ["risk_docs_regression"]
+
+
+def test_compress_training_trajectory_keeps_summary_redacted() -> None:
+    export = build_training_trajectory_export(
+        export_id="trajectory_export_docs_reconcile",
+        task_id="task_docs_reconcile",
+        steps=[
+            _step(
+                summary="Used token=redactionfixture123 from /Users/bjones/private",
+                observed_output={"evidence_ids": ["evidence_docs_reconcile"]},
+            )
+        ],
+        evidence=[_evidence()],
+        outcome="failed at /private/tmp/run with Bearer redactionfixture123",
+        created_at=NOW,
+    )
+
+    summary = compress_training_trajectory(
+        summary_id="trajectory_summary_docs_reconcile",
+        export=export,
+        created_at=NOW,
+    )
+    payload = summary.model_dump(by_alias=True, mode="json")
+
+    assert "redactionfixture123" not in str(payload)
+    assert "/Users/bjones" not in str(payload)
+    assert "/private/tmp" not in str(payload)
+    assert payload["summary_lines"] == [
+        f"plan:completed: Used token=[REDACTED] from {LOCAL_PATH_REDACTION}"
+    ]
+    assert payload["outcome"] == f"failed at {LOCAL_PATH_REDACTION} with Bearer [REDACTED]"
+    assert payload["redacted_paths"]
+
+
 def _step(
     *,
+    step_id: str = "runner_step_result_docs_reconcile_plan",
+    phase: TaskRunPhase = "plan",
     summary: str = "Step completed.",
     observed_output: dict[str, object] | None = None,
     diagnostics: list[str] | None = None,
     artifacts: list[str] | None = None,
 ) -> RunnerStepResult:
     return RunnerStepResult(
-        id="runner_step_result_docs_reconcile_plan",
-        request_id="runner_step_request_docs_reconcile_plan",
+        id=step_id,
+        request_id=f"request_{step_id}",
         run_id="run_docs_reconcile",
         task_id="task_docs_reconcile",
-        phase="plan",
+        phase=phase,
         runner=RunnerMetadata(
             id="runner_fixture",
             name="Fixture Runner",
