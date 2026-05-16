@@ -1121,6 +1121,36 @@
     "declared_policy_doc_paths": ["docs/policies/runtime.md"],
     "created_at": "2026-05-16T06:40:00Z"
   },
+  "craik.instruction_source_snapshot": {
+    "schema": "craik.instruction_source_snapshot",
+    "version": "0.1.0",
+    "id": "instruction_snapshot_agents_md",
+    "project_id": "project_stigmem",
+    "source_id": "instruction_source_agents_md",
+    "path": "AGENTS.md",
+    "hash_algorithm": "sha256",
+    "content_hash": "sha256:fixture-agents-md",
+    "hash_status": "unchanged",
+    "byte_count": 512,
+    "line_count": 24,
+    "captured_at": "2026-05-16T06:41:00Z"
+  },
+  "craik.instruction_provenance": {
+    "schema": "craik.instruction_provenance",
+    "version": "0.1.0",
+    "id": "instruction_provenance_agents_md_boundary",
+    "project_id": "project_stigmem",
+    "source_id": "instruction_source_agents_md",
+    "snapshot_id": "instruction_snapshot_agents_md",
+    "path": "AGENTS.md",
+    "start_line": 3,
+    "end_line": 6,
+    "start_column": 1,
+    "end_column": 80,
+    "summary": "Fixture provenance for a boundary instruction.",
+    "excerpt_hash": "sha256:fixture-agents-md-lines-3-6",
+    "captured_at": "2026-05-16T06:42:00Z"
+  },
   "craik.worker_result": {
     "schema": "craik.worker_result",
     "version": "0.1.0",

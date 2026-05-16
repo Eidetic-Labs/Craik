@@ -34,3 +34,19 @@ The registry is a discovery boundary, not an approval boundary. Later
 distillation and promotion steps must still preserve provenance, stale-source
 state, contradiction reports, and human approval before extracted instructions
 become active runtime constraints.
+
+## Hash State And Provenance
+
+`craik.instruction_source_snapshot` records observed source identity with a
+`sha256` content hash when the source is present. Hash status is one of:
+
+- `unchanged`: the observed hash matches the previous known state.
+- `changed`: the source exists and differs from the previous known state.
+- `missing`: the declared source was not found and must not include a content
+  hash.
+- `new`: the source exists but has no previous known state.
+
+`craik.instruction_provenance` links distilled material back to a source and
+optional snapshot. Provenance can use a precise line range when available or a
+source-level fallback when the extractor cannot identify stable lines. Partial
+line ranges are invalid because they make review ambiguous.
