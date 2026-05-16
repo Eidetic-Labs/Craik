@@ -30,6 +30,12 @@ Run read-only diagnostics for local home, local store, memory backend
 configuration, gateway prerequisites, and gateway policy readiness. The command
 prints JSON and does not create files or contact external services.
 
+## `craik update`
+
+Print update guidance as JSON. The command reports installed version,
+compatibility state, manual update steps, and non-mutating boundaries. It does
+not rewrite the installation, fetch release metadata, or migrate local state.
+
 ## `craik schema list`
 
 List registered Craik runtime contract schemas.

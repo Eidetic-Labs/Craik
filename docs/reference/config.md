@@ -25,6 +25,11 @@ for the local home, local store, memory backend configuration, gateway
 prerequisites, and gateway policy readiness without creating files or contacting
 external services.
 
+`craik update` is read-only update guidance. It reports the installed version,
+supported Python range, contract compatibility, local-store migration
+compatibility, manual update steps, and explicit non-mutating boundaries without
+fetching release metadata, rewriting the installation, or migrating local state.
+
 ## Context Discovery
 
 Project profiles can store documentation discovery overrides through
