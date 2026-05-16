@@ -27,3 +27,6 @@ timestamp.
 User preferences require `user:` subjects. Team preferences require `team:`
 subjects. Do not promote a user preference into a team preference without an
 explicit review decision and evidence for that broader scope.
+
+Use [Learning Receipts](learning-receipts.md) to record preference review and
+learning-loop decisions.
