@@ -11,6 +11,8 @@ from craik.contracts.models import (
     WorkGraphNode,
 )
 from craik.runtime.operator_views import (
+    BudgetQuotaSnapshot,
+    format_budget_quota_view,
     format_contradiction_inbox,
     format_delegation_queue,
     format_evidence_assumption_view,
@@ -278,6 +280,32 @@ def test_delegation_queue_formats_open_resolved_and_cancelled() -> None:
 
 def test_delegation_queue_empty_state() -> None:
     assert format_delegation_queue([]) == ["Delegation Queue: 0", "", "- none"]
+
+
+def test_budget_quota_view_formats_configured_missing_and_exceeded_states() -> None:
+    snapshot = BudgetQuotaSnapshot(
+        configured_limits={"tokens": 1000, "requests": 25},
+        usage={"tokens": 1200, "requests": 10},
+        missing=["cost_usd"],
+        exceeded=["tokens"],
+        notes=["Cost data unavailable in local fixtures."],
+    )
+
+    lines = format_budget_quota_view(snapshot)
+
+    assert lines[:3] == ["Budget And Quota", "", "Configured Limits"]
+    assert "- requests: 25" in lines
+    assert "- tokens: 1200" in lines
+    assert "- cost_usd" in lines
+    assert "- tokens" in lines
+    assert "- Cost data unavailable in local fixtures." in lines
+
+
+def test_budget_quota_view_empty_state_does_not_infer_costs() -> None:
+    lines = format_budget_quota_view(BudgetQuotaSnapshot(missing=["cost_usd"]))
+
+    assert lines.count("- none") == 4
+    assert "- cost_usd" in lines
 
 
 def _delegation(
