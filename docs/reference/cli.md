@@ -18,6 +18,15 @@ List registered Craik runtime contract schemas.
 
 Print the JSON Schema for a registered runtime contract.
 
+## `craik runners matrix`
+
+Print the built-in runner capability matrix and trust profiles as JSON.
+
+Options:
+
+- `--runner <id>`: print one runner matrix. Known preview ids are `codex`,
+  `claude`, `gemini`, and `fixture`.
+
 ## `craik home show`
 
 Print resolved Craik local state paths without creating directories.

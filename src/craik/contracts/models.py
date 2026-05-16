@@ -32,6 +32,9 @@ ReceiptStatus = Literal["passed", "failed", "blocked", "denied", "skipped"]
 RunStatus = Literal["completed", "incomplete", "blocked", "failed"]
 RunnerMode = Literal["fixture", "prompt-handoff", "live"]
 RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
+RunnerTrustLevel = Literal["low", "medium", "high"]
+RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
+RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
 
 
 class CraikModel(BaseModel):
@@ -240,6 +243,40 @@ class RunnerMetadata(CraikModel):
     mode: RunnerMode
     capabilities: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RunnerCapability(CraikModel):
+    """One normalized runner capability entry used by policy and prompt compilation."""
+
+    name: str
+    support: RunnerCapabilitySupport
+    grant_required: bool = True
+    notes: str | None = None
+
+
+class RunnerTrustProfile(CraikModel):
+    """Default trust boundary and grant posture for a runner."""
+
+    level: RunnerTrustLevel
+    boundary: str
+    default_grant_posture: RunnerGrantPosture = "deny-by-default"
+    requires_receipts: bool = True
+    requires_redaction: bool = True
+    notes: list[str] = Field(default_factory=list)
+
+
+class RunnerCapabilityMatrix(CraikModel):
+    """Validated capability and trust profile for a runner adapter."""
+
+    schema_: Literal["craik.runner_capability_matrix"] = Field(
+        default="craik.runner_capability_matrix",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    runner: RunnerMetadata
+    trust: RunnerTrustProfile
+    capabilities: list[RunnerCapability] = Field(default_factory=list)
+    policy_notes: list[str] = Field(default_factory=list)
 
 
 class RunnerAdapterRequest(CraikModel):

@@ -45,6 +45,25 @@ def test_schema_show_prints_json_schema() -> None:
     assert '"title": "TaskRequest"' in result.stdout
 
 
+def test_runners_matrix_lists_built_in_trust_profiles() -> None:
+    result = runner.invoke(app, ["runners", "matrix"])
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    runner_ids = {entry["runner"]["id"] for entry in payload}
+    assert {"codex", "claude", "gemini", "fixture"} == runner_ids
+
+
+def test_runners_matrix_filters_one_runner() -> None:
+    result = runner.invoke(app, ["runners", "matrix", "--runner", "codex"])
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["schema"] == "craik.runner_capability_matrix"
+    assert payload["runner"]["id"] == "codex"
+    assert payload["trust"]["default_grant_posture"] == "prompt-for-approval"
+
+
 def test_home_show_does_not_create_home(tmp_path) -> None:
     home = tmp_path / "craik-home"
 

@@ -8,7 +8,22 @@ from typing import Protocol, runtime_checkable
 from craik.contracts.models import (
     RunnerAdapterRequest,
     RunnerAdapterResult,
+    RunnerCapability,
+    RunnerCapabilityMatrix,
+    RunnerCapabilitySupport,
     RunnerMetadata,
+    RunnerTrustProfile,
+)
+
+RUNNER_CAPABILITY_NAMES = (
+    "file.read",
+    "file.write",
+    "shell.execute",
+    "network.access",
+    "memory.read",
+    "memory.write",
+    "review.comment",
+    "result.structured",
 )
 
 
@@ -38,3 +53,201 @@ class FixtureRunnerAdapter:
         if self.result.request_id != request.id:
             raise ValueError("runner fixture result does not match request id")
         return self.result
+
+
+def default_runner_capability_matrices() -> dict[str, RunnerCapabilityMatrix]:
+    """Return the built-in conservative runner matrix by runner id."""
+    matrices = [
+        _codex_matrix(),
+        _claude_matrix(),
+        _gemini_matrix(),
+        _fixture_matrix(),
+    ]
+    return {matrix.runner.id: matrix for matrix in matrices}
+
+
+def get_runner_capability_matrix(runner_id: str) -> RunnerCapabilityMatrix:
+    """Return a built-in runner capability matrix by runner id."""
+    try:
+        return default_runner_capability_matrices()[runner_id]
+    except KeyError:
+        known = ", ".join(sorted(default_runner_capability_matrices()))
+        raise KeyError(f"unknown runner {runner_id!r}; known runners: {known}") from None
+
+
+def capability_supported(matrix: RunnerCapabilityMatrix, capability: str) -> bool:
+    """Return whether a runner has direct support for a named capability."""
+    return any(
+        entry.name == capability and entry.support == "supported" for entry in matrix.capabilities
+    )
+
+
+def capability_requires_grant(matrix: RunnerCapabilityMatrix, capability: str) -> bool:
+    """Return whether a supported or handoff capability requires an explicit grant."""
+    for entry in matrix.capabilities:
+        if entry.name == capability:
+            return entry.grant_required
+    return True
+
+
+def _codex_matrix() -> RunnerCapabilityMatrix:
+    return RunnerCapabilityMatrix(
+        runner=RunnerMetadata(
+            id="codex",
+            name="Codex",
+            adapter="codex",
+            adapter_version="preview",
+            mode="live",
+            capabilities=list(RUNNER_CAPABILITY_NAMES),
+        ),
+        trust=RunnerTrustProfile(
+            level="medium",
+            boundary="Local workspace runner with shell/tool access mediated by Craik policy.",
+            default_grant_posture="prompt-for-approval",
+            notes=[
+                "Treat filesystem writes, shell execution, network, and memory writes as grants."
+            ],
+        ),
+        capabilities=[
+            _capability("file.read", "supported", grant_required=False),
+            _capability("file.write", "supported"),
+            _capability("shell.execute", "supported"),
+            _capability("network.access", "supported"),
+            _capability("memory.read", "supported", grant_required=False),
+            _capability("memory.write", "supported"),
+            _capability("review.comment", "supported"),
+            _capability("result.structured", "supported", grant_required=False),
+        ],
+        policy_notes=[
+            "Default to explicit grants for side effects.",
+            (
+                "Require receipts for writes, shell execution, network use, review comments, "
+                "and memory writes."
+            ),
+        ],
+    )
+
+
+def _claude_matrix() -> RunnerCapabilityMatrix:
+    return RunnerCapabilityMatrix(
+        runner=RunnerMetadata(
+            id="claude",
+            name="Claude",
+            adapter="claude",
+            adapter_version="preview",
+            mode="prompt-handoff",
+            capabilities=[
+                "file.read",
+                "file.write",
+                "memory.read",
+                "memory.write",
+                "review.comment",
+                "result.structured",
+            ],
+        ),
+        trust=RunnerTrustProfile(
+            level="medium",
+            boundary=(
+                "Prompt-handoff runner; Craik should treat side effects as proposed work "
+                "until verified."
+            ),
+            default_grant_posture="deny-by-default",
+            notes=[
+                "Live tool authority depends on the external Claude environment, not Craik core."
+            ],
+        ),
+        capabilities=[
+            _capability("file.read", "prompt-handoff", grant_required=False),
+            _capability("file.write", "prompt-handoff"),
+            _capability("shell.execute", "unsupported"),
+            _capability("network.access", "unsupported"),
+            _capability("memory.read", "prompt-handoff", grant_required=False),
+            _capability("memory.write", "prompt-handoff"),
+            _capability("review.comment", "prompt-handoff"),
+            _capability("result.structured", "supported", grant_required=False),
+        ],
+        policy_notes=[
+            "Prompt-handoff side effects must return through Craik review and receipt workflows.",
+        ],
+    )
+
+
+def _gemini_matrix() -> RunnerCapabilityMatrix:
+    return RunnerCapabilityMatrix(
+        runner=RunnerMetadata(
+            id="gemini",
+            name="Gemini",
+            adapter="gemini",
+            adapter_version="preview",
+            mode="prompt-handoff",
+            capabilities=["file.read", "memory.read", "review.comment", "result.structured"],
+        ),
+        trust=RunnerTrustProfile(
+            level="low",
+            boundary=(
+                "Prompt-handoff runner with conservative defaults until live adapter behavior "
+                "is proven."
+            ),
+            default_grant_posture="deny-by-default",
+            notes=["Use for review or synthesis by default; avoid direct side effects in v0.2.0."],
+        ),
+        capabilities=[
+            _capability("file.read", "prompt-handoff", grant_required=False),
+            _capability("file.write", "unsupported"),
+            _capability("shell.execute", "unsupported"),
+            _capability("network.access", "unsupported"),
+            _capability("memory.read", "prompt-handoff", grant_required=False),
+            _capability("memory.write", "unsupported"),
+            _capability("review.comment", "prompt-handoff"),
+            _capability("result.structured", "supported", grant_required=False),
+        ],
+        policy_notes=[
+            "Keep default Gemini use read/review-oriented until adapter tests justify more."
+        ],
+    )
+
+
+def _fixture_matrix() -> RunnerCapabilityMatrix:
+    return RunnerCapabilityMatrix(
+        runner=RunnerMetadata(
+            id="fixture",
+            name="Fixture Runner",
+            adapter="fixture",
+            adapter_version="0.1.0",
+            mode="fixture",
+            capabilities=["result.structured"],
+        ),
+        trust=RunnerTrustProfile(
+            level="high",
+            boundary="Deterministic in-process fixture for tests; no external side effects.",
+            default_grant_posture="allow-with-receipt",
+            requires_receipts=False,
+            notes=["Only use for fixtures and contract tests."],
+        ),
+        capabilities=[
+            _capability("file.read", "unsupported"),
+            _capability("file.write", "unsupported"),
+            _capability("shell.execute", "unsupported"),
+            _capability("network.access", "unsupported"),
+            _capability("memory.read", "unsupported"),
+            _capability("memory.write", "unsupported"),
+            _capability("review.comment", "unsupported"),
+            _capability("result.structured", "supported", grant_required=False),
+        ],
+        policy_notes=["Fixture runs should not widen runtime authority."],
+    )
+
+
+def _capability(
+    name: str,
+    support: RunnerCapabilitySupport,
+    *,
+    grant_required: bool = True,
+    notes: str | None = None,
+) -> RunnerCapability:
+    return RunnerCapability(
+        name=name,
+        support=support,
+        grant_required=grant_required,
+        notes=notes,
+    )
