@@ -211,7 +211,11 @@
       "trust_class": "observed"
     },
     "evidence": [],
-    "requires_approval": true
+    "requires_approval": true,
+    "status": "pending",
+    "decision_reason": null,
+    "decided_by": null,
+    "decided_at": null
   },
   "craik.policy_envelope": {
     "schema": "craik.policy_envelope",

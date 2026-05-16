@@ -117,6 +117,62 @@ Options:
 
 - `--markdown`: print Markdown instead of JSON.
 
+## `craik memory propose <task-id>`
+
+Create a reviewable local memory proposal.
+
+Required options:
+
+- `--entity <entity>`: fact entity.
+- `--relation <relation>`: fact relation.
+- `--value <value>`: fact value.
+- `--source <source>`: fact source.
+- `--evidence-source <source>`: evidence source.
+- `--evidence-locator <locator>`: evidence locator.
+- `--evidence-summary <summary>`: evidence summary.
+
+Options:
+
+- `--confidence <value>`: confidence from `0.0` to `1.0`.
+- `--scope <scope>`: `local`, `team`, `company`, or `public`.
+- `--trust-class <class>`: `observed`, `reported`, `inferred`, `policy`, `external`, or `stale-risk`.
+- `--operation <operation>`: `add`, `update`, or `invalidate`.
+
+## `craik memory list`
+
+List local memory proposals.
+
+Options:
+
+- `--task-id <id>`: only include proposals for this task.
+- `--status <status>`: only include proposals with this status.
+
+## `craik memory show <proposal-id>`
+
+Print one local memory proposal.
+
+## `craik memory approve <proposal-id>`
+
+Approve a local memory proposal for local search. Approval requires evidence.
+
+Options:
+
+- `--decided-by <identity>`: reviewer identity.
+- `--reason <text>`: decision reason.
+
+## `craik memory reject <proposal-id>`
+
+Reject a local memory proposal.
+
+Options:
+
+- `--decided-by <identity>`: reviewer identity.
+- `--reason <text>`: decision reason.
+
+## `craik memory search <query>`
+
+Search approved local memory facts.
+
 ## `craik policy show`
 
 Print a generated policy envelope.

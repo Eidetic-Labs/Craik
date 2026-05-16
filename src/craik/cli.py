@@ -10,7 +10,15 @@ from typing import Annotated, cast
 import typer
 
 from craik import __version__
-from craik.contracts.models import PolicyProfile, Priority, RunStatus, TaskMode
+from craik.contracts.models import (
+    MemoryScope,
+    PolicyProfile,
+    Priority,
+    ProposalOperation,
+    RunStatus,
+    TaskMode,
+    TrustClass,
+)
 from craik.contracts.registry import schema_model, schema_names
 from craik.runtime.case_files import (
     CaseFileAssembler,
@@ -24,6 +32,13 @@ from craik.runtime.handoffs import (
     render_markdown,
 )
 from craik.runtime.intent_locks import IntentLockManager, IntentLockNotFoundError
+from craik.runtime.memory import (
+    EvidenceRequiredError,
+    LocalMemoryStore,
+    MemoryProposalNotFoundError,
+    create_proposal,
+    evidence_reference,
+)
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy import (
     FailOpenNotAllowedError,
@@ -56,6 +71,8 @@ case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
 handoff_app = typer.Typer(help="Create and inspect Craik handoffs.")
 app.add_typer(handoff_app, name="handoff")
+memory_app = typer.Typer(help="Create and review local memory proposals.")
+app.add_typer(memory_app, name="memory")
 policy_app = typer.Typer(help="Inspect Craik policy profiles.")
 app.add_typer(policy_app, name="policy")
 receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
@@ -470,6 +487,192 @@ def handoff_show(
         )
 
 
+@memory_app.command("propose")
+def memory_propose(
+    task_id: Annotated[str, typer.Argument(help="Task id for the proposal.")],
+    entity: Annotated[str, typer.Option("--entity", help="Fact entity.")],
+    relation: Annotated[str, typer.Option("--relation", help="Fact relation.")],
+    value: Annotated[str, typer.Option("--value", help="Fact value.")],
+    source: Annotated[str, typer.Option("--source", help="Fact source.")],
+    evidence_source: Annotated[
+        str,
+        typer.Option("--evidence-source", help="Evidence source supporting the proposal."),
+    ],
+    evidence_locator: Annotated[
+        str,
+        typer.Option("--evidence-locator", help="Evidence locator supporting the proposal."),
+    ],
+    evidence_summary: Annotated[
+        str,
+        typer.Option("--evidence-summary", help="Evidence summary supporting the proposal."),
+    ],
+    confidence: Annotated[
+        float,
+        typer.Option("--confidence", min=0.0, max=1.0, help="Fact confidence."),
+    ] = 0.8,
+    scope: Annotated[
+        str,
+        typer.Option("--scope", help="Memory scope: local, team, company, or public."),
+    ] = "local",
+    trust_class: Annotated[
+        str,
+        typer.Option(
+            "--trust-class",
+            help="Trust class: observed, reported, inferred, policy, external, or stale-risk.",
+        ),
+    ] = "observed",
+    operation: Annotated[
+        str,
+        typer.Option("--operation", help="Operation: add, update, or invalidate."),
+    ] = "add",
+) -> None:
+    """Create a reviewable local memory proposal."""
+    evidence = evidence_reference(
+        task_id=task_id,
+        source=evidence_source,
+        locator=evidence_locator,
+        summary=evidence_summary,
+    )
+    proposal = create_proposal(
+        task_id=task_id,
+        entity=entity,
+        relation=relation,
+        value=value,
+        source=source,
+        confidence=confidence,
+        scope=_memory_scope(scope),
+        trust_class=_trust_class(trust_class),
+        operation=_proposal_operation(operation),
+        evidence=[evidence],
+    )
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposal = LocalMemoryStore(store).propose(proposal)
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(proposal.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
+@memory_app.command("list")
+def memory_list(
+    task_id: Annotated[
+        str | None,
+        typer.Option("--task-id", help="Only include proposals for this task id."),
+    ] = None,
+    status: Annotated[
+        str | None,
+        typer.Option("--status", help="Only include proposals with this status."),
+    ] = None,
+) -> None:
+    """List local memory proposals."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposals = LocalMemoryStore(store).list_proposals(task_id=task_id, status=status)
+    finally:
+        store.close()
+
+    payload = [proposal.model_dump(mode="json", by_alias=True) for proposal in proposals]
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@memory_app.command("show")
+def memory_show(proposal_id: str) -> None:
+    """Show one local memory proposal."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposal = LocalMemoryStore(store).get_proposal(proposal_id)
+    finally:
+        store.close()
+
+    if proposal is None:
+        raise typer.BadParameter(f"unknown memory proposal: {proposal_id}")
+    typer.echo(
+        json.dumps(proposal.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
+@memory_app.command("approve")
+def memory_approve(
+    proposal_id: str,
+    decided_by: Annotated[
+        str,
+        typer.Option("--decided-by", help="Reviewer identity."),
+    ] = "user:local",
+    reason: Annotated[
+        str,
+        typer.Option("--reason", help="Decision reason."),
+    ] = "Evidence reviewed.",
+) -> None:
+    """Approve a local memory proposal for local search."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposal = LocalMemoryStore(store).approve(
+            proposal_id,
+            decided_by=decided_by,
+            reason=reason,
+        )
+    except (MemoryProposalNotFoundError, EvidenceRequiredError) as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(proposal.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
+@memory_app.command("reject")
+def memory_reject(
+    proposal_id: str,
+    decided_by: Annotated[
+        str,
+        typer.Option("--decided-by", help="Reviewer identity."),
+    ] = "user:local",
+    reason: Annotated[
+        str,
+        typer.Option("--reason", help="Decision reason."),
+    ] = "Rejected during review.",
+) -> None:
+    """Reject a local memory proposal."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposal = LocalMemoryStore(store).reject(
+            proposal_id,
+            decided_by=decided_by,
+            reason=reason,
+        )
+    except MemoryProposalNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(proposal.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
+@memory_app.command("search")
+def memory_search(query: str) -> None:
+    """Search approved local memory facts."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        facts = LocalMemoryStore(store).search(query)
+    finally:
+        store.close()
+
+    payload = [fact.model_dump(mode="json", by_alias=True) for fact in facts]
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
 @policy_app.command("show")
 def policy_show(
     task_id: Annotated[
@@ -594,6 +797,24 @@ def _run_status(value: str) -> RunStatus:
     if value in {"completed", "incomplete", "blocked", "failed"}:
         return cast(RunStatus, value)
     raise typer.BadParameter(f"unknown run status: {value}")
+
+
+def _memory_scope(value: str) -> MemoryScope:
+    if value in {"local", "team", "company", "public"}:
+        return cast(MemoryScope, value)
+    raise typer.BadParameter(f"unknown memory scope: {value}")
+
+
+def _trust_class(value: str) -> TrustClass:
+    if value in {"observed", "reported", "inferred", "policy", "external", "stale-risk"}:
+        return cast(TrustClass, value)
+    raise typer.BadParameter(f"unknown trust class: {value}")
+
+
+def _proposal_operation(value: str) -> ProposalOperation:
+    if value in {"add", "update", "invalidate"}:
+        return cast(ProposalOperation, value)
+    raise typer.BadParameter(f"unknown proposal operation: {value}")
 
 
 def main() -> None:

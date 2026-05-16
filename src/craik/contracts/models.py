@@ -15,6 +15,7 @@ MemoryBackend = Literal["ephemeral", "local", "stigmem"]
 MemoryScope = Literal["local", "team", "company", "public"]
 PolicyProfile = Literal["strict", "trusted-local", "automation", "custom"]
 ProposalOperation = Literal["add", "update", "invalidate"]
+ProposalStatus = Literal["pending", "approved", "rejected"]
 TrustClass = Literal["observed", "reported", "inferred", "policy", "external", "stale-risk"]
 ContradictionStatus = Literal["open", "resolved", "ignored"]
 WorkGraphEventType = Literal[
@@ -245,6 +246,10 @@ class MemoryProposal(CraikModel):
     fact: FactValue
     evidence: list[EvidenceReference] = Field(default_factory=list)
     requires_approval: bool = True
+    status: ProposalStatus = "pending"
+    decision_reason: str | None = None
+    decided_by: str | None = None
+    decided_at: datetime | None = None
 
 
 class MemoryRequiredCapabilities(CraikModel):
