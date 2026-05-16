@@ -149,6 +149,7 @@ The case file is assembled before execution.
   "task_id": "task_...",
   "objective": "...",
   "policy_envelope_id": "policy_...",
+  "intent_lock_id": "intent_...",
   "facts": [],
   "docs": [],
   "adrs": [],
@@ -158,6 +159,28 @@ The case file is assembled before execution.
   "stale_risks": [],
   "contradictions": [],
   "verification_plan": []
+}
+```
+
+## Intent Lock
+
+Captures accepted task intent and scope boundaries before execution.
+
+```json
+{
+  "schema": "craik.intent_lock",
+  "version": "0.1.0",
+  "id": "intent_...",
+  "task_id": "task_...",
+  "original_request": "Review documentation against implementation state",
+  "objective": "Find stale docs and propose updates.",
+  "accepted_interpretation": "Review docs and propose updates only.",
+  "in_scope": ["README.md", "docs/"],
+  "out_of_scope": ["ADR edits"],
+  "allowed_autonomy": ["Inspect repository files"],
+  "stop_conditions": ["The task requires changing immutable docs"],
+  "scope_change_rules": ["Ask before expanding beyond documentation review"],
+  "created_at": "..."
 }
 ```
 
@@ -210,6 +233,7 @@ The durable run summary.
   "id": "handoff_...",
   "task_id": "task_...",
   "project_id": "project_...",
+  "intent_lock_id": "intent_...",
   "agent": "agent:...",
   "summary": "...",
   "completed_actions": [],

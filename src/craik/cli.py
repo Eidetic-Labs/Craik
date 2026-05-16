@@ -17,6 +17,7 @@ from craik.runtime.case_files import (
     ProjectNotFoundError,
     TaskNotFoundError,
 )
+from craik.runtime.intent_locks import IntentLockManager, IntentLockNotFoundError
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy import (
     FailOpenNotAllowedError,
@@ -43,6 +44,8 @@ project_app = typer.Typer(help="Register and inspect Craik projects.")
 app.add_typer(project_app, name="project")
 task_app = typer.Typer(help="Create and inspect Craik tasks.")
 app.add_typer(task_app, name="task")
+intent_app = typer.Typer(help="Inspect task intent locks.")
+app.add_typer(intent_app, name="intent")
 case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
 policy_app = typer.Typer(help="Inspect Craik policy profiles.")
@@ -224,6 +227,30 @@ def task_create(
         list[str] | None,
         typer.Option("--constraint", help="Task constraint. May be repeated."),
     ] = None,
+    accepted_interpretation: Annotated[
+        str | None,
+        typer.Option("--accepted-interpretation", help="Accepted interpretation of the request."),
+    ] = None,
+    in_scope: Annotated[
+        list[str] | None,
+        typer.Option("--in-scope", help="In-scope work. May be repeated."),
+    ] = None,
+    out_of_scope: Annotated[
+        list[str] | None,
+        typer.Option("--out-of-scope", help="Out-of-scope work. May be repeated."),
+    ] = None,
+    allowed_autonomy: Annotated[
+        list[str] | None,
+        typer.Option("--allowed-autonomy", help="Autonomous action allowed. May be repeated."),
+    ] = None,
+    stop_condition: Annotated[
+        list[str] | None,
+        typer.Option("--stop-condition", help="Condition that should stop execution."),
+    ] = None,
+    scope_change_rule: Annotated[
+        list[str] | None,
+        typer.Option("--scope-change-rule", help="Rule for handling scope changes."),
+    ] = None,
     expected_output: Annotated[
         list[str] | None,
         typer.Option("--expected-output", help="Expected output. May be repeated."),
@@ -248,10 +275,40 @@ def task_create(
             constraints=constraint,
             expected_outputs=expected_output,
         )
+        intent_lock = IntentLockManager(store).create_for_task(
+            task,
+            accepted_interpretation=accepted_interpretation,
+            in_scope=in_scope,
+            out_of_scope=out_of_scope,
+            allowed_autonomy=allowed_autonomy,
+            stop_conditions=stop_condition,
+            scope_change_rules=scope_change_rule,
+        )
     finally:
         store.close()
 
-    typer.echo(json.dumps(task.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+    payload = {
+        "task": task.model_dump(mode="json", by_alias=True),
+        "intent_lock": intent_lock.model_dump(mode="json", by_alias=True),
+    }
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@intent_app.command("show")
+def intent_show(intent_or_task_id: str) -> None:
+    """Show one persisted intent lock by intent lock id or task id."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        intent_lock = IntentLockManager(store).require(intent_or_task_id)
+    except IntentLockNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(intent_lock.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
 
 
 @case_app.command("build")

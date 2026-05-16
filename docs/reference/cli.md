@@ -60,7 +60,19 @@ Options:
 - `--priority <name>`: `low`, `normal`, `high`, or `urgent`.
 - `--mode <name>`: `plan`, `review`, `implement`, or `verify`.
 - `--constraint <text>`: task constraint; may be repeated.
+- `--accepted-interpretation <text>`: accepted interpretation to capture in the intent lock.
+- `--in-scope <text>`: in-scope work for the intent lock; may be repeated.
+- `--out-of-scope <text>`: excluded work for the intent lock; may be repeated.
+- `--allowed-autonomy <text>`: autonomous action allowed by the intent lock; may be repeated.
+- `--stop-condition <text>`: condition that should stop execution; may be repeated.
+- `--scope-change-rule <text>`: rule for handling scope changes; may be repeated.
 - `--expected-output <text>`: expected output; may be repeated.
+
+The command prints both the task request and the generated intent lock.
+
+## `craik intent show <intent-id-or-task-id>`
+
+Print one persisted intent lock by intent lock id or task id.
 
 ## `craik case build <task-id>`
 

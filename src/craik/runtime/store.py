@@ -18,6 +18,7 @@ from craik.contracts.models import (
     CaseFile,
     EvidenceReference,
     Handoff,
+    IntentLock,
     MemoryProposal,
     ProjectProfile,
     TaskRequest,
@@ -36,6 +37,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.capability_receipt": "receipts",
     "craik.case_file": "case_files",
     "craik.handoff": "handoffs",
+    "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
     "craik.assumption": "assumptions",
     "craik.evidence_reference": "evidence",
@@ -210,6 +212,16 @@ class LocalStore:
 
     def list_case_files(self) -> list[CaseFile]:
         return _cast_list(CaseFile, self.list_contracts("craik.case_file"))
+
+    def put_intent_lock(self, intent_lock: IntentLock) -> None:
+        self.put_contract(intent_lock)
+
+    def get_intent_lock(self, intent_lock_id: str) -> IntentLock | None:
+        contract = self.get_contract("craik.intent_lock", intent_lock_id)
+        return _cast_optional(IntentLock, contract)
+
+    def list_intent_locks(self) -> list[IntentLock]:
+        return _cast_list(IntentLock, self.list_contracts("craik.intent_lock"))
 
     def put_handoff(self, handoff: Handoff) -> None:
         self.put_contract(handoff)

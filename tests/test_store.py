@@ -11,6 +11,7 @@ from craik.contracts.models import (
     CaseFile,
     EvidenceReference,
     Handoff,
+    IntentLock,
     MemoryProposal,
     ProjectProfile,
     TaskRequest,
@@ -77,6 +78,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     receipt = CapabilityReceipt.model_validate(fixtures["craik.capability_receipt"])
     case_file = CaseFile.model_validate(fixtures["craik.case_file"])
     handoff = Handoff.model_validate(fixtures["craik.handoff"])
+    intent_lock = IntentLock.model_validate(fixtures["craik.intent_lock"])
     proposal = MemoryProposal.model_validate(fixtures["craik.memory_proposal"])
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
@@ -86,6 +88,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_receipt(receipt)
     store.put_case_file(case_file)
     store.put_handoff(handoff)
+    store.put_intent_lock(intent_lock)
     store.put_proposal(proposal)
     store.put_assumption(assumption)
     store.put_evidence(evidence)
@@ -95,6 +98,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_receipt(receipt.id) == receipt
     assert store.get_case_file(case_file.id) == case_file
     assert store.get_handoff(handoff.id) == handoff
+    assert store.get_intent_lock(intent_lock.id) == intent_lock
     assert store.get_proposal(proposal.id) == proposal
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
@@ -102,6 +106,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
+    assert store.list_intent_locks() == [intent_lock]
     assert store.list_proposals() == [proposal]
     assert store.list_assumptions() == [assumption]
     assert store.list_evidence() == [evidence]
@@ -118,6 +123,7 @@ def test_persists_supported_contract_types(
         "craik.capability_receipt",
         "craik.case_file",
         "craik.handoff",
+        "craik.intent_lock",
         "craik.memory_proposal",
         "craik.assumption",
         "craik.evidence_reference",

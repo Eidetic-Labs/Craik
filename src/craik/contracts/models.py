@@ -73,9 +73,14 @@ class IntentLock(CraikModel):
     version: Literal["0.1.0"] = "0.1.0"
     id: str
     task_id: str
+    original_request: str
     objective: str
+    accepted_interpretation: str
     in_scope: list[str] = Field(default_factory=list)
     out_of_scope: list[str] = Field(default_factory=list)
+    allowed_autonomy: list[str] = Field(default_factory=list)
+    stop_conditions: list[str] = Field(default_factory=list)
+    scope_change_rules: list[str] = Field(default_factory=list)
     created_at: datetime
 
 
@@ -321,6 +326,7 @@ class CaseFile(CraikModel):
     task_id: str
     objective: str
     policy_envelope_id: str
+    intent_lock_id: str | None = None
     facts: list[FactValue] = Field(default_factory=list)
     evidence: list[EvidenceReference] = Field(default_factory=list)
     assumptions: list[Assumption] = Field(default_factory=list)
@@ -343,6 +349,7 @@ class Handoff(CraikModel):
     id: str
     task_id: str
     project_id: str
+    intent_lock_id: str | None = None
     agent: str
     summary: str
     completed_actions: list[str] = Field(default_factory=list)

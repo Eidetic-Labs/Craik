@@ -159,9 +159,57 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
     assert task.exit_code == 0
     assert built.exit_code == 0
     assert shown.exit_code == 0
-    assert json.loads(task.stdout)["id"] == "task_review_docs"
+    task_payload = json.loads(task.stdout)
+    assert task_payload["task"]["id"] == "task_review_docs"
+    assert task_payload["intent_lock"]["id"] == "intent_review_docs"
+    assert json.loads(built.stdout)["intent_lock_id"] == "intent_review_docs"
     assert json.loads(built.stdout)["adrs"] == ["docs/adr/0001-record.md"]
     assert json.loads(shown.stdout)["id"] == "case_review_docs"
+
+
+def test_intent_show_reports_task_intent_lock(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Repo\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md")
+    _run_git(repo, "commit", "-m", "initial")
+    home = tmp_path / "home"
+    runner.invoke(
+        app,
+        ["project", "add", str(repo), "--name", "Example"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    runner.invoke(
+        app,
+        [
+            "task",
+            "create",
+            "--project",
+            "Example",
+            "--title",
+            "Review docs",
+            "--objective",
+            "Review docs against implementation.",
+            "--accepted-interpretation",
+            "Review documentation only.",
+            "--out-of-scope",
+            "Code changes.",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    shown = runner.invoke(
+        app,
+        ["intent", "show", "task_review_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert shown.exit_code == 0
+    payload = json.loads(shown.stdout)
+    assert payload["id"] == "intent_review_docs"
+    assert payload["accepted_interpretation"] == "Review documentation only."
+    assert payload["out_of_scope"] == ["Code changes."]
 
 
 def test_case_build_reports_missing_task(tmp_path: Path) -> None:

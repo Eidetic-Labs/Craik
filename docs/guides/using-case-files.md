@@ -35,6 +35,7 @@ Review these fields before starting work:
 
 - `objective`
 - `policy_envelope_id`
+- `intent_lock_id`
 - `repo_state`
 - `docs`
 - `adrs`
