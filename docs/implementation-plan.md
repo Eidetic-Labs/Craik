@@ -152,12 +152,15 @@ Build:
 - repository adapter,
 - branch/diff inspection,
 - docs discovery,
+- default repository context exclusions for generated, dependency, build, cache, and archive-heavy paths,
+- project and user override rules for discovery include/exclude behavior,
 - ADR/policy discovery,
 - Stigmem/local fact loading,
 - stale-risk section,
 - evidence references,
 - assumption ledger,
 - context budget accounting,
+- context debt for paths skipped by defaults, overrides, and budget pressure,
 - verification-plan section,
 - Markdown and JSON output.
 
@@ -171,6 +174,9 @@ Acceptance criteria:
 
 - case file includes repo status,
 - docs and immutable paths are labeled,
+- generated and dependency paths are excluded by default unless explicitly included,
+- project and user overrides can extend, replace, or explicitly include paths from the default discovery rules,
+- excluded paths are visible in case-file context metadata rather than silently disappearing,
 - facts include source/confidence,
 - unsupported conclusions are tracked as assumptions,
 - included and omitted context is explainable,
