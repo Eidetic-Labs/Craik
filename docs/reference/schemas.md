@@ -47,6 +47,8 @@ craik schema show craik.task_request
 | `craik.evidence_coverage_score` | Scores whether expected evidence links are present for a handoff or output. |
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
 | `craik.exit_discipline_check` | Verifies validation, handoff, risks, next steps, and context links before exit. |
+| `craik.gateway_config` | Configures the always-on gateway process mode, bind, policy, and pid/log paths. |
+| `craik.gateway_runtime_state` | Records supervised gateway lifecycle state, process id, receipts, and notes. |
 | `craik.handoff` | Summarizes durable run state for future agents. |
 | `craik.handoff_quality_score` | Scores handoff completeness, validation, evidence links, debt, and risks. |
 | `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |

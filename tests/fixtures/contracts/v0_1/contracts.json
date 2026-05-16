@@ -372,6 +372,36 @@
     "captured_at": "2026-05-15T22:40:00Z",
     "metadata": {}
   },
+  "craik.gateway_config": {
+    "schema": "craik.gateway_config",
+    "version": "0.1.0",
+    "id": "gateway_default",
+    "project_id": "project_stigmem",
+    "mode": "daemon",
+    "bind_host": "127.0.0.1",
+    "port": 8765,
+    "pid_file": "gateway.pid",
+    "log_file": "gateway.log",
+    "policy_envelope_id": "policy_gateway",
+    "enabled": false,
+    "created_at": "2026-05-16T18:10:00Z"
+  },
+  "craik.gateway_runtime_state": {
+    "schema": "craik.gateway_runtime_state",
+    "version": "0.1.0",
+    "id": "gateway_state_default",
+    "config_id": "gateway_default",
+    "project_id": "project_stigmem",
+    "mode": "daemon",
+    "status": "running",
+    "pid": 1234,
+    "started_at": "2026-05-16T18:11:00Z",
+    "stopped_at": null,
+    "updated_at": "2026-05-16T18:11:00Z",
+    "policy_envelope_id": "policy_gateway",
+    "receipt_ids": ["receipt_gateway_start"],
+    "supervision_notes": ["Gateway process is marked running by the supervisor."]
+  },
   "craik.handoff": {
     "schema": "craik.handoff",
     "version": "0.1.0",

@@ -171,6 +171,8 @@ DistilledInstructionCategory = Literal[
 DistilledInstructionPromotionStatus = Literal["proposed", "approved", "rejected", "deferred"]
 InstructionPromotionDecision = Literal["approved", "rejected", "deferred"]
 RecoveryStatus = Literal["clean_resume", "changed_state", "missing_prior_context"]
+GatewayMode = Literal["foreground", "daemon"]
+GatewayRuntimeStatus = Literal["stopped", "starting", "running", "stopping", "failed"]
 RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
 RunDeltaEntityType = Literal[
     "handoff",
@@ -1374,6 +1376,70 @@ class MemoryBackendCapabilities(CraikModel):
     required: MemoryRequiredCapabilities
     optional: MemoryOptionalCapabilities = Field(default_factory=MemoryOptionalCapabilities)
     checked_at: datetime
+
+
+class GatewayConfig(CraikModel):
+    """Configuration for the always-on operator gateway process."""
+
+    schema_: Literal["craik.gateway_config"] = Field(
+        default="craik.gateway_config",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str | None = None
+    mode: GatewayMode = "daemon"
+    bind_host: str = "127.0.0.1"
+    port: int = Field(default=8765, ge=1, le=65535)
+    pid_file: str | None = None
+    log_file: str | None = None
+    policy_envelope_id: str | None = None
+    enabled: bool = False
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_gateway_config(self) -> GatewayConfig:
+        """Keep daemon mode explicit and local by default."""
+        if self.mode == "daemon" and not self.pid_file:
+            raise ValueError("daemon gateway mode requires pid_file")
+        if self.bind_host in {"0.0.0.0", "::"} and not self.policy_envelope_id:
+            raise ValueError("public gateway bind requires policy_envelope_id")
+        return self
+
+
+class GatewayRuntimeState(CraikModel):
+    """Persisted lifecycle state for the operator gateway process."""
+
+    schema_: Literal["craik.gateway_runtime_state"] = Field(
+        default="craik.gateway_runtime_state",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    config_id: str
+    project_id: str | None = None
+    mode: GatewayMode
+    status: GatewayRuntimeStatus
+    pid: int | None = Field(default=None, ge=1)
+    started_at: datetime | None = None
+    stopped_at: datetime | None = None
+    updated_at: datetime
+    policy_envelope_id: str | None = None
+    receipt_ids: list[str] = Field(default_factory=list)
+    supervision_notes: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_gateway_state(self) -> GatewayRuntimeState:
+        """Keep lifecycle state internally consistent."""
+        if self.status == "running" and self.started_at is None:
+            raise ValueError("running gateway state requires started_at")
+        if self.status == "stopped" and self.stopped_at is None:
+            raise ValueError("stopped gateway state requires stopped_at")
+        if self.status == "failed" and not self.supervision_notes:
+            raise ValueError("failed gateway state requires supervision_notes")
+        if self.pid is not None and self.status not in {"starting", "running", "stopping"}:
+            raise ValueError("gateway pid is only valid while process may be active")
+        return self
 
 
 class MemoryFactReference(CraikModel):
