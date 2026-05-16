@@ -101,6 +101,16 @@ uv run --extra dev pytest tests/test_model_providers.py tests/test_mcp_client.py
 Expected output is passing tests for provider metadata, MCP client routing,
 sandbox backend contracts, and environment receipts.
 
+Run the aggregate sandbox policy boundary tests:
+
+```sh
+uv run --extra dev pytest tests/test_sandbox_policy_boundaries.py
+```
+
+Expected output is passing tests for allowed sandbox actions, denied missing
+policy controls, denied unsafe isolation defaults, and redacted environment
+receipts.
+
 ## Public Boundary
 
 Do not include local filesystem paths, private hostnames, raw command payloads,
