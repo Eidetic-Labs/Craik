@@ -173,6 +173,8 @@ InstructionPromotionDecision = Literal["approved", "rejected", "deferred"]
 RecoveryStatus = Literal["clean_resume", "changed_state", "missing_prior_context"]
 GatewayMode = Literal["foreground", "daemon"]
 GatewayRuntimeStatus = Literal["stopped", "starting", "running", "stopping", "failed"]
+ChannelKind = Literal["messaging", "webhook", "scheduler", "voice", "custom"]
+ChannelCapabilityDirection = Literal["inbound", "outbound", "bidirectional"]
 RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
 RunDeltaEntityType = Literal[
     "handoff",
@@ -1439,6 +1441,92 @@ class GatewayRuntimeState(CraikModel):
             raise ValueError("failed gateway state requires supervision_notes")
         if self.pid is not None and self.status not in {"starting", "running", "stopping"}:
             raise ValueError("gateway pid is only valid while process may be active")
+        return self
+
+
+class ChannelAdapterIdentity(CraikModel):
+    """Stable identity for one external operator channel adapter."""
+
+    adapter_id: str
+    channel: ChannelKind
+    name: str
+    adapter_version: str
+    service: str | None = None
+
+
+class ChannelAdapterCapability(CraikModel):
+    """One capability exposed by a channel adapter boundary."""
+
+    name: str
+    direction: ChannelCapabilityDirection
+    description: str
+    grant_required: bool = True
+    receipt_required: bool = True
+
+
+class ChannelPayloadShape(CraikModel):
+    """Inspectable payload fields for channel ingress and egress."""
+
+    fields: list[str] = Field(min_length=1)
+    redacted_fields: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ChannelReceiptRequirement(CraikModel):
+    """Receipt requirements for channel adapter activity."""
+
+    required: bool = True
+    receipt_schema: Literal["craik.capability_receipt"] = "craik.capability_receipt"
+    capabilities: list[str] = Field(min_length=1)
+
+
+class ChannelTrustBoundary(CraikModel):
+    """Policy and trust boundaries preserved across external channels."""
+
+    policy_envelope_required: bool = True
+    allowlist_required: bool = True
+    inbound_identity_required: bool = True
+    secrets_in_config_allowed: Literal[False] = False
+    notes: list[str] = Field(default_factory=list)
+
+
+class ChannelAdapterContract(CraikModel):
+    """Contract for external operator ingress and response channel adapters."""
+
+    schema_: Literal["craik.channel_adapter_contract"] = Field(
+        default="craik.channel_adapter_contract",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    identity: ChannelAdapterIdentity
+    capabilities: list[ChannelAdapterCapability] = Field(min_length=1)
+    inbound_event: ChannelPayloadShape
+    outbound_response: ChannelPayloadShape
+    receipts: ChannelReceiptRequirement
+    trust_boundary: ChannelTrustBoundary = Field(default_factory=ChannelTrustBoundary)
+    docs: list[str] = Field(min_length=1)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_channel_adapter_contract(self) -> ChannelAdapterContract:
+        """Keep channel adapters policy-bound and receipt-producing."""
+        inbound_required = {"event_id", "channel", "received_at", "sender"}
+        outbound_required = {"status", "summary"}
+        inbound_fields = set(self.inbound_event.fields)
+        outbound_fields = set(self.outbound_response.fields)
+        if missing := sorted(inbound_required - inbound_fields):
+            raise ValueError(f"inbound event shape missing fields: {', '.join(missing)}")
+        if missing := sorted(outbound_required - outbound_fields):
+            raise ValueError(f"outbound response shape missing fields: {', '.join(missing)}")
+        capability_names = {capability.name for capability in self.capabilities}
+        receipt_capabilities = set(self.receipts.capabilities)
+        if missing := sorted(receipt_capabilities - capability_names):
+            raise ValueError(f"receipt capabilities are not declared: {', '.join(missing)}")
+        if not self.receipts.required:
+            raise ValueError("channel adapter contracts require receipts")
+        if not self.trust_boundary.policy_envelope_required:
+            raise ValueError("channel adapter contracts require policy envelopes")
         return self
 
 
