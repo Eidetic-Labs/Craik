@@ -52,6 +52,7 @@ project.
 - [Evidence And Assumption View](reference/evidence-assumption-view.md)
 - [Delegation Queue View](reference/delegation-queue-view.md)
 - [Budget And Quota View](reference/budget-quota-view.md)
+- [Instruction Distillation View](reference/instruction-distillation-view.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
