@@ -44,6 +44,7 @@ from craik.contracts.models import (
     MemoryProposal,
     NegativeKnowledge,
     PluginDescriptor,
+    PluginProbation,
     PolicyEnvelope,
     ProjectProfile,
     PromotedInstructionConstraint,
@@ -82,6 +83,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.task_run": "task_runs",
     "craik.policy_envelope": "policies",
     "craik.plugin_descriptor": "plugin_descriptors",
+    "craik.plugin_probation": "plugin_probations",
     "craik.capability_grant": "grants",
     "craik.capability_receipt": "receipts",
     "craik.compiled_prompt": "compiled_prompts",
@@ -435,6 +437,16 @@ class LocalStore:
             PluginDescriptor,
             self.list_contracts("craik.plugin_descriptor"),
         )
+
+    def put_plugin_probation(self, probation: PluginProbation) -> None:
+        self.put_contract(probation)
+
+    def get_plugin_probation(self, probation_id: str) -> PluginProbation | None:
+        contract = self.get_contract("craik.plugin_probation", probation_id)
+        return _cast_optional(PluginProbation, contract)
+
+    def list_plugin_probations(self) -> list[PluginProbation]:
+        return _cast_list(PluginProbation, self.list_contracts("craik.plugin_probation"))
 
     def put_instruction_source(self, source: InstructionSource) -> None:
         self.put_contract(source)

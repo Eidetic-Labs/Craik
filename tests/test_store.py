@@ -33,6 +33,7 @@ from craik.contracts.models import (
     MemoryProposal,
     NegativeKnowledge,
     PluginDescriptor,
+    PluginProbation,
     ProjectProfile,
     PromotedInstructionConstraint,
     RecoverySession,
@@ -162,6 +163,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
         fixtures["craik.skill_invocation_context"]
     )
     plugin_descriptor = PluginDescriptor.model_validate(fixtures["craik.plugin_descriptor"])
+    plugin_probation = PluginProbation.model_validate(fixtures["craik.plugin_probation"])
     instruction_source = InstructionSource.model_validate(
         fixtures["craik.instruction_source"]
     )
@@ -227,6 +229,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_skill_registry(skill_registry)
     store.put_skill_invocation_context(skill_context)
     store.put_plugin_descriptor(plugin_descriptor)
+    store.put_plugin_probation(plugin_probation)
     store.put_instruction_source(instruction_source)
     store.put_instruction_source_registry(instruction_registry)
     store.put_instruction_source_snapshot(instruction_snapshot)
@@ -282,6 +285,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_skill_registry(skill_registry.id) == skill_registry
     assert store.get_skill_invocation_context(skill_context.id) == skill_context
     assert store.get_plugin_descriptor(plugin_descriptor.id) == plugin_descriptor
+    assert store.get_plugin_probation(plugin_probation.id) == plugin_probation
     assert store.get_instruction_source(instruction_source.id) == instruction_source
     assert store.get_instruction_source_registry(instruction_registry.id) == instruction_registry
     assert store.get_instruction_source_snapshot(instruction_snapshot.id) == instruction_snapshot
@@ -332,6 +336,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_skill_registries() == [skill_registry]
     assert store.list_skill_invocation_contexts() == [skill_context]
     assert store.list_plugin_descriptors() == [plugin_descriptor]
+    assert store.list_plugin_probations() == [plugin_probation]
     assert store.list_instruction_sources() == [instruction_source]
     assert store.list_instruction_source_registries() == [instruction_registry]
     assert store.list_instruction_source_snapshots() == [instruction_snapshot]
@@ -387,6 +392,7 @@ def test_persists_supported_contract_types(
         "craik.skill_registry",
         "craik.skill_invocation_context",
         "craik.plugin_descriptor",
+        "craik.plugin_probation",
         "craik.handoff",
         "craik.intent_lock",
         "craik.knowledge_freshness_probe",
