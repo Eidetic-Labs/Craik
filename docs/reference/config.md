@@ -20,6 +20,11 @@ writes a default `craik.gateway_config` record. The command prints
 `secrets_written = false` and does not collect API keys, channel tokens, webhook
 secrets, or bearer credentials.
 
+`craik doctor` is read-only. It reports pass, warning, and failure diagnostics
+for the local home, local store, memory backend configuration, gateway
+prerequisites, and gateway policy readiness without creating files or contacting
+external services.
+
 ## Context Discovery
 
 Project profiles can store documentation discovery overrides through

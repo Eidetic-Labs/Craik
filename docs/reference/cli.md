@@ -24,6 +24,12 @@ Options:
 - `--gateway-port <port>`: gateway port; defaults to `8765`.
 - `--policy-envelope-id <id>`: policy envelope for gateway authority.
 
+## `craik doctor`
+
+Run read-only diagnostics for local home, local store, memory backend
+configuration, gateway prerequisites, and gateway policy readiness. The command
+prints JSON and does not create files or contact external services.
+
 ## `craik schema list`
 
 List registered Craik runtime contract schemas.
