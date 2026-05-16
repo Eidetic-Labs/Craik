@@ -139,6 +139,7 @@ PluginCompatibilityStatus = Literal["supported", "experimental", "unsupported"]
 PluginProbationStatus = Literal["probationary", "promoted", "rejected", "expired"]
 PluginProbationDecisionKind = Literal["promote", "reject", "expire"]
 PluginGrantStatus = Literal["allowed", "denied", "expired", "approval_required"]
+AdapterEntrypointKind = Literal["module", "command", "service", "docs"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -2250,6 +2251,58 @@ class PluginCapabilityGrant(CraikModel):
                 raise ValueError("approval_required grants must set approval_required")
             if self.approved_by is not None:
                 raise ValueError("approval_required grants must not include approved_by")
+        return self
+
+
+class AdapterEntrypoint(CraikModel):
+    """One callable or readable entrypoint in an adapter package."""
+
+    id: str
+    kind: AdapterEntrypointKind
+    path: str
+    description: str
+
+
+class AdapterCompatibility(CraikModel):
+    """Runtime compatibility metadata for an adapter package."""
+
+    craik_versions: list[str] = Field(min_length=1)
+    runner_modes: list[RunnerMode] = Field(min_length=1)
+    python_versions: list[str] = Field(default_factory=list)
+    platforms: list[str] = Field(default_factory=list)
+    notes: str | None = None
+
+
+class AdapterPackage(CraikModel):
+    """Adapter package metadata and compatibility contract."""
+
+    schema_: Literal["craik.adapter_package"] = Field(
+        default="craik.adapter_package",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    name: str
+    package_version: str
+    adapter: str
+    description: str
+    entrypoints: list[AdapterEntrypoint] = Field(min_length=1)
+    capability_surfaces: list[str] = Field(min_length=1)
+    compatibility: AdapterCompatibility
+    runner_metadata_ids: list[str] = Field(default_factory=list)
+    plugin_descriptor_ids: list[str] = Field(default_factory=list)
+    docs: list[str] = Field(min_length=1)
+    provenance_ids: list[str] = Field(min_length=1)
+    version_constraints: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_adapter_package(self) -> AdapterPackage:
+        """Require versioned adapter packages with entrypoints and compatibility."""
+        if "." not in self.package_version:
+            raise ValueError("adapter package_version must be semantic-version-like")
+        if not self.compatibility.runner_modes:
+            raise ValueError("adapter packages require runner mode compatibility")
         return self
 
 

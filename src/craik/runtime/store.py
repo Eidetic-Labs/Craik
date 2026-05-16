@@ -13,6 +13,7 @@ from typing import Any
 from pydantic import BaseModel, ValidationError
 
 from craik.contracts.models import (
+    AdapterPackage,
     AdjudicationOutcome,
     Assumption,
     CapabilityGrant,
@@ -79,6 +80,7 @@ DATABASE_NAME = "craik.sqlite3"
 
 CONTRACT_KINDS: dict[str, str] = {
     "craik.adjudication_outcome": "adjudication_outcomes",
+    "craik.adapter_package": "adapter_packages",
     "craik.project_profile": "projects",
     "craik.run_output": "run_outputs",
     "craik.task_request": "tasks",
@@ -353,6 +355,16 @@ class LocalStore:
             AdjudicationOutcome,
             self.list_contracts("craik.adjudication_outcome"),
         )
+
+    def put_adapter_package(self, package: AdapterPackage) -> None:
+        self.put_contract(package)
+
+    def get_adapter_package(self, package_id: str) -> AdapterPackage | None:
+        contract = self.get_contract("craik.adapter_package", package_id)
+        return _cast_optional(AdapterPackage, contract)
+
+    def list_adapter_packages(self) -> list[AdapterPackage]:
+        return _cast_list(AdapterPackage, self.list_contracts("craik.adapter_package"))
 
     def put_human_delegation(self, delegation: HumanDelegationPoint) -> None:
         self.put_contract(delegation)

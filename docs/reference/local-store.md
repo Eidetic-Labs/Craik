@@ -25,6 +25,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | Kind | Contract |
 | --- | --- |
 | `adjudication_outcomes` | `craik.adjudication_outcome` |
+| `adapter_packages` | `craik.adapter_package` |
 | `projects` | `craik.project_profile` |
 | `run_outputs` | `craik.run_output` |
 | `tasks` | `craik.task_request` |
