@@ -19,6 +19,7 @@ project.
 - [Handoffs](concepts/handoffs.md)
 - [Receipts](concepts/receipts.md)
 - [Memory And Stigmem](concepts/memory-and-stigmem.md)
+- [Single-Agent Execution Loop](concepts/single-agent-loop.md)
 - [Work Graph](concepts/work-graph.md)
 - [Intent Locks](concepts/intent-locks.md)
 
@@ -34,6 +35,7 @@ project.
 - [Connecting Stigmem](guides/connecting-stigmem.md)
 - [Running Policy Tests](guides/running-policy-tests.md)
 - [Runner Preview Workflows](guides/runner-preview-workflows.md)
+- [Single-Agent Fixture Loop](guides/single-agent-fixture-loop.md)
 - [Development Checks](guides/development.md)
 
 ## Reference

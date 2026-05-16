@@ -61,3 +61,7 @@ The default deterministic loop uses `plan`, `act`, `observe`, and `evaluate`.
 The `act` phase is treated as a side-effect step and requires a matching policy
 grant. Reaching `max_iterations`, a runner failure, a blocked runner result, or
 an intent stop condition stops the run before additional side effects.
+
+See [Single-Agent Execution Loop](../concepts/single-agent-loop.md) for the
+conceptual lifecycle and [Single-Agent Fixture Loop](../guides/single-agent-fixture-loop.md)
+for the deterministic smoke-test workflow.

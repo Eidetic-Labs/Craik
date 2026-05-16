@@ -204,6 +204,29 @@ Options:
 
 - `--task-id <id>`: only export graph objects for this task.
 
+## `craik run inspect <run-id-or-task-id>`
+
+Inspect a persisted single-agent run. The command prints the task run, linked
+receipts, captured run outputs, memory proposals, and handoff references.
+
+Options:
+
+- `--json`: print machine-readable JSON.
+- `--include-outputs / --no-include-outputs`: include captured run output
+  payloads; defaults to including summaries and links.
+
+## `craik run recover <run-id-or-task-id>`
+
+Prepare recovery context for an interrupted or blocked run. Recovery inspects
+durable state and emits the next safe recovery boundary; it must re-check policy
+grants, intent-lock stop conditions, and iteration limits before any side
+effect.
+
+Options:
+
+- `--dry-run`: print the recovery plan without creating new run state.
+- `--reason <text>`: reason for recovery; recorded in follow-up handoff state.
+
 ## `craik handoff create <task-id>`
 
 Create and persist a structured handoff for a task.
