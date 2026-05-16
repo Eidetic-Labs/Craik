@@ -31,3 +31,6 @@ persisting raw prompts, outputs, traces, stdout, stderr, payloads, responses, or
 credentials.
 
 Failed replay results should block skill promotion until reviewed.
+
+Learning loops can use [Memory Review Nudges](memory-review-nudges.md) to
+surface stale or unsupported memory facts without rewriting them.
