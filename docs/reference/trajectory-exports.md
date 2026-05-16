@@ -47,3 +47,29 @@ export.
 Exports are designed for review and replay fixtures. They are not a raw trace
 dump and should not be used to reconstruct private prompts or local workspace
 state.
+
+## Compression
+
+`TrainingTrajectorySummary` compresses a trajectory export into a reviewable
+summary. It records:
+
+- source export id;
+- task id and outcome;
+- decision count;
+- phase and status counts;
+- selected redacted summary lines;
+- omitted decision ids;
+- receipt ids;
+- evidence ids;
+- policy envelope ids;
+- replay fixture ids;
+- replay result ids;
+- unresolved risk ids.
+
+Compressed summaries preserve links needed for replay and review, but they do
+not preserve every decision field. Consumers that need full diagnostics,
+artifacts, observed output, or per-step timestamps must load the source export.
+
+Compression must not remove required replay context. Replay fixture and result
+ids remain top-level fields even when the decision that introduced them is
+omitted from the summary lines.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Any, Literal
 
@@ -82,6 +83,36 @@ class TrainingTrajectoryExport(CraikModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
+class TrainingTrajectorySummary(CraikModel):
+    """Compressed redacted summary of a trajectory export."""
+
+    schema_: Literal["craik.training_trajectory_summary"] = Field(
+        default="craik.training_trajectory_summary",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    format_version: Literal["craik.training_trajectory.v1"] = TRAJECTORY_EXPORT_FORMAT
+    id: str
+    source_export_id: str
+    task_id: str
+    outcome: str
+    decision_count: int
+    phase_counts: dict[str, int] = Field(default_factory=dict)
+    status_counts: dict[str, int] = Field(default_factory=dict)
+    summary_lines: list[str] = Field(default_factory=list)
+    omitted_decision_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    policy_envelope_ids: list[str] = Field(default_factory=list)
+    replay_fixture_ids: list[str] = Field(default_factory=list)
+    replay_result_ids: list[str] = Field(default_factory=list)
+    unresolved_risk_ids: list[str] = Field(default_factory=list)
+    compatibility_notes: list[str] = Field(default_factory=list)
+    redacted_paths: list[str] = Field(default_factory=list)
+    redacted: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+
 def build_training_trajectory_export(
     *,
     export_id: str,
@@ -120,6 +151,58 @@ def build_training_trajectory_export(
         evidence_ids=sorted(evidence_by_id),
         compatibility_notes=compatibility_notes
         or ["Consumers must ignore unknown fields and preserve format_version."],
+        redacted_paths=sorted(set(redacted_paths)),
+        created_at=created_at or datetime.now(UTC),
+    )
+
+
+def compress_training_trajectory(
+    *,
+    summary_id: str,
+    export: TrainingTrajectoryExport,
+    max_summary_lines: int = 8,
+    compatibility_notes: list[str] | None = None,
+    created_at: datetime | None = None,
+) -> TrainingTrajectorySummary:
+    """Summarize a trajectory while preserving review and replay links."""
+    redacted_paths: list[str] = list(export.redacted_paths)
+    selected_decisions = export.decisions[:max_summary_lines]
+    summary_lines = [
+        str(
+            _safe_payload(
+                f"{decision.phase}:{decision.status}: {decision.summary}",
+                redacted_paths,
+            )
+        )
+        for decision in selected_decisions
+    ]
+    omitted_decision_ids = [decision.id for decision in export.decisions[max_summary_lines:]]
+    policy_envelope_ids = _metadata_string_ids(export.receipts, "policy_envelope_id")
+    replay_fixture_ids = _decision_link_ids(export.decisions, "replay_fixture_ids")
+    replay_result_ids = _decision_link_ids(export.decisions, "replay_result_ids")
+    unresolved_risk_ids = _decision_link_ids(export.decisions, "unresolved_risk_ids")
+
+    return TrainingTrajectorySummary(
+        id=summary_id,
+        source_export_id=export.id,
+        task_id=export.task_id,
+        outcome=str(_safe_payload(export.outcome, redacted_paths)),
+        decision_count=len(export.decisions),
+        phase_counts=_counts(str(decision.phase) for decision in export.decisions),
+        status_counts=_counts(str(decision.status) for decision in export.decisions),
+        summary_lines=summary_lines,
+        omitted_decision_ids=omitted_decision_ids,
+        receipt_ids=list(export.receipt_ids),
+        evidence_ids=list(export.evidence_ids),
+        policy_envelope_ids=policy_envelope_ids,
+        replay_fixture_ids=replay_fixture_ids,
+        replay_result_ids=replay_result_ids,
+        unresolved_risk_ids=unresolved_risk_ids,
+        compatibility_notes=compatibility_notes
+        or [
+            "Compressed summaries preserve ids for replay and review.",
+            "Consumers must fetch the source export for full decision context.",
+        ],
         redacted_paths=sorted(set(redacted_paths)),
         created_at=created_at or datetime.now(UTC),
     )
@@ -200,3 +283,29 @@ def _string_ids(value: Any) -> list[str]:
 
 def _step_receipt_ids(steps: list[RunnerStepResult]) -> set[str]:
     return {receipt_id for step in steps for receipt_id in step.receipt_ids}
+
+
+def _counts(values: Iterable[str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for value in values:
+        key = str(value)
+        counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def _metadata_string_ids(records: list[dict[str, Any]], key: str) -> list[str]:
+    ids: set[str] = set()
+    for record in records:
+        metadata = record.get("result", {}).get("metadata", {})
+        if isinstance(metadata, dict):
+            value = metadata.get(key)
+            if isinstance(value, str) and value:
+                ids.add(value)
+    return sorted(ids)
+
+
+def _decision_link_ids(decisions: list[TrainingTrajectoryDecision], key: str) -> list[str]:
+    ids: set[str] = set()
+    for decision in decisions:
+        ids.update(_string_ids(decision.observed_output.get(key)))
+    return sorted(ids)
