@@ -31,6 +31,7 @@ from craik.contracts.models import (
     RunOutput,
     TaskRequest,
     TaskRun,
+    WorkerResult,
     WorkGraphEvent,
     WorkGraphExport,
 )
@@ -66,6 +67,7 @@ CONTRACT_REGISTRY: dict[str, ContractModel] = {
     "craik.task_request": TaskRequest,
     "craik.work_graph_export": WorkGraphExport,
     "craik.work_graph_event": WorkGraphEvent,
+    "craik.worker_result": WorkerResult,
 }
 
 

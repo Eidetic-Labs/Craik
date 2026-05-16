@@ -57,6 +57,7 @@ craik schema show craik.task_request
 | `craik.task_request` | Defines requested work. |
 | `craik.work_graph_export` | Exports connected graph nodes and edges. |
 | `craik.work_graph_event` | Updates the work graph. |
+| `craik.worker_result` | Captures typed specialist worker output for multi-agent coordination. |
 
 ## Examples
 

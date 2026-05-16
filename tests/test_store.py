@@ -18,6 +18,7 @@ from craik.contracts.models import (
     RunOutput,
     TaskRequest,
     TaskRun,
+    WorkerResult,
     WorkGraphEvent,
     WorkGraphExport,
 )
@@ -91,6 +92,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
     event = WorkGraphEvent.model_validate(fixtures["craik.work_graph_event"])
     export = WorkGraphExport.model_validate(fixtures["craik.work_graph_export"])
+    worker_result = WorkerResult.model_validate(fixtures["craik.worker_result"])
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -105,6 +107,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_evidence(evidence)
     store.put_graph_event(event)
     store.put_contract(export)
+    store.put_worker_result(worker_result)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -122,6 +125,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_evidence(evidence.id) == evidence
     assert store.get_graph_event(event.id) == event
     assert store.get_contract("craik.work_graph_export", export.id) == export
+    assert store.get_worker_result(worker_result.id) == worker_result
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -131,6 +135,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_assumptions() == [assumption]
     assert store.list_evidence() == [evidence]
     assert store.list_graph_events() == [event]
+    assert store.list_worker_results() == [worker_result]
 
 
 def test_persists_supported_contract_types(
@@ -152,6 +157,7 @@ def test_persists_supported_contract_types(
         "craik.evidence_reference",
         "craik.work_graph_export",
         "craik.work_graph_event",
+        "craik.worker_result",
     ):
         model = CONTRACT_REGISTRY[schema_name]
         contract = model.model_validate(fixtures[schema_name])

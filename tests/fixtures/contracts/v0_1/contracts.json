@@ -778,5 +778,61 @@
       "contract": "craik.case_file"
     },
     "created_at": "2026-05-15T22:45:00Z"
+  },
+  "craik.worker_result": {
+    "schema": "craik.worker_result",
+    "version": "0.1.0",
+    "id": "worker_result_docs_reconcile_verifier",
+    "task_id": "task_docs_reconcile",
+    "run_id": "run_docs_reconcile",
+    "role_id": "role_verifier_fixture",
+    "role_kind": "verifier",
+    "runner": {
+      "schema": "craik.runner_metadata",
+      "version": "0.1.0",
+      "id": "runner_fixture",
+      "name": "Fixture Runner",
+      "adapter": "fixture",
+      "adapter_version": "0.1.0",
+      "mode": "fixture",
+      "capabilities": ["prompt.read", "result.structured"],
+      "metadata": {
+        "contract_test": true
+      }
+    },
+    "status": "completed",
+    "summary": "Verifier confirmed the fixture output is structured.",
+    "findings": [
+      {
+        "summary": "Fixture output includes receipts and evidence.",
+        "severity": "info",
+        "evidence_ids": ["evidence_readme_status"],
+        "artifact_refs": ["runout_docs_reconcile_docs_reconcile_plan"],
+        "contradiction_ids": []
+      }
+    ],
+    "artifacts": ["runout_docs_reconcile_docs_reconcile_plan"],
+    "assumptions": [],
+    "risks": [],
+    "proposed_actions": ["Continue to adjudication."],
+    "contradiction_ids": [],
+    "evidence": [
+      {
+        "schema": "craik.evidence_reference",
+        "version": "0.1.0",
+        "id": "evidence_worker_result_docs_reconcile",
+        "source": "tests/fixtures/contracts/v0_1/contracts.json",
+        "kind": "file",
+        "locator": "craik.worker_result",
+        "summary": "Fixture worker result evidence.",
+        "captured_at": "2026-05-16T06:30:00Z",
+        "metadata": {}
+      }
+    ],
+    "receipt_ids": ["receipt_runner_fixture"],
+    "handoff_id": null,
+    "diagnostics": [],
+    "redacted": true,
+    "created_at": "2026-05-16T06:30:00Z"
   }
 }

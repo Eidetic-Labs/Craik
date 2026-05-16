@@ -34,6 +34,7 @@ TaskRunPhase = Literal["plan", "act", "observe", "evaluate", "continue", "stop"]
 TaskRunStatus = Literal["pending", "running", "completed", "blocked", "failed", "interrupted"]
 RunnerMode = Literal["fixture", "prompt-handoff", "live"]
 RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
+WorkerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -406,6 +407,46 @@ class RunnerAdapterResult(CraikModel):
     memory_proposal_ids: list[str] = Field(default_factory=list)
     artifacts: list[str] = Field(default_factory=list)
     diagnostics: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+
+class WorkerFinding(CraikModel):
+    """One structured finding from a specialist worker."""
+
+    summary: str
+    severity: Literal["info", "low", "medium", "high", "critical"] = "info"
+    evidence_ids: list[str] = Field(default_factory=list)
+    artifact_refs: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+
+
+class WorkerResult(CraikModel):
+    """Typed output from a role-specific specialist agent."""
+
+    schema_: Literal["craik.worker_result"] = Field(
+        default="craik.worker_result",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    run_id: str | None = None
+    role_id: str
+    role_kind: AgentRoleKind
+    runner: RunnerMetadata | None = None
+    status: WorkerResultStatus
+    summary: str
+    findings: list[WorkerFinding] = Field(default_factory=list)
+    artifacts: list[str] = Field(default_factory=list)
+    assumptions: list[str] = Field(default_factory=list)
+    risks: list[str] = Field(default_factory=list)
+    proposed_actions: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    evidence: list[EvidenceReference] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    handoff_id: str | None = None
+    diagnostics: list[str] = Field(default_factory=list)
+    redacted: bool = True
     created_at: datetime
 
 
