@@ -468,6 +468,23 @@ def test_policy_show_can_include_fail_open_receipt() -> None:
     assert '"capability": "policy.fail_open"' in result.stdout
 
 
+def test_policy_test_command_prints_passing_report(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["policy", "test"],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["schema"] == "craik.policy_test_report"
+    assert payload["status"] == "passed"
+    assert payload["summary"]["failed"] == 0
+    assert "immutable_path_requires_override_and_grant" in {
+        item["name"] for item in payload["results"]
+    }
+
+
 def test_receipts_commands_list_and_show_persisted_receipts(tmp_path: Path) -> None:
     home = tmp_path / "home"
     _seed_receipt(

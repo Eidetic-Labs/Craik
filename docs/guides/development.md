@@ -8,7 +8,7 @@ Use `uv` for reproducible local validation:
 uv run --python 3.12 --extra dev pytest
 uv run --python 3.12 --extra dev ruff check .
 uv run --python 3.12 --extra dev mypy
+uv run --python 3.12 --extra dev craik policy test
 ```
 
 The same checks run in CI for pull requests and pushes to `main`.
-

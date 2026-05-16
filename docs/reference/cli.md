@@ -262,6 +262,13 @@ Options:
 - `--trusted-local-fail-open`: required explicit opt-in for trusted-local fail-open.
 - `--include-receipt`: include the fail-open receipt preview when applicable.
 
+## `craik policy test`
+
+Run the v0.1.0 policy regression harness.
+
+The command prints a JSON `craik.policy_test_report`. It exits with code `0`
+when every check passes and code `1` if any policy check fails.
+
 ## `craik receipts list`
 
 Print persisted capability receipts as JSON.
