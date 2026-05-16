@@ -37,6 +37,9 @@ RunnerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 WorkerResultStatus = Literal["completed", "blocked", "failed", "partial"]
 DebateTurnPosition = Literal["supports", "opposes", "clarifies", "questions", "blocks"]
 DebateOutcome = Literal["agreement", "unresolved_disagreement", "contradiction_opened"]
+ReviewRequestStatus = Literal["open", "completed", "cancelled"]
+ReviewDecision = Literal["approved", "changes_requested", "blocked", "deferred"]
+AdjudicationDecision = Literal["accepted", "rejected", "revised", "deferred"]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -504,6 +507,115 @@ class DebateSummary(CraikModel):
         return self
 
 
+class ReviewRequest(CraikModel):
+    """Request from one role for bounded cross-agent review."""
+
+    schema_: Literal["craik.review_request"] = Field(
+        default="craik.review_request",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    requester_role_id: str
+    reviewer_role_id: str
+    reviewer_role_kind: AgentRoleKind
+    subject_worker_result_ids: list[str] = Field(default_factory=list)
+    subject_debate_summary_ids: list[str] = Field(default_factory=list)
+    focus: list[str] = Field(default_factory=list)
+    policy_envelope_id: str | None = None
+    receipt_ids: list[str] = Field(default_factory=list)
+    status: ReviewRequestStatus = "open"
+    due_at: datetime | None = None
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_subjects(self) -> ReviewRequest:
+        """Require at least one worker result or debate summary under review."""
+        if not self.subject_worker_result_ids and not self.subject_debate_summary_ids:
+            raise ValueError("review requests require at least one review subject")
+        return self
+
+
+class ReviewResult(CraikModel):
+    """Result returned by a specialist reviewer."""
+
+    schema_: Literal["craik.review_result"] = Field(
+        default="craik.review_result",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    review_request_id: str
+    reviewer_role_id: str
+    reviewer_role_kind: AgentRoleKind
+    decision: ReviewDecision
+    summary: str
+    finding_ids: list[str] = Field(default_factory=list)
+    worker_result_ids: list[str] = Field(default_factory=list)
+    debate_summary_ids: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    handoff_id: str | None = None
+    created_at: datetime
+
+
+class AdjudicatedFinding(CraikModel):
+    """One finding decision made by an adjudicator."""
+
+    source_worker_result_id: str | None = None
+    source_finding_id: str | None = None
+    source_review_result_id: str | None = None
+    decision: AdjudicationDecision
+    rationale: str
+    revised_summary: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_revision(self) -> AdjudicatedFinding:
+        """Require replacement text for revised findings."""
+        if self.decision == "revised" and not self.revised_summary:
+            raise ValueError("revised adjudicated findings require revised_summary")
+        return self
+
+
+class AdjudicationOutcome(CraikModel):
+    """Final or deferred adjudicator decision over reviewed specialist outputs."""
+
+    schema_: Literal["craik.adjudication_outcome"] = Field(
+        default="craik.adjudication_outcome",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    adjudicator_role_id: str
+    decision: AdjudicationDecision
+    summary: str
+    review_result_ids: list[str] = Field(default_factory=list)
+    worker_result_ids: list[str] = Field(default_factory=list)
+    debate_summary_ids: list[str] = Field(default_factory=list)
+    adjudicated_findings: list[AdjudicatedFinding] = Field(default_factory=list)
+    unresolved_disagreements: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    policy_review_result_ids: list[str] = Field(default_factory=list)
+    adversarial_review_result_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_decision_payload(self) -> AdjudicationOutcome:
+        """Ensure adjudication payloads explain their durable decision."""
+        if self.decision == "deferred" and not self.unresolved_disagreements:
+            raise ValueError("deferred adjudication requires unresolved disagreements")
+        if self.decision != "deferred" and not self.adjudicated_findings:
+            raise ValueError("non-deferred adjudication requires adjudicated findings")
+        return self
+
+
 class RunnerStepRequest(CraikModel):
     """Normalized input for one governed runner loop step."""
 
@@ -866,6 +978,8 @@ class Handoff(CraikModel):
     facts_learned: list[str] = Field(default_factory=list)
     facts_invalidated: list[str] = Field(default_factory=list)
     contradictions_opened: list[str] = Field(default_factory=list)
+    adjudication_ids: list[str] = Field(default_factory=list)
+    unresolved_disagreements: list[str] = Field(default_factory=list)
     risks: list[str] = Field(default_factory=list)
     next_steps: list[str] = Field(default_factory=list)
     receipt_ids: list[str] = Field(default_factory=list)

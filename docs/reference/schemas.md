@@ -29,6 +29,7 @@ craik schema show craik.task_request
 
 | Schema | Purpose |
 | --- | --- |
+| `craik.adjudication_outcome` | Records adjudicator decisions over reviewed specialist outputs and unresolved disagreements. |
 | `craik.agent_onboarding` | Summarizes runner-readable project context before an agent starts work. |
 | `craik.agent_role` | Defines a policy-aware orchestrator or specialist role for multi-agent coordination. |
 | `craik.assumption` | Tracks unresolved assumptions that need evidence before promotion to fact. |
@@ -48,6 +49,8 @@ craik schema show craik.task_request
 | `craik.memory_proposal` | Describes reviewable memory updates. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
+| `craik.review_request` | Requests bounded cross-agent review of worker results or debate summaries. |
+| `craik.review_result` | Captures specialist reviewer decisions, evidence, and preserved reviewer role kind. |
 | `craik.run_output` | Stores redacted observed output captured from one runner step. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |

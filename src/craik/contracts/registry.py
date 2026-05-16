@@ -5,6 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from craik.contracts.models import (
+    AdjudicationOutcome,
     AgentOnboarding,
     AgentRole,
     Assumption,
@@ -24,6 +25,8 @@ from craik.contracts.models import (
     MemoryProposal,
     PolicyEnvelope,
     ProjectProfile,
+    ReviewRequest,
+    ReviewResult,
     RunnerAdapterRequest,
     RunnerAdapterResult,
     RunnerCapabilityMatrix,
@@ -41,6 +44,7 @@ from craik.contracts.models import (
 type ContractModel = type[BaseModel]
 
 CONTRACT_REGISTRY: dict[str, ContractModel] = {
+    "craik.adjudication_outcome": AdjudicationOutcome,
     "craik.agent_onboarding": AgentOnboarding,
     "craik.agent_role": AgentRole,
     "craik.assumption": Assumption,
@@ -60,6 +64,8 @@ CONTRACT_REGISTRY: dict[str, ContractModel] = {
     "craik.memory_proposal": MemoryProposal,
     "craik.policy_envelope": PolicyEnvelope,
     "craik.project_profile": ProjectProfile,
+    "craik.review_request": ReviewRequest,
+    "craik.review_result": ReviewResult,
     "craik.run_output": RunOutput,
     "craik.runner_adapter_request": RunnerAdapterRequest,
     "craik.runner_adapter_result": RunnerAdapterResult,

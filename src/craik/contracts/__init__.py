@@ -1,6 +1,8 @@
 """Versioned runtime contracts for Craik."""
 
 from craik.contracts.models import (
+    AdjudicatedFinding,
+    AdjudicationOutcome,
     AgentOnboarding,
     AgentRole,
     Assumption,
@@ -18,6 +20,8 @@ from craik.contracts.models import (
     MemoryProposal,
     PolicyEnvelope,
     ProjectProfile,
+    ReviewRequest,
+    ReviewResult,
     RunnerAdapterRequest,
     RunnerAdapterResult,
     RunnerCapability,
@@ -36,6 +40,8 @@ from craik.contracts.models import (
 )
 
 __all__ = [
+    "AdjudicatedFinding",
+    "AdjudicationOutcome",
     "AgentOnboarding",
     "AgentRole",
     "Assumption",
@@ -53,6 +59,8 @@ __all__ = [
     "MemoryProposal",
     "PolicyEnvelope",
     "ProjectProfile",
+    "ReviewRequest",
+    "ReviewResult",
     "RunOutput",
     "RunnerAdapterRequest",
     "RunnerAdapterResult",

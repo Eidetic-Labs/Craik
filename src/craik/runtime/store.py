@@ -13,6 +13,7 @@ from typing import Any
 from pydantic import BaseModel, ValidationError
 
 from craik.contracts.models import (
+    AdjudicationOutcome,
     Assumption,
     CapabilityGrant,
     CapabilityReceipt,
@@ -29,6 +30,8 @@ from craik.contracts.models import (
     MemoryProposal,
     PolicyEnvelope,
     ProjectProfile,
+    ReviewRequest,
+    ReviewResult,
     RunOutput,
     TaskRequest,
     TaskRun,
@@ -43,6 +46,7 @@ CURRENT_MIGRATION = 1
 DATABASE_NAME = "craik.sqlite3"
 
 CONTRACT_KINDS: dict[str, str] = {
+    "craik.adjudication_outcome": "adjudication_outcomes",
     "craik.project_profile": "projects",
     "craik.run_output": "run_outputs",
     "craik.task_request": "tasks",
@@ -65,6 +69,8 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.work_graph_export": "graph_exports",
     "craik.work_graph_event": "graph_events",
     "craik.worker_result": "worker_results",
+    "craik.review_request": "review_requests",
+    "craik.review_result": "review_results",
 }
 
 
@@ -250,6 +256,39 @@ class LocalStore:
 
     def list_debate_summaries(self) -> list[DebateSummary]:
         return _cast_list(DebateSummary, self.list_contracts("craik.debate_summary"))
+
+    def put_review_request(self, request: ReviewRequest) -> None:
+        self.put_contract(request)
+
+    def get_review_request(self, request_id: str) -> ReviewRequest | None:
+        contract = self.get_contract("craik.review_request", request_id)
+        return _cast_optional(ReviewRequest, contract)
+
+    def list_review_requests(self) -> list[ReviewRequest]:
+        return _cast_list(ReviewRequest, self.list_contracts("craik.review_request"))
+
+    def put_review_result(self, result: ReviewResult) -> None:
+        self.put_contract(result)
+
+    def get_review_result(self, result_id: str) -> ReviewResult | None:
+        contract = self.get_contract("craik.review_result", result_id)
+        return _cast_optional(ReviewResult, contract)
+
+    def list_review_results(self) -> list[ReviewResult]:
+        return _cast_list(ReviewResult, self.list_contracts("craik.review_result"))
+
+    def put_adjudication_outcome(self, outcome: AdjudicationOutcome) -> None:
+        self.put_contract(outcome)
+
+    def get_adjudication_outcome(self, outcome_id: str) -> AdjudicationOutcome | None:
+        contract = self.get_contract("craik.adjudication_outcome", outcome_id)
+        return _cast_optional(AdjudicationOutcome, contract)
+
+    def list_adjudication_outcomes(self) -> list[AdjudicationOutcome]:
+        return _cast_list(
+            AdjudicationOutcome,
+            self.list_contracts("craik.adjudication_outcome"),
+        )
 
     def put_task(self, task: TaskRequest) -> None:
         self.put_contract(task)
