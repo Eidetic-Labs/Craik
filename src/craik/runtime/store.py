@@ -16,6 +16,7 @@ from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
     CaseFile,
+    ContradictionReport,
     EvidenceReference,
     Handoff,
     IntentLock,
@@ -38,6 +39,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.task_request": "tasks",
     "craik.capability_receipt": "receipts",
     "craik.case_file": "case_files",
+    "craik.contradiction_report": "contradictions",
     "craik.handoff": "handoffs",
     "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
@@ -273,6 +275,16 @@ class LocalStore:
             MemoryImpactPreview,
             self.list_contracts("craik.memory_impact_preview"),
         )
+
+    def put_contradiction(self, contradiction: ContradictionReport) -> None:
+        self.put_contract(contradiction)
+
+    def get_contradiction(self, contradiction_id: str) -> ContradictionReport | None:
+        contract = self.get_contract("craik.contradiction_report", contradiction_id)
+        return _cast_optional(ContradictionReport, contract)
+
+    def list_contradictions(self) -> list[ContradictionReport]:
+        return _cast_list(ContradictionReport, self.list_contracts("craik.contradiction_report"))
 
     def put_assumption(self, assumption: Assumption) -> None:
         self.put_contract(assumption)

@@ -90,9 +90,28 @@ class WorkGraphExporter:
         for assumption in _filter_by_task(self._store.list_assumptions(), task_id):
             builder.add_assumption(assumption)
         if task_id is None:
-            for contradiction in self._store.list_contracts("craik.contradiction_report"):
-                report = ContradictionReport.model_validate(contradiction)
-                builder.add_contradiction(report, task_id=None)
+            contradictions = self._store.list_contradictions()
+        else:
+            contradictions = [
+                report for report in self._store.list_contradictions() if report.task_id == task_id
+            ]
+        for report in contradictions:
+            builder.add_contradiction(report, task_id=report.task_id)
+            if report.task_id:
+                builder.add_edge(
+                    type="has_contradiction",
+                    from_node=f"task:{report.task_id}",
+                    to_node=f"contradiction:{report.id}",
+                )
+            for evidence_id in report.evidence_ids:
+                evidence = self._store.get_evidence(evidence_id)
+                if evidence is not None:
+                    builder.add_evidence(evidence, task_id=report.task_id)
+                builder.add_edge(
+                    type="supported_by",
+                    from_node=f"contradiction:{report.id}",
+                    to_node=f"evidence:{evidence_id}",
+                )
         for event in _filter_by_task(self._store.list_graph_events(), task_id):
             builder.add_edge(
                 type=event.type,

@@ -364,12 +364,17 @@ class ContradictionReport(CraikModel):
     )
     version: Literal["0.1.0"] = "0.1.0"
     id: str
+    task_id: str | None = None
     facts: list[str] = Field(min_length=2)
     summary: str
     affected_artifacts: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
     proposed_resolution: str | None = None
     status: ContradictionStatus = "open"
     owner: str | None = None
+    stigmem_conflict_id: str | None = None
+    created_at: datetime | None = None
+    resolved_at: datetime | None = None
 
 
 class WorkGraphEvent(CraikModel):

@@ -12,6 +12,7 @@ import typer
 
 from craik import __version__
 from craik.contracts.models import (
+    ContradictionStatus,
     MemoryScope,
     PolicyProfile,
     Priority,
@@ -26,6 +27,7 @@ from craik.runtime.case_files import (
     ProjectNotFoundError,
     TaskNotFoundError,
 )
+from craik.runtime.contradictions import ContradictionManager, ContradictionNotFoundError
 from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
 from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
 from craik.runtime.handoffs import (
@@ -79,6 +81,8 @@ case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
 connect_app = typer.Typer(help="Connect to external services.")
 app.add_typer(connect_app, name="connect")
+contradictions_app = typer.Typer(help="Manage local contradiction reports.")
+app.add_typer(contradictions_app, name="contradictions")
 graph_app = typer.Typer(help="Export Craik work graphs.")
 app.add_typer(graph_app, name="graph")
 handoff_app = typer.Typer(help="Create and inspect Craik handoffs.")
@@ -433,6 +437,107 @@ def connect_stigmem(
     typer.echo(
         json.dumps(capabilities.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
     )
+
+
+@contradictions_app.command("open")
+def contradiction_open(
+    summary: Annotated[str, typer.Option("--summary", help="Contradiction summary.")],
+    fact: Annotated[
+        list[str],
+        typer.Option("--fact", help="Conflicting fact id or statement. Repeat at least twice."),
+    ],
+    task_id: Annotated[
+        str | None,
+        typer.Option("--task-id", help="Task associated with this contradiction."),
+    ] = None,
+    affected_artifact: Annotated[
+        list[str] | None,
+        typer.Option("--affected-artifact", help="Affected artifact path or id."),
+    ] = None,
+    evidence_id: Annotated[
+        list[str] | None,
+        typer.Option("--evidence-id", help="Supporting evidence id."),
+    ] = None,
+    owner: Annotated[
+        str | None,
+        typer.Option("--owner", help="Owner responsible for resolution."),
+    ] = None,
+    proposed_resolution: Annotated[
+        str | None,
+        typer.Option("--proposed-resolution", help="Proposed resolution."),
+    ] = None,
+    stigmem_conflict_id: Annotated[
+        str | None,
+        typer.Option("--stigmem-conflict-id", help="Optional future Stigmem conflict id."),
+    ] = None,
+) -> None:
+    """Open and persist a local contradiction report."""
+    if len(fact) < 2:
+        raise typer.BadParameter("at least two --fact values are required")
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        report = ContradictionManager(store).open_report(
+            task_id=task_id,
+            facts=fact,
+            summary=summary,
+            affected_artifacts=affected_artifact or [],
+            evidence_ids=evidence_id or [],
+            owner=owner,
+            proposed_resolution=proposed_resolution,
+            stigmem_conflict_id=stigmem_conflict_id,
+        )
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(report.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+
+
+@contradictions_app.command("list")
+def contradiction_list(
+    task_id: Annotated[
+        str | None,
+        typer.Option("--task-id", help="Only include reports for this task."),
+    ] = None,
+    status: Annotated[
+        str | None,
+        typer.Option("--status", help="Only include reports with this status."),
+    ] = None,
+) -> None:
+    """List local contradiction reports."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        reports = ContradictionManager(store).list_reports(
+            task_id=task_id,
+            status=_contradiction_status(status) if status else None,
+        )
+    finally:
+        store.close()
+
+    payload = [report.model_dump(mode="json", by_alias=True) for report in reports]
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@contradictions_app.command("show")
+def contradiction_show(report_id: str) -> None:
+    """Show one local contradiction report and linked evidence."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        manager = ContradictionManager(store)
+        report = manager.get_report(report_id)
+        evidence = manager.evidence_for(report_id)
+    except ContradictionNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    payload = {
+        "contradiction": report.model_dump(mode="json", by_alias=True),
+        "evidence": [item.model_dump(mode="json", by_alias=True) for item in evidence],
+    }
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
 @graph_app.command("export")
@@ -929,6 +1034,12 @@ def _proposal_operation(value: str) -> ProposalOperation:
     if value in {"add", "update", "invalidate"}:
         return cast(ProposalOperation, value)
     raise typer.BadParameter(f"unknown proposal operation: {value}")
+
+
+def _contradiction_status(value: str) -> ContradictionStatus:
+    if value in {"open", "resolved", "ignored"}:
+        return cast(ContradictionStatus, value)
+    raise typer.BadParameter(f"unknown contradiction status: {value}")
 
 
 def main() -> None:

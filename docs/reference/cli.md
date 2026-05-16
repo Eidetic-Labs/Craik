@@ -97,6 +97,37 @@ Options:
 - `--api-key <key>`: bearer API key. Prefer `CRAIK_STIGMEM_API_KEY`.
 - `--timeout <seconds>`: request timeout. Can also be set with `CRAIK_STIGMEM_TIMEOUT`.
 
+## `craik contradictions open`
+
+Open and persist a local contradiction report.
+
+Required options:
+
+- `--summary <text>`: contradiction summary.
+- `--fact <id-or-text>`: conflicting fact id or statement. Repeat at least twice.
+
+Options:
+
+- `--task-id <id>`: task associated with this contradiction.
+- `--affected-artifact <path-or-id>`: affected artifact. May be repeated.
+- `--evidence-id <id>`: linked evidence id. May be repeated.
+- `--owner <identity>`: owner responsible for resolution.
+- `--proposed-resolution <text>`: proposed resolution.
+- `--stigmem-conflict-id <id>`: optional future Stigmem conflict id.
+
+## `craik contradictions list`
+
+List local contradiction reports.
+
+Options:
+
+- `--task-id <id>`: only include reports for this task.
+- `--status <status>`: `open`, `resolved`, or `ignored`.
+
+## `craik contradictions show <report-id>`
+
+Show one local contradiction report and linked evidence.
+
 ## `craik graph export`
 
 Export the local work graph as deterministic JSON.
