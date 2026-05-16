@@ -77,6 +77,7 @@ project.
 - [MCP Export Boundary](reference/mcp-export-boundary.md)
 - [MCP Client](reference/mcp-client.md)
 - [Sandbox Backends](reference/sandbox-backends.md)
+- [Local Process Backend](reference/local-process-backend.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)

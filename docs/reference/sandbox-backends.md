@@ -43,3 +43,6 @@ Sandbox backend records must not contain provider ids, model routing choices, or
 secret-like metadata keys. Provider routing can choose a model provider, and
 sandbox routing can choose an execution backend, but those decisions stay
 separate so policy can audit each boundary independently.
+
+For host process execution boundaries, see
+[Local Process Backend](local-process-backend.md).
