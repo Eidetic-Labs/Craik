@@ -16,6 +16,8 @@ from craik.contracts.models import (
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionSource,
+    InstructionSourceRegistry,
     IntentLock,
     MemoryProposal,
     ProjectProfile,
@@ -113,6 +115,12 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     )
     scope_request = ScopeChangeRequest.model_validate(fixtures["craik.scope_change_request"])
     scope_result = ScopeChangeResult.model_validate(fixtures["craik.scope_change_result"])
+    instruction_source = InstructionSource.model_validate(
+        fixtures["craik.instruction_source"]
+    )
+    instruction_registry = InstructionSourceRegistry.model_validate(
+        fixtures["craik.instruction_source_registry"]
+    )
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -136,6 +144,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_human_delegation(delegation)
     store.put_scope_change_request(scope_request)
     store.put_scope_change_result(scope_result)
+    store.put_instruction_source(instruction_source)
+    store.put_instruction_source_registry(instruction_registry)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -162,6 +172,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_human_delegation(delegation.id) == delegation
     assert store.get_scope_change_request(scope_request.id) == scope_request
     assert store.get_scope_change_result(scope_result.id) == scope_result
+    assert store.get_instruction_source(instruction_source.id) == instruction_source
+    assert store.get_instruction_source_registry(instruction_registry.id) == instruction_registry
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -180,6 +192,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_human_delegations() == [delegation]
     assert store.list_scope_change_requests() == [scope_request]
     assert store.list_scope_change_results() == [scope_result]
+    assert store.list_instruction_sources() == [instruction_source]
+    assert store.list_instruction_source_registries() == [instruction_registry]
 
 
 def test_persists_supported_contract_types(
@@ -200,6 +214,8 @@ def test_persists_supported_contract_types(
         "craik.review_result",
         "craik.adjudication_outcome",
         "craik.human_delegation_point",
+        "craik.instruction_source",
+        "craik.instruction_source_registry",
         "craik.scope_change_request",
         "craik.scope_change_result",
         "craik.handoff",

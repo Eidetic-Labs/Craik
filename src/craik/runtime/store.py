@@ -25,6 +25,8 @@ from craik.contracts.models import (
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionSource,
+    InstructionSourceRegistry,
     IntentLock,
     MemoryDiff,
     MemoryImpactPreview,
@@ -64,6 +66,8 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.debate_turn": "debate_turns",
     "craik.handoff": "handoffs",
     "craik.human_delegation_point": "human_delegations",
+    "craik.instruction_source": "instruction_sources",
+    "craik.instruction_source_registry": "instruction_source_registries",
     "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
     "craik.memory_diff": "memory_diffs",
@@ -333,6 +337,35 @@ class LocalStore:
         return _cast_list(
             ScopeChangeResult,
             self.list_contracts("craik.scope_change_result"),
+        )
+
+    def put_instruction_source(self, source: InstructionSource) -> None:
+        self.put_contract(source)
+
+    def get_instruction_source(self, source_id: str) -> InstructionSource | None:
+        contract = self.get_contract("craik.instruction_source", source_id)
+        return _cast_optional(InstructionSource, contract)
+
+    def list_instruction_sources(self) -> list[InstructionSource]:
+        return _cast_list(
+            InstructionSource,
+            self.list_contracts("craik.instruction_source"),
+        )
+
+    def put_instruction_source_registry(self, registry: InstructionSourceRegistry) -> None:
+        self.put_contract(registry)
+
+    def get_instruction_source_registry(
+        self,
+        registry_id: str,
+    ) -> InstructionSourceRegistry | None:
+        contract = self.get_contract("craik.instruction_source_registry", registry_id)
+        return _cast_optional(InstructionSourceRegistry, contract)
+
+    def list_instruction_source_registries(self) -> list[InstructionSourceRegistry]:
+        return _cast_list(
+            InstructionSourceRegistry,
+            self.list_contracts("craik.instruction_source_registry"),
         )
 
     def put_task(self, task: TaskRequest) -> None:
