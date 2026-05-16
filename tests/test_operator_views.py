@@ -1,10 +1,16 @@
 from craik.contracts.models import (
+    CapabilityReceipt,
     Handoff,
+    PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
 )
-from craik.runtime.operator_views import format_handoff_viewer, format_work_graph_explorer
+from craik.runtime.operator_views import (
+    format_handoff_viewer,
+    format_receipt_viewer,
+    format_work_graph_explorer,
+)
 
 
 def test_work_graph_explorer_formats_nodes_and_edges() -> None:
@@ -116,3 +122,63 @@ def test_handoff_viewer_formats_summary_links_and_empty_sections() -> None:
     assert "- src/craik/contracts/models.py" in lines
     assert "- none" in lines
     assert "- delegation_docs_reconcile_approval" in lines
+
+
+def test_receipt_viewer_formats_capability_receipt_statuses() -> None:
+    for status in ("passed", "failed", "denied", "skipped"):
+        receipt = CapabilityReceipt.model_validate(
+            {
+                "id": f"receipt_{status}",
+                "task_id": "task_docs_reconcile",
+                "actor": "agent:codex",
+                "capability": "shell.test",
+                "target": "uv run --extra dev pytest",
+                "policy_profile": "strict",
+                "reason": "Validate operator receipt formatting.",
+                "result": {
+                    "status": status,
+                    "summary": f"Receipt {status}.",
+                    "metadata": {"redacted": True},
+                },
+                "redacted": True,
+                "created_at": "2026-05-16T17:00:00Z",
+            }
+        )
+
+        lines = format_receipt_viewer(receipt)
+
+        assert f"Capability Receipt: receipt_{status}" in lines
+        assert f"Status: {status}" in lines
+        assert "Redacted: True" in lines
+
+
+def test_receipt_viewer_formats_plugin_receipt_links() -> None:
+    receipt = PluginReceipt.model_validate(
+        {
+            "id": "plugin_receipt_docs_reconcile",
+            "task_id": "task_docs_reconcile",
+            "actor": "agent:codex",
+            "plugin_descriptor_id": "plugin_docs_reconcile",
+            "action": "docs.reconcile",
+            "capability_grant_ids": ["plugin_grant_docs_reconcile"],
+            "trust_boundary": "project",
+            "result": {
+                "status": "denied",
+                "summary": "Plugin action denied by policy.",
+                "metadata": {"redacted": True},
+            },
+            "evidence_ids": ["evidence_readme_status"],
+            "handoff_ids": ["handoff_docs_reconcile"],
+            "redacted": True,
+            "created_at": "2026-05-16T17:00:00Z",
+        }
+    )
+
+    lines = format_receipt_viewer(receipt)
+
+    assert "Plugin Receipt: plugin_receipt_docs_reconcile" in lines
+    assert "Plugin: plugin_docs_reconcile" in lines
+    assert "Status: denied" in lines
+    assert "- plugin_grant_docs_reconcile" in lines
+    assert "- evidence_readme_status" in lines
+    assert "- handoff_docs_reconcile" in lines
