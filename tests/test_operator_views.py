@@ -1,9 +1,10 @@
 from craik.contracts.models import (
+    Handoff,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
 )
-from craik.runtime.operator_views import format_work_graph_explorer
+from craik.runtime.operator_views import format_handoff_viewer, format_work_graph_explorer
 
 
 def test_work_graph_explorer_formats_nodes_and_edges() -> None:
@@ -69,3 +70,49 @@ def test_work_graph_explorer_empty_state() -> None:
         "",
         "Edges",
     ]
+
+
+def test_handoff_viewer_formats_summary_links_and_empty_sections() -> None:
+    handoff = Handoff.model_validate(
+        {
+            "id": "handoff_docs_reconcile",
+            "task_id": "task_docs_reconcile",
+            "project_id": "project_stigmem",
+            "agent": "agent:codex",
+            "status": "completed",
+            "summary": "Contract schema work completed with tests and docs.",
+            "self_audit": {
+                "schema_validated": True,
+                "redaction_reviewed": True,
+                "receipts_reviewed": True,
+                "assumptions_reviewed": True,
+                "validation_recorded": True,
+                "policy_exceptions_disclosed": True,
+                "notes": [],
+            },
+            "completed_actions": ["Added schemas.", "Validated fixtures."],
+            "artifacts": ["docs/reference/schemas.md"],
+            "files_changed": ["src/craik/contracts/models.py"],
+            "risks": [],
+            "next_steps": ["Implement project registry."],
+            "receipt_ids": ["receipt_pytest"],
+            "open_human_delegation_ids": ["delegation_docs_reconcile_approval"],
+            "created_at": "2026-05-16T16:55:00Z",
+        }
+    )
+
+    lines = format_handoff_viewer(handoff)
+
+    assert lines[:6] == [
+        "Handoff: handoff_docs_reconcile",
+        "Task: task_docs_reconcile",
+        "Project: project_stigmem",
+        "Status: completed",
+        "Agent: agent:codex",
+        "Summary: Contract schema work completed with tests and docs.",
+    ]
+    assert "- receipt_pytest" in lines
+    assert "- docs/reference/schemas.md" in lines
+    assert "- src/craik/contracts/models.py" in lines
+    assert "- none" in lines
+    assert "- delegation_docs_reconcile_approval" in lines
