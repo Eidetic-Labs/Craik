@@ -26,6 +26,7 @@ from craik.contracts.models import (
     EvidenceReference,
     Handoff,
     HumanDelegationPoint,
+    InstructionPromotionReview,
     InstructionProvenance,
     InstructionSource,
     InstructionSourceRegistry,
@@ -36,6 +37,7 @@ from craik.contracts.models import (
     MemoryProposal,
     PolicyEnvelope,
     ProjectProfile,
+    PromotedInstructionConstraint,
     ReviewRequest,
     ReviewResult,
     RunOutput,
@@ -71,6 +73,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.handoff": "handoffs",
     "craik.human_delegation_point": "human_delegations",
     "craik.instruction_source": "instruction_sources",
+    "craik.instruction_promotion_review": "instruction_promotion_reviews",
     "craik.instruction_provenance": "instruction_provenance",
     "craik.instruction_source_registry": "instruction_source_registries",
     "craik.instruction_source_snapshot": "instruction_source_snapshots",
@@ -85,6 +88,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.worker_result": "worker_results",
     "craik.review_request": "review_requests",
     "craik.review_result": "review_results",
+    "craik.promoted_instruction_constraint": "promoted_instruction_constraints",
     "craik.scope_change_request": "scope_change_requests",
     "craik.scope_change_result": "scope_change_results",
 }
@@ -420,6 +424,41 @@ class LocalStore:
         return _cast_list(
             DistilledInstructionProposal,
             self.list_contracts("craik.distilled_instruction_proposal"),
+        )
+
+    def put_instruction_promotion_review(self, review: InstructionPromotionReview) -> None:
+        self.put_contract(review)
+
+    def get_instruction_promotion_review(
+        self,
+        review_id: str,
+    ) -> InstructionPromotionReview | None:
+        contract = self.get_contract("craik.instruction_promotion_review", review_id)
+        return _cast_optional(InstructionPromotionReview, contract)
+
+    def list_instruction_promotion_reviews(self) -> list[InstructionPromotionReview]:
+        return _cast_list(
+            InstructionPromotionReview,
+            self.list_contracts("craik.instruction_promotion_review"),
+        )
+
+    def put_promoted_instruction_constraint(
+        self,
+        constraint: PromotedInstructionConstraint,
+    ) -> None:
+        self.put_contract(constraint)
+
+    def get_promoted_instruction_constraint(
+        self,
+        constraint_id: str,
+    ) -> PromotedInstructionConstraint | None:
+        contract = self.get_contract("craik.promoted_instruction_constraint", constraint_id)
+        return _cast_optional(PromotedInstructionConstraint, contract)
+
+    def list_promoted_instruction_constraints(self) -> list[PromotedInstructionConstraint]:
+        return _cast_list(
+            PromotedInstructionConstraint,
+            self.list_contracts("craik.promoted_instruction_constraint"),
         )
 
     def put_task(self, task: TaskRequest) -> None:
