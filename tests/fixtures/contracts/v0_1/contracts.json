@@ -232,6 +232,73 @@
     "redacted": true,
     "created_at": "2026-05-15T22:45:00Z"
   },
+  "craik.channel_adapter_contract": {
+    "schema": "craik.channel_adapter_contract",
+    "version": "0.1.0",
+    "id": "channel_adapter_messaging_fixture",
+    "identity": {
+      "adapter_id": "messaging_fixture",
+      "channel": "messaging",
+      "name": "Messaging Fixture Adapter",
+      "adapter_version": "0.1.0",
+      "service": "fixture-chat"
+    },
+    "capabilities": [
+      {
+        "name": "channel.message.receive",
+        "direction": "inbound",
+        "description": "Receive normalized operator messages.",
+        "grant_required": true,
+        "receipt_required": true
+      },
+      {
+        "name": "channel.message.respond",
+        "direction": "outbound",
+        "description": "Send redacted operator responses.",
+        "grant_required": true,
+        "receipt_required": true
+      }
+    ],
+    "inbound_event": {
+      "fields": [
+        "event_id",
+        "channel",
+        "received_at",
+        "sender",
+        "text",
+        "thread_id",
+        "metadata"
+      ],
+      "redacted_fields": ["text"],
+      "metadata": {
+        "identity_model": "external sender id is paired separately"
+      }
+    },
+    "outbound_response": {
+      "fields": ["response_id", "event_id", "status", "summary", "text", "receipt_ids"],
+      "redacted_fields": ["text"],
+      "metadata": {
+        "delivery": "adapter-specific delivery metadata stays nested"
+      }
+    },
+    "receipts": {
+      "required": true,
+      "receipt_schema": "craik.capability_receipt",
+      "capabilities": ["channel.message.receive", "channel.message.respond"]
+    },
+    "trust_boundary": {
+      "policy_envelope_required": true,
+      "allowlist_required": true,
+      "inbound_identity_required": true,
+      "secrets_in_config_allowed": false,
+      "notes": [
+        "Adapters normalize channel payloads but do not grant authority.",
+        "Channel secrets remain outside Craik contract payloads."
+      ]
+    },
+    "docs": ["docs/reference/channel-adapter-contract.md"],
+    "created_at": "2026-05-16T18:30:00Z"
+  },
   "craik.case_file": {
     "schema": "craik.case_file",
     "version": "0.1.0",

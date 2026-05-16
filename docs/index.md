@@ -61,6 +61,7 @@ project.
 - [Known Traps View](reference/known-traps-view.md)
 - [Run Delta View](reference/run-delta-view.md)
 - [Gateway Daemon Mode](reference/gateway-daemon.md)
+- [Channel Adapter Contract](reference/channel-adapter-contract.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
