@@ -32,6 +32,7 @@ from craik.runtime.case_files import (
 )
 from craik.runtime.contradictions import ContradictionManager, ContradictionNotFoundError
 from craik.runtime.demos import StigmemDocsDemo
+from craik.runtime.doctor import run_doctor
 from craik.runtime.gateway import default_gateway_config
 from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
 from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
@@ -210,6 +211,14 @@ def setup_command(
     finally:
         store.close()
 
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@app.command("doctor")
+def doctor_command() -> None:
+    """Run read-only diagnostics for local and gateway readiness."""
+    paths = resolve_craik_paths()
+    payload = run_doctor(paths, env=dict(os.environ))
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
