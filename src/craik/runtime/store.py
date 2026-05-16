@@ -27,6 +27,7 @@ from craik.contracts.models import (
     MemoryProposal,
     PolicyEnvelope,
     ProjectProfile,
+    RunOutput,
     TaskRequest,
     TaskRun,
     WorkGraphEvent,
@@ -40,6 +41,7 @@ DATABASE_NAME = "craik.sqlite3"
 
 CONTRACT_KINDS: dict[str, str] = {
     "craik.project_profile": "projects",
+    "craik.run_output": "run_outputs",
     "craik.task_request": "tasks",
     "craik.task_run": "task_runs",
     "craik.policy_envelope": "policies",
@@ -202,6 +204,16 @@ class LocalStore:
 
     def list_projects(self) -> list[ProjectProfile]:
         return _cast_list(ProjectProfile, self.list_contracts("craik.project_profile"))
+
+    def put_run_output(self, output: RunOutput) -> None:
+        self.put_contract(output)
+
+    def get_run_output(self, output_id: str) -> RunOutput | None:
+        contract = self.get_contract("craik.run_output", output_id)
+        return _cast_optional(RunOutput, contract)
+
+    def list_run_outputs(self) -> list[RunOutput]:
+        return _cast_list(RunOutput, self.list_contracts("craik.run_output"))
 
     def put_task(self, task: TaskRequest) -> None:
         self.put_contract(task)

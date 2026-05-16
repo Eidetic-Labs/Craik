@@ -45,6 +45,7 @@ craik schema show craik.task_request
 | `craik.memory_proposal` | Describes reviewable memory updates. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
+| `craik.run_output` | Stores redacted observed output captured from one runner step. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |
 | `craik.runner_capability_matrix` | Defines runner capability support, trust boundary, and default grant posture. |
