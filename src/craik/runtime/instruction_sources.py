@@ -132,6 +132,36 @@ def promotable_distilled_instructions(
     )
 
 
+def active_instruction_context(store: LocalStore, project_id: str) -> list[dict[str, object]]:
+    """Return active promoted instruction constraints for runtime context."""
+    constraints = [
+        constraint
+        for constraint in store.list_promoted_instruction_constraints()
+        if constraint.project_id == project_id and constraint.active
+    ]
+    proposal_by_id = {
+        proposal.id: proposal for proposal in store.list_distilled_instruction_proposals()
+    }
+    active: list[dict[str, object]] = []
+    for constraint in sorted(constraints, key=lambda item: item.id):
+        proposal = proposal_by_id.get(constraint.proposal_id)
+        if proposal is not None and (
+            proposal.promotion_status != "approved" or proposal.contradiction_ids
+        ):
+            continue
+        active.append(
+            {
+                "id": constraint.id,
+                "category": constraint.category,
+                "statement": constraint.statement,
+                "source_id": constraint.source_id,
+                "snapshot_id": constraint.snapshot_id,
+                "provenance_ids": list(constraint.provenance_ids),
+            }
+        )
+    return active
+
+
 def detect_instruction_contradictions(
     store: LocalStore,
     *,

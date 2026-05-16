@@ -17,7 +17,10 @@ from craik.contracts.models import (
     TaskRequest,
 )
 from craik.runtime.github import GitHubReadAdapter
-from craik.runtime.instruction_sources import instruction_stale_risk_warnings
+from craik.runtime.instruction_sources import (
+    active_instruction_context,
+    instruction_stale_risk_warnings,
+)
 from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.redaction import redact
@@ -134,6 +137,7 @@ class CaseFileAssembler:
             *instruction_stale_risk_warnings(self.store, project.id),
         ]
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
+        active_instructions = active_instruction_context(self.store, project.id)
         intent_lock = IntentLockManager(self.store).ensure_for_task(task)
         case_file = CaseFile(
             id=f"case_{task.id.removeprefix('task_')}",
@@ -161,6 +165,7 @@ class CaseFileAssembler:
                 discovery_rules=discovered.rules,
                 evidence=evidence,
                 assumptions=assumptions,
+                active_instruction_constraints=active_instructions,
             ),
         )
         self.store.put_case_file(case_file)
@@ -492,6 +497,7 @@ def _context_budget(
     discovery_rules: dict[str, list[str]],
     evidence: list[EvidenceReference],
     assumptions: list[Assumption],
+    active_instruction_constraints: list[dict[str, object]],
 ) -> dict[str, Any]:
     return {
         "max_tokens": max_tokens,
@@ -503,6 +509,7 @@ def _context_budget(
         "discovery_rules": discovery_rules,
         "evidence_count": len(evidence),
         "assumption_count": len(assumptions),
+        "active_instruction_constraints": active_instruction_constraints,
     }
 
 

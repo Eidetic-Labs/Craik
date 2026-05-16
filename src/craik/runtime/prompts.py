@@ -167,6 +167,16 @@ def _sections(
                     ),
                     _bullet_block("Stale risks", case_file.stale_risks),
                     _bullet_block(
+                        "Active instruction constraints",
+                        [
+                            str(item.get("statement", item))
+                            for item in case_file.context_budget.get(
+                                "active_instruction_constraints",
+                                [],
+                            )
+                        ],
+                    ),
+                    _bullet_block(
                         "Open contradictions",
                         [item.summary for item in case_file.contradictions],
                     ),
