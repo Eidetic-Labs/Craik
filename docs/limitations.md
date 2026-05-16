@@ -14,9 +14,10 @@ Current limitations:
 - Case files currently load local project/task/repo/docs context and read-only GitHub state when configured; Stigmem facts, recent handoffs, and local contradiction report loading are not wired into case assembly yet.
 - The Stigmem documentation demo creates local proposed updates and artifacts; it does not edit documentation files or directly write Stigmem facts by default.
 - Policy tests cover current policy primitives and keep runner grant boundaries visible, but full live runner adapters are not implemented yet.
-- Runner capability matrices, trust profiles, prompt compilation, and Codex/Claude fixture/prompt-handoff adapters are available for preview runner workflows.
+- Runner capability matrices, trust profiles, prompt compilation, and Codex/Claude/Gemini fixture/prompt-handoff adapters are available for preview runner workflows.
 - Prompt compilation produces deterministic runner-ready prompts, but it does not invoke live runners or enforce grants at execution time yet.
 - The Codex runner adapter does not invoke an external Codex process or finalize receipts from live side effects in v0.2.0.
 - The Claude runner adapter does not invoke an external Claude process, capture live transcripts, or finalize receipts from live side effects in v0.2.0.
+- The Gemini runner adapter does not invoke an external Gemini process, capture live responses, or finalize receipts from live side effects in v0.2.0.
 - The CLI does not request tool authority or write runtime state.
 - Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.

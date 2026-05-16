@@ -43,6 +43,7 @@ project.
 - [Runner Adapter Contract](reference/runner-adapter-contract.md)
 - [Codex Runner Adapter](reference/codex-runner-adapter.md)
 - [Claude Runner Adapter](reference/claude-runner-adapter.md)
+- [Gemini Runner Adapter](reference/gemini-runner-adapter.md)
 - [Prompt Compiler](reference/prompt-compiler.md)
 - [Policy Profiles](reference/policy-profiles.md)
 - [Policy Tests](reference/policy-tests.md)

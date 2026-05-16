@@ -81,6 +81,9 @@ interface for Codex-compatible prompt handoff and deterministic fixture runs.
 The [Claude Runner Adapter Preview](claude-runner-adapter.md) implements the
 same interface for Claude-compatible prompt handoff and deterministic fixture
 runs.
+The [Gemini Runner Adapter Preview](gemini-runner-adapter.md) implements the
+same interface for Gemini-compatible read/review-oriented prompt handoff and
+deterministic fixture runs.
 
 ## Capability Matrix
 

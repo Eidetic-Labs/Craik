@@ -43,6 +43,9 @@ metadata, and limitations.
 The Claude adapter preview follows the same runtime API for Claude-compatible
 prompt handoff. See [Claude Runner Adapter](claude-runner-adapter.md).
 
+The Gemini adapter preview follows the same runtime API for conservative
+read/review-oriented prompt handoff. See [Gemini Runner Adapter](gemini-runner-adapter.md).
+
 ## `craik home show`
 
 Print resolved Craik local state paths without creating directories.
