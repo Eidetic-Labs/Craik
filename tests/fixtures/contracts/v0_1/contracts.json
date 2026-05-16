@@ -1276,6 +1276,32 @@
     "runtime_authority": false,
     "created_at": "2026-05-16T15:45:00Z"
   },
+  "craik.plugin_capability_grant": {
+    "schema": "craik.plugin_capability_grant",
+    "version": "0.1.0",
+    "id": "plugin_grant_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "plugin_descriptor_id": "plugin_docs_reconcile",
+    "policy_envelope_id": "policy_docs_reconcile",
+    "capability": "repo.write.docs",
+    "target": {
+      "repo": "Eidetic-Labs/Craik",
+      "paths": ["docs/**"],
+      "exclude": ["docs/adr/**"],
+      "metadata": {
+        "scope": "plugin"
+      }
+    },
+    "operations": ["read", "write"],
+    "status": "allowed",
+    "approval_required": true,
+    "approved_by": "user:maintainer",
+    "expires_at": "2026-06-16T16:30:00Z",
+    "reason": "Allow docs reconciliation plugin to update docs.",
+    "evidence_ids": ["evidence_readme_status"],
+    "receipt_ids": ["plugin_receipt_docs_reconcile"],
+    "created_at": "2026-05-16T16:30:00Z"
+  },
   "craik.plugin_probation": {
     "schema": "craik.plugin_probation",
     "version": "0.1.0",

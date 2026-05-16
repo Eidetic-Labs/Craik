@@ -32,6 +32,7 @@ from craik.contracts.models import (
     KnownTrap,
     MemoryProposal,
     NegativeKnowledge,
+    PluginCapabilityGrant,
     PluginDescriptor,
     PluginProbation,
     PluginReceipt,
@@ -163,6 +164,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     skill_context = SkillInvocationContext.model_validate(
         fixtures["craik.skill_invocation_context"]
     )
+    plugin_grant = PluginCapabilityGrant.model_validate(
+        fixtures["craik.plugin_capability_grant"]
+    )
     plugin_descriptor = PluginDescriptor.model_validate(fixtures["craik.plugin_descriptor"])
     plugin_probation = PluginProbation.model_validate(fixtures["craik.plugin_probation"])
     plugin_receipt = PluginReceipt.model_validate(fixtures["craik.plugin_receipt"])
@@ -230,6 +234,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_skill_package(skill_package)
     store.put_skill_registry(skill_registry)
     store.put_skill_invocation_context(skill_context)
+    store.put_plugin_capability_grant(plugin_grant)
     store.put_plugin_descriptor(plugin_descriptor)
     store.put_plugin_probation(plugin_probation)
     store.put_plugin_receipt(plugin_receipt)
@@ -287,6 +292,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_skill_package(skill_package.id) == skill_package
     assert store.get_skill_registry(skill_registry.id) == skill_registry
     assert store.get_skill_invocation_context(skill_context.id) == skill_context
+    assert store.get_plugin_capability_grant(plugin_grant.id) == plugin_grant
     assert store.get_plugin_descriptor(plugin_descriptor.id) == plugin_descriptor
     assert store.get_plugin_probation(plugin_probation.id) == plugin_probation
     assert store.get_plugin_receipt(plugin_receipt.id) == plugin_receipt
@@ -339,6 +345,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_skill_packages() == [skill_package]
     assert store.list_skill_registries() == [skill_registry]
     assert store.list_skill_invocation_contexts() == [skill_context]
+    assert store.list_plugin_capability_grants() == [plugin_grant]
     assert store.list_plugin_descriptors() == [plugin_descriptor]
     assert store.list_plugin_probations() == [plugin_probation]
     assert store.list_plugin_receipts() == [plugin_receipt]
@@ -396,6 +403,7 @@ def test_persists_supported_contract_types(
         "craik.skill_package",
         "craik.skill_registry",
         "craik.skill_invocation_context",
+        "craik.plugin_capability_grant",
         "craik.plugin_descriptor",
         "craik.plugin_probation",
         "craik.plugin_receipt",

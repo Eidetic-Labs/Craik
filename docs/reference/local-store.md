@@ -45,6 +45,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `intent_locks` | `craik.intent_lock` |
 | `knowledge_freshness_probes` | `craik.knowledge_freshness_probe` |
 | `known_traps` | `craik.known_trap` |
+| `plugin_capability_grants` | `craik.plugin_capability_grant` |
 | `plugin_descriptors` | `craik.plugin_descriptor` |
 | `plugin_probations` | `craik.plugin_probation` |
 | `plugin_receipts` | `craik.plugin_receipt` |
