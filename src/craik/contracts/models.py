@@ -98,6 +98,16 @@ FreshnessProbeKind = Literal[
     "instruction_source",
     "other",
 ]
+KnownTrapStatus = Literal["active", "expired", "contradicted"]
+KnownTrapKind = Literal[
+    "workflow",
+    "policy",
+    "tool",
+    "memory",
+    "documentation",
+    "security",
+    "other",
+]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1600,6 +1610,66 @@ class KnowledgeFreshnessProbe(CraikModel):
             raise ValueError("non-fresh freshness probes require stale_risk_warning")
         if self.status == "missing" and self.attestation_id is not None:
             raise ValueError("missing freshness probes must not link an attestation")
+        return self
+
+
+class KnownTrap(CraikModel):
+    """Known pitfall agents should avoid when working in a project."""
+
+    schema_: Literal["craik.known_trap"] = Field(default="craik.known_trap", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str | None = None
+    task_id: str | None = None
+    kind: KnownTrapKind
+    status: KnownTrapStatus = "active"
+    statement: str
+    avoidance: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+    expires_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_known_trap_status(self) -> KnownTrap:
+        """Require evidence for active traps and contradiction links for contradicted traps."""
+        if self.expires_at is not None and self.expires_at <= self.created_at:
+            raise ValueError("known trap expires_at must be after created_at")
+        if self.status == "active" and not self.evidence_ids:
+            raise ValueError("active known traps require evidence_ids")
+        if self.status == "contradicted" and not self.contradiction_ids:
+            raise ValueError("contradicted known traps require contradiction_ids")
+        return self
+
+
+class NegativeKnowledge(CraikModel):
+    """Evidence-backed statement about what is not true or not available."""
+
+    schema_: Literal["craik.negative_knowledge"] = Field(
+        default="craik.negative_knowledge",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str | None = None
+    task_id: str | None = None
+    statement: str
+    scope: str
+    trust_class: TrustClass
+    evidence_ids: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+    expires_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_negative_knowledge(self) -> NegativeKnowledge:
+        """Keep negative knowledge evidence-backed and freshness-bounded."""
+        if not self.evidence_ids:
+            raise ValueError("negative knowledge requires evidence_ids")
+        if self.expires_at is not None and self.expires_at <= self.created_at:
+            raise ValueError("negative knowledge expires_at must be after created_at")
         return self
 
 

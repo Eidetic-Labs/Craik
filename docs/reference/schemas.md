@@ -54,10 +54,12 @@ craik schema show craik.task_request
 | `craik.instruction_source_snapshot` | Records source hash state for one observed instruction source. |
 | `craik.intent_lock` | Preserves task intent and scope boundaries. |
 | `craik.knowledge_freshness_probe` | Tracks fresh, expiring, expired, or missing knowledge for stale-risk warnings. |
+| `craik.known_trap` | Records evidence-backed pitfalls and avoidance guidance for agents. |
 | `craik.memory_backend_capabilities` | Records detected memory backend support. |
 | `craik.memory_diff` | Explains run-scoped memory reads, proposals, writes, and failures. |
 | `craik.memory_impact_preview` | Previews memory additions, invalidations, evidence gaps, and likely contradictions. |
 | `craik.memory_proposal` | Describes reviewable memory updates. |
+| `craik.negative_knowledge` | Records evidence-backed negative statements with scope and freshness boundaries. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.promoted_instruction_constraint` | Captures an approved distilled instruction as an active runtime constraint. |
