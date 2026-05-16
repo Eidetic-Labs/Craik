@@ -28,7 +28,10 @@ from craik.contracts.models import (
     MemoryProposal,
     NegativeKnowledge,
     PluginReceipt,
+    RecoverySession,
     RedTeamFinding,
+    RunDelta,
+    RunDeltaItem,
     RuntimeCriticFinding,
     WorkGraphEdge,
     WorkGraphExport,
@@ -85,6 +88,14 @@ class KnownTrapsSnapshot:
     known_traps: list[KnownTrap] = field(default_factory=list)
     negative_knowledge: list[NegativeKnowledge] = field(default_factory=list)
     now: datetime | None = None
+
+
+@dataclass(frozen=True)
+class RunDeltaSnapshot:
+    """Operator-visible run delta and recovery-link state."""
+
+    delta: RunDelta
+    recovery_sessions: list[RecoverySession] = field(default_factory=list)
 
 
 def format_quality_gate_view(snapshot: QualityGateSnapshot) -> list[str]:
@@ -170,6 +181,64 @@ def format_quality_gate_view(snapshot: QualityGateSnapshot) -> list[str]:
                 ]
             )
 
+    return lines
+
+
+def format_run_delta_view(snapshot: RunDeltaSnapshot) -> list[str]:
+    """Format continuity-relevant run delta state."""
+    delta = snapshot.delta
+    lines = [
+        f"Run Delta: {delta.id}",
+        f"Project: {delta.project_id}",
+        f"Task: {delta.task_id or 'all'}",
+        f"Previous Handoff: {delta.previous_handoff_id or 'none'}",
+        f"Current Handoff: {delta.current_handoff_id or 'none'}",
+        f"Summary: {delta.summary}",
+        "",
+        "Case Files",
+        *_format_items(delta.case_file_ids),
+        "",
+        "Receipts",
+        *_format_items(delta.receipt_ids),
+        "",
+        "Contradictions",
+        *_format_items(delta.contradiction_ids),
+        "",
+        "Active Instruction Constraints",
+        *_format_items(delta.active_instruction_constraint_ids),
+        "",
+        "Changes",
+    ]
+    if not delta.changes:
+        lines.append("- none")
+    else:
+        for kind in ("created", "updated", "removed", "unchanged"):
+            changes = sorted(
+                (change for change in delta.changes if change.kind == kind),
+                key=lambda item: (item.entity_type, item.entity_id),
+            )
+            lines.append(f"{kind.title()}: {len(changes)}")
+            lines.extend(_format_run_delta_change(change) for change in changes)
+
+    lines.extend(["", "Recovery Sessions"])
+    if not snapshot.recovery_sessions:
+        lines.append("- none")
+    else:
+        for session in sorted(snapshot.recovery_sessions, key=lambda item: item.id):
+            lines.extend(
+                [
+                    f"- {session.id} [{session.status}] delta={session.run_delta_id}",
+                    f"  Task: {session.task_id or 'all'}",
+                    f"  Summary: {session.resume_summary}",
+                    f"  Required Actions: {_join_or_none(session.required_actions)}",
+                    f"  Stale Risks: {_join_or_none(session.stale_risks)}",
+                    f"  Handoffs: {_join_or_none(session.handoff_ids)}",
+                    f"  Receipts: {_join_or_none(session.receipt_ids)}",
+                    f"  Contradictions: {_join_or_none(session.contradiction_ids)}",
+                    "  Active Instruction Constraints: "
+                    f"{_join_or_none(session.active_instruction_constraint_ids)}",
+                ]
+            )
     return lines
 
 
@@ -586,6 +655,16 @@ def _format_fact_reference(fact: FactValue | MemoryFactReference) -> str:
     return (
         f"{fact.entity} {fact.relation}={fact.value!r} "
         f"source={fact.source} scope={fact.scope} trust={fact.trust_class}"
+    )
+
+
+def _format_run_delta_change(change: RunDeltaItem) -> str:
+    previous = change.previous_ref
+    current = change.current_ref
+    return (
+        f"- {change.entity_type}:{change.entity_id} "
+        f"prev={previous or 'none'} current={current or 'none'} "
+        f"evidence={_join_or_none(change.evidence_ids)}: {change.summary}"
     )
 
 
