@@ -19,7 +19,9 @@ from craik.contracts.models import (
     MemoryProposal,
     NegativeKnowledge,
     PluginReceipt,
+    RecoverySession,
     RedTeamFinding,
+    RunDelta,
     RuntimeCriticFinding,
     WorkGraphEdge,
     WorkGraphExport,
@@ -31,6 +33,7 @@ from craik.runtime.operator_views import (
     KnownTrapsSnapshot,
     MemoryImpactPreviewSnapshot,
     QualityGateSnapshot,
+    RunDeltaSnapshot,
     format_budget_quota_view,
     format_contradiction_inbox,
     format_delegation_queue,
@@ -41,6 +44,7 @@ from craik.runtime.operator_views import (
     format_memory_impact_preview_view,
     format_quality_gate_view,
     format_receipt_viewer,
+    format_run_delta_view,
     format_work_graph_explorer,
 )
 
@@ -762,6 +766,120 @@ def test_known_traps_view_empty_state() -> None:
         "Negative Knowledge",
         "- none",
     ]
+
+
+def test_run_delta_view_formats_change_kinds_and_recovery_links() -> None:
+    delta = RunDelta.model_validate(
+        {
+            "id": "rundelta_task_docs",
+            "project_id": "project_craik",
+            "task_id": "task_docs",
+            "previous_handoff_id": "handoff_previous",
+            "current_handoff_id": "handoff_current",
+            "case_file_ids": ["case_docs"],
+            "receipt_ids": ["receipt_pytest"],
+            "contradiction_ids": ["contradiction_docs"],
+            "active_instruction_constraint_ids": ["constraint_review"],
+            "changes": [
+                {
+                    "kind": "created",
+                    "entity_type": "receipt",
+                    "entity_id": "receipt_pytest",
+                    "summary": "Validation receipt was created.",
+                    "current_ref": "receipt_pytest",
+                    "evidence_ids": ["evidence_pytest"],
+                },
+                {
+                    "kind": "updated",
+                    "entity_type": "handoff",
+                    "entity_id": "handoff_current",
+                    "summary": "Current handoff replaced the previous one.",
+                    "previous_ref": "handoff_previous",
+                    "current_ref": "handoff_current",
+                },
+                {
+                    "kind": "removed",
+                    "entity_type": "contradiction",
+                    "entity_id": "contradiction_old",
+                    "summary": "Old contradiction is no longer open.",
+                    "previous_ref": "contradiction_old",
+                },
+                {
+                    "kind": "unchanged",
+                    "entity_type": "case_file",
+                    "entity_id": "case_docs",
+                    "summary": "Case file remains usable.",
+                    "previous_ref": "case_docs",
+                    "current_ref": "case_docs",
+                },
+            ],
+            "summary": "Run state changed since the previous handoff.",
+            "created_at": "2026-05-16T18:00:00Z",
+        }
+    )
+    recovery = RecoverySession.model_validate(
+        {
+            "id": "recovery_task_docs",
+            "project_id": "project_craik",
+            "task_id": "task_docs",
+            "status": "changed_state",
+            "run_delta_id": "rundelta_task_docs",
+            "resume_summary": "Review changed handoff and contradiction state.",
+            "required_actions": ["Review current handoff."],
+            "stale_risks": ["Previous handoff may be stale."],
+            "handoff_ids": ["handoff_current"],
+            "case_file_ids": ["case_docs"],
+            "receipt_ids": ["receipt_pytest"],
+            "contradiction_ids": ["contradiction_docs"],
+            "active_instruction_constraint_ids": ["constraint_review"],
+            "created_at": "2026-05-16T18:01:00Z",
+        }
+    )
+
+    lines = format_run_delta_view(RunDeltaSnapshot(delta=delta, recovery_sessions=[recovery]))
+
+    assert lines[:6] == [
+        "Run Delta: rundelta_task_docs",
+        "Project: project_craik",
+        "Task: task_docs",
+        "Previous Handoff: handoff_previous",
+        "Current Handoff: handoff_current",
+        "Summary: Run state changed since the previous handoff.",
+    ]
+    assert "Created: 1" in lines
+    assert "Updated: 1" in lines
+    assert "Removed: 1" in lines
+    assert "Unchanged: 1" in lines
+    assert (
+        "- receipt:receipt_pytest prev=none current=receipt_pytest "
+        "evidence=evidence_pytest: Validation receipt was created."
+    ) in lines
+    assert (
+        "- recovery_task_docs [changed_state] delta=rundelta_task_docs"
+        in lines
+    )
+    assert "  Required Actions: Review current handoff." in lines
+    assert "  Handoffs: handoff_current" in lines
+    assert "  Active Instruction Constraints: constraint_review" in lines
+
+
+def test_run_delta_view_empty_change_and_recovery_state() -> None:
+    delta = RunDelta.model_validate(
+        {
+            "id": "rundelta_empty",
+            "project_id": "project_craik",
+            "summary": "No changes.",
+            "created_at": "2026-05-16T18:00:00Z",
+        }
+    )
+
+    lines = format_run_delta_view(RunDeltaSnapshot(delta=delta))
+
+    assert lines[0] == "Run Delta: rundelta_empty"
+    assert "Task: all" in lines
+    assert "Changes" in lines
+    assert "- none" in lines
+    assert lines[-3:] == ["", "Recovery Sessions", "- none"]
 
 
 def _delegation(
