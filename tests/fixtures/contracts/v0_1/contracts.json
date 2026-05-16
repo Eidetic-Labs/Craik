@@ -760,6 +760,37 @@
     "created_at": "2026-05-16T09:40:00Z",
     "expires_at": "2026-05-17T09:40:00Z"
   },
+  "craik.model_provider": {
+    "schema": "craik.model_provider",
+    "version": "0.1.0",
+    "id": "provider_fixture_local",
+    "name": "Fixture Local Provider",
+    "provider": "fixture",
+    "modes": ["chat", "runner"],
+    "capabilities": [
+      {
+        "name": "model.chat",
+        "mode": "chat",
+        "description": "Fixture chat completion.",
+        "grant_required": true
+      },
+      {
+        "name": "runner.execute",
+        "mode": "runner",
+        "description": "Fixture runner execution.",
+        "grant_required": true
+      }
+    ],
+    "trust_boundary": "local",
+    "config_refs": ["CRAIK_PROVIDER_FIXTURE_MODE"],
+    "secret_ref_names": ["CRAIK_PROVIDER_FIXTURE_TOKEN"],
+    "runtime_path": "craik.runtime.fixture_provider",
+    "metadata": {
+      "notes": "Fixture provider metadata only."
+    },
+    "docs": ["docs/reference/model-providers.md"],
+    "created_at": "2026-05-16T19:40:00Z"
+  },
   "craik.negative_knowledge": {
     "schema": "craik.negative_knowledge",
     "version": "0.1.0",

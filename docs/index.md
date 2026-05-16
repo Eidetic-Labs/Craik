@@ -71,6 +71,7 @@ project.
 - [Scheduled Task Creation](reference/scheduled-task-creation.md)
 - [Scheduled Automations](reference/scheduled-automations.md)
 - [Gateway Receipts](reference/gateway-receipts.md)
+- [Model Providers](reference/model-providers.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
