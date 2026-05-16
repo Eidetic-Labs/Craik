@@ -36,6 +36,24 @@ Print update guidance as JSON. The command reports installed version,
 compatibility state, manual update steps, and non-mutating boundaries. It does
 not rewrite the installation, fetch release metadata, or migrate local state.
 
+## `craik provider list`
+
+Print registered model providers as JSON.
+
+## `craik provider show <provider-id>`
+
+Print one registered model provider as JSON.
+
+## `craik provider select <provider-id>`
+
+Print a redacted provider selection payload.
+
+Options:
+
+- `--mode <mode>`: provider mode to select; defaults to `chat`.
+- `--policy-envelope-id <id>`: policy envelope linked to this selection.
+- `--receipt-id <id>`: receipt id linked to this selection; may be repeated.
+
 ## `craik schema list`
 
 List registered Craik runtime contract schemas.

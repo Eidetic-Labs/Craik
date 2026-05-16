@@ -1,0 +1,45 @@
+# Provider Switching
+
+`craik provider` exposes a small operator-facing surface for model/provider
+routing.
+
+## List Providers
+
+```sh
+craik provider list
+```
+
+Prints registered provider metadata as JSON, including provider ids, supported
+modes, capabilities, trust boundaries, config references, and secret reference
+names. Secret values are not printed.
+
+## Show Provider
+
+```sh
+craik provider show provider_fixture_local
+```
+
+Prints one provider by stable id.
+
+## Select Provider
+
+```sh
+craik provider select provider_fixture_local --mode runner --policy-envelope-id policy_provider
+```
+
+Prints a redacted selection payload with:
+
+- provider id;
+- provider family;
+- selected mode;
+- trust boundary;
+- runtime path;
+- config references;
+- secret reference names;
+- policy envelope id;
+- linked receipt ids.
+
+Selection output is metadata-only. It does not contact providers, load secrets,
+or grant execution authority.
+
+Unsupported modes are rejected before a selection payload is produced.
