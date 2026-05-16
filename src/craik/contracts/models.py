@@ -69,6 +69,15 @@ DistilledInstructionCategory = Literal[
 ]
 DistilledInstructionPromotionStatus = Literal["proposed", "approved", "rejected", "deferred"]
 InstructionPromotionDecision = Literal["approved", "rejected", "deferred"]
+RecoveryStatus = Literal["clean_resume", "changed_state", "missing_prior_context"]
+RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
+RunDeltaEntityType = Literal[
+    "handoff",
+    "case_file",
+    "receipt",
+    "contradiction",
+    "instruction_constraint",
+]
 RunnerTrustLevel = Literal["low", "medium", "high"]
 RunnerGrantPosture = Literal["deny-by-default", "prompt-for-approval", "allow-with-receipt"]
 RunnerCapabilitySupport = Literal["unsupported", "prompt-handoff", "supported"]
@@ -954,6 +963,68 @@ class PromotedInstructionConstraint(CraikModel):
     handoff_ids: list[str] = Field(default_factory=list)
     active: bool = True
     created_at: datetime
+
+
+class RunDeltaItem(CraikModel):
+    """One observed continuity-relevant state change for recovery mode."""
+
+    kind: RunDeltaChangeKind
+    entity_type: RunDeltaEntityType
+    entity_id: str
+    summary: str
+    previous_ref: str | None = None
+    current_ref: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class RunDelta(CraikModel):
+    """What changed since the previous usable handoff or resume point."""
+
+    schema_: Literal["craik.run_delta"] = Field(default="craik.run_delta", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    task_id: str | None = None
+    previous_handoff_id: str | None = None
+    current_handoff_id: str | None = None
+    case_file_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    active_instruction_constraint_ids: list[str] = Field(default_factory=list)
+    changes: list[RunDeltaItem] = Field(default_factory=list)
+    summary: str
+    created_at: datetime
+
+
+class RecoverySession(CraikModel):
+    """Resume-time continuity summary for an agent picking work back up."""
+
+    schema_: Literal["craik.recovery_session"] = Field(
+        default="craik.recovery_session",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    task_id: str | None = None
+    status: RecoveryStatus
+    run_delta_id: str
+    resume_summary: str
+    required_actions: list[str] = Field(default_factory=list)
+    stale_risks: list[str] = Field(default_factory=list)
+    handoff_ids: list[str] = Field(default_factory=list)
+    case_file_ids: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    contradiction_ids: list[str] = Field(default_factory=list)
+    active_instruction_constraint_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_recovery_actions(self) -> RecoverySession:
+        """Require explicit next actions when recovery is not clean."""
+        if self.status != "clean_resume" and not self.required_actions:
+            raise ValueError("non-clean recovery sessions require required_actions")
+        return self
 
 
 class InstructionPromotionReview(CraikModel):

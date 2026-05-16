@@ -1208,6 +1208,65 @@
     "handoff_ids": ["handoff_docs_reconcile"],
     "created_at": "2026-05-16T06:44:00Z"
   },
+  "craik.run_delta": {
+    "schema": "craik.run_delta",
+    "version": "0.1.0",
+    "id": "run_delta_task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "task_id": "task_docs_reconcile",
+    "previous_handoff_id": null,
+    "current_handoff_id": "handoff_docs_reconcile",
+    "case_file_ids": ["case_docs_reconcile"],
+    "receipt_ids": ["receipt_pytest"],
+    "contradiction_ids": ["contradiction_docs_status"],
+    "active_instruction_constraint_ids": ["constraint_distilled_instruction_agents_boundary"],
+    "changes": [
+      {
+        "kind": "unchanged",
+        "entity_type": "handoff",
+        "entity_id": "handoff_docs_reconcile",
+        "summary": "Latest handoff available: handoff_docs_reconcile.",
+        "previous_ref": null,
+        "current_ref": "handoff_docs_reconcile",
+        "evidence_ids": []
+      },
+      {
+        "kind": "created",
+        "entity_type": "contradiction",
+        "entity_id": "contradiction_docs_status",
+        "summary": "Open contradiction requires review: contradiction_docs_status.",
+        "previous_ref": null,
+        "current_ref": "contradiction_docs_status",
+        "evidence_ids": ["evidence_readme_status"]
+      }
+    ],
+    "summary": "Recovery status is changed_state; 2 continuity records were summarized.",
+    "created_at": "2026-05-16T06:45:00Z"
+  },
+  "craik.recovery_session": {
+    "schema": "craik.recovery_session",
+    "version": "0.1.0",
+    "id": "recovery_session_task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "task_id": "task_docs_reconcile",
+    "status": "changed_state",
+    "run_delta_id": "run_delta_task_docs_reconcile",
+    "resume_summary": "Resume from latest handoff handoff_docs_reconcile after reviewing changed state.",
+    "required_actions": [
+      "Review open contradictions before promoting new facts.",
+      "Apply active instruction constraints to the resumed runtime context."
+    ],
+    "stale_risks": [
+      "Open contradictions may invalidate prior assumptions or facts.",
+      "Instruction constraints may change how previous handoffs should be interpreted."
+    ],
+    "handoff_ids": ["handoff_docs_reconcile"],
+    "case_file_ids": ["case_docs_reconcile"],
+    "receipt_ids": ["receipt_pytest"],
+    "contradiction_ids": ["contradiction_docs_status"],
+    "active_instruction_constraint_ids": ["constraint_distilled_instruction_agents_boundary"],
+    "created_at": "2026-05-16T06:45:00Z"
+  },
   "craik.worker_result": {
     "schema": "craik.worker_result",
     "version": "0.1.0",

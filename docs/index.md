@@ -50,6 +50,7 @@ project.
 - [Human Delegation](reference/human-delegation.md)
 - [Instruction Sources](reference/instruction-sources.md)
 - [Instruction Distillation Workflow](reference/instruction-distillation-workflow.md)
+- [Recovery Mode](reference/recovery.md)
 - [Runner Adapter Contract](reference/runner-adapter-contract.md)
 - [Runner Step Contracts](reference/runner-step-contracts.md)
 - [Codex Runner Adapter](reference/codex-runner-adapter.md)
