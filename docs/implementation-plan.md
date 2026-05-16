@@ -19,8 +19,8 @@ Accepted default:
 Rationale:
 
 - Stigmem already has Python surfaces.
-- Hermes uses Python for its primary agent runtime, so Python keeps Craik close to agent-runtime conventions.
-- OpenClaw's Node/TypeScript gateway pattern remains relevant for future adapters and UI, but Craik's core differentiator is durable state, policy, and memory integration.
+- Python keeps Craik close to common agent-runtime conventions.
+- Node/TypeScript gateway patterns remain relevant for future adapters and UI, but Craik's core differentiator is durable state, policy, and memory integration.
 - Pydantic makes versioned contracts straightforward.
 - SQLite is enough for local task, receipt, handoff, and work graph state.
 - CLI-first keeps the MVP focused.
@@ -517,7 +517,7 @@ Acceptance criteria:
 - each adapter emits typed worker results or clear block/failure states,
 - adapter outputs can create handoffs and receipts,
 - runner-specific metadata is preserved without polluting core contracts,
-- and OpenClaw remains a future bridge rather than a required execution layer.
+- and adjacent runtime bridges remain future integrations rather than required execution layers.
 
 ## Milestone 12: Skills And Probationary Plugins
 
@@ -582,7 +582,7 @@ These should be decided before coding starts, but they should not block the plan
 - Initial interface: CLI-first.
 - First demo target: Stigmem documentation and state reconciliation.
 - Initial first-class agent runners: Codex, Claude, and Gemini.
-- OpenClaw relationship: design reference and possible future bridge, not a required dependency.
+- Adjacent runtime relationship: design reference and possible future bridge, not a required dependency.
 - Differentiator objective: evidence-first, assumption-aware, policy-tested, budgeted, human-delegable agent work.
 - Core implementation language: Python 3.12+.
 - PyPI distribution: `craik`.

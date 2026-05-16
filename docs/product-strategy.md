@@ -1,8 +1,8 @@
 # Product Strategy
 
-Craik should build on the strengths of OpenClaw and Hermes without becoming a clone of either.
+Craik should build on strong agent-runtime and multi-agent coordination patterns without becoming a clone of any adjacent tool.
 
-The opportunity is to combine the approachable local-agent ergonomics of OpenClaw, the multi-agent decomposition patterns of Hermes, and Stigmem's durable memory/truth substrate into a new product category: a durable runtime for agent organizations.
+The opportunity is to combine approachable local-agent ergonomics, multi-agent decomposition, and Stigmem's durable memory/truth substrate into a new product category: a durable runtime for agent organizations.
 
 ## Agent Runner Strategy
 
@@ -25,7 +25,7 @@ Craik core should remain runner-agnostic through contracts, but the first implem
 - emit durable handoffs,
 - and propose memory updates.
 
-OpenClaw is not a required dependency and should not be treated as the initial execution layer. Its value to Craik is as a reference for local/self-hosted ergonomics, gateway design, workspace identity, sessions, tool descriptors, skills, and channel integrations. A future OpenClaw bridge may be useful, but Craik's first agent path should be direct integration with Codex, Claude, and Gemini.
+Craik should not depend on another agent framework as its initial execution layer. Adjacent tools are useful references for local and self-hosted ergonomics, gateway design, workspace identity, sessions, tool descriptors, skills, and channel integrations. Craik's first agent path should be direct integration with Codex, Claude, and Gemini.
 
 ## License Strategy
 
@@ -41,15 +41,9 @@ The license choice supports:
 
 The code license should remain separate from brand and trademark usage. Eidetic Labs should reserve the right to define how the Craik name, marks, and hosted service branding may be used.
 
-## What To Borrow From OpenClaw
+## Local Agent Runtime Patterns
 
-OpenClaw's strongest lessons are operational and ergonomic.
-
-Reference sources:
-
-- OpenClaw agent runtime documentation: https://docs.openclaw.ai/agent
-- OpenClaw workspace documentation: https://docs.openclaw.ai/agent-workspace
-- OpenClaw tools and skills documentation: https://docs.openclaw.ai/tools
+The strongest local-agent runtime lessons are operational and ergonomic.
 
 Craik should adopt:
 
@@ -70,15 +64,11 @@ Craik should improve on this pattern by adding:
 - contradiction workflows,
 - and project-level work graphs.
 
-OpenClaw should be considered a design reference and possible later integration target, not a core dependency.
+Adjacent local runtimes should be considered design references and possible later integration targets, not core dependencies.
 
-## What To Borrow From Hermes
+## Multi-Agent Coordination Patterns
 
-Hermes' strongest lessons are about multi-agent coordination.
-
-Reference source:
-
-- Hermes multi-agent orchestration documentation: https://hermes-agent.ai/features/multi-agent
+The strongest multi-agent lessons are about decomposition, role separation, and durable coordination.
 
 Craik should adopt:
 

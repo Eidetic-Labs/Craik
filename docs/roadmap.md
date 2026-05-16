@@ -16,7 +16,7 @@ Craik's product goal is a durable agent runtime for shared project models and go
 
 ## Documentation Model
 
-Craik documentation should borrow the most useful pieces from Stigmem, OpenClaw, and Hermes.
+Craik documentation should borrow the most useful patterns from durable-memory systems, local agent runtimes, and multi-agent orchestration tools.
 
 From Stigmem:
 
@@ -28,7 +28,7 @@ From Stigmem:
 - durable examples tied to real workflows,
 - clear public/internal boundaries.
 
-From OpenClaw:
+From local agent runtimes:
 
 - practical setup docs,
 - workspace/project mental model,
@@ -36,7 +36,7 @@ From OpenClaw:
 - channel/adapter docs,
 - operator-friendly examples.
 
-From Hermes:
+From multi-agent orchestration tools:
 
 - CLI-first user guides,
 - configuration docs,
@@ -266,6 +266,124 @@ Required capabilities:
 - memory impact preview,
 - known traps view,
 - run delta view.
+
+### v0.8.0 Gate: Operator Integrations And Always-On Gateway
+
+Required outcome:
+
+> Craik can run as an always-on operator service with controlled ingress from external channels.
+
+Required capabilities:
+
+- gateway daemon mode,
+- `craik setup` wizard,
+- `craik doctor` diagnostics,
+- `craik update` or update guidance,
+- channel adapter contract,
+- first messaging channel adapter,
+- inbound identity and pairing model,
+- channel allowlists,
+- channel-scoped policy envelopes,
+- webhook ingress,
+- scheduled automations,
+- cron-like task creation,
+- gateway receipts,
+- gateway troubleshooting docs.
+
+Explicitly deferred until this phase or later:
+
+- broad channel matrix,
+- consumer assistant positioning,
+- open inbound DM behavior,
+- and mobile companion surfaces.
+
+### v0.9.0 Gate: Execution Environments, Sandboxes, And Provider Routing
+
+Required outcome:
+
+> Craik can choose model/provider/runtime execution paths and enforce environment boundaries explicitly.
+
+Required capabilities:
+
+- model provider registry,
+- model/provider switching UX,
+- provider failover policy,
+- provider budget and quota links,
+- MCP client integration,
+- MCP server/export decision,
+- sandbox backend contract,
+- local process backend,
+- Docker sandbox backend,
+- SSH or remote shell backend,
+- browser/tool execution boundary,
+- environment capability receipts,
+- sandbox policy tests,
+- provider routing docs.
+
+### v0.10.0 Gate: Self-Improving Skills And Learning Loops
+
+Required outcome:
+
+> Craik can improve reusable operating guidance without allowing agents to silently rewrite their own authority.
+
+Required capabilities:
+
+- skill performance telemetry,
+- autonomous skill proposal creation,
+- skill improvement proposals,
+- skill eval/replay harness,
+- periodic memory review nudges,
+- user/team preference modeling as reviewable facts,
+- learning-loop receipts,
+- approval gates for promoted skills,
+- rollback path for bad skill updates,
+- training/trajectory export format,
+- trajectory compression or summarization,
+- learning-loop docs.
+
+This phase should build on instruction distillation and the skill/plugin system. Agents may propose changes to skills, but those changes must remain reviewable until policy allows promotion.
+
+### v0.11.0 Gate: Multimodal And Companion Surfaces
+
+Required outcome:
+
+> Craik can expose durable agent work through richer operator surfaces without compromising its policy and evidence model.
+
+Required capabilities:
+
+- voice input/output posture,
+- speech-to-text adapter contract,
+- text-to-speech adapter contract,
+- multimodal artifact references,
+- desktop companion app decision,
+- mobile companion app decision,
+- live visual workspace/canvas decision,
+- work graph to visual workspace bridge,
+- accessibility requirements,
+- companion app security docs,
+- multimodal redaction tests.
+
+This phase is optional unless Craik deliberately competes with personal-assistant surfaces. It should not block server-side software-delivery workflows.
+
+### v0.12.0 Gate: Migration, Internationalization, And Ecosystem Compatibility
+
+Required outcome:
+
+> Teams can adopt Craik from adjacent tools and operate it in broader language and ecosystem contexts.
+
+Required capabilities:
+
+- adjacent-tool import/migration assessment,
+- multi-agent tool import/migration assessment,
+- import dry-run reports,
+- memory/skill/config migration maps,
+- secret migration policy,
+- MCP ecosystem compatibility guide,
+- adjacent-runtime bridge decision,
+- multi-agent workflow bridge decision,
+- locale/i18n framework,
+- translated docs strategy,
+- ecosystem compatibility tests.
 
 ### Future 1.0 Graduation Gate: Professional Agent Runtime
 
@@ -882,6 +1000,175 @@ Docs required:
 - dashboard/TUI guide,
 - view reference,
 - troubleshooting guide.
+
+### 19. Operator Integrations And Always-On Gateway
+
+Scope:
+
+- gateway daemon mode,
+- setup wizard,
+- diagnostics command,
+- update guidance,
+- channel adapter contract,
+- first messaging channel adapter,
+- inbound identity and pairing model,
+- channel allowlists,
+- channel-scoped policy envelopes,
+- webhook ingress,
+- scheduled automations,
+- gateway receipts.
+
+Validation:
+
+- daemon lifecycle tests,
+- setup wizard fixture tests,
+- diagnostics failure-mode tests,
+- webhook signature tests,
+- channel identity mapping tests,
+- scheduled task creation tests,
+- gateway receipt tests.
+
+Docs required:
+
+- gateway guide,
+- setup guide,
+- diagnostics guide,
+- channel adapter reference,
+- webhook reference,
+- scheduler guide,
+- gateway security guide.
+
+### 20. Execution Environments, Sandboxes, And Provider Routing
+
+Scope:
+
+- model provider registry,
+- provider switching UX,
+- provider failover policy,
+- provider budget and quota links,
+- MCP client integration,
+- MCP server/export decision,
+- sandbox backend contract,
+- local process backend,
+- Docker sandbox backend,
+- SSH or remote shell backend,
+- browser/tool execution boundary,
+- environment capability receipts.
+
+Validation:
+
+- provider registry tests,
+- provider failover tests,
+- MCP compatibility fixture tests,
+- sandbox policy tests,
+- backend isolation tests,
+- environment receipt tests,
+- budget linkage tests.
+
+Docs required:
+
+- provider routing guide,
+- provider config reference,
+- MCP integration guide,
+- sandbox backend reference,
+- execution environment security guide.
+
+### 21. Self-Improving Skills And Learning Loops
+
+Scope:
+
+- skill performance telemetry,
+- autonomous skill proposal creation,
+- skill improvement proposals,
+- skill eval/replay harness,
+- periodic memory review nudges,
+- user/team preference facts,
+- learning-loop receipts,
+- approval gates for promoted skills,
+- rollback path for bad skill updates,
+- training/trajectory export format,
+- trajectory compression or summarization.
+
+Validation:
+
+- skill proposal tests,
+- skill eval fixture tests,
+- replay determinism tests,
+- approval gate tests,
+- rollback tests,
+- trajectory export tests,
+- learning-loop receipt tests.
+
+Docs required:
+
+- skill improvement guide,
+- learning-loop policy guide,
+- skill eval reference,
+- trajectory export reference,
+- rollback guide.
+
+### 22. Multimodal And Companion Surfaces
+
+Scope:
+
+- voice input/output posture,
+- speech-to-text adapter contract,
+- text-to-speech adapter contract,
+- multimodal artifact references,
+- desktop companion app decision,
+- mobile companion app decision,
+- live visual workspace/canvas decision,
+- work graph to visual workspace bridge,
+- accessibility requirements.
+
+Validation:
+
+- multimodal artifact schema tests,
+- redaction tests for transcript and media metadata,
+- accessibility checks for companion surfaces,
+- visual workspace smoke tests where implemented,
+- adapter contract tests.
+
+Docs required:
+
+- multimodal posture doc,
+- voice adapter reference,
+- companion app security guide,
+- visual workspace guide,
+- accessibility checklist.
+
+### 23. Migration, Internationalization, And Ecosystem Compatibility
+
+Scope:
+
+- adjacent-tool import/migration assessment,
+- multi-agent workflow import/migration assessment,
+- import dry-run reports,
+- memory/skill/config migration maps,
+- secret migration policy,
+- ecosystem compatibility guide,
+- adjacent runtime bridge decision,
+- multi-agent workflow bridge decision,
+- locale/i18n framework,
+- translated docs strategy.
+
+Validation:
+
+- import dry-run fixture tests,
+- migration map tests,
+- secret redaction tests,
+- bridge compatibility smoke tests where implemented,
+- locale fallback tests,
+- translated docs link tests where applicable.
+
+Docs required:
+
+- migration guide,
+- import dry-run reference,
+- secret migration policy,
+- ecosystem compatibility guide,
+- i18n guide,
+- bridge decision records.
 
 ## v0.1.0 Issue Cut
 

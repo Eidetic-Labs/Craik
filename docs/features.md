@@ -297,7 +297,7 @@ Acceptance criteria:
 - unsupported capabilities fail clearly,
 - and a task can be replayed or inspected from Craik artifacts without relying on raw chat history.
 
-OpenClaw-style integration should be tracked as a later bridge, not a dependency for this feature.
+Adjacent runtime integration should be tracked as a later bridge, not a dependency for this feature.
 
 ## Feature 12: Skills And Plugins
 
