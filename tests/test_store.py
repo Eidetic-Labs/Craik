@@ -15,12 +15,15 @@ from craik.contracts.models import (
     DebateTurn,
     EvidenceReference,
     Handoff,
+    HumanDelegationPoint,
     IntentLock,
     MemoryProposal,
     ProjectProfile,
     ReviewRequest,
     ReviewResult,
     RunOutput,
+    ScopeChangeRequest,
+    ScopeChangeResult,
     TaskRequest,
     TaskRun,
     WorkerResult,
@@ -105,6 +108,11 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     adjudication = AdjudicationOutcome.model_validate(
         fixtures["craik.adjudication_outcome"]
     )
+    delegation = HumanDelegationPoint.model_validate(
+        fixtures["craik.human_delegation_point"]
+    )
+    scope_request = ScopeChangeRequest.model_validate(fixtures["craik.scope_change_request"])
+    scope_result = ScopeChangeResult.model_validate(fixtures["craik.scope_change_result"])
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -125,6 +133,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_review_request(review_request)
     store.put_review_result(review_result)
     store.put_adjudication_outcome(adjudication)
+    store.put_human_delegation(delegation)
+    store.put_scope_change_request(scope_request)
+    store.put_scope_change_result(scope_result)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -148,6 +159,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_review_request(review_request.id) == review_request
     assert store.get_review_result(review_result.id) == review_result
     assert store.get_adjudication_outcome(adjudication.id) == adjudication
+    assert store.get_human_delegation(delegation.id) == delegation
+    assert store.get_scope_change_request(scope_request.id) == scope_request
+    assert store.get_scope_change_result(scope_result.id) == scope_result
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -163,6 +177,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_review_requests() == [review_request]
     assert store.list_review_results() == [review_result]
     assert store.list_adjudication_outcomes() == [adjudication]
+    assert store.list_human_delegations() == [delegation]
+    assert store.list_scope_change_requests() == [scope_request]
+    assert store.list_scope_change_results() == [scope_result]
 
 
 def test_persists_supported_contract_types(
@@ -182,6 +199,9 @@ def test_persists_supported_contract_types(
         "craik.review_request",
         "craik.review_result",
         "craik.adjudication_outcome",
+        "craik.human_delegation_point",
+        "craik.scope_change_request",
+        "craik.scope_change_result",
         "craik.handoff",
         "craik.intent_lock",
         "craik.memory_proposal",

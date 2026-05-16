@@ -24,6 +24,7 @@ from craik.contracts.models import (
     DebateTurn,
     EvidenceReference,
     Handoff,
+    HumanDelegationPoint,
     IntentLock,
     MemoryDiff,
     MemoryImpactPreview,
@@ -33,6 +34,8 @@ from craik.contracts.models import (
     ReviewRequest,
     ReviewResult,
     RunOutput,
+    ScopeChangeRequest,
+    ScopeChangeResult,
     TaskRequest,
     TaskRun,
     WorkerResult,
@@ -60,6 +63,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.debate_summary": "debate_summaries",
     "craik.debate_turn": "debate_turns",
     "craik.handoff": "handoffs",
+    "craik.human_delegation_point": "human_delegations",
     "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
     "craik.memory_diff": "memory_diffs",
@@ -71,6 +75,8 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.worker_result": "worker_results",
     "craik.review_request": "review_requests",
     "craik.review_result": "review_results",
+    "craik.scope_change_request": "scope_change_requests",
+    "craik.scope_change_result": "scope_change_results",
 }
 
 
@@ -288,6 +294,45 @@ class LocalStore:
         return _cast_list(
             AdjudicationOutcome,
             self.list_contracts("craik.adjudication_outcome"),
+        )
+
+    def put_human_delegation(self, delegation: HumanDelegationPoint) -> None:
+        self.put_contract(delegation)
+
+    def get_human_delegation(self, delegation_id: str) -> HumanDelegationPoint | None:
+        contract = self.get_contract("craik.human_delegation_point", delegation_id)
+        return _cast_optional(HumanDelegationPoint, contract)
+
+    def list_human_delegations(self) -> list[HumanDelegationPoint]:
+        return _cast_list(
+            HumanDelegationPoint,
+            self.list_contracts("craik.human_delegation_point"),
+        )
+
+    def put_scope_change_request(self, request: ScopeChangeRequest) -> None:
+        self.put_contract(request)
+
+    def get_scope_change_request(self, request_id: str) -> ScopeChangeRequest | None:
+        contract = self.get_contract("craik.scope_change_request", request_id)
+        return _cast_optional(ScopeChangeRequest, contract)
+
+    def list_scope_change_requests(self) -> list[ScopeChangeRequest]:
+        return _cast_list(
+            ScopeChangeRequest,
+            self.list_contracts("craik.scope_change_request"),
+        )
+
+    def put_scope_change_result(self, result: ScopeChangeResult) -> None:
+        self.put_contract(result)
+
+    def get_scope_change_result(self, result_id: str) -> ScopeChangeResult | None:
+        contract = self.get_contract("craik.scope_change_result", result_id)
+        return _cast_optional(ScopeChangeResult, contract)
+
+    def list_scope_change_results(self) -> list[ScopeChangeResult]:
+        return _cast_list(
+            ScopeChangeResult,
+            self.list_contracts("craik.scope_change_result"),
         )
 
     def put_task(self, task: TaskRequest) -> None:

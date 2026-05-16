@@ -42,6 +42,7 @@ craik schema show craik.task_request
 | `craik.debate_turn` | Captures one role-linked debate contribution with evidence, assumptions, and contradiction links. |
 | `craik.evidence_reference` | Points to source material supporting a contract assertion. |
 | `craik.handoff` | Summarizes durable run state for future agents. |
+| `craik.human_delegation_point` | Records an open or resolved human approval, clarification, escalation, or ownership-transfer point. |
 | `craik.intent_lock` | Preserves task intent and scope boundaries. |
 | `craik.memory_backend_capabilities` | Records detected memory backend support. |
 | `craik.memory_diff` | Explains run-scoped memory reads, proposals, writes, and failures. |
@@ -52,6 +53,8 @@ craik schema show craik.task_request
 | `craik.review_request` | Requests bounded cross-agent review of worker results or debate summaries. |
 | `craik.review_result` | Captures specialist reviewer decisions, evidence, and preserved reviewer role kind. |
 | `craik.run_output` | Stores redacted observed output captured from one runner step. |
+| `craik.scope_change_request` | Requests a human decision to change accepted task scope. |
+| `craik.scope_change_result` | Records accepted or rejected human scope-change decisions. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |
 | `craik.runner_capability_matrix` | Defines runner capability support, trust boundary, and default grant posture. |
