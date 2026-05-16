@@ -27,3 +27,6 @@ preference evidence, or unredacted trajectories.
 
 Learning receipts record decisions. They do not approve promotion, rewrite
 skills, write memory facts, or export trajectories by themselves.
+
+Use [Training Trajectory Exports](trajectory-exports.md) when a learning loop
+needs a stable redacted artifact for replay or review.

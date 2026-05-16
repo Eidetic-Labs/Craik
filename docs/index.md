@@ -103,6 +103,7 @@ project.
 - [Skill Proposals](reference/skill-proposals.md)
 - [Skill Replay](reference/skill-replay.md)
 - [Learning Receipts](reference/learning-receipts.md)
+- [Training Trajectory Exports](reference/trajectory-exports.md)
 - [Skill Rollbacks](reference/skill-rollbacks.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
