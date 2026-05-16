@@ -137,3 +137,6 @@ Adapter-produced receipts and handoff inputs should include the stable
 [Runner Metadata](runner-metadata.md) snapshot so downstream agents can see the
 runner id, adapter version, execution mode, trust profile, and capability
 profile involved in the work.
+
+See [Runner Preview Workflows](../guides/runner-preview-workflows.md) for the
+end-to-end preview path and smoke-test checklist.
