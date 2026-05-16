@@ -97,6 +97,23 @@ Options:
 - `--api-key <key>`: bearer API key. Prefer `CRAIK_STIGMEM_API_KEY`.
 - `--timeout <seconds>`: request timeout. Can also be set with `CRAIK_STIGMEM_TIMEOUT`.
 
+## `craik demo stigmem-docs`
+
+Run the Stigmem documentation reconciliation demo.
+
+Options:
+
+- `--repo-path <path>`: path inside the Stigmem Git repository; defaults to `.`.
+- `--project-name <name>`: project name to register; defaults to `Stigmem`.
+- `--stigmem-url <url>`: Stigmem node URL. Can also be set with `CRAIK_STIGMEM_URL`.
+- `--stigmem-api-key <key>`: bearer API key. Prefer `CRAIK_STIGMEM_API_KEY`.
+- `--github / --no-github`: load or skip read-only GitHub context.
+- `--max-tokens <count>`: approximate case-file context budget.
+
+The command prints a `craik.demo.stigmem_docs_reconciliation` JSON payload and
+creates local project, task, case-file, contradiction, memory proposal, receipt,
+handoff, and work-graph artifacts.
+
 ## `craik onboard`
 
 Print runner-readable project onboarding context.

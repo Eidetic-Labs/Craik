@@ -252,6 +252,29 @@ def test_onboard_command_prints_runner_readable_project_context(tmp_path: Path) 
     assert payload["validation_commands"][-1] == "uv run --python 3.12 --extra dev pytest"
 
 
+def test_demo_stigmem_docs_command_runs_without_live_stigmem(tmp_path: Path) -> None:
+    repo = tmp_path / "stigmem"
+    (repo / "docs" / "adr").mkdir(parents=True)
+    (repo / "README.md").write_text("# Stigmem\n")
+    (repo / "docs" / "adr" / "0001-record.md").write_text("# ADR\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md", "docs")
+    _run_git(repo, "commit", "-m", "initial")
+
+    result = runner.invoke(
+        app,
+        ["demo", "stigmem-docs", "--repo-path", str(repo), "--no-github"],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["schema"] == "craik.demo.stigmem_docs_reconciliation"
+    assert payload["status"] == "runnable"
+    assert payload["stigmem_backend_status"]["status"] == "not_configured"
+    assert payload["next_commands"]
+
+
 def test_intent_show_reports_task_intent_lock(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
