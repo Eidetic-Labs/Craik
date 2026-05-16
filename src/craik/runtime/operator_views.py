@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
 
 from craik.contracts.models import (
@@ -21,9 +22,11 @@ from craik.contracts.models import (
     InstructionProvenance,
     InstructionSource,
     InstructionSourceSnapshot,
+    KnownTrap,
     MemoryFactReference,
     MemoryImpactPreview,
     MemoryProposal,
+    NegativeKnowledge,
     PluginReceipt,
     RedTeamFinding,
     RuntimeCriticFinding,
@@ -73,6 +76,15 @@ class MemoryImpactPreviewSnapshot:
     proposals: list[MemoryProposal] = field(default_factory=list)
     policy_envelope_id: str | None = None
     receipt_ids: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class KnownTrapsSnapshot:
+    """Operator-visible known traps and negative knowledge state."""
+
+    known_traps: list[KnownTrap] = field(default_factory=list)
+    negative_knowledge: list[NegativeKnowledge] = field(default_factory=list)
+    now: datetime | None = None
 
 
 def format_quality_gate_view(snapshot: QualityGateSnapshot) -> list[str]:
@@ -155,6 +167,53 @@ def format_quality_gate_view(snapshot: QualityGateSnapshot) -> list[str]:
                     "  Proposed Actions: "
                     f"{_join_or_none(red_team_finding.proposed_actions)}",
                     f"  Summary: {red_team_finding.summary}",
+                ]
+            )
+
+    return lines
+
+
+def format_known_traps_view(snapshot: KnownTrapsSnapshot) -> list[str]:
+    """Format known traps and negative knowledge without promoting guesses."""
+    lines = ["Known Traps", ""]
+    if not snapshot.known_traps:
+        lines.append("- none")
+    else:
+        for trap in sorted(snapshot.known_traps, key=lambda item: (item.status, item.id)):
+            lines.extend(
+                [
+                    f"- {trap.id} [{_known_trap_state(trap, snapshot.now)}/{trap.kind}]",
+                    f"  Project: {trap.project_id or 'none'}",
+                    f"  Task: {trap.task_id or 'none'}",
+                    f"  Statement: {trap.statement}",
+                    f"  Avoidance: {trap.avoidance}",
+                    f"  Evidence: {_join_or_none(trap.evidence_ids)}",
+                    f"  Handoffs: {_join_or_none(trap.handoff_ids)}",
+                    f"  Contradictions: {_join_or_none(trap.contradiction_ids)}",
+                    f"  Expires: {trap.expires_at.isoformat() if trap.expires_at else 'none'}",
+                ]
+            )
+
+    lines.extend(["", "Negative Knowledge"])
+    if not snapshot.negative_knowledge:
+        lines.append("- none")
+    else:
+        for knowledge in sorted(
+            snapshot.negative_knowledge,
+            key=lambda item: (_negative_knowledge_state(item, snapshot.now), item.id),
+        ):
+            lines.extend(
+                [
+                    f"- {knowledge.id} [{_negative_knowledge_state(knowledge, snapshot.now)}] "
+                    f"scope={knowledge.scope} trust={knowledge.trust_class}",
+                    f"  Project: {knowledge.project_id or 'none'}",
+                    f"  Task: {knowledge.task_id or 'none'}",
+                    f"  Statement: {knowledge.statement}",
+                    f"  Evidence: {_join_or_none(knowledge.evidence_ids)}",
+                    f"  Handoffs: {_join_or_none(knowledge.handoff_ids)}",
+                    f"  Contradictions: {_join_or_none(knowledge.contradiction_ids)}",
+                    "  Expires: "
+                    f"{knowledge.expires_at.isoformat() if knowledge.expires_at else 'none'}",
                 ]
             )
 
@@ -528,6 +587,24 @@ def _format_fact_reference(fact: FactValue | MemoryFactReference) -> str:
         f"{fact.entity} {fact.relation}={fact.value!r} "
         f"source={fact.source} scope={fact.scope} trust={fact.trust_class}"
     )
+
+
+def _known_trap_state(trap: KnownTrap, now: datetime | None) -> str:
+    if trap.status == "active" and _is_expired(trap.expires_at, now):
+        return "expired"
+    return trap.status
+
+
+def _negative_knowledge_state(knowledge: NegativeKnowledge, now: datetime | None) -> str:
+    if knowledge.contradiction_ids:
+        return "contradicted"
+    if _is_expired(knowledge.expires_at, now):
+        return "expired"
+    return "active"
+
+
+def _is_expired(expires_at: datetime | None, now: datetime | None) -> bool:
+    return expires_at is not None and now is not None and expires_at <= now
 
 
 def _format_line_range(provenance: InstructionProvenance) -> str:
