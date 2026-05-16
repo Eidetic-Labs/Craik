@@ -3,14 +3,18 @@ from craik.contracts.models import (
     CapabilityReceipt,
     ContradictionReport,
     DistilledInstructionProposal,
+    EvidenceCoverageScore,
     EvidenceReference,
     Handoff,
+    HandoffQualityScore,
     HumanDelegationPoint,
     InstructionPromotionReview,
     InstructionProvenance,
     InstructionSource,
     InstructionSourceSnapshot,
     PluginReceipt,
+    RedTeamFinding,
+    RuntimeCriticFinding,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
@@ -18,12 +22,14 @@ from craik.contracts.models import (
 from craik.runtime.operator_views import (
     BudgetQuotaSnapshot,
     InstructionDistillationSnapshot,
+    QualityGateSnapshot,
     format_budget_quota_view,
     format_contradiction_inbox,
     format_delegation_queue,
     format_evidence_assumption_view,
     format_handoff_viewer,
     format_instruction_distillation_view,
+    format_quality_gate_view,
     format_receipt_viewer,
     format_work_graph_explorer,
 )
@@ -457,6 +463,128 @@ def test_instruction_distillation_view_empty_state() -> None:
         "- none",
         "",
         "Promotion Reviews",
+        "- none",
+    ]
+
+
+def test_quality_gate_view_formats_score_bands_and_finding_statuses() -> None:
+    handoff_score = HandoffQualityScore.model_validate(
+        {
+            "id": "handoff_quality_handoff_docs",
+            "task_id": "task_quality",
+            "project_id": "project_craik",
+            "handoff_id": "handoff_docs",
+            "score": 0.55,
+            "band": "poor",
+            "components": [
+                {
+                    "name": "summary",
+                    "score": 0.8,
+                    "weight": 0.2,
+                    "rationale": "Summary is present.",
+                },
+                {
+                    "name": "validation_records",
+                    "score": 0.2,
+                    "weight": 0.3,
+                    "rationale": "Validation is missing.",
+                },
+            ],
+            "blocking_reasons": ["missing validation records"],
+            "created_at": "2026-05-16T17:40:00Z",
+        }
+    )
+    evidence_score = EvidenceCoverageScore.model_validate(
+        {
+            "id": "evidence_coverage_handoff_docs",
+            "task_id": "task_quality",
+            "project_id": "project_craik",
+            "handoff_id": "handoff_docs",
+            "score": 0.72,
+            "band": "adequate",
+            "evidence_ids": ["receipt_pytest"],
+            "required_evidence_ids": ["receipt_pytest", "receipt_mypy"],
+            "missing_evidence_ids": ["receipt_mypy"],
+            "weak_claims": [],
+            "created_at": "2026-05-16T17:41:00Z",
+        }
+    )
+    critic_finding = RuntimeCriticFinding.model_validate(
+        {
+            "id": "critic_missing_validation",
+            "task_id": "task_quality",
+            "project_id": "project_craik",
+            "handoff_id": "handoff_docs",
+            "finding_type": "missing_validation",
+            "severity": "high",
+            "summary": "Handoff claims tests passed without receipt links.",
+            "rationale": "Quality gate requires validation evidence.",
+            "affected_artifacts": ["handoff_docs"],
+            "proposed_actions": ["Attach test receipt."],
+            "review_status": "reviewable",
+            "created_at": "2026-05-16T17:42:00Z",
+        }
+    )
+    red_team_finding = RedTeamFinding.model_validate(
+        {
+            "id": "red_team_policy_bypass",
+            "task_id": "task_quality",
+            "project_id": "project_craik",
+            "handoff_id": "handoff_docs",
+            "finding_type": "policy_bypass",
+            "severity": "critical",
+            "summary": "Output bypasses required review.",
+            "attack_path": "Skip handoff quality review before promotion.",
+            "affected_artifacts": ["proposal_quality"],
+            "evidence_ids": ["evidence_policy_review"],
+            "proposed_actions": ["Require adjudication before promotion."],
+            "blocking": True,
+            "review_status": "reviewable",
+            "created_at": "2026-05-16T17:43:00Z",
+        }
+    )
+
+    lines = format_quality_gate_view(
+        QualityGateSnapshot(
+            handoff_scores=[handoff_score],
+            evidence_scores=[evidence_score],
+            critic_findings=[critic_finding],
+            red_team_findings=[red_team_finding],
+        )
+    )
+
+    assert lines[0] == "Quality Gate: blocked"
+    assert "- handoff_quality_handoff_docs [poor] score=0.55 handoff=handoff_docs" in lines
+    assert "  Blocking Reasons: missing validation records" in lines
+    assert "summary=0.80" in next(line for line in lines if line.startswith("  Components:"))
+    assert any(
+        line.startswith("- evidence_coverage_handoff_docs [adequate] score=0.72")
+        for line in lines
+    )
+    assert "  Missing Evidence: receipt_mypy" in lines
+    assert "- critic_missing_validation [reviewable/high] type=missing_validation" in lines
+    assert "  Authoritative: False" in lines
+    assert (
+        "- red_team_policy_bypass [reviewable/critical] type=policy_bypass blocking=True"
+        in lines
+    )
+    assert "  Proposed Actions: Require adjudication before promotion." in lines
+
+
+def test_quality_gate_view_clear_empty_state() -> None:
+    assert format_quality_gate_view(QualityGateSnapshot()) == [
+        "Quality Gate: clear",
+        "",
+        "Handoff Quality Scores",
+        "- none",
+        "",
+        "Evidence Coverage Scores",
+        "- none",
+        "",
+        "Critic Findings",
+        "- none",
+        "",
+        "Red-Team Findings",
         "- none",
     ]
 
