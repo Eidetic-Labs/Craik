@@ -67,6 +67,7 @@ project.
 - [Channel Allowlists](reference/channel-allowlists.md)
 - [Channel Policy Envelopes](reference/channel-policy-envelopes.md)
 - [Webhook Ingress](reference/webhook-ingress.md)
+- [Scheduled Task Creation](reference/scheduled-task-creation.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
