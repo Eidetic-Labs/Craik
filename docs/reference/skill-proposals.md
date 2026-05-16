@@ -15,6 +15,7 @@ silently changing their own authority.
 - evidence ids;
 - telemetry ids;
 - receipt ids;
+- optional structured improvement plan;
 - creator and creation timestamp.
 
 Agent-created proposals must remain `pending_review`. Review and promotion are
@@ -31,3 +32,17 @@ loop receipts.
 
 Use [Skill Replay](skill-replay.md) to compare current skill behavior against
 redacted fixtures before promotion.
+
+## Improvement Plans
+
+`SkillImprovementPlan` adds structured review details:
+
+- expected benefit;
+- risk: `low`, `medium`, `high`, or `critical`;
+- rollback notes;
+- proposed edit targets;
+- replay fixture ids.
+
+High-risk and critical improvements require replay fixture ids. Approved
+proposals require an improvement plan so reviewers can inspect benefit, risk,
+edit scope, and rollback path before promotion.
