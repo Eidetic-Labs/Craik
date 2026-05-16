@@ -4,12 +4,33 @@ from __future__ import annotations
 
 from craik.contracts.models import (
     CapabilityReceipt,
+    ContradictionReport,
     Handoff,
     PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
 )
+
+
+def format_contradiction_inbox(reports: list[ContradictionReport]) -> list[str]:
+    """Format a read-only contradiction inbox."""
+    lines = [f"Contradiction Inbox: {len(reports)}", ""]
+    if not reports:
+        return [*lines, "- none"]
+    for report in sorted(reports, key=lambda item: (item.status, item.id)):
+        lines.extend(
+            [
+                f"- {report.id} [{report.status}]",
+                f"  Task: {report.task_id}",
+                f"  Owner: {report.owner or 'unassigned'}",
+                f"  Summary: {report.summary}",
+                f"  Proposed Resolution: {report.proposed_resolution}",
+                f"  Affected Artifacts: {_join_or_none(report.affected_artifacts)}",
+                f"  Evidence: {_join_or_none(report.evidence_ids)}",
+            ]
+        )
+    return lines
 
 
 def format_receipt_viewer(receipt: CapabilityReceipt | PluginReceipt) -> list[str]:
@@ -127,3 +148,9 @@ def _format_items(items: list[str]) -> list[str]:
     if not items:
         return ["- none"]
     return [f"- {item}" for item in items]
+
+
+def _join_or_none(items: list[str]) -> str:
+    if not items:
+        return "none"
+    return ", ".join(items)

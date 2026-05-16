@@ -1,5 +1,6 @@
 from craik.contracts.models import (
     CapabilityReceipt,
+    ContradictionReport,
     Handoff,
     PluginReceipt,
     WorkGraphEdge,
@@ -7,6 +8,7 @@ from craik.contracts.models import (
     WorkGraphNode,
 )
 from craik.runtime.operator_views import (
+    format_contradiction_inbox,
     format_handoff_viewer,
     format_receipt_viewer,
     format_work_graph_explorer,
@@ -182,3 +184,47 @@ def test_receipt_viewer_formats_plugin_receipt_links() -> None:
     assert "- plugin_grant_docs_reconcile" in lines
     assert "- evidence_readme_status" in lines
     assert "- handoff_docs_reconcile" in lines
+
+
+def test_contradiction_inbox_formats_statuses_and_review_links() -> None:
+    reports = [
+        _contradiction("contradiction_open", "open"),
+        _contradiction("contradiction_resolved", "resolved"),
+        _contradiction("contradiction_ignored", "ignored", owner=None),
+    ]
+
+    lines = format_contradiction_inbox(reports)
+
+    assert lines[0] == "Contradiction Inbox: 3"
+    assert "- contradiction_ignored [ignored]" in lines
+    assert "- contradiction_open [open]" in lines
+    assert "- contradiction_resolved [resolved]" in lines
+    assert "  Owner: unassigned" in lines
+    assert "  Affected Artifacts: README.md" in lines
+    assert "  Evidence: evidence_readme_status" in lines
+
+
+def test_contradiction_inbox_empty_state() -> None:
+    assert format_contradiction_inbox([]) == ["Contradiction Inbox: 0", "", "- none"]
+
+
+def _contradiction(
+    report_id: str,
+    status: str,
+    *,
+    owner: str | None = "user:maintainer",
+) -> ContradictionReport:
+    return ContradictionReport.model_validate(
+        {
+            "id": report_id,
+            "task_id": "task_docs_reconcile",
+            "facts": ["fact_docs_planned", "fact_cli_implemented"],
+            "summary": "Docs and implementation disagree.",
+            "affected_artifacts": ["README.md"],
+            "evidence_ids": ["evidence_readme_status"],
+            "proposed_resolution": "Update docs to match implementation.",
+            "status": status,
+            "owner": owner,
+            "created_at": "2026-05-16T17:10:00Z",
+        }
+    )

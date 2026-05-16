@@ -48,6 +48,7 @@ project.
 - [Work Graph Explorer](reference/work-graph-explorer.md)
 - [Handoff Viewer](reference/handoff-viewer.md)
 - [Receipt Viewer](reference/receipt-viewer.md)
+- [Contradiction Inbox View](reference/contradiction-inbox-view.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
