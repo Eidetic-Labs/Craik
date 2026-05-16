@@ -17,6 +17,7 @@ from craik.contracts.models import (
     TaskRunStatus,
 )
 from craik.runtime.case_files import CaseFileAssembler
+from craik.runtime.context_debt import context_debt_summaries, records_from_case_file
 from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.receipts import ReceiptStore
 from craik.runtime.redaction import redact
@@ -88,7 +89,13 @@ class HandoffWriter:
         assumptions = (
             [assumption.statement for assumption in case_file.assumptions] if case_file else []
         )
-        context_debt = _context_debt(case_file)
+        debt_records = records_from_case_file(
+            case_file,
+            task_id=task_id,
+            project_id=project.id,
+            handoff_id=handoff_id(task_id),
+        )
+        context_debt = context_debt_summaries(debt_records)
         audit = _self_audit(
             receipts_reviewed=bool(receipts),
             assumptions_reviewed=bool(case_file),
@@ -124,6 +131,8 @@ class HandoffWriter:
             created_at=datetime.now(UTC),
         )
         self.store.put_handoff(handoff)
+        for debt in debt_records:
+            self.store.put_context_debt_record(debt)
         return handoff
 
     def create_from_run(
@@ -337,32 +346,8 @@ def _self_audit(
 
 
 def _context_debt(case_file: CaseFile | None) -> list[str]:
-    if case_file is None:
-        return ["No case file was available for this handoff."]
-    debt: list[str] = []
-    omitted = case_file.context_budget.get("docs_omitted", [])
-    if isinstance(omitted, list) and omitted:
-        omitted_list = ", ".join(str(item) for item in omitted)
-        debt.append(f"Documentation omitted by context budget: {omitted_list}")
-    excluded = case_file.context_budget.get("docs_excluded", [])
-    if isinstance(excluded, list) and excluded:
-        excluded_list = ", ".join(
-            str(item.get("path", item)) if isinstance(item, dict) else str(item)
-            for item in excluded
-        )
-        debt.append(f"Documentation excluded by discovery rules: {excluded_list}")
-    if case_file.github_state.get("status") == "not_loaded":
-        debt.append("GitHub state was not loaded into the case file.")
-    if not case_file.facts:
-        debt.append("No memory facts were loaded into the case file.")
-    active_constraints = case_file.context_budget.get("active_instruction_constraints", [])
-    if isinstance(active_constraints, list) and active_constraints:
-        ids = ", ".join(
-            str(item.get("id", item)) if isinstance(item, dict) else str(item)
-            for item in active_constraints
-        )
-        debt.append(f"Active instruction constraints carried forward: {ids}")
-    return debt
+    task_id = case_file.task_id if case_file is not None else "unknown"
+    return context_debt_summaries(records_from_case_file(case_file, task_id=task_id))
 
 
 def _runner_metadata(

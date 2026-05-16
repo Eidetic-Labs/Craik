@@ -56,6 +56,9 @@ def test_handoff_writer_creates_structured_handoff(store: LocalStore, tmp_path: 
     assert handoff.self_audit.assumptions_reviewed is True
     assert handoff.self_audit.validation_recorded is True
     assert "GitHub state was not loaded" in handoff.context_debt[0]
+    debt_records = store.list_context_debt_records()
+    assert [record.summary for record in debt_records] == handoff.context_debt
+    assert all(record.handoff_id == handoff.id for record in debt_records)
     assert store.get_handoff(handoff.id) == handoff
 
 

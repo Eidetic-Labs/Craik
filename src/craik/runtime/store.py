@@ -19,6 +19,7 @@ from craik.contracts.models import (
     CapabilityReceipt,
     CaseFile,
     CompiledPrompt,
+    ContextDebtRecord,
     ContradictionReport,
     DebateSummary,
     DebateTurn,
@@ -73,6 +74,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.compiled_prompt": "compiled_prompts",
     "craik.case_file": "case_files",
     "craik.contradiction_report": "contradictions",
+    "craik.context_debt_record": "context_debt_records",
     "craik.debate_summary": "debate_summaries",
     "craik.debate_turn": "debate_turns",
     "craik.distilled_instruction_proposal": "distilled_instruction_proposals",
@@ -663,6 +665,19 @@ class LocalStore:
 
     def list_contradictions(self) -> list[ContradictionReport]:
         return _cast_list(ContradictionReport, self.list_contracts("craik.contradiction_report"))
+
+    def put_context_debt_record(self, debt: ContextDebtRecord) -> None:
+        self.put_contract(debt)
+
+    def get_context_debt_record(self, debt_id: str) -> ContextDebtRecord | None:
+        contract = self.get_contract("craik.context_debt_record", debt_id)
+        return _cast_optional(ContextDebtRecord, contract)
+
+    def list_context_debt_records(self) -> list[ContextDebtRecord]:
+        return _cast_list(
+            ContextDebtRecord,
+            self.list_contracts("craik.context_debt_record"),
+        )
 
     def put_assumption(self, assumption: Assumption) -> None:
         self.put_contract(assumption)

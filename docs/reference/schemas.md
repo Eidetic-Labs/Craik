@@ -38,6 +38,7 @@ craik schema show craik.task_request
 | `craik.case_file` | Captures task-specific context assembled before execution. |
 | `craik.compiled_prompt` | Captures a deterministic policy-aware runner prompt. |
 | `craik.contradiction_report` | Captures incompatible assertions for review. |
+| `craik.context_debt_record` | Tracks omitted, stale, unresolved, or missing context with owner and next action. |
 | `craik.debate_summary` | Summarizes agreement, unresolved disagreement, or contradiction escalation for a bounded agent debate. |
 | `craik.debate_turn` | Captures one role-linked debate contribution with evidence, assumptions, and contradiction links. |
 | `craik.distilled_instruction_proposal` | Captures a reviewable instruction distilled from declared instruction sources. |

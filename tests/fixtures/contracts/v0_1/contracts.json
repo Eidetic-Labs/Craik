@@ -291,6 +291,27 @@
     "created_at": "2026-05-15T22:41:00Z",
     "resolved_at": null
   },
+  "craik.context_debt_record": {
+    "schema": "craik.context_debt_record",
+    "version": "0.1.0",
+    "id": "context_debt_task_docs_reconcile_missing_external_state_github",
+    "task_id": "task_docs_reconcile",
+    "project_id": "project_stigmem",
+    "case_file_id": "case_docs_reconcile",
+    "handoff_id": "handoff_docs_reconcile",
+    "kind": "missing_external_state",
+    "status": "created",
+    "summary": "GitHub state was not loaded into the case file.",
+    "owner": "agent:codex",
+    "next_action": "Refresh GitHub issue and pull request state before continuing.",
+    "omitted_doc_paths": [],
+    "stale_instruction_ids": [],
+    "assumption_ids": [],
+    "missing_external_state": ["github"],
+    "evidence_ids": [],
+    "created_at": "2026-05-16T09:10:00Z",
+    "resolved_at": null
+  },
   "craik.evidence_reference": {
     "schema": "craik.evidence_reference",
     "version": "0.1.0",
