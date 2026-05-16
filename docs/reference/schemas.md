@@ -65,6 +65,7 @@ craik schema show craik.task_request
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.plugin_descriptor` | Defines governed plugin identity, entrypoints, capability declarations, docs, security metadata, and compatibility without granting authority. |
 | `craik.plugin_probation` | Tracks probationary plugin criteria, compatibility checks, evidence, receipts, and promotion, rejection, or expiration decisions. |
+| `craik.plugin_receipt` | Records redacted plugin actions and outputs with descriptor, grant, evidence, handoff, and trust-boundary links. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.promoted_instruction_constraint` | Captures an approved distilled instruction as an active runtime constraint. |
 | `craik.red_team_finding` | Captures reviewable adversarial findings and blockers for high-risk work. |

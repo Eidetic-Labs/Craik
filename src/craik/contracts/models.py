@@ -2174,6 +2174,40 @@ class PluginProbation(CraikModel):
         return self
 
 
+class PluginReceipt(CraikModel):
+    """Redacted receipt for a plugin action or output."""
+
+    schema_: Literal["craik.plugin_receipt"] = Field(
+        default="craik.plugin_receipt",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    actor: str
+    plugin_descriptor_id: str
+    plugin_probation_id: str | None = None
+    action: str
+    capability_grant_ids: list[str] = Field(min_length=1)
+    trust_boundary: InstructionTrustBoundary
+    result: ReceiptResult
+    evidence_ids: list[str] = Field(min_length=1)
+    handoff_ids: list[str] = Field(min_length=1)
+    redacted: bool = True
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_plugin_receipt(self) -> PluginReceipt:
+        """Require redacted plugin receipts with grant and evidence links."""
+        if not self.redacted:
+            raise ValueError("plugin receipts must be redacted")
+        if self.result.status == "passed" and not self.capability_grant_ids:
+            raise ValueError("successful plugin receipts require capability grants")
+        if self.result.status == "denied" and not self.result.summary:
+            raise ValueError("denied plugin receipts require a denial summary")
+        return self
+
+
 class AgentOnboarding(CraikModel):
     """Runner-readable project context for an agent starting work."""
 

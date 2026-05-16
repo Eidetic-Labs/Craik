@@ -57,6 +57,7 @@ project.
 - [Skill Invocation Contexts](reference/skill-contexts.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
+- [Plugin Receipts](reference/plugin-receipts.md)
 - [Human Delegation](reference/human-delegation.md)
 - [Instruction Sources](reference/instruction-sources.md)
 - [Instruction Distillation Workflow](reference/instruction-distillation-workflow.md)

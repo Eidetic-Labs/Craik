@@ -1300,6 +1300,29 @@
     "durable_trust_granted": false,
     "created_at": "2026-05-16T16:10:00Z"
   },
+  "craik.plugin_receipt": {
+    "schema": "craik.plugin_receipt",
+    "version": "0.1.0",
+    "id": "plugin_receipt_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "actor": "agent:codex",
+    "plugin_descriptor_id": "plugin_docs_reconcile",
+    "plugin_probation_id": "plugin_probation_docs_reconcile",
+    "action": "docs.reconcile",
+    "capability_grant_ids": ["grant_docs_write"],
+    "trust_boundary": "project",
+    "result": {
+      "status": "passed",
+      "summary": "Plugin action completed with redacted output.",
+      "metadata": {
+        "redacted": true
+      }
+    },
+    "evidence_ids": ["evidence_readme_status"],
+    "handoff_ids": ["handoff_docs_reconcile"],
+    "redacted": true,
+    "created_at": "2026-05-16T16:20:00Z"
+  },
   "craik.instruction_source": {
     "schema": "craik.instruction_source",
     "version": "0.1.0",
