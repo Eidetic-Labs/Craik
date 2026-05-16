@@ -46,6 +46,7 @@ project.
 - [Config](reference/config.md)
 - [Operator Surface](reference/operator-surface.md)
 - [Work Graph Explorer](reference/work-graph-explorer.md)
+- [Handoff Viewer](reference/handoff-viewer.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)
