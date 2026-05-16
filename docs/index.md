@@ -44,6 +44,7 @@ project.
 - [Config](reference/config.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
+- [Adapter Packages](reference/adapter-packages.md)
 - [Worker Results](reference/worker-results.md)
 - [Structured Debates](reference/debates.md)
 - [Cross-Agent Review](reference/cross-agent-review.md)

@@ -1,4 +1,35 @@
 {
+  "craik.adapter_package": {
+    "schema": "craik.adapter_package",
+    "version": "0.1.0",
+    "id": "adapter_package_codex_fixture",
+    "name": "Codex Fixture Adapter",
+    "package_version": "0.1.0",
+    "adapter": "codex",
+    "description": "Fixture adapter package metadata.",
+    "entrypoints": [
+      {
+        "id": "adapter_module",
+        "kind": "module",
+        "path": "craik.adapters.codex:CodexAdapter",
+        "description": "Adapter implementation entrypoint."
+      }
+    ],
+    "capability_surfaces": ["prompt.read", "result.structured"],
+    "compatibility": {
+      "craik_versions": ["0.7"],
+      "runner_modes": ["prompt-handoff"],
+      "python_versions": ["3.12"],
+      "platforms": ["darwin", "linux"],
+      "notes": "Fixture compatibility metadata."
+    },
+    "runner_metadata_ids": ["runner_fixture"],
+    "plugin_descriptor_ids": ["plugin_docs_reconcile"],
+    "docs": ["docs/reference/codex-runner-adapter.md"],
+    "provenance_ids": ["evidence_readme_status"],
+    "version_constraints": ["craik>=0.7,<0.8"],
+    "created_at": "2026-05-16T16:40:00Z"
+  },
   "craik.agent_onboarding": {
     "schema": "craik.agent_onboarding",
     "version": "0.1.0",

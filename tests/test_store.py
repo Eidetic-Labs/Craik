@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from craik.contracts.models import (
+    AdapterPackage,
     AdjudicationOutcome,
     Assumption,
     CapabilityReceipt,
@@ -154,6 +155,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     adjudication = AdjudicationOutcome.model_validate(
         fixtures["craik.adjudication_outcome"]
     )
+    adapter_package = AdapterPackage.model_validate(fixtures["craik.adapter_package"])
     delegation = HumanDelegationPoint.model_validate(
         fixtures["craik.human_delegation_point"]
     )
@@ -228,6 +230,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_review_request(review_request)
     store.put_review_result(review_result)
     store.put_adjudication_outcome(adjudication)
+    store.put_adapter_package(adapter_package)
     store.put_human_delegation(delegation)
     store.put_scope_change_request(scope_request)
     store.put_scope_change_result(scope_result)
@@ -286,6 +289,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_review_request(review_request.id) == review_request
     assert store.get_review_result(review_result.id) == review_result
     assert store.get_adjudication_outcome(adjudication.id) == adjudication
+    assert store.get_adapter_package(adapter_package.id) == adapter_package
     assert store.get_human_delegation(delegation.id) == delegation
     assert store.get_scope_change_request(scope_request.id) == scope_request
     assert store.get_scope_change_result(scope_result.id) == scope_result
@@ -339,6 +343,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_review_requests() == [review_request]
     assert store.list_review_results() == [review_result]
     assert store.list_adjudication_outcomes() == [adjudication]
+    assert store.list_adapter_packages() == [adapter_package]
     assert store.list_human_delegations() == [delegation]
     assert store.list_scope_change_requests() == [scope_request]
     assert store.list_scope_change_results() == [scope_result]
@@ -407,6 +412,7 @@ def test_persists_supported_contract_types(
         "craik.plugin_descriptor",
         "craik.plugin_probation",
         "craik.plugin_receipt",
+        "craik.adapter_package",
         "craik.handoff",
         "craik.intent_lock",
         "craik.knowledge_freshness_probe",

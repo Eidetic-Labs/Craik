@@ -30,6 +30,7 @@ craik schema show craik.task_request
 | Schema | Purpose |
 | --- | --- |
 | `craik.adjudication_outcome` | Records adjudicator decisions over reviewed specialist outputs and unresolved disagreements. |
+| `craik.adapter_package` | Defines runner adapter package metadata, compatibility, entrypoints, capability surfaces, provenance, and version constraints. |
 | `craik.agent_onboarding` | Summarizes runner-readable project context before an agent starts work. |
 | `craik.agent_role` | Defines a policy-aware orchestrator or specialist role for multi-agent coordination. |
 | `craik.assumption` | Tracks unresolved assumptions that need evidence before promotion to fact. |
