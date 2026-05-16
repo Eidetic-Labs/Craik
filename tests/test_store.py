@@ -9,6 +9,7 @@ from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
     CaseFile,
+    ContradictionReport,
     EvidenceReference,
     Handoff,
     IntentLock,
@@ -81,6 +82,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     handoff = Handoff.model_validate(fixtures["craik.handoff"])
     intent_lock = IntentLock.model_validate(fixtures["craik.intent_lock"])
     proposal = MemoryProposal.model_validate(fixtures["craik.memory_proposal"])
+    contradiction = ContradictionReport.model_validate(fixtures["craik.contradiction_report"])
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
     event = WorkGraphEvent.model_validate(fixtures["craik.work_graph_event"])
@@ -92,6 +94,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_handoff(handoff)
     store.put_intent_lock(intent_lock)
     store.put_proposal(proposal)
+    store.put_contradiction(contradiction)
     store.put_assumption(assumption)
     store.put_evidence(evidence)
     store.put_graph_event(event)
@@ -104,6 +107,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_handoff(handoff.id) == handoff
     assert store.get_intent_lock(intent_lock.id) == intent_lock
     assert store.get_proposal(proposal.id) == proposal
+    assert store.get_contradiction(contradiction.id) == contradiction
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
     assert store.get_graph_event(event.id) == event
@@ -113,6 +117,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_handoffs() == [handoff]
     assert store.list_intent_locks() == [intent_lock]
     assert store.list_proposals() == [proposal]
+    assert store.list_contradictions() == [contradiction]
     assert store.list_assumptions() == [assumption]
     assert store.list_evidence() == [evidence]
     assert store.list_graph_events() == [event]
@@ -127,6 +132,7 @@ def test_persists_supported_contract_types(
         "craik.task_request",
         "craik.capability_receipt",
         "craik.case_file",
+        "craik.contradiction_report",
         "craik.handoff",
         "craik.intent_lock",
         "craik.memory_proposal",

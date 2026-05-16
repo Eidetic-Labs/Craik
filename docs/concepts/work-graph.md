@@ -25,4 +25,4 @@ Edges explain relationships such as:
 
 Graph export is read-only. It does not grant authority, mutate GitHub, write memory, or resolve contradictions.
 
-Exports are deterministic and redacted before printing.
+Exports are deterministic and redacted before printing. Task-linked local contradiction reports appear as contradiction nodes connected to their task and evidence.

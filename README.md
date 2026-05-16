@@ -74,6 +74,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Memory Proposals](docs/guides/memory-proposals.md)
 - [Memory Diffs](docs/guides/memory-diffs.md)
 - [Memory Impact Preview](docs/guides/memory-impact-preview.md)
+- [Contradiction Inbox](docs/guides/contradiction-inbox.md)
 - [Connecting Stigmem](docs/guides/connecting-stigmem.md)
 - [Evidence And Assumptions](docs/guides/evidence-and-assumptions.md)
 - [Context Budgeting](docs/guides/context-budgeting.md)
@@ -99,7 +100,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
-The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, read-only GitHub context, work graph export, handoff writing, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
+The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, read-only GitHub context, work graph export, handoff writing, local contradiction reports, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 

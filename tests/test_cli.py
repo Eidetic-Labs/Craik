@@ -176,6 +176,50 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
     assert "task:task_review_docs" in {node["id"] for node in graph_payload["nodes"]}
 
 
+def test_contradiction_commands_open_list_show(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+
+    opened = runner.invoke(
+        app,
+        [
+            "contradictions",
+            "open",
+            "--summary",
+            "Docs conflict with implementation.",
+            "--fact",
+            "fact_old",
+            "--fact",
+            "fact_new",
+            "--task-id",
+            "task_docs",
+            "--affected-artifact",
+            "README.md",
+            "--evidence-id",
+            "evidence_docs",
+            "--owner",
+            "user:maintainer",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    report_id = json.loads(opened.stdout)["id"]
+    listed = runner.invoke(
+        app,
+        ["contradictions", "list", "--task-id", "task_docs", "--status", "open"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    shown = runner.invoke(
+        app,
+        ["contradictions", "show", report_id],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert opened.exit_code == 0
+    assert listed.exit_code == 0
+    assert shown.exit_code == 0
+    assert [item["id"] for item in json.loads(listed.stdout)] == [report_id]
+    assert json.loads(shown.stdout)["contradiction"]["id"] == report_id
+
+
 def test_intent_show_reports_task_intent_lock(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

@@ -103,12 +103,17 @@
     "schema": "craik.contradiction_report",
     "version": "0.1.0",
     "id": "contradiction_docs_status",
+    "task_id": "task_docs_reconcile",
     "facts": ["fact_docs_planned", "fact_cli_implemented"],
     "summary": "Docs say the CLI is planned while implementation shows it exists.",
     "affected_artifacts": ["README.md", "docs/guides/quickstart.md"],
+    "evidence_ids": ["evidence_readme_status"],
     "proposed_resolution": "Update docs to pre-0.1.0 implementation language.",
     "status": "open",
-    "owner": "user:maintainer"
+    "owner": "user:maintainer",
+    "stigmem_conflict_id": null,
+    "created_at": "2026-05-15T22:41:00Z",
+    "resolved_at": null
   },
   "craik.evidence_reference": {
     "schema": "craik.evidence_reference",
