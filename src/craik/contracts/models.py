@@ -389,6 +389,41 @@ class WorkGraphEvent(CraikModel):
     created_at: datetime
 
 
+class WorkGraphNode(CraikModel):
+    """Exported work graph node."""
+
+    id: str
+    type: str
+    label: str
+    task_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class WorkGraphEdge(CraikModel):
+    """Exported work graph edge."""
+
+    id: str
+    type: str
+    from_node: str = Field(alias="from")
+    to_node: str = Field(alias="to")
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class WorkGraphExport(CraikModel):
+    """Deterministic export of graph-connected runtime objects."""
+
+    schema_: Literal["craik.work_graph_export"] = Field(
+        default="craik.work_graph_export",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str | None = None
+    nodes: list[WorkGraphNode] = Field(default_factory=list)
+    edges: list[WorkGraphEdge] = Field(default_factory=list)
+    created_at: datetime
+
+
 class CaseFile(CraikModel):
     """Task-specific context assembled before execution."""
 

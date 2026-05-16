@@ -16,6 +16,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
     WorkGraphEvent,
+    WorkGraphExport,
 )
 from craik.contracts.registry import CONTRACT_REGISTRY
 from craik.runtime.paths import ensure_craik_home
@@ -83,6 +84,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
     event = WorkGraphEvent.model_validate(fixtures["craik.work_graph_event"])
+    export = WorkGraphExport.model_validate(fixtures["craik.work_graph_export"])
 
     store.put_task(task)
     store.put_receipt(receipt)
@@ -93,8 +95,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_assumption(assumption)
     store.put_evidence(evidence)
     store.put_graph_event(event)
+    store.put_contract(export)
 
     assert store.get_task(task.id) == task
+    assert store.list_tasks() == [task]
     assert store.get_receipt(receipt.id) == receipt
     assert store.get_case_file(case_file.id) == case_file
     assert store.get_handoff(handoff.id) == handoff
@@ -103,6 +107,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
     assert store.get_graph_event(event.id) == event
+    assert store.get_contract("craik.work_graph_export", export.id) == export
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -127,6 +132,7 @@ def test_persists_supported_contract_types(
         "craik.memory_proposal",
         "craik.assumption",
         "craik.evidence_reference",
+        "craik.work_graph_export",
         "craik.work_graph_event",
     ):
         model = CONTRACT_REGISTRY[schema_name]

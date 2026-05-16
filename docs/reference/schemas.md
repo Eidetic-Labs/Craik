@@ -44,6 +44,7 @@ craik schema show craik.task_request
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.task_request` | Defines requested work. |
+| `craik.work_graph_export` | Exports connected graph nodes and edges. |
 | `craik.work_graph_event` | Updates the work graph. |
 
 ## Examples

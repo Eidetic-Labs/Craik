@@ -317,6 +317,44 @@
     "expected_outputs": ["case_file", "findings", "handoff"],
     "created_at": "2026-05-15T22:30:00Z"
   },
+  "craik.work_graph_export": {
+    "schema": "craik.work_graph_export",
+    "version": "0.1.0",
+    "id": "graph_task_docs_reconcile",
+    "task_id": "task_docs_reconcile",
+    "nodes": [
+      {
+        "id": "task:task_docs_reconcile",
+        "type": "task",
+        "label": "Review documentation against implementation state",
+        "task_id": "task_docs_reconcile",
+        "metadata": {
+          "mode": "review",
+          "priority": "normal"
+        }
+      },
+      {
+        "id": "handoff:handoff_docs_reconcile",
+        "type": "handoff",
+        "label": "Contract schema work completed with tests and docs.",
+        "task_id": "task_docs_reconcile",
+        "metadata": {
+          "status": "completed",
+          "agent": "agent:codex"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge:has_handoff:task:task_docs_reconcile:handoff:handoff_docs_reconcile",
+        "type": "has_handoff",
+        "from": "task:task_docs_reconcile",
+        "to": "handoff:handoff_docs_reconcile",
+        "metadata": {}
+      }
+    ],
+    "created_at": "2026-05-15T22:52:00Z"
+  },
   "craik.work_graph_event": {
     "schema": "craik.work_graph_event",
     "version": "0.1.0",

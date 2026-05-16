@@ -27,6 +27,7 @@ from craik.runtime.case_files import (
     TaskNotFoundError,
 )
 from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
+from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
 from craik.runtime.handoffs import (
     HandoffContextError,
     HandoffNotFoundError,
@@ -78,6 +79,8 @@ case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
 connect_app = typer.Typer(help="Connect to external services.")
 app.add_typer(connect_app, name="connect")
+graph_app = typer.Typer(help="Export Craik work graphs.")
+app.add_typer(graph_app, name="graph")
 handoff_app = typer.Typer(help="Create and inspect Craik handoffs.")
 app.add_typer(handoff_app, name="handoff")
 memory_app = typer.Typer(help="Create and review local memory proposals.")
@@ -430,6 +433,26 @@ def connect_stigmem(
     typer.echo(
         json.dumps(capabilities.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
     )
+
+
+@graph_app.command("export")
+def graph_export(
+    task_id: Annotated[
+        str | None,
+        typer.Option("--task-id", help="Only export graph objects for this task."),
+    ] = None,
+) -> None:
+    """Export the local work graph as deterministic JSON."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        export = WorkGraphExporter(store).export(task_id=task_id)
+    except WorkGraphTaskNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(export.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
 
 
 @handoff_app.command("create")

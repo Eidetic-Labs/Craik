@@ -154,17 +154,26 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
         ["case", "show", "task_review_docs"],
         env={"CRAIK_HOME": str(home)},
     )
+    graph = runner.invoke(
+        app,
+        ["graph", "export", "--task-id", "task_review_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
 
     assert project.exit_code == 0
     assert task.exit_code == 0
     assert built.exit_code == 0
     assert shown.exit_code == 0
+    assert graph.exit_code == 0
     task_payload = json.loads(task.stdout)
     assert task_payload["task"]["id"] == "task_review_docs"
     assert task_payload["intent_lock"]["id"] == "intent_review_docs"
     assert json.loads(built.stdout)["intent_lock_id"] == "intent_review_docs"
     assert json.loads(built.stdout)["adrs"] == ["docs/adr/0001-record.md"]
     assert json.loads(shown.stdout)["id"] == "case_review_docs"
+    graph_payload = json.loads(graph.stdout)
+    assert graph_payload["id"] == "graph_task_review_docs"
+    assert "task:task_review_docs" in {node["id"] for node in graph_payload["nodes"]}
 
 
 def test_intent_show_reports_task_intent_lock(tmp_path: Path) -> None:
