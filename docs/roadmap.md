@@ -123,6 +123,7 @@ Required capabilities:
 - evidence references.
 - assumption ledger.
 - context budget metadata.
+- default repository context exclusions with project/user overrides.
 - intent lock.
 - self-audit before handoff.
 - memory proposal flow.
@@ -584,6 +585,9 @@ Scope:
 - task intent lock,
 - repository state ingestion,
 - docs and ADR discovery,
+- default discovery exclusions for generated, dependency, build, cache, and archive-heavy paths,
+- project and user override rules for inclusion/exclusion defaults,
+- visible context-debt metadata for excluded and omitted paths,
 - Stigmem/local fact loading,
 - GitHub context placeholders,
 - evidence references,
@@ -601,6 +605,8 @@ Validation:
 - evidence reference tests,
 - assumption promotion tests,
 - context inclusion/exclusion tests,
+- default exclusion tests for generated and dependency paths,
+- override tests for project/user include and exclude rules,
 - stale-risk tests.
 
 Docs required:
@@ -609,6 +615,7 @@ Docs required:
 - using case files guide,
 - evidence and assumptions guide,
 - context budgeting guide.
+- context discovery and exclusion guide.
 
 ### 5. Handoffs, Self-Audit, And Exit Discipline
 
@@ -800,6 +807,7 @@ Scope:
 - task run state machine,
 - plan/act/observe/evaluate/continue/stop phases,
 - runner step contract,
+- bounded case-file context with default exclusions and user/project overrides,
 - max-iteration limit,
 - timeout and budget limits,
 - intent-lock stop-condition enforcement,
@@ -823,6 +831,7 @@ Validation:
 - interrupted run resume tests,
 - handoff-on-failure tests,
 - runner fixture tests.
+- polluted-context fixture tests.
 
 Docs required:
 
@@ -831,6 +840,7 @@ Docs required:
 - run state reference,
 - resume and recovery guide,
 - loop policy guide.
+- context discovery override guide.
 
 ### 12. Multi-Agent Coordination
 

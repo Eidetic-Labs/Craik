@@ -29,6 +29,7 @@ Inputs:
 - project profile,
 - repository state,
 - docs snippets,
+- repository discovery defaults and project/user include/exclude overrides,
 - ADR/policy snippets,
 - GitHub state when configured,
 - Stigmem facts when configured,
@@ -40,11 +41,15 @@ Outputs:
 - human-readable Markdown case file,
 - stale-risk list,
 - contradiction list,
+- context inclusion, exclusion, and omission metadata,
 - verification plan.
 
 Acceptance criteria:
 
 - case file generation is deterministic for test fixtures,
+- generated, dependency, build, cache, and archive-heavy paths are excluded by default,
+- project and user overrides can extend, replace, or explicitly include paths from the defaults,
+- excluded and omitted paths are visible in context metadata,
 - immutable ADR paths are clearly labeled,
 - memory facts include source and confidence,
 - stale-risk warnings are separated from verified facts,
@@ -249,6 +254,7 @@ MVP behavior:
 - create a persistent run id,
 - move through plan, act, observe, evaluate, continue, and stop phases,
 - call a runner through a step contract,
+- assemble bounded runner context from default discovery rules plus project/user overrides,
 - enforce max-iteration, timeout, and budget limits,
 - check policy before side effects,
 - record receipts for important steps,
@@ -261,6 +267,8 @@ Acceptance criteria:
 
 - Craik owns the loop boundary instead of relying on an untracked chat transcript,
 - loop state is inspectable,
+- runner context avoids generated and dependency-path pollution by default,
+- context defaults are overridable and their effects are inspectable,
 - side effects cannot bypass grants,
 - blocked approvals halt the loop,
 - memory updates are proposed unless direct writes are granted,
