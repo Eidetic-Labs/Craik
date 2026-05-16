@@ -177,6 +177,8 @@ ChannelKind = Literal["messaging", "webhook", "scheduler", "voice", "custom"]
 ChannelCapabilityDirection = Literal["inbound", "outbound", "bidirectional"]
 ChannelPairingStatus = Literal["unpaired", "paired", "revoked"]
 ChannelAllowlistAction = Literal["allow", "deny"]
+ModelProviderMode = Literal["chat", "completion", "embedding", "tool", "runner"]
+ModelProviderTrustBoundary = Literal["local", "self-hosted", "hosted", "third-party"]
 RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
 RunDeltaEntityType = Literal[
     "handoff",
@@ -1656,6 +1658,52 @@ class ChannelAllowlist(CraikModel):
             raise ValueError("channel allowlists must default to deny")
         if not self.audit_required:
             raise ValueError("channel allowlist decisions require audit")
+        return self
+
+
+class ModelProviderCapability(CraikModel):
+    """One capability exposed by a model provider."""
+
+    name: str
+    mode: ModelProviderMode
+    description: str
+    grant_required: bool = True
+
+
+class ModelProvider(CraikModel):
+    """Model provider and runtime execution path metadata."""
+
+    schema_: Literal["craik.model_provider"] = Field(
+        default="craik.model_provider",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    name: str
+    provider: str
+    modes: list[ModelProviderMode] = Field(min_length=1)
+    capabilities: list[ModelProviderCapability] = Field(min_length=1)
+    trust_boundary: ModelProviderTrustBoundary
+    config_refs: list[str] = Field(default_factory=list)
+    secret_ref_names: list[str] = Field(default_factory=list)
+    runtime_path: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    docs: list[str] = Field(min_length=1)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_model_provider(self) -> ModelProvider:
+        """Keep provider metadata separate from secrets."""
+        capability_modes = {capability.mode for capability in self.capabilities}
+        missing_modes = capability_modes - set(self.modes)
+        if missing_modes:
+            missing = ", ".join(sorted(missing_modes))
+            raise ValueError(f"provider capabilities reference undeclared modes: {missing}")
+        secret_tokens = ("secret", "token", "api_key", "apikey", "password", "credential")
+        for key in self.metadata:
+            normalized = key.lower().replace("-", "_")
+            if any(token in normalized for token in secret_tokens):
+                raise ValueError("provider metadata must not contain secret-like keys")
         return self
 
 

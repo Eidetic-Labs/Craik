@@ -67,6 +67,7 @@ craik schema show craik.task_request
 | `craik.memory_diff` | Explains run-scoped memory reads, proposals, writes, and failures. |
 | `craik.memory_impact_preview` | Previews memory additions, invalidations, evidence gaps, and likely contradictions. |
 | `craik.memory_proposal` | Describes reviewable memory updates. |
+| `craik.model_provider` | Defines model provider identity, modes, capabilities, trust boundary, config references, and secret reference names. |
 | `craik.negative_knowledge` | Records evidence-backed negative statements with scope and freshness boundaries. |
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.plugin_capability_grant` | Defines least-privilege plugin-scoped capability grants with policy, approval, expiry, evidence, and receipt links. |
