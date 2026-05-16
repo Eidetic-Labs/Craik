@@ -240,6 +240,32 @@ Acceptance criteria:
 - diff is linked from handoff,
 - and diff can be stored as a receipt artifact.
 
+## Feature 10a: Single-Agent Execution Loop
+
+Purpose: let Craik drive one agent through a governed task loop while preserving state, policy checks, receipts, and stop conditions.
+
+MVP behavior:
+
+- create a persistent run id,
+- move through plan, act, observe, evaluate, continue, and stop phases,
+- call a runner through a step contract,
+- enforce max-iteration, timeout, and budget limits,
+- check policy before side effects,
+- record receipts for important steps,
+- capture observed outputs,
+- stop on intent-lock stop conditions,
+- create handoffs on completion, block, failure, or interruption,
+- and resume interrupted runs from stored state.
+
+Acceptance criteria:
+
+- Craik owns the loop boundary instead of relying on an untracked chat transcript,
+- loop state is inspectable,
+- side effects cannot bypass grants,
+- blocked approvals halt the loop,
+- memory updates are proposed unless direct writes are granted,
+- and run recovery does not require replaying raw conversation history.
+
 ## Feature 11: Orchestrator And Specialists
 
 Purpose: support multi-agent workflows after the single-agent loop works.

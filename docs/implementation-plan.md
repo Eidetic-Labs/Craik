@@ -460,7 +460,46 @@ Acceptance criteria:
 - resolutions record rationale,
 - and memory diff includes contradiction state.
 
-## Milestone 10: Multi-Agent Orchestration
+## Milestone 10: Single-Agent Execution Loop
+
+Build after runner contracts and the durable single-agent state model are stable.
+
+Build:
+
+- task run state machine,
+- run id and status model,
+- plan/act/observe/evaluate/continue/stop phases,
+- runner step contract,
+- max-iteration limit,
+- timeout and budget checks,
+- intent-lock stop-condition enforcement,
+- approval and grant checks before side effects,
+- step receipts,
+- observed output capture,
+- memory proposal hooks,
+- handoff on completion/block/failure/interruption,
+- run resume,
+- run recovery,
+- agent exit discipline.
+
+Commands:
+
+- `craik task run <task-id> --runner <runner>`
+- `craik runs show <run-id>`
+- `craik runs resume <run-id>`
+
+Acceptance criteria:
+
+- Craik, not the chat transcript, owns the loop boundary,
+- every side-effecting step checks policy before execution,
+- each important step can produce a receipt,
+- stop conditions halt the run before scope drift,
+- iteration, budget, and timeout limits are enforced,
+- interrupted runs can resume from persisted state,
+- blocked or failed runs produce handoffs,
+- and memory updates remain proposals unless policy grants direct writes.
+
+## Milestone 11: Multi-Agent Orchestration
 
 Build after the single-agent durable loop works.
 
@@ -488,7 +527,7 @@ Acceptance criteria:
 - read-only work can run in parallel,
 - and unresolved contradictions block flattening into a final answer.
 
-## Milestone 11: First-Class Runner Adapters
+## Milestone 12: First-Class Runner Adapters
 
 Build:
 
@@ -519,7 +558,7 @@ Acceptance criteria:
 - runner-specific metadata is preserved without polluting core contracts,
 - and adjacent runtime bridges remain future integrations rather than required execution layers.
 
-## Milestone 12: Skills And Probationary Plugins
+## Milestone 13: Skills And Probationary Plugins
 
 Build:
 
