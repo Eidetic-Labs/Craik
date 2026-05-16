@@ -3,7 +3,12 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.skill_proposals import SkillChangeProposal, draft_skill_change_proposal
+from craik.runtime.skill_proposals import (
+    SkillChangeProposal,
+    SkillImprovementEdit,
+    SkillImprovementPlan,
+    draft_skill_change_proposal,
+)
 
 NOW = datetime(2026, 5, 16, 21, 5, tzinfo=UTC)
 
@@ -88,8 +93,62 @@ def test_non_agent_proposal_status_can_reflect_review_result() -> None:
         policy_envelope_id="policy_docs_reconcile",
         evidence_ids=["evidence_skill_validation"],
         receipt_ids=["receipt_skill_proposal"],
+        improvement_plan=_improvement_plan(),
         created_by="user:maintainer",
         created_at=NOW,
     )
 
     assert proposal.status == "approved"
+
+
+def test_skill_improvement_plan_records_benefit_risk_edits_and_rollback() -> None:
+    proposal = _proposal(improvement_plan=_improvement_plan())
+
+    assert proposal.improvement_plan is not None
+    assert proposal.improvement_plan.expected_benefit == "Reduce missed validation steps."
+    assert proposal.improvement_plan.risk == "medium"
+    assert proposal.improvement_plan.rollback_notes == "Revert checklist wording if replay fails."
+    assert proposal.improvement_plan.edits[0].target_ref == "skill_docs_reconcile:checklist"
+
+
+def test_high_risk_skill_improvements_require_replay_fixtures() -> None:
+    with pytest.raises(ValidationError, match="replay_fixture_ids"):
+        _improvement_plan(risk="high", replay_fixture_ids=[])
+
+
+def test_approved_skill_proposals_require_improvement_plan() -> None:
+    with pytest.raises(ValidationError, match="improvement_plan"):
+        SkillChangeProposal(
+            id="skill_proposal_reviewed",
+            skill_package_id="skill_docs_reconcile",
+            task_id="task_docs_reconcile",
+            title="Reviewed change",
+            summary="Human-reviewed proposal.",
+            rationale="Operator approved it.",
+            proposed_change="Update checklist.",
+            source="operator",
+            status="approved",
+            policy_envelope_id="policy_docs_reconcile",
+            evidence_ids=["evidence_skill_validation"],
+            receipt_ids=["receipt_skill_proposal"],
+            created_by="user:maintainer",
+            created_at=NOW,
+        )
+
+
+def _improvement_plan(**overrides: object) -> SkillImprovementPlan:
+    payload = {
+        "expected_benefit": "Reduce missed validation steps.",
+        "risk": "medium",
+        "rollback_notes": "Revert checklist wording if replay fails.",
+        "edits": [
+            SkillImprovementEdit(
+                target_ref="skill_docs_reconcile:checklist",
+                change_summary="Add validation command requirements.",
+                rationale="Telemetry showed missing validation output.",
+            )
+        ],
+        "replay_fixture_ids": ["skill_replay_docs_fixture"],
+    }
+    payload.update(overrides)
+    return SkillImprovementPlan.model_validate(payload)
