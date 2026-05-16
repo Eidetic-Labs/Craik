@@ -25,3 +25,6 @@ that claim unredacted persisted context.
 Missing required outputs should be represented as omissions. This makes failed
 or partial skill runs reviewable instead of silently treating absent context as
 irrelevant.
+
+Use [Skill Telemetry](skill-telemetry.md) to record invocation outcomes,
+durations, validation signals, and redacted learning-loop metadata.
