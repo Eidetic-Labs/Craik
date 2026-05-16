@@ -53,6 +53,7 @@ from craik.contracts.models import (
     PromotedInstructionConstraint,
     RecoverySession,
     RedTeamFinding,
+    ReferenceIntegration,
     ReviewRequest,
     ReviewResult,
     RunDelta,
@@ -125,6 +126,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.review_request": "review_requests",
     "craik.review_result": "review_results",
     "craik.promoted_instruction_constraint": "promoted_instruction_constraints",
+    "craik.reference_integration": "reference_integrations",
     "craik.red_team_finding": "red_team_findings",
     "craik.recovery_session": "recovery_sessions",
     "craik.scope_change_request": "scope_change_requests",
@@ -600,6 +602,22 @@ class LocalStore:
         return _cast_list(
             PromotedInstructionConstraint,
             self.list_contracts("craik.promoted_instruction_constraint"),
+        )
+
+    def put_reference_integration(self, integration: ReferenceIntegration) -> None:
+        self.put_contract(integration)
+
+    def get_reference_integration(
+        self,
+        integration_id: str,
+    ) -> ReferenceIntegration | None:
+        contract = self.get_contract("craik.reference_integration", integration_id)
+        return _cast_optional(ReferenceIntegration, contract)
+
+    def list_reference_integrations(self) -> list[ReferenceIntegration]:
+        return _cast_list(
+            ReferenceIntegration,
+            self.list_contracts("craik.reference_integration"),
         )
 
     def put_run_delta(self, delta: RunDelta) -> None:

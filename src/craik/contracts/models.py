@@ -140,6 +140,7 @@ PluginProbationStatus = Literal["probationary", "promoted", "rejected", "expired
 PluginProbationDecisionKind = Literal["promote", "reject", "expire"]
 PluginGrantStatus = Literal["allowed", "denied", "expired", "approval_required"]
 AdapterEntrypointKind = Literal["module", "command", "service", "docs"]
+ReferenceIntegrationKind = Literal["skill", "plugin", "adapter"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -2303,6 +2304,45 @@ class AdapterPackage(CraikModel):
             raise ValueError("adapter package_version must be semantic-version-like")
         if not self.compatibility.runner_modes:
             raise ValueError("adapter packages require runner mode compatibility")
+        return self
+
+
+class ReferenceIntegration(CraikModel):
+    """Safe reproducible reference integration for a skill, plugin, or adapter."""
+
+    schema_: Literal["craik.reference_integration"] = Field(
+        default="craik.reference_integration",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    kind: ReferenceIntegrationKind
+    name: str
+    description: str
+    skill_package_id: str | None = None
+    plugin_descriptor_id: str | None = None
+    adapter_package_id: str | None = None
+    docs: list[str] = Field(min_length=1)
+    fixture_paths: list[str] = Field(min_length=1)
+    check_commands: list[str] = Field(min_length=1)
+    receipt_ids: list[str] = Field(default_factory=list)
+    compatibility_notes: list[str] = Field(min_length=1)
+    safe_to_run_locally: bool = True
+    reproducible: bool = True
+    provenance_ids: list[str] = Field(min_length=1)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_reference_integration(self) -> ReferenceIntegration:
+        """Require the reference id that matches the integration kind."""
+        if self.kind == "skill" and not self.skill_package_id:
+            raise ValueError("skill reference integrations require skill_package_id")
+        if self.kind == "plugin" and not self.plugin_descriptor_id:
+            raise ValueError("plugin reference integrations require plugin_descriptor_id")
+        if self.kind == "adapter" and not self.adapter_package_id:
+            raise ValueError("adapter reference integrations require adapter_package_id")
+        if not self.safe_to_run_locally or not self.reproducible:
+            raise ValueError("reference integrations must be safe and reproducible")
         return self
 
 

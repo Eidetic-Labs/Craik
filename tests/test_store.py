@@ -41,6 +41,7 @@ from craik.contracts.models import (
     PromotedInstructionConstraint,
     RecoverySession,
     RedTeamFinding,
+    ReferenceIntegration,
     ReviewRequest,
     ReviewResult,
     RunDelta,
@@ -193,6 +194,9 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     promoted_constraint = PromotedInstructionConstraint.model_validate(
         fixtures["craik.promoted_instruction_constraint"]
     )
+    reference_integration = ReferenceIntegration.model_validate(
+        fixtures["craik.reference_integration"]
+    )
     run_delta = RunDelta.model_validate(fixtures["craik.run_delta"])
     recovery_session = RecoverySession.model_validate(fixtures["craik.recovery_session"])
     critic_finding = RuntimeCriticFinding.model_validate(
@@ -248,6 +252,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_distilled_instruction_proposal(distilled_instruction)
     store.put_instruction_promotion_review(promotion_review)
     store.put_promoted_instruction_constraint(promoted_constraint)
+    store.put_reference_integration(reference_integration)
     store.put_run_delta(run_delta)
     store.put_recovery_session(recovery_session)
     store.put_runtime_critic_finding(critic_finding)
@@ -313,6 +318,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
         store.get_promoted_instruction_constraint(promoted_constraint.id)
         == promoted_constraint
     )
+    assert (
+        store.get_reference_integration(reference_integration.id)
+        == reference_integration
+    )
     assert store.get_run_delta(run_delta.id) == run_delta
     assert store.get_recovery_session(recovery_session.id) == recovery_session
     assert store.get_runtime_critic_finding(critic_finding.id) == critic_finding
@@ -361,6 +370,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_distilled_instruction_proposals() == [distilled_instruction]
     assert store.list_instruction_promotion_reviews() == [promotion_review]
     assert store.list_promoted_instruction_constraints() == [promoted_constraint]
+    assert store.list_reference_integrations() == [reference_integration]
     assert store.list_run_deltas() == [run_delta]
     assert store.list_recovery_sessions() == [recovery_session]
     assert store.list_runtime_critic_findings() == [critic_finding]
@@ -390,6 +400,7 @@ def test_persists_supported_contract_types(
         "craik.instruction_promotion_review",
         "craik.handoff_quality_score",
         "craik.promoted_instruction_constraint",
+        "craik.reference_integration",
         "craik.red_team_finding",
         "craik.recovery_session",
         "craik.review_request",
