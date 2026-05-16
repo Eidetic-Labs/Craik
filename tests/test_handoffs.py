@@ -1,9 +1,17 @@
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
-from craik.contracts.models import CapabilityReceipt, ReceiptResult
+from craik.contracts.models import (
+    CapabilityReceipt,
+    ReceiptResult,
+    RunOutput,
+    RunStatus,
+    TaskRun,
+    TaskRunStatus,
+)
 from craik.runtime.case_files import CaseFileAssembler
 from craik.runtime.handoffs import HandoffContextError, HandoffWriter, render_markdown
 from craik.runtime.paths import ensure_craik_home
@@ -132,6 +140,46 @@ def test_markdown_handoff_is_deterministic(store: LocalStore, tmp_path: Path) ->
     assert "- Continue with memory backend." in markdown
 
 
+@pytest.mark.parametrize(
+    ("run_status", "handoff_status", "next_step"),
+    [
+        ("completed", "completed", "Review receipts, memory proposals, and merged handoff state."),
+        ("blocked", "blocked", "Resolve the blocking approval, context, or intent-lock condition."),
+        ("failed", "failed", "Inspect diagnostics and decide whether recovery is appropriate."),
+        ("interrupted", "incomplete", "Inspect run state and recover from the last safe boundary."),
+    ],
+)
+def test_handoff_writer_creates_run_outcome_handoffs(
+    store: LocalStore,
+    tmp_path: Path,
+    run_status: TaskRunStatus,
+    handoff_status: RunStatus,
+    next_step: str,
+) -> None:
+    task_id = _seed_case(store, tmp_path)
+    run = _task_run(task_id, status=run_status)
+    output = _run_output(task_id, run.id, diagnostics=["runner [REDACTED]"])
+    receipt = _receipt(task_id)
+    store.put_task_run(run)
+    store.put_run_output(output)
+    ReceiptStore(store).record_receipt(receipt)
+
+    handoff = HandoffWriter(store).create_from_run(run.id, tests_run=["pytest"])
+    updated_run = store.get_task_run(run.id)
+
+    assert handoff.status == handoff_status
+    assert output.id in handoff.artifacts
+    assert receipt.id in handoff.receipt_ids
+    assert "memprop_docs_reconcile" in handoff.memory_proposal_ids
+    assert handoff.runner_metadata == [{"runner_id": "runner_fixture", "execution_mode": "fixture"}]
+    assert handoff.self_audit.receipts_reviewed is True
+    assert "runner [REDACTED]" in handoff.self_audit.notes
+    assert next_step in handoff.next_steps
+    assert updated_run is not None
+    assert updated_run.handoff_id == handoff.id
+    assert "## Runner Metadata" in render_markdown(handoff)
+
+
 def test_handoff_requires_existing_task(store: LocalStore) -> None:
     with pytest.raises(HandoffContextError, match="unknown task"):
         HandoffWriter(store).create(
@@ -139,6 +187,11 @@ def test_handoff_requires_existing_task(store: LocalStore) -> None:
             agent="agent:codex",
             summary="No task.",
         )
+
+
+def test_handoff_from_run_requires_existing_run(store: LocalStore) -> None:
+    with pytest.raises(HandoffContextError, match="unknown task run"):
+        HandoffWriter(store).create_from_run("run_missing")
 
 
 def _seed_case(store: LocalStore, tmp_path: Path) -> str:
@@ -160,9 +213,47 @@ def _seed_case(store: LocalStore, tmp_path: Path) -> str:
     return task.id
 
 
-def _receipt(task_id: str, metadata: dict[str, object] | None = None) -> CapabilityReceipt:
-    from datetime import UTC, datetime
+def _task_run(task_id: str, *, status: TaskRunStatus) -> TaskRun:
+    return TaskRun(
+        id=f"run_{task_id.removeprefix('task_')}",
+        task_id=task_id,
+        case_file_id=f"case_{task_id.removeprefix('task_')}",
+        policy_envelope_id=f"policy_{task_id.removeprefix('task_')}",
+        intent_lock_id=f"intent_{task_id.removeprefix('task_')}",
+        runner_id="runner_fixture",
+        runner_mode="fixture",
+        status=status,
+        phase="stop",
+        iteration=2,
+        max_iterations=5,
+        started_at=datetime(2026, 5, 16, 12, 0, tzinfo=UTC),
+        phase_started_at=datetime(2026, 5, 16, 12, 1, tzinfo=UTC),
+        updated_at=datetime(2026, 5, 16, 12, 2, tzinfo=UTC),
+        ended_at=datetime(2026, 5, 16, 12, 2, tzinfo=UTC),
+        stop_reason=f"run {status}",
+        receipt_ids=["receipt_pytest"],
+    )
 
+
+def _run_output(task_id: str, run_id: str, diagnostics: list[str]) -> RunOutput:
+    return RunOutput(
+        id=f"runout_{task_id.removeprefix('task_')}",
+        run_id=run_id,
+        step_result_id="runner_step_result_docs_reconcile_plan",
+        task_id=task_id,
+        phase="evaluate",
+        summary="Runner evaluated the task.",
+        observed_output={"status": "done"},
+        diagnostics=diagnostics,
+        receipt_ids=["receipt_pytest"],
+        memory_proposal_ids=["memprop_docs_reconcile"],
+        artifacts=["case_docs_reconcile"],
+        redacted=True,
+        created_at=datetime(2026, 5, 16, 12, 2, tzinfo=UTC),
+    )
+
+
+def _receipt(task_id: str, metadata: dict[str, object] | None = None) -> CapabilityReceipt:
     return CapabilityReceipt(
         id="receipt_pytest",
         task_id=task_id,
