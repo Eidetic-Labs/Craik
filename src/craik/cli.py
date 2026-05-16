@@ -6,7 +6,7 @@ import json
 import os
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Annotated, cast
+from typing import Annotated, Any, cast
 
 import typer
 
@@ -61,6 +61,7 @@ from craik.runtime.policy import (
 from craik.runtime.policy_tests import PolicyTestHarness
 from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
 from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
+from craik.runtime.runners import default_runner_capability_matrices, get_runner_capability_matrix
 from craik.runtime.store import LocalStore
 from craik.runtime.tasks import create_task
 
@@ -99,6 +100,8 @@ policy_app = typer.Typer(help="Inspect Craik policy profiles.")
 app.add_typer(policy_app, name="policy")
 receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
 app.add_typer(receipts_app, name="receipts")
+runners_app = typer.Typer(help="Inspect runner capabilities and trust profiles.")
+app.add_typer(runners_app, name="runners")
 
 
 def package_version() -> str:
@@ -153,6 +156,32 @@ def schema_show(name: str) -> None:
         raise typer.BadParameter(f"unknown schema {name!r}; known schemas: {known}") from None
 
     typer.echo(json.dumps(model.model_json_schema(), indent=2, sort_keys=True))
+
+
+@runners_app.command("matrix")
+def runners_matrix(
+    runner_id: Annotated[
+        str | None,
+        typer.Option("--runner", help="Runner id to inspect. Prints all runners when omitted."),
+    ] = None,
+) -> None:
+    """Print runner capability matrix entries as JSON."""
+    payload: Any
+    if runner_id is None:
+        payload = [
+            matrix.model_dump(mode="json", by_alias=True)
+            for matrix in default_runner_capability_matrices().values()
+        ]
+    else:
+        try:
+            payload = get_runner_capability_matrix(runner_id).model_dump(
+                mode="json",
+                by_alias=True,
+            )
+        except KeyError as error:
+            raise typer.BadParameter(str(error)) from None
+
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
 @home_app.command("show")

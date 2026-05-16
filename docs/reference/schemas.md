@@ -46,6 +46,7 @@ craik schema show craik.task_request
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |
 | `craik.runner_adapter_result` | Defines normalized output returned by a runner adapter. |
+| `craik.runner_capability_matrix` | Defines runner capability support, trust boundary, and default grant posture. |
 | `craik.runner_metadata` | Defines stable runner identity, mode, and capability summary. |
 | `craik.task_request` | Defines requested work. |
 | `craik.work_graph_export` | Exports connected graph nodes and edges. |

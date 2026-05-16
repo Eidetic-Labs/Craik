@@ -10,7 +10,14 @@ from craik.contracts.models import (
     RunnerMetadata,
     RunnerResultStatus,
 )
-from craik.runtime.runners import FixtureRunnerAdapter, RunnerAdapter
+from craik.runtime.runners import (
+    FixtureRunnerAdapter,
+    RunnerAdapter,
+    capability_requires_grant,
+    capability_supported,
+    default_runner_capability_matrices,
+    get_runner_capability_matrix,
+)
 
 
 def test_fixture_runner_adapter_returns_normalized_result() -> None:
@@ -56,6 +63,33 @@ def test_fixture_runner_adapter_rejects_mismatched_request() -> None:
 
     with pytest.raises(ValueError, match="metadata"):
         adapter.run(request)
+
+
+def test_default_runner_matrix_contains_conservative_profiles() -> None:
+    matrices = default_runner_capability_matrices()
+
+    assert sorted(matrices) == ["claude", "codex", "fixture", "gemini"]
+    assert matrices["codex"].trust.default_grant_posture == "prompt-for-approval"
+    assert matrices["claude"].trust.default_grant_posture == "deny-by-default"
+    assert matrices["gemini"].trust.level == "low"
+    assert matrices["fixture"].trust.requires_receipts is False
+
+
+def test_runner_capability_lookup_support_and_grant_policy() -> None:
+    codex = get_runner_capability_matrix("codex")
+    gemini = get_runner_capability_matrix("gemini")
+
+    assert capability_supported(codex, "shell.execute")
+    assert capability_requires_grant(codex, "shell.execute")
+    assert capability_supported(codex, "file.read")
+    assert not capability_requires_grant(codex, "file.read")
+    assert not capability_supported(gemini, "memory.write")
+    assert capability_requires_grant(gemini, "unknown.future_capability")
+
+
+def test_unknown_runner_matrix_raises_with_known_runners() -> None:
+    with pytest.raises(KeyError, match="known runners"):
+        get_runner_capability_matrix("unknown")
 
 
 def _runner() -> RunnerMetadata:

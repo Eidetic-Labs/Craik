@@ -484,6 +484,46 @@
     "diagnostics": [],
     "created_at": "2026-05-16T03:31:00Z"
   },
+  "craik.runner_capability_matrix": {
+    "schema": "craik.runner_capability_matrix",
+    "version": "0.1.0",
+    "runner": {
+      "schema": "craik.runner_metadata",
+      "version": "0.1.0",
+      "id": "runner_fixture",
+      "name": "Fixture Runner",
+      "adapter": "fixture",
+      "adapter_version": "0.1.0",
+      "mode": "fixture",
+      "capabilities": ["result.structured"],
+      "metadata": {
+        "contract_test": true
+      }
+    },
+    "trust": {
+      "level": "high",
+      "boundary": "Deterministic in-process fixture with no external side effects.",
+      "default_grant_posture": "allow-with-receipt",
+      "requires_receipts": false,
+      "requires_redaction": true,
+      "notes": ["Only use for contract tests."]
+    },
+    "capabilities": [
+      {
+        "name": "file.read",
+        "support": "unsupported",
+        "grant_required": true,
+        "notes": null
+      },
+      {
+        "name": "result.structured",
+        "support": "supported",
+        "grant_required": false,
+        "notes": null
+      }
+    ],
+    "policy_notes": ["Fixture runs should not widen runtime authority."]
+  },
   "craik.runner_metadata": {
     "schema": "craik.runner_metadata",
     "version": "0.1.0",

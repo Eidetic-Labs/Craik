@@ -14,5 +14,6 @@ Current limitations:
 - Case files currently load local project/task/repo/docs context and read-only GitHub state when configured; Stigmem facts, recent handoffs, and local contradiction report loading are not wired into case assembly yet.
 - The Stigmem documentation demo creates local proposed updates and artifacts; it does not edit documentation files or directly write Stigmem facts by default.
 - Policy tests cover current policy primitives and keep runner grant boundaries visible, but runner adapters are not implemented yet.
+- Runner capability matrices and trust profiles are available for preview runner ids, but prompt compilation and runtime runner selection are not wired to them yet.
 - The CLI does not request tool authority or write runtime state.
 - Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.
