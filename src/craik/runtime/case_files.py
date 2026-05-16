@@ -17,6 +17,7 @@ from craik.contracts.models import (
     TaskRequest,
 )
 from craik.runtime.github import GitHubReadAdapter
+from craik.runtime.instruction_sources import instruction_stale_risk_warnings
 from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.redaction import redact
@@ -128,7 +129,10 @@ class CaseFileAssembler:
             discovered.omitted,
             github_state,
         )
-        stale_risks = _stale_risks(repo_state, discovered.docs, assumptions)
+        stale_risks = [
+            *_stale_risks(repo_state, discovered.docs, assumptions),
+            *instruction_stale_risk_warnings(self.store, project.id),
+        ]
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
         intent_lock = IntentLockManager(self.store).ensure_for_task(task)
         case_file = CaseFile(

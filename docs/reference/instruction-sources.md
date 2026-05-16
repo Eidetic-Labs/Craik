@@ -76,3 +76,14 @@ provenance. Approved proposals must include a promoted constraint ID plus
 reviewer and decision time. Rejected and deferred proposals also preserve
 reviewer and decision time so future agents can see that extraction did not
 silently become active runtime behavior.
+
+## Stale Invalidation
+
+Instruction source snapshots are compared by source ID and content hash.
+Distillations are deferred when their source changes, goes missing, is newly
+discovered, or is omitted from the current scan. Deferral preserves the
+proposal, provenance, evidence, and previous review decision for audit, but the
+proposal is excluded from automatic promotion until it is reviewed again.
+
+Case files and onboarding reports surface stale instruction warnings so agents
+do not treat outdated distilled instructions as active constraints.
