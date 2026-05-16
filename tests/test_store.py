@@ -8,6 +8,7 @@ import pytest
 from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
+    CaseFile,
     EvidenceReference,
     Handoff,
     MemoryProposal,
@@ -74,6 +75,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
 ) -> None:
     task = TaskRequest.model_validate(fixtures["craik.task_request"])
     receipt = CapabilityReceipt.model_validate(fixtures["craik.capability_receipt"])
+    case_file = CaseFile.model_validate(fixtures["craik.case_file"])
     handoff = Handoff.model_validate(fixtures["craik.handoff"])
     proposal = MemoryProposal.model_validate(fixtures["craik.memory_proposal"])
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
@@ -82,6 +84,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
 
     store.put_task(task)
     store.put_receipt(receipt)
+    store.put_case_file(case_file)
     store.put_handoff(handoff)
     store.put_proposal(proposal)
     store.put_assumption(assumption)
@@ -90,12 +93,14 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
 
     assert store.get_task(task.id) == task
     assert store.get_receipt(receipt.id) == receipt
+    assert store.get_case_file(case_file.id) == case_file
     assert store.get_handoff(handoff.id) == handoff
     assert store.get_proposal(proposal.id) == proposal
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
     assert store.get_graph_event(event.id) == event
     assert store.list_receipts() == [receipt]
+    assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
     assert store.list_proposals() == [proposal]
     assert store.list_assumptions() == [assumption]
@@ -111,6 +116,7 @@ def test_persists_supported_contract_types(
         "craik.project_profile",
         "craik.task_request",
         "craik.capability_receipt",
+        "craik.case_file",
         "craik.handoff",
         "craik.memory_proposal",
         "craik.assumption",

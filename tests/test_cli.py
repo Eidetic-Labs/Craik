@@ -112,6 +112,69 @@ def test_project_add_rejects_non_repo(tmp_path) -> None:
     assert "not inside a Git repository" in result.output
 
 
+def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    (repo / "docs" / "adr").mkdir(parents=True)
+    (repo / "README.md").write_text("# Repo\n")
+    (repo / "docs" / "guide.md").write_text("# Guide\n")
+    (repo / "docs" / "adr" / "0001-record.md").write_text("# ADR\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md", "docs")
+    _run_git(repo, "commit", "-m", "initial")
+    home = tmp_path / "home"
+
+    project = runner.invoke(
+        app,
+        ["project", "add", str(repo), "--name", "Example"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    task = runner.invoke(
+        app,
+        [
+            "task",
+            "create",
+            "--project",
+            "Example",
+            "--title",
+            "Review docs",
+            "--objective",
+            "Review docs against implementation.",
+            "--mode",
+            "review",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    built = runner.invoke(
+        app,
+        ["case", "build", "task_review_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    shown = runner.invoke(
+        app,
+        ["case", "show", "task_review_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert project.exit_code == 0
+    assert task.exit_code == 0
+    assert built.exit_code == 0
+    assert shown.exit_code == 0
+    assert json.loads(task.stdout)["id"] == "task_review_docs"
+    assert json.loads(built.stdout)["adrs"] == ["docs/adr/0001-record.md"]
+    assert json.loads(shown.stdout)["id"] == "case_review_docs"
+
+
+def test_case_build_reports_missing_task(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["case", "build", "task_missing"],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code != 0
+    assert "unknown task: task_missing" in result.output
+
+
 def test_policy_show_defaults_to_strict() -> None:
     result = runner.invoke(app, ["policy", "show"])
 

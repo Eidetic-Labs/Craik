@@ -9,6 +9,7 @@ from typing import Any
 
 REDACTION = "[REDACTED]"
 SECRET_KEY_PARTS = ("secret", "token", "password", "api_key", "apikey", "credential")
+NON_SECRET_KEYS = frozenset({"max_tokens", "estimated_tokens"})
 REDACTED_VALUES = ("[REDACTED]", "<redacted>", "redacted")
 REDACTED_VALUE_KEYS = frozenset(value.lower() for value in REDACTED_VALUES)
 
@@ -152,4 +153,6 @@ def _is_secret_key(key: str | None, config: RedactionConfig) -> bool:
     if key is None:
         return False
     lowered = key.lower()
+    if lowered in NON_SECRET_KEYS:
+        return False
     return any(part in lowered for part in config.secret_key_parts)

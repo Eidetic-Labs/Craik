@@ -10,8 +10,13 @@ from typing import Annotated, cast
 import typer
 
 from craik import __version__
-from craik.contracts.models import PolicyProfile
+from craik.contracts.models import PolicyProfile, Priority, TaskMode
 from craik.contracts.registry import schema_model, schema_names
+from craik.runtime.case_files import (
+    CaseFileAssembler,
+    ProjectNotFoundError,
+    TaskNotFoundError,
+)
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy import (
     FailOpenNotAllowedError,
@@ -21,6 +26,7 @@ from craik.runtime.policy import (
 from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
 from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.store import LocalStore
+from craik.runtime.tasks import create_task
 
 PACKAGE_NAME = "craik"
 
@@ -35,6 +41,10 @@ home_app = typer.Typer(help="Inspect and initialize Craik local state paths.")
 app.add_typer(home_app, name="home")
 project_app = typer.Typer(help="Register and inspect Craik projects.")
 app.add_typer(project_app, name="project")
+task_app = typer.Typer(help="Create and inspect Craik tasks.")
+app.add_typer(task_app, name="task")
+case_app = typer.Typer(help="Build and inspect Craik case files.")
+app.add_typer(case_app, name="case")
 policy_app = typer.Typer(help="Inspect Craik policy profiles.")
 app.add_typer(policy_app, name="policy")
 receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
@@ -193,6 +203,99 @@ def project_show(project: str) -> None:
     typer.echo(json.dumps(profile.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
 
 
+@task_app.command("create")
+def task_create(
+    title: Annotated[str, typer.Option("--title", help="Task title.")],
+    objective: Annotated[str, typer.Option("--objective", help="Task objective.")],
+    project: Annotated[str, typer.Option("--project", help="Registered project id or name.")],
+    requested_by: Annotated[
+        str,
+        typer.Option("--requested-by", help="Requester identity to store on the task."),
+    ] = "user:local",
+    priority: Annotated[
+        str,
+        typer.Option("--priority", help="Priority: low, normal, high, or urgent."),
+    ] = "normal",
+    mode: Annotated[
+        str,
+        typer.Option("--mode", help="Mode: plan, review, implement, or verify."),
+    ] = "implement",
+    constraint: Annotated[
+        list[str] | None,
+        typer.Option("--constraint", help="Task constraint. May be repeated."),
+    ] = None,
+    expected_output: Annotated[
+        list[str] | None,
+        typer.Option("--expected-output", help="Expected output. May be repeated."),
+    ] = None,
+) -> None:
+    """Create a task request for a registered project."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        registry = ProjectRegistry(store)
+        profile = registry.get_project(project)
+        if profile is None:
+            raise typer.BadParameter(f"unknown project: {project}")
+        task = create_task(
+            store,
+            title=title,
+            objective=objective,
+            project_id=profile.id,
+            requested_by=requested_by,
+            priority=_priority(priority),
+            mode=_task_mode(mode),
+            constraints=constraint,
+            expected_outputs=expected_output,
+        )
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(task.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+
+
+@case_app.command("build")
+def case_build(
+    task_id: Annotated[str, typer.Argument(help="Task id to build a case file for.")],
+    max_tokens: Annotated[
+        int,
+        typer.Option("--max-tokens", min=1, help="Approximate context budget."),
+    ] = 24000,
+) -> None:
+    """Build and persist a deterministic case file for a task."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        assembler = CaseFileAssembler(store)
+        case_file = assembler.build(task_id, max_tokens=max_tokens)
+    except (TaskNotFoundError, ProjectNotFoundError) as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(case_file.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
+@case_app.command("show")
+def case_show(case_or_task_id: str) -> None:
+    """Show one persisted case file by case id or task id."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        assembler = CaseFileAssembler(store)
+        case_file = assembler.get(case_or_task_id) or assembler.latest_for_task(case_or_task_id)
+    finally:
+        store.close()
+
+    if case_file is None:
+        raise typer.BadParameter(f"unknown case file or task: {case_or_task_id}")
+    typer.echo(
+        json.dumps(case_file.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
 @policy_app.command("show")
 def policy_show(
     task_id: Annotated[
@@ -299,6 +402,18 @@ def _policy_profile(value: str) -> PolicyProfile:
     if value in {"strict", "trusted-local", "automation"}:
         return cast(PolicyProfile, value)
     raise typer.BadParameter(f"unknown policy profile: {value}")
+
+
+def _priority(value: str) -> Priority:
+    if value in {"low", "normal", "high", "urgent"}:
+        return cast(Priority, value)
+    raise typer.BadParameter(f"unknown priority: {value}")
+
+
+def _task_mode(value: str) -> TaskMode:
+    if value in {"plan", "review", "implement", "verify"}:
+        return cast(TaskMode, value)
+    raise typer.BadParameter(f"unknown task mode: {value}")
 
 
 def main() -> None:

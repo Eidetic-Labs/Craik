@@ -60,6 +60,10 @@ def test_detects_unredacted_secret_material() -> None:
     assert not contains_unredacted_secret({"password": "[REDACTED]"})
 
 
+def test_context_budget_token_counts_are_not_secret_keys() -> None:
+    assert not contains_unredacted_secret({"max_tokens": 24000, "estimated_tokens": 12})
+
+
 def test_receipt_shape_redaction_regression() -> None:
     payload = {
         "schema": "craik.capability_receipt",
