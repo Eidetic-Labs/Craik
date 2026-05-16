@@ -72,3 +72,6 @@ event id, sender external id, paired identity id, channel, and redaction fields.
 - Sender identity pairing and allowlists are enforced by later gateway layers.
 - Policy envelopes and capability grants remain required before privileged
   action can happen.
+
+See [Channel Identity Pairing](channel-identity-pairing.md) for paired,
+unpaired, and revoked sender authority states.

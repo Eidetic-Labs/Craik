@@ -299,6 +299,31 @@
     "docs": ["docs/reference/channel-adapter-contract.md"],
     "created_at": "2026-05-16T18:30:00Z"
   },
+  "craik.channel_identity_pairing": {
+    "schema": "craik.channel_identity_pairing",
+    "version": "0.1.0",
+    "id": "channel_identity_alice",
+    "external_account": {
+      "channel": "messaging",
+      "external_id": "external:alice",
+      "service": "fixture-chat",
+      "display_name": "Alice",
+      "metadata": {
+        "workspace": "ops"
+      }
+    },
+    "status": "paired",
+    "subject": "user:alice",
+    "policy_envelope_id": "policy_gateway",
+    "paired_at": "2026-05-16T18:45:00Z",
+    "paired_by": "user:maintainer",
+    "revoked_at": null,
+    "revoked_by": null,
+    "revocation_reason": null,
+    "audit_ids": ["receipt_pair_alice"],
+    "created_at": "2026-05-16T18:44:00Z",
+    "updated_at": "2026-05-16T18:45:00Z"
+  },
   "craik.case_file": {
     "schema": "craik.case_file",
     "version": "0.1.0",

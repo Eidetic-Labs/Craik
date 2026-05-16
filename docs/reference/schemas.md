@@ -38,6 +38,7 @@ craik schema show craik.task_request
 | `craik.capability_receipt` | Records an auditable action result under a policy profile. |
 | `craik.case_file` | Captures task-specific context assembled before execution. |
 | `craik.channel_adapter_contract` | Defines external channel adapter identity, payload shapes, capability surfaces, receipts, and trust boundaries. |
+| `craik.channel_identity_pairing` | Records external channel account pairing state, policy linkage, revocation state, and audit links. |
 | `craik.compiled_prompt` | Captures a deterministic policy-aware runner prompt. |
 | `craik.contradiction_report` | Captures incompatible assertions for review. |
 | `craik.context_debt_record` | Tracks omitted, stale, unresolved, or missing context with owner and next action. |
