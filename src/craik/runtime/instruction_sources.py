@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from craik.contracts.models import (
+    ContradictionReport,
     DistilledInstructionProposal,
     InstructionProvenance,
     InstructionSourceSnapshot,
 )
+from craik.runtime.contradictions import ContradictionManager
 from craik.runtime.store import LocalStore
 
 
@@ -125,10 +127,99 @@ def promotable_distilled_instructions(
     )
 
 
+def detect_instruction_contradictions(
+    store: LocalStore,
+    *,
+    task_id: str | None = None,
+    owner: str | None = None,
+) -> list[ContradictionReport]:
+    """Open contradiction reports for incompatible distilled instruction proposals."""
+    proposals = sorted(
+        store.list_distilled_instruction_proposals(),
+        key=lambda proposal: proposal.id,
+    )
+    reports: list[ContradictionReport] = []
+    for index, left in enumerate(proposals):
+        for right in proposals[index + 1 :]:
+            if not _proposals_conflict(left, right):
+                continue
+            report = ContradictionManager(store).open_report(
+                task_id=task_id or left.task_id or right.task_id,
+                facts=[left.statement, right.statement],
+                summary=f"Instruction source conflict: {left.category}",
+                affected_artifacts=[
+                    left.id,
+                    right.id,
+                    left.source_id,
+                    right.source_id,
+                ],
+                evidence_ids=sorted({*left.provenance_ids, *right.provenance_ids}),
+                owner=owner,
+                proposed_resolution="Human review must decide which instruction source applies.",
+            )
+            _defer_conflicting_proposal(store, left, report.id)
+            _defer_conflicting_proposal(store, right, report.id)
+            reports.append(report)
+    return sorted(reports, key=lambda report: report.id)
+
+
 def _bullet_lines(values: list[str]) -> list[str]:
     if not values:
         return ["  - None"]
     return [f"  - {value}" for value in values]
+
+
+def _proposals_conflict(
+    left: DistilledInstructionProposal,
+    right: DistilledInstructionProposal,
+) -> bool:
+    if left.source_id == right.source_id or left.category != right.category:
+        return False
+    if left.category not in {"instruction", "policy", "command", "boundary", "security_rule"}:
+        return False
+    return _normalized_positive(left.statement) == _normalized_negative(
+        right.statement
+    ) or _normalized_positive(right.statement) == _normalized_negative(left.statement)
+
+
+def _defer_conflicting_proposal(
+    store: LocalStore,
+    proposal: DistilledInstructionProposal,
+    contradiction_id: str,
+) -> None:
+    updated = proposal.model_copy(
+        update={
+            "promotion_status": "deferred",
+            "decided_by": "agent:instruction-distillation",
+            "decided_at": proposal.created_at,
+            "contradiction_ids": sorted({*proposal.contradiction_ids, contradiction_id}),
+        }
+    )
+    store.put_distilled_instruction_proposal(
+        DistilledInstructionProposal.model_validate(
+            updated.model_dump(mode="json", by_alias=True)
+        )
+    )
+
+
+def _normalized_positive(statement: str) -> str:
+    value = _normalize_statement(statement)
+    for prefix in ("must ", "should ", "may "):
+        if value.startswith(prefix):
+            return value.removeprefix(prefix)
+    return value
+
+
+def _normalized_negative(statement: str) -> str:
+    value = _normalize_statement(statement)
+    for prefix in ("must not ", "should not ", "may not "):
+        if value.startswith(prefix):
+            return value.removeprefix(prefix)
+    return ""
+
+
+def _normalize_statement(statement: str) -> str:
+    return " ".join(statement.lower().rstrip(".").split())
 
 
 def _stale_source_ids(

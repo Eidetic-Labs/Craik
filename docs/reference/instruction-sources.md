@@ -87,3 +87,17 @@ proposal is excluded from automatic promotion until it is reviewed again.
 
 Case files and onboarding reports surface stale instruction warnings so agents
 do not treat outdated distilled instructions as active constraints.
+
+## Instruction Conflicts
+
+Distilled proposals from different sources can conflict. Craik opens local
+`craik.contradiction_report` records for incompatible instruction, policy,
+command, boundary, or security-rule proposals. Reports link the conflicting
+proposal IDs, source IDs, and provenance IDs so a human reviewer can inspect the
+source material.
+
+Conflicting proposals are deferred and excluded from automatic promotion until
+the contradiction is reviewed. Preference and stale-risk disagreements are kept
+as reviewable proposals, but they do not automatically become contradiction
+reports because they may represent tolerable local variation rather than
+mutually exclusive runtime authority.
