@@ -102,6 +102,7 @@ project.
 - [Skill Telemetry](reference/skill-telemetry.md)
 - [Skill Proposals](reference/skill-proposals.md)
 - [Skill Replay](reference/skill-replay.md)
+- [Learning Receipts](reference/learning-receipts.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
