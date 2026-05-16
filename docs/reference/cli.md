@@ -86,6 +86,16 @@ Options:
 
 Print one persisted case file by case id or task id.
 
+## `craik connect stigmem`
+
+Detect Stigmem backend compatibility.
+
+Options:
+
+- `--url <url>`: Stigmem node URL. Can also be set with `CRAIK_STIGMEM_URL`.
+- `--api-key <key>`: bearer API key. Prefer `CRAIK_STIGMEM_API_KEY`.
+- `--timeout <seconds>`: request timeout. Can also be set with `CRAIK_STIGMEM_TIMEOUT`.
+
 ## `craik handoff create <task-id>`
 
 Create and persist a structured handoff for a task.

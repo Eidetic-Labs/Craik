@@ -25,6 +25,21 @@ Approved local proposals are searchable as local facts. Rejected and pending pro
 
 Direct local memory writes are denied until a policy-granted write path exists. Proposal creation is the default path.
 
+### Stigmem
+
+`StigmemMemoryStore` uses the Stigmem HTTP API for shared durable memory and keeps proposals in Craik local state. Stigmem facts are immutable assertions, so Craik still uses local proposals until a proposal is approved and policy grants a direct write.
+
+The minimum endpoint mapping is:
+
+- `GET /healthz`
+- `GET /.well-known/stigmem`
+- `POST /v1/facts`
+- `GET /v1/facts`
+- `GET /v1/facts/{fact_id}`
+- `GET /v1/facts/{fact_id}/provenance`
+
+Use `craik connect stigmem` to detect compatibility. Configure the node with `CRAIK_STIGMEM_URL` and authenticated nodes with `CRAIK_STIGMEM_API_KEY`.
+
 ## Proposal Status
 
 `craik.memory_proposal` records use these statuses:
