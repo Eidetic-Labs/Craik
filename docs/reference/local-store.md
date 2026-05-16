@@ -40,6 +40,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `evidence` | `craik.evidence_reference` |
 | `graph_exports` | `craik.work_graph_export` |
 | `graph_events` | `craik.work_graph_event` |
+| `worker_results` | `craik.worker_result` |
 
 Every stored payload is validated through the Pydantic contract registry before persistence and again when loaded.
 

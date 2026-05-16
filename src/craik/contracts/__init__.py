@@ -27,6 +27,8 @@ from craik.contracts.models import (
     RunOutput,
     TaskRequest,
     TaskRun,
+    WorkerFinding,
+    WorkerResult,
     WorkGraphEvent,
     WorkGraphExport,
 )
@@ -60,4 +62,6 @@ __all__ = [
     "TaskRequest",
     "WorkGraphExport",
     "WorkGraphEvent",
+    "WorkerFinding",
+    "WorkerResult",
 ]

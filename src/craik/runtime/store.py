@@ -30,6 +30,7 @@ from craik.contracts.models import (
     RunOutput,
     TaskRequest,
     TaskRun,
+    WorkerResult,
     WorkGraphEvent,
 )
 from craik.contracts.registry import CONTRACT_REGISTRY, ContractModel
@@ -59,6 +60,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.evidence_reference": "evidence",
     "craik.work_graph_export": "graph_exports",
     "craik.work_graph_event": "graph_events",
+    "craik.worker_result": "worker_results",
 }
 
 
@@ -214,6 +216,16 @@ class LocalStore:
 
     def list_run_outputs(self) -> list[RunOutput]:
         return _cast_list(RunOutput, self.list_contracts("craik.run_output"))
+
+    def put_worker_result(self, result: WorkerResult) -> None:
+        self.put_contract(result)
+
+    def get_worker_result(self, result_id: str) -> WorkerResult | None:
+        contract = self.get_contract("craik.worker_result", result_id)
+        return _cast_optional(WorkerResult, contract)
+
+    def list_worker_results(self) -> list[WorkerResult]:
+        return _cast_list(WorkerResult, self.list_contracts("craik.worker_result"))
 
     def put_task(self, task: TaskRequest) -> None:
         self.put_contract(task)
