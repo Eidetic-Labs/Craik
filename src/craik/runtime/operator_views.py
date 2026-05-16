@@ -3,14 +3,51 @@
 from __future__ import annotations
 
 from craik.contracts.models import (
+    Assumption,
     CapabilityReceipt,
     ContradictionReport,
+    EvidenceReference,
     Handoff,
     PluginReceipt,
     WorkGraphEdge,
     WorkGraphExport,
     WorkGraphNode,
 )
+
+
+def format_evidence_assumption_view(
+    evidence: list[EvidenceReference],
+    assumptions: list[Assumption],
+) -> list[str]:
+    """Format evidence and assumptions while keeping assumptions distinct."""
+    lines = [f"Evidence: {len(evidence)}", ""]
+    lines.extend(_format_evidence(item) for item in sorted(evidence, key=lambda item: item.id))
+    if not evidence:
+        lines.append("- none")
+    lines.extend(["", f"Assumptions: {len(assumptions)}", ""])
+    lines.extend(
+        _format_assumption(item) for item in sorted(assumptions, key=lambda item: item.id)
+    )
+    if not assumptions:
+        lines.append("- none")
+    return lines
+
+
+def _format_evidence(evidence: EvidenceReference) -> str:
+    captured = evidence.captured_at.isoformat() if evidence.captured_at else "unknown"
+    return (
+        f"- {evidence.id} [{evidence.kind}] source={evidence.source} "
+        f"locator={evidence.locator} captured={captured}: {evidence.summary}"
+    )
+
+
+def _format_assumption(assumption: Assumption) -> str:
+    evidence = _join_or_none(assumption.evidence_ids)
+    return (
+        f"- {assumption.id} [{assumption.status}] task={assumption.task_id} "
+        f"confidence={assumption.confidence:.2f} evidence={evidence}: "
+        f"{assumption.statement}"
+    )
 
 
 def format_contradiction_inbox(reports: list[ContradictionReport]) -> list[str]:

@@ -1,6 +1,8 @@
 from craik.contracts.models import (
+    Assumption,
     CapabilityReceipt,
     ContradictionReport,
+    EvidenceReference,
     Handoff,
     PluginReceipt,
     WorkGraphEdge,
@@ -9,6 +11,7 @@ from craik.contracts.models import (
 )
 from craik.runtime.operator_views import (
     format_contradiction_inbox,
+    format_evidence_assumption_view,
     format_handoff_viewer,
     format_receipt_viewer,
     format_work_graph_explorer,
@@ -206,6 +209,50 @@ def test_contradiction_inbox_formats_statuses_and_review_links() -> None:
 
 def test_contradiction_inbox_empty_state() -> None:
     assert format_contradiction_inbox([]) == ["Contradiction Inbox: 0", "", "- none"]
+
+
+def test_evidence_assumption_view_keeps_assumptions_distinct() -> None:
+    evidence = EvidenceReference.model_validate(
+        {
+            "id": "evidence_readme_status",
+            "source": "README.md",
+            "kind": "file",
+            "locator": "README.md#status",
+            "summary": "README documents project status.",
+            "captured_at": "2026-05-16T17:15:00Z",
+        }
+    )
+    assumption = Assumption.model_validate(
+        {
+            "id": "assumption_docs_stale",
+            "task_id": "task_docs_reconcile",
+            "statement": "Docs may be stale.",
+            "rationale": "Review requested docs reconciliation.",
+            "evidence_ids": ["evidence_readme_status"],
+            "confidence": 0.65,
+            "status": "open",
+        }
+    )
+
+    lines = format_evidence_assumption_view([evidence], [assumption])
+
+    assert lines[0] == "Evidence: 1"
+    assert "[file] source=README.md" in lines[2]
+    assert "Assumptions: 1" in lines
+    assert "[open] task=task_docs_reconcile confidence=0.65" in lines[-1]
+    assert "evidence=evidence_readme_status" in lines[-1]
+
+
+def test_evidence_assumption_view_empty_state() -> None:
+    assert format_evidence_assumption_view([], []) == [
+        "Evidence: 0",
+        "",
+        "- none",
+        "",
+        "Assumptions: 0",
+        "",
+        "- none",
+    ]
 
 
 def _contradiction(
