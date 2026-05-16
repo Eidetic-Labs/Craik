@@ -10,6 +10,7 @@ from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
     CaseFile,
+    ContextDebtRecord,
     ContradictionReport,
     DebateSummary,
     DebateTurn,
@@ -109,6 +110,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     intent_lock = IntentLock.model_validate(fixtures["craik.intent_lock"])
     proposal = MemoryProposal.model_validate(fixtures["craik.memory_proposal"])
     contradiction = ContradictionReport.model_validate(fixtures["craik.contradiction_report"])
+    context_debt = ContextDebtRecord.model_validate(fixtures["craik.context_debt_record"])
     assumption = Assumption.model_validate(fixtures["craik.assumption"])
     evidence = EvidenceReference.model_validate(fixtures["craik.evidence_reference"])
     handoff_quality_score = HandoffQualityScore.model_validate(
@@ -169,6 +171,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_intent_lock(intent_lock)
     store.put_proposal(proposal)
     store.put_contradiction(contradiction)
+    store.put_context_debt_record(context_debt)
     store.put_assumption(assumption)
     store.put_evidence(evidence)
     store.put_handoff_quality_score(handoff_quality_score)
@@ -208,6 +211,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.get_intent_lock(intent_lock.id) == intent_lock
     assert store.get_proposal(proposal.id) == proposal
     assert store.get_contradiction(contradiction.id) == contradiction
+    assert store.get_context_debt_record(context_debt.id) == context_debt
     assert store.get_assumption(assumption.id) == assumption
     assert store.get_evidence(evidence.id) == evidence
     assert store.get_handoff_quality_score(handoff_quality_score.id) == handoff_quality_score
@@ -249,6 +253,7 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_intent_locks() == [intent_lock]
     assert store.list_proposals() == [proposal]
     assert store.list_contradictions() == [contradiction]
+    assert store.list_context_debt_records() == [context_debt]
     assert store.list_assumptions() == [assumption]
     assert store.list_evidence() == [evidence]
     assert store.list_handoff_quality_scores() == [handoff_quality_score]
@@ -288,6 +293,7 @@ def test_persists_supported_contract_types(
         "craik.capability_receipt",
         "craik.case_file",
         "craik.contradiction_report",
+        "craik.context_debt_record",
         "craik.debate_summary",
         "craik.debate_turn",
         "craik.distilled_instruction_proposal",

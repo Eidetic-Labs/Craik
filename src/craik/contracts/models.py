@@ -75,6 +75,18 @@ HandoffQualityComponentName = Literal[
     "next_steps",
     "self_audit",
 ]
+ContextDebtKind = Literal[
+    "omitted_doc",
+    "excluded_doc",
+    "stale_instruction",
+    "unresolved_assumption",
+    "missing_external_state",
+    "missing_memory_facts",
+    "active_instruction_constraint",
+    "missing_case_file",
+    "other",
+]
+ContextDebtStatus = Literal["created", "carried_forward", "resolved"]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1471,6 +1483,44 @@ class CaseFile(CraikModel):
     contradictions: list[ContradictionReport] = Field(default_factory=list)
     verification_plan: list[str] = Field(default_factory=list)
     context_budget: dict[str, Any] = Field(default_factory=dict)
+
+
+class ContextDebtRecord(CraikModel):
+    """First-class record for context that was omitted, stale, unresolved, or missing."""
+
+    schema_: Literal["craik.context_debt_record"] = Field(
+        default="craik.context_debt_record",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    case_file_id: str | None = None
+    handoff_id: str | None = None
+    kind: ContextDebtKind
+    status: ContextDebtStatus = "created"
+    summary: str
+    owner: str | None = None
+    next_action: str | None = None
+    omitted_doc_paths: list[str] = Field(default_factory=list)
+    stale_instruction_ids: list[str] = Field(default_factory=list)
+    assumption_ids: list[str] = Field(default_factory=list)
+    missing_external_state: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    created_at: datetime
+    resolved_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_context_debt_status(self) -> ContextDebtRecord:
+        """Require open debt to be actionable and resolved debt to be timestamped."""
+        if self.status in {"created", "carried_forward"} and not self.next_action:
+            raise ValueError("open context debt requires next_action")
+        if self.status == "resolved" and self.resolved_at is None:
+            raise ValueError("resolved context debt requires resolved_at")
+        if self.status != "resolved" and self.resolved_at is not None:
+            raise ValueError("unresolved context debt must not set resolved_at")
+        return self
 
 
 class AgentOnboarding(CraikModel):
