@@ -38,8 +38,10 @@ from craik.contracts.models import (
     PolicyEnvelope,
     ProjectProfile,
     PromotedInstructionConstraint,
+    RecoverySession,
     ReviewRequest,
     ReviewResult,
+    RunDelta,
     RunOutput,
     ScopeChangeRequest,
     ScopeChangeResult,
@@ -89,8 +91,10 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.review_request": "review_requests",
     "craik.review_result": "review_results",
     "craik.promoted_instruction_constraint": "promoted_instruction_constraints",
+    "craik.recovery_session": "recovery_sessions",
     "craik.scope_change_request": "scope_change_requests",
     "craik.scope_change_result": "scope_change_results",
+    "craik.run_delta": "run_deltas",
 }
 
 
@@ -460,6 +464,26 @@ class LocalStore:
             PromotedInstructionConstraint,
             self.list_contracts("craik.promoted_instruction_constraint"),
         )
+
+    def put_run_delta(self, delta: RunDelta) -> None:
+        self.put_contract(delta)
+
+    def get_run_delta(self, delta_id: str) -> RunDelta | None:
+        contract = self.get_contract("craik.run_delta", delta_id)
+        return _cast_optional(RunDelta, contract)
+
+    def list_run_deltas(self) -> list[RunDelta]:
+        return _cast_list(RunDelta, self.list_contracts("craik.run_delta"))
+
+    def put_recovery_session(self, session: RecoverySession) -> None:
+        self.put_contract(session)
+
+    def get_recovery_session(self, session_id: str) -> RecoverySession | None:
+        contract = self.get_contract("craik.recovery_session", session_id)
+        return _cast_optional(RecoverySession, contract)
+
+    def list_recovery_sessions(self) -> list[RecoverySession]:
+        return _cast_list(RecoverySession, self.list_contracts("craik.recovery_session"))
 
     def put_task(self, task: TaskRequest) -> None:
         self.put_contract(task)
