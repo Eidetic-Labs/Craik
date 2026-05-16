@@ -23,8 +23,10 @@ from craik.contracts.models import (
     DebateSummary,
     DebateTurn,
     DistilledInstructionProposal,
+    EvidenceCoverageScore,
     EvidenceReference,
     Handoff,
+    HandoffQualityScore,
     HumanDelegationPoint,
     InstructionPromotionReview,
     InstructionProvenance,
@@ -87,7 +89,9 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.memory_impact_preview": "memory_previews",
     "craik.assumption": "assumptions",
     "craik.evidence_reference": "evidence",
+    "craik.evidence_coverage_score": "evidence_coverage_scores",
     "craik.work_graph_export": "graph_exports",
+    "craik.handoff_quality_score": "handoff_quality_scores",
     "craik.work_graph_event": "graph_events",
     "craik.worker_result": "worker_results",
     "craik.review_request": "review_requests",
@@ -604,6 +608,19 @@ class LocalStore:
     def list_handoffs(self) -> list[Handoff]:
         return _cast_list(Handoff, self.list_contracts("craik.handoff"))
 
+    def put_handoff_quality_score(self, score: HandoffQualityScore) -> None:
+        self.put_contract(score)
+
+    def get_handoff_quality_score(self, score_id: str) -> HandoffQualityScore | None:
+        contract = self.get_contract("craik.handoff_quality_score", score_id)
+        return _cast_optional(HandoffQualityScore, contract)
+
+    def list_handoff_quality_scores(self) -> list[HandoffQualityScore]:
+        return _cast_list(
+            HandoffQualityScore,
+            self.list_contracts("craik.handoff_quality_score"),
+        )
+
     def put_proposal(self, proposal: MemoryProposal) -> None:
         self.put_contract(proposal)
 
@@ -666,6 +683,19 @@ class LocalStore:
 
     def list_evidence(self) -> list[EvidenceReference]:
         return _cast_list(EvidenceReference, self.list_contracts("craik.evidence_reference"))
+
+    def put_evidence_coverage_score(self, score: EvidenceCoverageScore) -> None:
+        self.put_contract(score)
+
+    def get_evidence_coverage_score(self, score_id: str) -> EvidenceCoverageScore | None:
+        contract = self.get_contract("craik.evidence_coverage_score", score_id)
+        return _cast_optional(EvidenceCoverageScore, contract)
+
+    def list_evidence_coverage_scores(self) -> list[EvidenceCoverageScore]:
+        return _cast_list(
+            EvidenceCoverageScore,
+            self.list_contracts("craik.evidence_coverage_score"),
+        )
 
     def put_graph_event(self, event: WorkGraphEvent) -> None:
         self.put_contract(event)

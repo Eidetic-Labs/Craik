@@ -63,6 +63,18 @@ RedTeamFindingType = Literal[
     "adversarial_input",
     "other",
 ]
+QualityScoreBand = Literal["excellent", "adequate", "poor"]
+HandoffQualityComponentName = Literal[
+    "summary",
+    "completed_actions",
+    "validation_records",
+    "receipt_links",
+    "evidence_links",
+    "context_debt",
+    "unresolved_risks",
+    "next_steps",
+    "self_audit",
+]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -1531,6 +1543,83 @@ class Handoff(CraikModel):
     memory_proposal_ids: list[str] = Field(default_factory=list)
     runner_metadata: list[dict[str, Any]] = Field(default_factory=list)
     created_at: datetime
+
+
+class QualityScoreComponent(CraikModel):
+    """One weighted scoring input for a handoff or evidence coverage score."""
+
+    name: HandoffQualityComponentName
+    score: float = Field(ge=0.0, le=1.0)
+    weight: float = Field(gt=0.0, le=1.0)
+    rationale: str
+
+
+class HandoffQualityScore(CraikModel):
+    """Derived quality score for a handoff's completeness and recovery value."""
+
+    schema_: Literal["craik.handoff_quality_score"] = Field(
+        default="craik.handoff_quality_score",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str
+    handoff_id: str
+    score: float = Field(ge=0.0, le=1.0)
+    band: QualityScoreBand
+    components: list[QualityScoreComponent] = Field(min_length=1)
+    blocking_reasons: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_handoff_score_band(self) -> HandoffQualityScore:
+        """Keep the derived band aligned with the numeric score."""
+        if self.score >= 0.85 and self.band != "excellent":
+            raise ValueError("handoff scores >= 0.85 must be excellent")
+        if 0.60 <= self.score < 0.85 and self.band != "adequate":
+            raise ValueError("handoff scores between 0.60 and 0.85 must be adequate")
+        if self.score < 0.60 and self.band != "poor":
+            raise ValueError("handoff scores below 0.60 must be poor")
+        if self.band == "poor" and not self.blocking_reasons:
+            raise ValueError("poor handoff quality scores require blocking_reasons")
+        return self
+
+
+class EvidenceCoverageScore(CraikModel):
+    """Derived score for evidence links supporting a handoff or output."""
+
+    schema_: Literal["craik.evidence_coverage_score"] = Field(
+        default="craik.evidence_coverage_score",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    handoff_id: str | None = None
+    score: float = Field(ge=0.0, le=1.0)
+    band: QualityScoreBand
+    evidence_ids: list[str] = Field(default_factory=list)
+    required_evidence_ids: list[str] = Field(default_factory=list)
+    missing_evidence_ids: list[str] = Field(default_factory=list)
+    weak_claims: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_evidence_score(self) -> EvidenceCoverageScore:
+        """Require explicit gaps for poor evidence coverage scores."""
+        if self.score >= 0.85 and self.band != "excellent":
+            raise ValueError("evidence scores >= 0.85 must be excellent")
+        if 0.60 <= self.score < 0.85 and self.band != "adequate":
+            raise ValueError("evidence scores between 0.60 and 0.85 must be adequate")
+        if self.score < 0.60 and self.band != "poor":
+            raise ValueError("evidence scores below 0.60 must be poor")
+        if self.band == "poor" and not self.missing_evidence_ids and not self.weak_claims:
+            raise ValueError(
+                "poor evidence coverage scores require missing evidence or weak claims"
+            )
+        return self
 
 
 class TaskRun(CraikModel):
