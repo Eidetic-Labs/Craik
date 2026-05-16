@@ -14,6 +14,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
 )
+from craik.runtime.github import GitHubReadAdapter
 from craik.runtime.intent_locks import IntentLockManager
 from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.redaction import redact
@@ -37,6 +38,7 @@ class CaseFileAssembler:
     """Build deterministic case files from local project and task contracts."""
 
     store: LocalStore
+    github_adapter: GitHubReadAdapter | None = None
 
     def build(self, task_id: str, *, max_tokens: int = 24000) -> CaseFile:
         """Build and persist a case file for a task."""
@@ -50,8 +52,9 @@ class CaseFileAssembler:
         repo_root = Path(project.repo.local_path)
         docs, adrs, omitted_docs = _discover_docs(project, repo_root, max_tokens=max_tokens)
         repo_state = _repo_state(project, repo_root)
+        github_state = _github_state(self.github_adapter, project, repo_state)
         evidence = _evidence(task, project, docs, adrs, repo_state)
-        assumptions = _assumptions(task, project, docs, omitted_docs)
+        assumptions = _assumptions(task, project, docs, omitted_docs, github_state)
         stale_risks = _stale_risks(repo_state, docs, assumptions)
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
         intent_lock = IntentLockManager(self.store).ensure_for_task(task)
@@ -67,7 +70,7 @@ class CaseFileAssembler:
             docs=docs,
             adrs=adrs,
             repo_state=repo_state,
-            github_state={"status": "not_loaded"},
+            github_state=github_state,
             recent_handoffs=[],
             stale_risks=stale_risks,
             contradictions=[],
@@ -151,6 +154,19 @@ def _repo_state(project: ProjectProfile, repo_root: Path) -> dict[str, Any]:
     }
 
 
+def _github_state(
+    adapter: GitHubReadAdapter | None,
+    project: ProjectProfile,
+    repo_state: dict[str, Any],
+) -> dict[str, Any]:
+    if adapter is None:
+        return {"status": "not_loaded"}
+    return adapter.case_file_state(
+        remote=project.repo.remote,
+        ref=str(repo_state["head"]),
+    )
+
+
 def _evidence(
     task: TaskRequest,
     project: ProjectProfile,
@@ -205,6 +221,7 @@ def _assumptions(
     project: ProjectProfile,
     docs: list[str],
     omitted_docs: list[str],
+    github_state: dict[str, Any],
 ) -> list[Assumption]:
     assumptions = [
         Assumption(
@@ -218,15 +235,18 @@ def _assumptions(
             confidence=1.0,
             status="open",
         ),
-        Assumption(
-            id=f"assumption_{task.id}_github_not_loaded",
-            task_id=task.id,
-            statement="No GitHub issue or pull request state was loaded into this case file.",
-            rationale="The GitHub read adapter is not implemented yet.",
-            confidence=1.0,
-            status="open",
-        ),
     ]
+    if github_state.get("status") != "loaded":
+        assumptions.append(
+            Assumption(
+                id=f"assumption_{task.id}_github_not_loaded",
+                task_id=task.id,
+                statement="No GitHub issue or pull request state was loaded into this case file.",
+                rationale=_github_assumption_rationale(github_state),
+                confidence=1.0,
+                status="open",
+            )
+        )
     if not docs:
         assumptions.append(
             Assumption(
@@ -252,6 +272,18 @@ def _assumptions(
             )
         )
     return assumptions
+
+
+def _github_assumption_rationale(github_state: dict[str, Any]) -> str:
+    status = github_state.get("status")
+    if status == "not_configured":
+        return "Project remote is not configured as a GitHub repository."
+    if status == "error":
+        warnings = github_state.get("warnings")
+        if isinstance(warnings, list) and warnings:
+            return f"GitHub read adapter could not load state: {warnings[0]}"
+        return "GitHub read adapter could not load state."
+    return "GitHub read adapter was not configured for this case file build."
 
 
 def _stale_risks(

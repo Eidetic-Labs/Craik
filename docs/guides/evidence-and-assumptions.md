@@ -23,7 +23,7 @@ The local case assembler records assumptions when expected context is missing.
 Current examples:
 
 - memory facts were not loaded,
-- GitHub issue or pull request state was not loaded,
+- GitHub issue or pull request state was not loaded because the adapter was disabled, unconfigured, unauthenticated, or rate limited,
 - no mutable documentation files were discovered,
 - or some documentation was omitted by the context budget.
 

@@ -67,6 +67,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Configuring Craik Home](docs/guides/configuring-craik-home.md)
 - [Project Registry](docs/guides/project-registry.md)
 - [Using Case Files](docs/guides/using-case-files.md)
+- [GitHub Adapter](docs/guides/github-adapter.md)
 - [Scope Control](docs/guides/scope-control.md)
 - [Writing Handoffs](docs/guides/writing-handoffs.md)
 - [Memory Proposals](docs/guides/memory-proposals.md)
@@ -87,6 +88,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Local State Layout](docs/reference/local-state.md)
 - [Local Store](docs/reference/local-store.md)
 - [Project Profile](docs/reference/project-profile.md)
+- [GitHub Config](docs/reference/github-config.md)
 - [Self-Audit](docs/reference/self-audit.md)
 - [Secrets](docs/security/secrets.md)
 - [Limitations](docs/limitations.md)
@@ -95,7 +97,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
-The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, handoff writing, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
+The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, read-only GitHub context, handoff writing, policy profile generation, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 
@@ -107,7 +109,7 @@ Craik core will be implemented in Python 3.12+ with a CLI-first package shape. T
 - Typer for CLI
 - Pydantic for runtime contracts
 - SQLite for local persistent state
-- stdlib HTTP for the first Stigmem compatibility client
+- stdlib HTTP for the first Stigmem and GitHub compatibility clients
 - `pytest` for tests
 - `ruff` and `mypy` for quality gates
 
