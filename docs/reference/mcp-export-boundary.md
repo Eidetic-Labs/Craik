@@ -59,3 +59,5 @@ change before export.
 The `craik.runtime.mcp_export` helper records the decision status, reason, and
 required controls for a candidate surface. It does not start an MCP server or
 grant runtime authority by itself.
+
+For client-side provider and tool routing, see [MCP Client](mcp-client.md).
