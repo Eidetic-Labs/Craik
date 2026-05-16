@@ -132,6 +132,7 @@ ContextRequestKind = Literal[
 ExitDisciplineStatus = Literal["complete", "blocked"]
 SkillEntrypointKind = Literal["prompt", "script", "module", "workflow", "docs"]
 SkillOmissionSeverity = Literal["low", "medium", "high", "critical"]
+SkillScope = Literal["project", "global"]
 PluginEntrypointKind = Literal["command", "module", "workflow", "service", "docs"]
 PluginCapabilityRisk = Literal["low", "medium", "high", "critical"]
 PluginCompatibilityStatus = Literal["supported", "experimental", "unsupported"]
@@ -1944,6 +1945,89 @@ class SkillInvocationContext(CraikModel):
         ]
         if missing_required_outputs and not self.omissions:
             raise ValueError("missing required outputs must be explained by omissions")
+        return self
+
+
+class SkillRegistryEntry(CraikModel):
+    """One discovered project-local or global skill package entry."""
+
+    id: str
+    skill_package_id: str
+    scope: SkillScope
+    project_id: str | None = None
+    source_path: str
+    trust_boundary: InstructionTrustBoundary
+    precedence: int = Field(ge=0)
+    active: bool = True
+    provenance_ids: list[str] = Field(min_length=1)
+    declared_by: str
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_scope_project_link(self) -> SkillRegistryEntry:
+        """Require project ids only for project-scoped skills."""
+        if self.scope == "project" and not self.project_id:
+            raise ValueError("project-scoped skill entries require project_id")
+        if self.scope == "global" and self.project_id is not None:
+            raise ValueError("global skill entries must not set project_id")
+        return self
+
+
+class SkillRegistry(CraikModel):
+    """Registry of project-local and global skills with explicit precedence."""
+
+    schema_: Literal["craik.skill_registry"] = Field(
+        default="craik.skill_registry",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    project_id: str
+    entries: list[SkillRegistryEntry] = Field(min_length=1)
+    active_entry_ids: list[str] = Field(default_factory=list)
+    precedence_order: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_skill_registry(self) -> SkillRegistry:
+        """Require active links and project-local precedence over globals."""
+        entry_by_id = {entry.id: entry for entry in self.entries}
+        unknown = sorted(set(self.active_entry_ids) - set(entry_by_id))
+        if unknown:
+            raise ValueError(f"unknown active skill entry ids: {unknown}")
+        inactive = sorted(
+            entry_id
+            for entry_id in self.active_entry_ids
+            if not entry_by_id[entry_id].active
+        )
+        if inactive:
+            raise ValueError(f"inactive skill entry ids marked active: {inactive}")
+        if self.precedence_order:
+            unknown_order = sorted(set(self.precedence_order) - set(entry_by_id))
+            if unknown_order:
+                raise ValueError(f"unknown precedence skill entry ids: {unknown_order}")
+            missing_active = sorted(set(self.active_entry_ids) - set(self.precedence_order))
+            if missing_active:
+                raise ValueError(f"active skill entry ids missing precedence: {missing_active}")
+        active_entries = [entry_by_id[entry_id] for entry_id in self.active_entry_ids]
+        precedence_values = [entry.precedence for entry in active_entries]
+        if len(precedence_values) != len(set(precedence_values)):
+            raise ValueError("active skill entry precedence values must be unique")
+        packages = {entry.skill_package_id for entry in active_entries}
+        for package_id in packages:
+            project_precedence = [
+                entry.precedence
+                for entry in active_entries
+                if entry.skill_package_id == package_id and entry.scope == "project"
+            ]
+            global_precedence = [
+                entry.precedence
+                for entry in active_entries
+                if entry.skill_package_id == package_id and entry.scope == "global"
+            ]
+            if project_precedence and global_precedence:
+                if min(project_precedence) > min(global_precedence):
+                    raise ValueError("project-scoped skills must outrank global skills")
         return self
 
 

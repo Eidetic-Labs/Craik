@@ -53,6 +53,7 @@ project.
 - [Scratchpad And Unknowns](reference/scratchpad-and-unknowns.md)
 - [Context Requests And Exit Discipline](reference/exit-discipline.md)
 - [Skill Packages](reference/skill-packages.md)
+- [Skill Registries](reference/skill-registries.md)
 - [Skill Invocation Contexts](reference/skill-contexts.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Human Delegation](reference/human-delegation.md)

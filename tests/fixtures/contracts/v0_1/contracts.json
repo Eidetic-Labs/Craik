@@ -1163,6 +1163,43 @@
     "runtime_authority": false,
     "created_at": "2026-05-16T15:30:00Z"
   },
+  "craik.skill_registry": {
+    "schema": "craik.skill_registry",
+    "version": "0.1.0",
+    "id": "skill_registry_project_stigmem",
+    "project_id": "project_stigmem",
+    "entries": [
+      {
+        "id": "skill_entry_project_docs",
+        "skill_package_id": "skill_docs_reconcile",
+        "scope": "project",
+        "project_id": "project_stigmem",
+        "source_path": ".craik/skills/docs-reconcile/SKILL.md",
+        "trust_boundary": "project",
+        "precedence": 0,
+        "active": true,
+        "provenance_ids": ["evidence_readme_status"],
+        "declared_by": "agent:orchestrator",
+        "created_at": "2026-05-16T16:00:00Z"
+      },
+      {
+        "id": "skill_entry_global_docs",
+        "skill_package_id": "skill_docs_reconcile",
+        "scope": "global",
+        "project_id": null,
+        "source_path": "~/.craik/skills/docs-reconcile/SKILL.md",
+        "trust_boundary": "user",
+        "precedence": 10,
+        "active": true,
+        "provenance_ids": ["evidence_readme_status"],
+        "declared_by": "agent:orchestrator",
+        "created_at": "2026-05-16T16:00:00Z"
+      }
+    ],
+    "active_entry_ids": ["skill_entry_project_docs", "skill_entry_global_docs"],
+    "precedence_order": ["skill_entry_project_docs", "skill_entry_global_docs"],
+    "created_at": "2026-05-16T16:00:00Z"
+  },
   "craik.skill_invocation_context": {
     "schema": "craik.skill_invocation_context",
     "version": "0.1.0",
