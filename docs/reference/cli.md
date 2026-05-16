@@ -35,6 +35,8 @@ Options:
 - `--name <name>`: project name; defaults to the repository directory name.
 - `--docs-path <path>`: documentation path to include; may be repeated.
 - `--immutable-path <path>`: immutable path to include; may be repeated.
+- `--discovery-include <glob>`: context discovery include override; may be repeated.
+- `--discovery-exclude <glob>`: context discovery exclude override; may be repeated.
 
 ## `craik project list`
 
@@ -82,6 +84,8 @@ Options:
 
 - `--max-tokens <count>`: approximate context budget; defaults to `24000`.
 - `--github / --no-github`: load or skip read-only GitHub context.
+- `--discovery-include <glob>`: one-off context discovery include override; may be repeated.
+- `--discovery-exclude <glob>`: one-off context discovery exclude override; may be repeated.
 
 ## `craik case show <case-id-or-task-id>`
 

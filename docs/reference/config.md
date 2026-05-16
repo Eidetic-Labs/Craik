@@ -13,6 +13,21 @@ Craik stores runtime state in a SQLite database under `CRAIK_HOME/state/`.
 Project-local `.craik/` directories are opt-in only and are not created by the
 current CLI.
 
+## Context Discovery
+
+Project profiles can store documentation discovery overrides through
+`craik project add`:
+
+| Option | Purpose |
+| --- | --- |
+| `--discovery-exclude <glob>` | Adds a project-level context exclusion rule. |
+| `--discovery-include <glob>` | Adds a project-level include rule that can restore a default-excluded path. |
+
+`craik case build` accepts the same options as one-off user overrides for a
+single case-file build. Craik always starts from conservative defaults that skip
+generated, dependency, build, cache, and archive-heavy paths. The resulting case
+file records active rules and skipped paths in `context_budget`.
+
 ## Stigmem
 
 | Variable | Purpose |

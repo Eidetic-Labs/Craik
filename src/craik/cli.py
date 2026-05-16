@@ -24,6 +24,7 @@ from craik.contracts.models import (
 from craik.contracts.registry import schema_model, schema_names
 from craik.runtime.case_files import (
     CaseFileAssembler,
+    DiscoveryOverrides,
     ProjectNotFoundError,
     TaskNotFoundError,
 )
@@ -201,6 +202,20 @@ def project_add(
         list[str] | None,
         typer.Option("--immutable-path", help="Immutable path to include. May be repeated."),
     ] = None,
+    discovery_include: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--discovery-include",
+            help="Context discovery include override. May be repeated.",
+        ),
+    ] = None,
+    discovery_exclude: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--discovery-exclude",
+            help="Context discovery exclude override. May be repeated.",
+        ),
+    ] = None,
 ) -> None:
     """Register a Git project."""
     store = LocalStore.from_env()
@@ -212,6 +227,8 @@ def project_add(
             name=name,
             docs_paths=tuple(docs_path or ()),
             immutable_paths=tuple(immutable_path or ()),
+            discovery_include=tuple(discovery_include or ()),
+            discovery_exclude=tuple(discovery_exclude or ()),
         )
     except NotGitRepositoryError as error:
         raise typer.BadParameter(str(error)) from None
@@ -368,6 +385,20 @@ def case_build(
         bool,
         typer.Option("--github/--no-github", help="Load read-only GitHub context."),
     ] = True,
+    discovery_include: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--discovery-include",
+            help="One-off context discovery include override. May be repeated.",
+        ),
+    ] = None,
+    discovery_exclude: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--discovery-exclude",
+            help="One-off context discovery exclude override. May be repeated.",
+        ),
+    ] = None,
 ) -> None:
     """Build and persist a deterministic case file for a task."""
     store = LocalStore.from_env()
@@ -375,7 +406,14 @@ def case_build(
         store.initialize()
         github_adapter = _github_adapter() if github else None
         assembler = CaseFileAssembler(store, github_adapter=github_adapter)
-        case_file = assembler.build(task_id, max_tokens=max_tokens)
+        case_file = assembler.build(
+            task_id,
+            max_tokens=max_tokens,
+            discovery_overrides=DiscoveryOverrides(
+                include=tuple(discovery_include or ()),
+                exclude=tuple(discovery_exclude or ()),
+            ),
+        )
     except (TaskNotFoundError, ProjectNotFoundError) as error:
         raise typer.BadParameter(str(error)) from None
     finally:

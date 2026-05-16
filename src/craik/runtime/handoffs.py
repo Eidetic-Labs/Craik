@@ -207,6 +207,13 @@ def _context_debt(case_file: CaseFile | None) -> list[str]:
     if isinstance(omitted, list) and omitted:
         omitted_list = ", ".join(str(item) for item in omitted)
         debt.append(f"Documentation omitted by context budget: {omitted_list}")
+    excluded = case_file.context_budget.get("docs_excluded", [])
+    if isinstance(excluded, list) and excluded:
+        excluded_list = ", ".join(
+            str(item.get("path", item)) if isinstance(item, dict) else str(item)
+            for item in excluded
+        )
+        debt.append(f"Documentation excluded by discovery rules: {excluded_list}")
     if case_file.github_state.get("status") == "not_loaded":
         debt.append("GitHub state was not loaded into the case file.")
     if not case_file.facts:

@@ -3,7 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from craik.runtime.case_files import CaseFileAssembler, ProjectNotFoundError, TaskNotFoundError
+from craik.runtime.case_files import (
+    CaseFileAssembler,
+    DiscoveryOverrides,
+    ProjectNotFoundError,
+    TaskNotFoundError,
+)
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
@@ -121,6 +126,83 @@ def test_case_file_reports_omitted_docs_from_context_budget(
 
     assert "docs/long.md" in case_file.context_budget["docs_omitted"]
     assert any("omitted from the case file" in item.statement for item in case_file.assumptions)
+
+
+def test_case_file_excludes_generated_dependency_and_archive_paths_by_default(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+    (repo / "docs" / "archive").mkdir()
+    (repo / "docs" / "archive" / "old.md").write_text("# Old\n")
+    (repo / "docs" / "build").mkdir()
+    (repo / "docs" / "build" / "generated.md").write_text("# Generated\n")
+    (repo / "docs" / "reference" / "generated").mkdir(parents=True)
+    (repo / "docs" / "reference" / "generated" / "api.md").write_text("# API\n")
+    (repo / "docs" / "node_modules" / "pkg").mkdir(parents=True)
+    (repo / "docs" / "node_modules" / "pkg" / "README.md").write_text("# Dependency\n")
+    _run_git(repo, "add", "docs")
+    _run_git(repo, "commit", "-m", "add polluted docs")
+    project = ProjectRegistry(store).add_project(repo, name="Example")
+    task = create_task(
+        store,
+        title="Clean context",
+        objective="Build case without generated docs.",
+        project_id=project.id,
+    )
+
+    case_file = CaseFileAssembler(store).build(task.id)
+
+    assert "docs/archive/old.md" not in case_file.docs
+    assert "docs/build/generated.md" not in case_file.docs
+    assert "docs/reference/generated/api.md" not in case_file.docs
+    assert "docs/node_modules/pkg/README.md" not in case_file.docs
+    excluded = {item["path"] for item in case_file.context_budget["docs_excluded"]}
+    assert "docs/archive" in excluded
+    assert "docs/build" in excluded
+    assert "docs/reference/generated" in excluded
+    assert "docs/node_modules" in excluded
+    assert case_file.context_budget["discovery_rules"]["default_exclude"]
+
+
+def test_case_file_project_and_user_discovery_overrides_are_deterministic(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+    (repo / "docs" / "archive").mkdir()
+    (repo / "docs" / "archive" / "old.md").write_text("# Old\n")
+    (repo / "docs" / "draft.md").write_text("# Draft\n")
+    _run_git(repo, "add", "docs")
+    _run_git(repo, "commit", "-m", "add override docs")
+    project = ProjectRegistry(store).add_project(
+        repo,
+        name="Example",
+        discovery_include=("docs/archive/**",),
+        discovery_exclude=("docs/draft.md",),
+    )
+    task = create_task(
+        store,
+        title="Override context",
+        objective="Build case with discovery overrides.",
+        project_id=project.id,
+    )
+
+    case_file = CaseFileAssembler(store).build(
+        task.id,
+        discovery_overrides=DiscoveryOverrides(exclude=("docs/guide.md",)),
+    )
+
+    assert "docs/archive/old.md" in case_file.docs
+    assert "docs/draft.md" not in case_file.docs
+    assert "docs/guide.md" not in case_file.docs
+    excluded = {item["path"] for item in case_file.context_budget["docs_excluded"]}
+    assert "docs/draft.md" in excluded
+    assert "docs/guide.md" in excluded
+    rules = case_file.context_budget["discovery_rules"]
+    assert rules["project_include"] == ["docs/archive/**"]
+    assert rules["project_exclude"] == ["docs/draft.md"]
+    assert rules["user_exclude"] == ["docs/guide.md"]
 
 
 def test_case_file_errors_for_missing_task_or_project(store: LocalStore) -> None:
