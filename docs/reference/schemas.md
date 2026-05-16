@@ -57,11 +57,13 @@ craik schema show craik.task_request
 | `craik.policy_envelope` | Defines runtime authority and obligations. |
 | `craik.project_profile` | Defines a project Craik can reason about. |
 | `craik.promoted_instruction_constraint` | Captures an approved distilled instruction as an active runtime constraint. |
+| `craik.red_team_finding` | Captures reviewable adversarial findings and blockers for high-risk work. |
 | `craik.recovery_session` | Summarizes resume readiness and required recovery actions for an agent. |
 | `craik.review_request` | Requests bounded cross-agent review of worker results or debate summaries. |
 | `craik.review_result` | Captures specialist reviewer decisions, evidence, and preserved reviewer role kind. |
 | `craik.run_delta` | Records continuity-relevant changes since the previous usable handoff. |
 | `craik.run_output` | Stores redacted observed output captured from one runner step. |
+| `craik.runtime_critic_finding` | Captures reviewable non-authoritative quality findings from a critic pass. |
 | `craik.scope_change_request` | Requests a human decision to change accepted task scope. |
 | `craik.scope_change_result` | Records accepted or rejected human scope-change decisions. |
 | `craik.runner_adapter_request` | Defines normalized input handed to a runner adapter. |

@@ -43,6 +43,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `intent_locks` | `craik.intent_lock` |
 | `proposals` | `craik.memory_proposal` |
 | `promoted_instruction_constraints` | `craik.promoted_instruction_constraint` |
+| `red_team_findings` | `craik.red_team_finding` |
 | `recovery_sessions` | `craik.recovery_session` |
 | `memory_diffs` | `craik.memory_diff` |
 | `memory_previews` | `craik.memory_impact_preview` |
@@ -54,6 +55,7 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `review_requests` | `craik.review_request` |
 | `review_results` | `craik.review_result` |
 | `run_deltas` | `craik.run_delta` |
+| `runtime_critic_findings` | `craik.runtime_critic_finding` |
 | `scope_change_requests` | `craik.scope_change_request` |
 | `scope_change_results` | `craik.scope_change_result` |
 

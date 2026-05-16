@@ -40,6 +40,29 @@ DebateOutcome = Literal["agreement", "unresolved_disagreement", "contradiction_o
 ReviewRequestStatus = Literal["open", "completed", "cancelled"]
 ReviewDecision = Literal["approved", "changes_requested", "blocked", "deferred"]
 AdjudicationDecision = Literal["accepted", "rejected", "revised", "deferred"]
+FindingSeverity = Literal["info", "low", "medium", "high", "critical"]
+FindingReviewStatus = Literal["reviewable", "adjudicated", "dismissed"]
+RuntimeCriticFindingType = Literal[
+    "unsupported_claim",
+    "policy_violation",
+    "scope_drift",
+    "missing_validation",
+    "stale_evidence",
+    "missing_handoff",
+    "unredacted_sensitive_content",
+    "risky_memory_write",
+    "other",
+]
+RedTeamFindingType = Literal[
+    "prompt_injection",
+    "privilege_escalation",
+    "data_exfiltration",
+    "destructive_action",
+    "policy_bypass",
+    "memory_poisoning",
+    "adversarial_input",
+    "other",
+]
 HumanDelegationKind = Literal["approval", "clarification", "escalation", "ownership_transfer"]
 HumanDelegationStatus = Literal["open", "resolved", "cancelled"]
 ScopeChangeStatus = Literal["pending", "accepted", "rejected"]
@@ -457,7 +480,7 @@ class WorkerFinding(CraikModel):
     """One structured finding from a specialist worker."""
 
     summary: str
-    severity: Literal["info", "low", "medium", "high", "critical"] = "info"
+    severity: FindingSeverity = "info"
     evidence_ids: list[str] = Field(default_factory=list)
     artifact_refs: list[str] = Field(default_factory=list)
     contradiction_ids: list[str] = Field(default_factory=list)
@@ -491,6 +514,83 @@ class WorkerResult(CraikModel):
     diagnostics: list[str] = Field(default_factory=list)
     redacted: bool = True
     created_at: datetime
+
+
+class RuntimeCriticFinding(CraikModel):
+    """Reviewable, non-authoritative runtime critic finding."""
+
+    schema_: Literal["craik.runtime_critic_finding"] = Field(
+        default="craik.runtime_critic_finding",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    run_id: str | None = None
+    handoff_id: str | None = None
+    critic_role_id: str | None = None
+    finding_type: RuntimeCriticFindingType
+    severity: FindingSeverity = "medium"
+    summary: str
+    rationale: str
+    affected_artifacts: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    proposed_actions: list[str] = Field(default_factory=list)
+    authoritative: Literal[False] = False
+    review_status: FindingReviewStatus = "reviewable"
+    adjudication_id: str | None = None
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_review_boundary(self) -> RuntimeCriticFinding:
+        """Keep critic findings actionable and non-authoritative until adjudication."""
+        if self.review_status == "adjudicated" and not self.adjudication_id:
+            raise ValueError("adjudicated critic findings require adjudication_id")
+        if self.severity in {"high", "critical"} and not self.proposed_actions:
+            raise ValueError("high-severity critic findings require proposed_actions")
+        if self.finding_type in {"unsupported_claim", "stale_evidence"} and not self.evidence_ids:
+            raise ValueError("evidence-related critic findings require evidence_ids")
+        return self
+
+
+class RedTeamFinding(CraikModel):
+    """Reviewable, non-authoritative adversarial finding for high-risk work."""
+
+    schema_: Literal["craik.red_team_finding"] = Field(
+        default="craik.red_team_finding",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    project_id: str | None = None
+    run_id: str | None = None
+    handoff_id: str | None = None
+    red_team_role_id: str | None = None
+    finding_type: RedTeamFindingType
+    severity: FindingSeverity = "high"
+    summary: str
+    attack_path: str
+    affected_artifacts: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    proposed_actions: list[str] = Field(default_factory=list)
+    blocking: bool = False
+    authoritative: Literal[False] = False
+    review_status: FindingReviewStatus = "reviewable"
+    adjudication_id: str | None = None
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_red_team_boundary(self) -> RedTeamFinding:
+        """Require blockers to be actionable and keep findings reviewable."""
+        if self.review_status == "adjudicated" and not self.adjudication_id:
+            raise ValueError("adjudicated red-team findings require adjudication_id")
+        if self.blocking and not self.proposed_actions:
+            raise ValueError("blocking red-team findings require proposed_actions")
+        if self.blocking and self.severity not in {"high", "critical"}:
+            raise ValueError("blocking red-team findings must be high or critical severity")
+        return self
 
 
 class DebateTurn(CraikModel):

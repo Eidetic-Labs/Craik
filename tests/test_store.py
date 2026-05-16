@@ -27,10 +27,12 @@ from craik.contracts.models import (
     ProjectProfile,
     PromotedInstructionConstraint,
     RecoverySession,
+    RedTeamFinding,
     ReviewRequest,
     ReviewResult,
     RunDelta,
     RunOutput,
+    RuntimeCriticFinding,
     ScopeChangeRequest,
     ScopeChangeResult,
     TaskRequest,
@@ -145,6 +147,10 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     )
     run_delta = RunDelta.model_validate(fixtures["craik.run_delta"])
     recovery_session = RecoverySession.model_validate(fixtures["craik.recovery_session"])
+    critic_finding = RuntimeCriticFinding.model_validate(
+        fixtures["craik.runtime_critic_finding"]
+    )
+    red_team_finding = RedTeamFinding.model_validate(fixtures["craik.red_team_finding"])
 
     store.put_task(task)
     store.put_task_run(task_run)
@@ -177,6 +183,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     store.put_promoted_instruction_constraint(promoted_constraint)
     store.put_run_delta(run_delta)
     store.put_recovery_session(recovery_session)
+    store.put_runtime_critic_finding(critic_finding)
+    store.put_red_team_finding(red_team_finding)
 
     assert store.get_task(task.id) == task
     assert store.get_task_run(task_run.id) == task_run
@@ -218,6 +226,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     )
     assert store.get_run_delta(run_delta.id) == run_delta
     assert store.get_recovery_session(recovery_session.id) == recovery_session
+    assert store.get_runtime_critic_finding(critic_finding.id) == critic_finding
+    assert store.get_red_team_finding(red_team_finding.id) == red_team_finding
     assert store.list_receipts() == [receipt]
     assert store.list_case_files() == [case_file]
     assert store.list_handoffs() == [handoff]
@@ -245,6 +255,8 @@ def test_typed_store_helpers_round_trip_all_supported_contracts(
     assert store.list_promoted_instruction_constraints() == [promoted_constraint]
     assert store.list_run_deltas() == [run_delta]
     assert store.list_recovery_sessions() == [recovery_session]
+    assert store.list_runtime_critic_findings() == [critic_finding]
+    assert store.list_red_team_findings() == [red_team_finding]
 
 
 def test_persists_supported_contract_types(
@@ -264,10 +276,12 @@ def test_persists_supported_contract_types(
         "craik.distilled_instruction_proposal",
         "craik.instruction_promotion_review",
         "craik.promoted_instruction_constraint",
+        "craik.red_team_finding",
         "craik.recovery_session",
         "craik.review_request",
         "craik.review_result",
         "craik.run_delta",
+        "craik.runtime_critic_finding",
         "craik.adjudication_outcome",
         "craik.human_delegation_point",
         "craik.instruction_source",
