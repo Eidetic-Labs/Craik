@@ -28,3 +28,6 @@ observed behavior that motivated the proposed change.
 Skill proposals are not skill updates. They are reviewable records that can be
 cited by later approval gates, eval/replay checks, rollback plans, and learning
 loop receipts.
+
+Use [Skill Replay](skill-replay.md) to compare current skill behavior against
+redacted fixtures before promotion.
