@@ -14,8 +14,10 @@ from pydantic import BaseModel, ValidationError
 
 from craik.contracts.models import (
     Assumption,
+    CapabilityGrant,
     CapabilityReceipt,
     CaseFile,
+    CompiledPrompt,
     ContradictionReport,
     EvidenceReference,
     Handoff,
@@ -23,6 +25,7 @@ from craik.contracts.models import (
     MemoryDiff,
     MemoryImpactPreview,
     MemoryProposal,
+    PolicyEnvelope,
     ProjectProfile,
     TaskRequest,
     WorkGraphEvent,
@@ -37,7 +40,10 @@ DATABASE_NAME = "craik.sqlite3"
 CONTRACT_KINDS: dict[str, str] = {
     "craik.project_profile": "projects",
     "craik.task_request": "tasks",
+    "craik.policy_envelope": "policies",
+    "craik.capability_grant": "grants",
     "craik.capability_receipt": "receipts",
+    "craik.compiled_prompt": "compiled_prompts",
     "craik.case_file": "case_files",
     "craik.contradiction_report": "contradictions",
     "craik.handoff": "handoffs",
@@ -50,6 +56,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.work_graph_export": "graph_exports",
     "craik.work_graph_event": "graph_events",
 }
+
 
 class LocalStoreError(RuntimeError):
     """Base error for local store failures."""
@@ -213,6 +220,26 @@ class LocalStore:
     def list_receipts(self) -> list[CapabilityReceipt]:
         return _cast_list(CapabilityReceipt, self.list_contracts("craik.capability_receipt"))
 
+    def put_policy_envelope(self, policy: PolicyEnvelope) -> None:
+        self.put_contract(policy)
+
+    def get_policy_envelope(self, policy_id: str) -> PolicyEnvelope | None:
+        contract = self.get_contract("craik.policy_envelope", policy_id)
+        return _cast_optional(PolicyEnvelope, contract)
+
+    def list_policy_envelopes(self) -> list[PolicyEnvelope]:
+        return _cast_list(PolicyEnvelope, self.list_contracts("craik.policy_envelope"))
+
+    def put_capability_grant(self, grant: CapabilityGrant) -> None:
+        self.put_contract(grant)
+
+    def get_capability_grant(self, grant_id: str) -> CapabilityGrant | None:
+        contract = self.get_contract("craik.capability_grant", grant_id)
+        return _cast_optional(CapabilityGrant, contract)
+
+    def list_capability_grants(self) -> list[CapabilityGrant]:
+        return _cast_list(CapabilityGrant, self.list_contracts("craik.capability_grant"))
+
     def put_case_file(self, case_file: CaseFile) -> None:
         self.put_contract(case_file)
 
@@ -222,6 +249,16 @@ class LocalStore:
 
     def list_case_files(self) -> list[CaseFile]:
         return _cast_list(CaseFile, self.list_contracts("craik.case_file"))
+
+    def put_compiled_prompt(self, prompt: CompiledPrompt) -> None:
+        self.put_contract(prompt)
+
+    def get_compiled_prompt(self, prompt_id: str) -> CompiledPrompt | None:
+        contract = self.get_contract("craik.compiled_prompt", prompt_id)
+        return _cast_optional(CompiledPrompt, contract)
+
+    def list_compiled_prompts(self) -> list[CompiledPrompt]:
+        return _cast_list(CompiledPrompt, self.list_contracts("craik.compiled_prompt"))
 
     def put_intent_lock(self, intent_lock: IntentLock) -> None:
         self.put_contract(intent_lock)

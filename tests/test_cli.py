@@ -179,6 +179,11 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
         ["case", "show", "task_review_docs"],
         env={"CRAIK_HOME": str(home)},
     )
+    prompt = runner.invoke(
+        app,
+        ["prompt", "compile", "task_review_docs", "--runner", "codex"],
+        env={"CRAIK_HOME": str(home)},
+    )
     graph = runner.invoke(
         app,
         ["graph", "export", "--task-id", "task_review_docs"],
@@ -189,6 +194,7 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
     assert task.exit_code == 0
     assert built.exit_code == 0
     assert shown.exit_code == 0
+    assert prompt.exit_code == 0
     assert graph.exit_code == 0
     task_payload = json.loads(task.stdout)
     assert task_payload["task"]["id"] == "task_review_docs"
@@ -197,6 +203,10 @@ def test_task_and_case_commands_round_trip(tmp_path: Path) -> None:
     assert "docs/guide.md" not in json.loads(built.stdout)["docs"]
     assert json.loads(built.stdout)["adrs"] == ["docs/adr/0001-record.md"]
     assert json.loads(shown.stdout)["id"] == "case_review_docs"
+    prompt_payload = json.loads(prompt.stdout)
+    assert prompt_payload["schema"] == "craik.compiled_prompt"
+    assert prompt_payload["runner_id"] == "codex"
+    assert "## Policy" in prompt_payload["prompt"]
     graph_payload = json.loads(graph.stdout)
     assert graph_payload["id"] == "graph_task_review_docs"
     assert "task:task_review_docs" in {node["id"] for node in graph_payload["nodes"]}
