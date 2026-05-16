@@ -15,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 from craik.contracts.models import (
     Assumption,
     CapabilityReceipt,
+    CaseFile,
     EvidenceReference,
     Handoff,
     MemoryProposal,
@@ -33,6 +34,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.project_profile": "projects",
     "craik.task_request": "tasks",
     "craik.capability_receipt": "receipts",
+    "craik.case_file": "case_files",
     "craik.handoff": "handoffs",
     "craik.memory_proposal": "proposals",
     "craik.assumption": "assumptions",
@@ -198,6 +200,16 @@ class LocalStore:
 
     def list_receipts(self) -> list[CapabilityReceipt]:
         return _cast_list(CapabilityReceipt, self.list_contracts("craik.capability_receipt"))
+
+    def put_case_file(self, case_file: CaseFile) -> None:
+        self.put_contract(case_file)
+
+    def get_case_file(self, case_file_id: str) -> CaseFile | None:
+        contract = self.get_contract("craik.case_file", case_file_id)
+        return _cast_optional(CaseFile, contract)
+
+    def list_case_files(self) -> list[CaseFile]:
+        return _cast_list(CaseFile, self.list_contracts("craik.case_file"))
 
     def put_handoff(self, handoff: Handoff) -> None:
         self.put_contract(handoff)

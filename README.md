@@ -52,6 +52,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Differentiators](docs/differentiators.md)
 - [Architecture](docs/architecture.md)
 - [Runtime Contracts](docs/runtime-contracts.md)
+- [Case Files](docs/concepts/case-files.md)
 - [Receipts](docs/concepts/receipts.md)
 - [Feature Specification](docs/features.md)
 - [MVP Plan](docs/mvp.md)
@@ -63,6 +64,9 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 - [Quickstart](docs/guides/quickstart.md)
 - [Configuring Craik Home](docs/guides/configuring-craik-home.md)
 - [Project Registry](docs/guides/project-registry.md)
+- [Using Case Files](docs/guides/using-case-files.md)
+- [Evidence And Assumptions](docs/guides/evidence-and-assumptions.md)
+- [Context Budgeting](docs/guides/context-budgeting.md)
 - [Development Checks](docs/guides/development.md)
 - [CLI Reference](docs/reference/cli.md)
 - [Schema Reference](docs/reference/schemas.md)
@@ -80,7 +84,7 @@ OpenClaw is not a required dependency and is not the initial execution target. C
 
 Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
 
-The Python package and `craik` CLI scaffold now exist. Project registration, local SQLite persistence, policy profile generation, capability grant checks, central redaction, and receipt storage are implemented. Runtime workflows such as case file assembly, governed execution wrappers, handoffs, and Stigmem-backed memory are still planned work.
+The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, policy profile generation, capability grant checks, central redaction, and receipt storage are implemented. Runtime workflows such as governed execution wrappers, handoffs, and Stigmem-backed memory are still planned work.
 
 The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
 

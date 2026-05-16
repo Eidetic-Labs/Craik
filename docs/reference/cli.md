@@ -44,6 +44,36 @@ Print registered projects as JSON.
 
 Print one registered project as JSON.
 
+## `craik task create`
+
+Create a task request for a registered project.
+
+Required options:
+
+- `--project <id-or-name>`: registered project id or name.
+- `--title <title>`: task title.
+- `--objective <objective>`: task objective.
+
+Options:
+
+- `--requested-by <identity>`: requester identity; defaults to `user:local`.
+- `--priority <name>`: `low`, `normal`, `high`, or `urgent`.
+- `--mode <name>`: `plan`, `review`, `implement`, or `verify`.
+- `--constraint <text>`: task constraint; may be repeated.
+- `--expected-output <text>`: expected output; may be repeated.
+
+## `craik case build <task-id>`
+
+Build and persist a deterministic case file for a task.
+
+Options:
+
+- `--max-tokens <count>`: approximate context budget; defaults to `24000`.
+
+## `craik case show <case-id-or-task-id>`
+
+Print one persisted case file by case id or task id.
+
 ## `craik policy show`
 
 Print a generated policy envelope.
