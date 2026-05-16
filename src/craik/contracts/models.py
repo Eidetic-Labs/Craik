@@ -176,6 +176,7 @@ GatewayRuntimeStatus = Literal["stopped", "starting", "running", "stopping", "fa
 ChannelKind = Literal["messaging", "webhook", "scheduler", "voice", "custom"]
 ChannelCapabilityDirection = Literal["inbound", "outbound", "bidirectional"]
 ChannelPairingStatus = Literal["unpaired", "paired", "revoked"]
+ChannelAllowlistAction = Literal["allow", "deny"]
 RunDeltaChangeKind = Literal["created", "updated", "removed", "unchanged"]
 RunDeltaEntityType = Literal[
     "handoff",
@@ -1598,6 +1599,63 @@ class ChannelIdentityPairing(CraikModel):
                 raise ValueError("revoked channel identities require revocation audit fields")
             if not self.audit_ids:
                 raise ValueError("revoked channel identities require audit_ids")
+        return self
+
+
+class ChannelAllowlistRule(CraikModel):
+    """One allowlist selector for normalized inbound channel events."""
+
+    id: str
+    description: str
+    channel: ChannelKind | None = None
+    service: str | None = None
+    sender_external_ids: list[str] = Field(default_factory=list)
+    workspace_ids: list[str] = Field(default_factory=list)
+    thread_ids: list[str] = Field(default_factory=list)
+    metadata_match: dict[str, str] = Field(default_factory=dict)
+    enabled: bool = True
+
+    @model_validator(mode="after")
+    def validate_allowlist_rule(self) -> ChannelAllowlistRule:
+        """Require at least one selector so broad allows are explicit."""
+        if not any(
+            (
+                self.channel,
+                self.service,
+                self.sender_external_ids,
+                self.workspace_ids,
+                self.thread_ids,
+                self.metadata_match,
+            )
+        ):
+            raise ValueError("channel allowlist rules require at least one selector")
+        return self
+
+
+class ChannelAllowlist(CraikModel):
+    """Allowlist policy for controlled external channel ingress."""
+
+    schema_: Literal["craik.channel_allowlist"] = Field(
+        default="craik.channel_allowlist",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    channel: ChannelKind
+    default_action: ChannelAllowlistAction = "deny"
+    rules: list[ChannelAllowlistRule] = Field(default_factory=list)
+    audit_required: bool = True
+    denial_capability: str = "channel.ingress.denied"
+    created_at: datetime
+    updated_at: datetime
+
+    @model_validator(mode="after")
+    def validate_channel_allowlist(self) -> ChannelAllowlist:
+        """Keep external ingress deny-by-default and auditable."""
+        if self.default_action != "deny":
+            raise ValueError("channel allowlists must default to deny")
+        if not self.audit_required:
+            raise ValueError("channel allowlist decisions require audit")
         return self
 
 
