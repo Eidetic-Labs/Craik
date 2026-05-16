@@ -2,6 +2,7 @@
 
 from craik.contracts.models import (
     AgentOnboarding,
+    AgentRole,
     Assumption,
     CapabilityGrant,
     CapabilityReceipt,
@@ -32,6 +33,7 @@ from craik.contracts.models import (
 
 __all__ = [
     "AgentOnboarding",
+    "AgentRole",
     "Assumption",
     "CapabilityGrant",
     "CapabilityReceipt",
