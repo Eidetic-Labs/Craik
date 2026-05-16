@@ -36,6 +36,10 @@ Options:
 - `--runner <id>`: runner id from `craik runners matrix`.
 - `--expected-output-schema <schema>`: expected output schema. May be repeated.
 
+The Codex adapter preview consumes compiled prompts through the Python runtime
+API. See [Codex Runner Adapter](codex-runner-adapter.md) for fixture-mode setup,
+metadata, and limitations.
+
 ## `craik home show`
 
 Print resolved Craik local state paths without creating directories.

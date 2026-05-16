@@ -76,6 +76,9 @@ return a `craik.runner_adapter_result` payload. Fixture adapters can use
 `FixtureRunnerAdapter` for deterministic contract tests without live runner
 credentials.
 
+The [Codex Runner Adapter Preview](codex-runner-adapter.md) implements this
+interface for Codex-compatible prompt handoff and deterministic fixture runs.
+
 ## Capability Matrix
 
 Built-in preview matrices are exposed through:

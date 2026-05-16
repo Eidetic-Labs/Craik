@@ -13,8 +13,9 @@ Current limitations:
 - Agent onboarding summarizes local state and configured Stigmem environment presence, but it does not perform live Stigmem backend discovery.
 - Case files currently load local project/task/repo/docs context and read-only GitHub state when configured; Stigmem facts, recent handoffs, and local contradiction report loading are not wired into case assembly yet.
 - The Stigmem documentation demo creates local proposed updates and artifacts; it does not edit documentation files or directly write Stigmem facts by default.
-- Policy tests cover current policy primitives and keep runner grant boundaries visible, but runner adapters are not implemented yet.
-- Runner capability matrices and trust profiles are available for preview runner ids, but prompt compilation and runtime runner selection are not wired to them yet.
+- Policy tests cover current policy primitives and keep runner grant boundaries visible, but full live runner adapters are not implemented yet.
+- Runner capability matrices, trust profiles, prompt compilation, and the Codex fixture/prompt-handoff adapter are available for preview runner workflows.
 - Prompt compilation produces deterministic runner-ready prompts, but it does not invoke live runners or enforce grants at execution time yet.
+- The Codex runner adapter does not invoke an external Codex process or finalize receipts from live side effects in v0.2.0.
 - The CLI does not request tool authority or write runtime state.
 - Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.
