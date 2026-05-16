@@ -64,6 +64,7 @@ project.
 - [Channel Adapter Contract](reference/channel-adapter-contract.md)
 - [Messaging Channel Adapter](reference/messaging-channel-adapter.md)
 - [Channel Identity Pairing](reference/channel-identity-pairing.md)
+- [Channel Allowlists](reference/channel-allowlists.md)
 - [Schemas](reference/schemas.md)
 - [Agent Roles](reference/agent-roles.md)
 - [Adapter Packages](reference/adapter-packages.md)

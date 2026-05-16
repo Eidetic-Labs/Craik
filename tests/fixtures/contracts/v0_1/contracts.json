@@ -232,6 +232,30 @@
     "redacted": true,
     "created_at": "2026-05-15T22:45:00Z"
   },
+  "craik.channel_allowlist": {
+    "schema": "craik.channel_allowlist",
+    "version": "0.1.0",
+    "id": "allowlist_messaging_ops",
+    "channel": "messaging",
+    "default_action": "deny",
+    "rules": [
+      {
+        "id": "ops_alice",
+        "description": "Allow Alice in the ops workspace.",
+        "channel": "messaging",
+        "service": "fixture-chat",
+        "sender_external_ids": ["external:alice"],
+        "workspace_ids": ["ops"],
+        "thread_ids": [],
+        "metadata_match": {},
+        "enabled": true
+      }
+    ],
+    "audit_required": true,
+    "denial_capability": "channel.ingress.denied",
+    "created_at": "2026-05-16T18:55:00Z",
+    "updated_at": "2026-05-16T18:55:00Z"
+  },
   "craik.channel_adapter_contract": {
     "schema": "craik.channel_adapter_contract",
     "version": "0.1.0",

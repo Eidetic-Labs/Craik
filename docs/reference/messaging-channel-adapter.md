@@ -75,3 +75,6 @@ event id, sender external id, paired identity id, channel, and redaction fields.
 
 See [Channel Identity Pairing](channel-identity-pairing.md) for paired,
 unpaired, and revoked sender authority states.
+
+See [Channel Allowlists](channel-allowlists.md) for deny-by-default ingress
+filtering after normalization.
