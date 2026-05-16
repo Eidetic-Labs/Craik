@@ -28,6 +28,7 @@ from craik.runtime.case_files import (
     TaskNotFoundError,
 )
 from craik.runtime.contradictions import ContradictionManager, ContradictionNotFoundError
+from craik.runtime.demos import StigmemDocsDemo
 from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
 from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
 from craik.runtime.handoffs import (
@@ -83,6 +84,8 @@ case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
 connect_app = typer.Typer(help="Connect to external services.")
 app.add_typer(connect_app, name="connect")
+demo_app = typer.Typer(help="Run built-in Craik demos.")
+app.add_typer(demo_app, name="demo")
 contradictions_app = typer.Typer(help="Manage local contradiction reports.")
 app.add_typer(contradictions_app, name="contradictions")
 graph_app = typer.Typer(help="Export Craik work graphs.")
@@ -482,6 +485,65 @@ def onboard(
         store.close()
 
     typer.echo(json.dumps(report.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+
+
+@demo_app.command("stigmem-docs")
+def demo_stigmem_docs(
+    repo_path: Annotated[
+        Path,
+        typer.Option("--repo-path", help="Path inside the Stigmem Git repository."),
+    ] = Path("."),
+    project_name: Annotated[
+        str,
+        typer.Option("--project-name", help="Project name to register for the demo."),
+    ] = "Stigmem",
+    stigmem_url: Annotated[
+        str | None,
+        typer.Option("--stigmem-url", envvar="CRAIK_STIGMEM_URL", help="Stigmem node URL."),
+    ] = None,
+    stigmem_api_key: Annotated[
+        str | None,
+        typer.Option(
+            "--stigmem-api-key",
+            envvar="CRAIK_STIGMEM_API_KEY",
+            help="Bearer API key. Prefer CRAIK_STIGMEM_API_KEY.",
+        ),
+    ] = None,
+    github: Annotated[
+        bool,
+        typer.Option("--github/--no-github", help="Load read-only GitHub context."),
+    ] = True,
+    max_tokens: Annotated[
+        int,
+        typer.Option("--max-tokens", min=1, help="Approximate case-file context budget."),
+    ] = 24000,
+) -> None:
+    """Run the Stigmem documentation reconciliation demo."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        result = StigmemDocsDemo(
+            store,
+            github_adapter=_github_adapter() if github else None,
+        ).run(
+            repo_path=repo_path,
+            project_name=project_name,
+            stigmem_url=stigmem_url,
+            stigmem_api_key=stigmem_api_key,
+            github=github,
+            max_tokens=max_tokens,
+        )
+    except (
+        NotGitRepositoryError,
+        TaskNotFoundError,
+        ProjectNotFoundError,
+        HandoffContextError,
+    ) as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(result, indent=2, sort_keys=True))
 
 
 @contradictions_app.command("open")
