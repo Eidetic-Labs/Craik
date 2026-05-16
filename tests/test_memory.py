@@ -1,16 +1,27 @@
+import json
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from typing import Any
 
 import pytest
 
+from craik.contracts.models import CapabilityGrant, CapabilityTarget
 from craik.runtime.memory import (
     DirectMemoryWriteDeniedError,
     EphemeralMemoryStore,
     EvidenceRequiredError,
     LocalMemoryStore,
+    StigmemAuthError,
+    StigmemClient,
+    StigmemConfig,
+    StigmemMemoryStore,
+    StigmemPermissionError,
     create_proposal,
     evidence_reference,
 )
 from craik.runtime.paths import ensure_craik_home
+from craik.runtime.policy import generate_policy_envelope
 from craik.runtime.store import LocalStore
 
 
@@ -85,6 +96,73 @@ def test_direct_local_memory_write_requires_policy_grant(store: LocalStore) -> N
         LocalMemoryStore(store).write_fact(proposal.fact)
 
 
+def test_stigmem_backend_detects_capabilities_and_queries_local_node() -> None:
+    with _stigmem_node() as node:
+        backend = StigmemMemoryStore(
+            StigmemClient(StigmemConfig(node_url=node.url, api_key="test-key"))
+        )
+
+        capabilities = backend.discover()
+        facts = backend.search("local proposals")
+        fact = backend.get_fact("fact_1")
+        provenance = backend.get_provenance("fact_1")
+
+    assert capabilities.backend == "stigmem"
+    assert capabilities.node_id == "stigmem:node:test"
+    assert capabilities.auth_required is True
+    assert capabilities.required.fact_query is True
+    assert capabilities.optional.recall is False
+    assert facts[0].value == "Local proposals require review."
+    assert fact.entity == "repo:example"
+    assert provenance["sources"] == ["README.md"]
+
+
+def test_stigmem_backend_maps_auth_failures() -> None:
+    with _stigmem_node() as node:
+        backend = StigmemMemoryStore(
+            StigmemClient(StigmemConfig(node_url=node.url, api_key="wrong-key"))
+        )
+
+        with pytest.raises(StigmemAuthError, match="authentication failed"):
+            backend.search("local proposals")
+
+
+def test_stigmem_backend_maps_permission_failures() -> None:
+    with _stigmem_node(deny_write=True) as node:
+        backend = StigmemMemoryStore(
+            StigmemClient(StigmemConfig(node_url=node.url, api_key="test-key"))
+        )
+        proposal = _proposal()
+        policy = generate_policy_envelope(task_id="task_docs", actor="agent:codex")
+
+        with pytest.raises(StigmemPermissionError, match="permission denied"):
+            backend.write_fact(
+                proposal.fact,
+                policy=policy,
+                grants=[_memory_write_grant()],
+            )
+
+
+def test_stigmem_direct_write_requires_policy_grant() -> None:
+    with _stigmem_node() as node:
+        backend = StigmemMemoryStore(
+            StigmemClient(StigmemConfig(node_url=node.url, api_key="test-key"))
+        )
+        proposal = _proposal()
+        policy = generate_policy_envelope(task_id="task_docs", actor="agent:codex")
+
+        with pytest.raises(DirectMemoryWriteDeniedError, match="matching capability grant"):
+            backend.write_fact(proposal.fact, policy=policy, grants=[])
+
+        written = backend.write_fact(
+            proposal.fact,
+            policy=policy,
+            grants=[_memory_write_grant()],
+        )
+
+    assert written.value == "Local proposals require review before promotion."
+
+
 def _proposal():
     evidence = evidence_reference(
         task_id="task_docs",
@@ -103,3 +181,120 @@ def _proposal():
         trust_class="observed",
         evidence=[evidence],
     )
+
+
+def _memory_write_grant() -> CapabilityGrant:
+    return CapabilityGrant(
+        id="grant_memory_write",
+        task_id="task_docs",
+        capability="memory.write",
+        target=CapabilityTarget(),
+        operations=["write"],
+        reason="Test memory write grant.",
+        approved_by="user:maintainer",
+    )
+
+
+class _Node:
+    def __init__(self, server: HTTPServer, thread: threading.Thread) -> None:
+        self._server = server
+        self._thread = thread
+        self.url = f"http://127.0.0.1:{server.server_port}"
+
+    def close(self) -> None:
+        self._server.shutdown()
+        self._server.server_close()
+        self._thread.join(timeout=5)
+
+
+class _stigmem_node:
+    def __init__(self, *, deny_write: bool = False) -> None:
+        self._deny_write = deny_write
+        self._node: _Node | None = None
+
+    def __enter__(self) -> _Node:
+        deny_write = self._deny_write
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_GET(self) -> None:
+                if self.path == "/healthz":
+                    self._json({"status": "ok"})
+                    return
+                if self.path == "/.well-known/stigmem":
+                    self._json(
+                        {
+                            "node_id": "stigmem:node:test",
+                            "node_url": self.server_url(),
+                            "auth": {"required": True},
+                            "federation": False,
+                            "source_attestation": "off",
+                        }
+                    )
+                    return
+                if self.path.startswith("/v1/facts"):
+                    if not self._authorized():
+                        self._json({"error": "unauthorized"}, status=401)
+                        return
+                    if self.path.startswith("/v1/facts/fact_1/provenance"):
+                        self._json({"fact_id": "fact_1", "sources": ["README.md"]})
+                        return
+                    if self.path.startswith("/v1/facts/fact_1"):
+                        self._json(_fact_payload())
+                        return
+                    self._json({"facts": [_fact_payload()]})
+                    return
+                self._json({"error": "not found"}, status=404)
+
+            def do_POST(self) -> None:
+                if self.path == "/v1/facts":
+                    if not self._authorized():
+                        self._json({"error": "unauthorized"}, status=401)
+                        return
+                    if deny_write:
+                        self._json({"error": "forbidden"}, status=403)
+                        return
+                    content_length = int(self.headers.get("Content-Length", "0"))
+                    payload = json.loads(self.rfile.read(content_length).decode("utf-8"))
+                    self._json(payload, status=201)
+                    return
+                self._json({"error": "not found"}, status=404)
+
+            def log_message(self, format: str, *args: Any) -> None:
+                return
+
+            def server_url(self) -> str:
+                return f"http://127.0.0.1:{self.server.server_port}"
+
+            def _authorized(self) -> bool:
+                return self.headers.get("Authorization") == "Bearer test-key"
+
+            def _json(self, payload: dict[str, Any], *, status: int = 200) -> None:
+                body = json.dumps(payload).encode("utf-8")
+                self.send_response(status)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+        server = HTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self._node = _Node(server, thread)
+        return self._node
+
+    def __exit__(self, *args: object) -> None:
+        if self._node is not None:
+            self._node.close()
+
+
+def _fact_payload() -> dict[str, Any]:
+    return {
+        "id": "fact_1",
+        "entity": "repo:example",
+        "relation": "craik:memory",
+        "value": {"type": "text", "v": "Local proposals require review."},
+        "source": "README.md",
+        "confidence": 0.9,
+        "scope": "team",
+        "trust_class": "observed",
+    }

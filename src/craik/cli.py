@@ -36,6 +36,9 @@ from craik.runtime.memory import (
     EvidenceRequiredError,
     LocalMemoryStore,
     MemoryProposalNotFoundError,
+    StigmemClient,
+    StigmemConfig,
+    StigmemMemoryStore,
     create_proposal,
     evidence_reference,
 )
@@ -69,6 +72,8 @@ intent_app = typer.Typer(help="Inspect task intent locks.")
 app.add_typer(intent_app, name="intent")
 case_app = typer.Typer(help="Build and inspect Craik case files.")
 app.add_typer(case_app, name="case")
+connect_app = typer.Typer(help="Connect to external services.")
+app.add_typer(connect_app, name="connect")
 handoff_app = typer.Typer(help="Create and inspect Craik handoffs.")
 app.add_typer(handoff_app, name="handoff")
 memory_app = typer.Typer(help="Create and review local memory proposals.")
@@ -375,6 +380,41 @@ def case_show(case_or_task_id: str) -> None:
         raise typer.BadParameter(f"unknown case file or task: {case_or_task_id}")
     typer.echo(
         json.dumps(case_file.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
+
+
+@connect_app.command("stigmem")
+def connect_stigmem(
+    url: Annotated[
+        str,
+        typer.Option(
+            "--url",
+            envvar="CRAIK_STIGMEM_URL",
+            help="Stigmem node URL.",
+        ),
+    ],
+    api_key: Annotated[
+        str | None,
+        typer.Option(
+            "--api-key",
+            envvar="CRAIK_STIGMEM_API_KEY",
+            help="Bearer API key. Prefer CRAIK_STIGMEM_API_KEY.",
+        ),
+    ] = None,
+    timeout: Annotated[
+        float,
+        typer.Option(
+            "--timeout",
+            envvar="CRAIK_STIGMEM_TIMEOUT",
+            help="Request timeout in seconds.",
+        ),
+    ] = 5.0,
+) -> None:
+    """Detect Stigmem backend compatibility."""
+    config = StigmemConfig(node_url=url, api_key=api_key, timeout_seconds=timeout)
+    capabilities = StigmemMemoryStore(StigmemClient(config)).discover()
+    typer.echo(
+        json.dumps(capabilities.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
     )
 
 
