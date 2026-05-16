@@ -91,6 +91,52 @@ def test_home_init_creates_home_layout(tmp_path) -> None:
     assert (home / "case-files").is_dir()
 
 
+def test_setup_wizard_writes_non_secret_gateway_config(tmp_path) -> None:
+    home = tmp_path / "craik-home"
+
+    result = runner.invoke(
+        app,
+        [
+            "setup",
+            "--project-id",
+            "project_gateway",
+            "--enable-gateway",
+            "--policy-envelope-id",
+            "policy_gateway",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["secrets_written"] is False
+    assert payload["gateway_config"]["project_id"] == "project_gateway"
+    assert payload["gateway_config"]["enabled"] is True
+    assert payload["gateway_config"]["policy_envelope_id"] == "policy_gateway"
+    assert "api_key" not in json.dumps(payload).lower()
+
+    store = LocalStore.from_paths(ensure_craik_home({"CRAIK_HOME": str(home)}))
+    try:
+        store.initialize()
+        config = store.get_gateway_config("gateway_default")
+        assert config is not None
+        assert config.enabled is True
+        assert config.project_id == "project_gateway"
+    finally:
+        store.close()
+
+
+def test_setup_wizard_rejects_public_gateway_bind_without_policy(tmp_path) -> None:
+    result = runner.invoke(
+        app,
+        ["setup", "--gateway-bind-host", "0.0.0.0"],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code != 0
+    assert "public gateway bind requires policy_envelope_id" in result.output
+
+
 def test_project_commands_round_trip_registered_repo(tmp_path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

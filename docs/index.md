@@ -26,6 +26,7 @@ project.
 ## Guides
 
 - [Configuring Craik Home](guides/configuring-craik-home.md)
+- [Setup Wizard](guides/setup.md)
 - [Project Registry](guides/project-registry.md)
 - [Using Case Files](guides/using-case-files.md)
 - [Agent Onboarding](guides/agent-onboarding.md)

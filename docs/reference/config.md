@@ -13,6 +13,13 @@ Craik stores runtime state in a SQLite database under `CRAIK_HOME/state/`.
 Project-local `.craik/` directories are opt-in only and are not created by the
 current CLI.
 
+## Setup
+
+`craik setup` creates the local home layout, initializes the local store, and
+writes a default `craik.gateway_config` record. The command prints
+`secrets_written = false` and does not collect API keys, channel tokens, webhook
+secrets, or bearer credentials.
+
 ## Context Discovery
 
 Project profiles can store documentation discovery overrides through
