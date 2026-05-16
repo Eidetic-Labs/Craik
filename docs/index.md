@@ -42,6 +42,7 @@ project.
 - [Config](reference/config.md)
 - [Schemas](reference/schemas.md)
 - [Runner Adapter Contract](reference/runner-adapter-contract.md)
+- [Runner Step Contracts](reference/runner-step-contracts.md)
 - [Codex Runner Adapter](reference/codex-runner-adapter.md)
 - [Claude Runner Adapter](reference/claude-runner-adapter.md)
 - [Gemini Runner Adapter](reference/gemini-runner-adapter.md)

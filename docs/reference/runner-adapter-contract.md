@@ -38,6 +38,36 @@ details into core contracts.
 - diagnostics,
 - and runner metadata.
 
+`craik.runner_step_request` is the bounded input for one loop phase:
+
+- run id,
+- task id,
+- phase: `plan`, `act`, `observe`, `evaluate`, `continue`, or `stop`,
+- runner metadata,
+- policy envelope id,
+- optional intent lock id,
+- capability grant ids,
+- expected output schemas,
+- input prompt,
+- bounded context,
+- and whether redaction is required.
+
+`craik.runner_step_result` is the observed output from one loop phase:
+
+- request id,
+- run id,
+- task id,
+- phase,
+- runner metadata,
+- status: `completed`, `blocked`, `failed`, or `partial`,
+- summary,
+- observed output,
+- diagnostics,
+- receipt ids,
+- memory proposal ids,
+- artifacts,
+- and whether the payload is redacted.
+
 `craik.runner_capability_matrix` records the stable capability and trust profile
 Craik uses before selecting or prompting a runner:
 

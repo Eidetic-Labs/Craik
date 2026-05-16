@@ -353,6 +353,54 @@ class RunnerAdapterResult(CraikModel):
     created_at: datetime
 
 
+class RunnerStepRequest(CraikModel):
+    """Normalized input for one governed runner loop step."""
+
+    schema_: Literal["craik.runner_step_request"] = Field(
+        default="craik.runner_step_request",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    run_id: str
+    task_id: str
+    phase: TaskRunPhase
+    runner: RunnerMetadata
+    policy_envelope_id: str
+    intent_lock_id: str | None = None
+    capability_grant_ids: list[str] = Field(default_factory=list)
+    expected_output_schemas: list[str] = Field(default_factory=list)
+    input_prompt: str
+    context: dict[str, Any] = Field(default_factory=dict)
+    redaction_required: bool = True
+    created_at: datetime
+
+
+class RunnerStepResult(CraikModel):
+    """Normalized output from one governed runner loop step."""
+
+    schema_: Literal["craik.runner_step_result"] = Field(
+        default="craik.runner_step_result",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    request_id: str
+    run_id: str
+    task_id: str
+    phase: TaskRunPhase
+    runner: RunnerMetadata
+    status: RunnerResultStatus
+    summary: str
+    observed_output: dict[str, Any] = Field(default_factory=dict)
+    diagnostics: list[str] = Field(default_factory=list)
+    receipt_ids: list[str] = Field(default_factory=list)
+    memory_proposal_ids: list[str] = Field(default_factory=list)
+    artifacts: list[str] = Field(default_factory=list)
+    redacted: bool = True
+    created_at: datetime
+
+
 class FactValue(CraikModel):
     """Proposed fact payload for memory updates."""
 
