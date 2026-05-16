@@ -17,8 +17,12 @@ from craik.runtime.memory import (
     StigmemConfig,
     StigmemMemoryStore,
     StigmemPermissionError,
+    build_memory_diff,
     create_proposal,
     evidence_reference,
+    fact_reference,
+    memory_write_failure,
+    preview_memory_impact,
 )
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.policy import generate_policy_envelope
@@ -161,6 +165,88 @@ def test_stigmem_direct_write_requires_policy_grant() -> None:
         )
 
     assert written.value == "Local proposals require review before promotion."
+
+
+def test_memory_diff_tracks_proposal_decisions_and_fact_activity() -> None:
+    created = _proposal()
+    approved = created.model_copy(update={"id": "memprop_approved", "status": "approved"})
+    rejected = created.model_copy(update={"id": "memprop_rejected", "status": "rejected"})
+    other_task = created.model_copy(update={"id": "memprop_other", "task_id": "task_other"})
+    written = fact_reference(approved.fact, fact_id="fact_approved", cid="sha256:approved")
+    failure = memory_write_failure(fact=rejected.fact, reason="permission denied")
+
+    diff = build_memory_diff(
+        task_id="task_docs",
+        proposals=[created, approved, rejected, other_task],
+        facts_written=[written],
+        write_failures=[failure],
+        facts_read=[fact_reference(created.fact, fact_id="fact_read")],
+    )
+
+    assert diff.proposals_created == [
+        "memprop_approved",
+        "memprop_docs_repo_example_craik_memory",
+        "memprop_rejected",
+    ]
+    assert diff.proposals_approved == ["memprop_approved"]
+    assert diff.proposals_rejected == ["memprop_rejected"]
+    assert diff.facts_written == [written]
+    assert diff.write_failures[0].reason == "permission denied"
+    assert diff.facts_read[0].id == "fact_read"
+
+
+def test_memory_impact_preview_shows_scope_evidence_and_contradictions() -> None:
+    existing = _proposal().fact.model_copy(update={"value": "Older value."})
+    add = _proposal()
+    invalidate = create_proposal(
+        task_id="task_docs",
+        entity="repo:example",
+        relation="craik:obsolete",
+        value="Outdated fact.",
+        source="docs/old.md",
+        confidence=0.6,
+        scope="company",
+        trust_class="reported",
+        operation="invalidate",
+        evidence=[],
+    )
+
+    preview = preview_memory_impact(
+        task_id="task_docs",
+        proposals=[add, invalidate],
+        existing_facts=[existing],
+    )
+
+    assert [fact.relation for fact in preview.facts_to_add] == ["craik:memory"]
+    assert [fact.relation for fact in preview.facts_to_invalidate] == ["craik:obsolete"]
+    assert preview.evidence_missing == [invalidate.id]
+    assert preview.scope_summary == {"company": 1, "local": 1}
+    assert preview.likely_contradictions[0].existing_value == "Older value."
+    assert "different value" in preview.likely_contradictions[0].reason
+
+
+def test_memory_diff_and_preview_redact_secret_like_values() -> None:
+    proposal = create_proposal(
+        task_id="task_docs",
+        entity="repo:example",
+        relation="craik:secret",
+        value="token=redactionfixture123",
+        source="Authorization: Bearer redactionfixture123",
+        confidence=0.5,
+        scope="local",
+        trust_class="reported",
+        evidence=[],
+    )
+
+    preview = preview_memory_impact(
+        task_id="task_docs",
+        proposals=[proposal],
+        existing_facts=[],
+    )
+    failure = memory_write_failure(fact=proposal.fact, reason="api_key=redactionfixture123")
+
+    assert "redactionfixture" not in preview.model_dump_json()
+    assert "redactionfixture" not in failure.model_dump_json()
 
 
 def _proposal():

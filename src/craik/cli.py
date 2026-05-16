@@ -39,8 +39,10 @@ from craik.runtime.memory import (
     StigmemClient,
     StigmemConfig,
     StigmemMemoryStore,
+    build_memory_diff,
     create_proposal,
     evidence_reference,
+    preview_memory_impact,
 )
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy import (
@@ -711,6 +713,43 @@ def memory_search(query: str) -> None:
 
     payload = [fact.model_dump(mode="json", by_alias=True) for fact in facts]
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@memory_app.command("diff")
+def memory_diff(task_id: str) -> None:
+    """Print a run-scoped memory diff for local proposal activity."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposals = store.list_proposals()
+        diff = build_memory_diff(task_id=task_id, proposals=proposals)
+        store.put_memory_diff(diff)
+    finally:
+        store.close()
+
+    typer.echo(json.dumps(diff.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
+
+
+@memory_app.command("preview")
+def memory_preview(task_id: str) -> None:
+    """Preview local memory impact before promotion or direct writes."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        proposals = store.list_proposals()
+        existing_facts = LocalMemoryStore(store).search("")
+        preview = preview_memory_impact(
+            task_id=task_id,
+            proposals=proposals,
+            existing_facts=existing_facts,
+        )
+        store.put_memory_impact_preview(preview)
+    finally:
+        store.close()
+
+    typer.echo(
+        json.dumps(preview.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
+    )
 
 
 @policy_app.command("show")

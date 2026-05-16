@@ -17,6 +17,7 @@ PolicyProfile = Literal["strict", "trusted-local", "automation", "custom"]
 ProposalOperation = Literal["add", "update", "invalidate"]
 ProposalStatus = Literal["pending", "approved", "rejected"]
 TrustClass = Literal["observed", "reported", "inferred", "policy", "external", "stale-risk"]
+MemoryDiffChangeKind = Literal["created", "approved", "rejected", "written", "failed", "read"]
 ContradictionStatus = Literal["open", "resolved", "ignored"]
 WorkGraphEventType = Literal[
     "created",
@@ -287,6 +288,71 @@ class MemoryBackendCapabilities(CraikModel):
     required: MemoryRequiredCapabilities
     optional: MemoryOptionalCapabilities = Field(default_factory=MemoryOptionalCapabilities)
     checked_at: datetime
+
+
+class MemoryFactReference(CraikModel):
+    """Reference to a memory fact involved in a run-scoped diff."""
+
+    id: str | None = None
+    cid: str | None = None
+    entity: str
+    relation: str
+    value: str
+    source: str
+    scope: MemoryScope
+    trust_class: TrustClass
+
+
+class MemoryWriteFailure(CraikModel):
+    """A failed attempt to write memory."""
+
+    fact: MemoryFactReference
+    reason: str
+    attempted_at: datetime
+
+
+class MemoryContradictionPreview(CraikModel):
+    """Likely contradiction identified before memory promotion."""
+
+    entity: str
+    relation: str
+    existing_value: str
+    proposed_value: str
+    reason: str
+
+
+class MemoryDiff(CraikModel):
+    """Run-scoped explanation of memory reads, proposals, writes, and failures."""
+
+    schema_: Literal["craik.memory_diff"] = Field(default="craik.memory_diff", alias="schema")
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    proposals_created: list[str] = Field(default_factory=list)
+    proposals_approved: list[str] = Field(default_factory=list)
+    proposals_rejected: list[str] = Field(default_factory=list)
+    facts_written: list[MemoryFactReference] = Field(default_factory=list)
+    write_failures: list[MemoryWriteFailure] = Field(default_factory=list)
+    facts_read: list[MemoryFactReference] = Field(default_factory=list)
+    created_at: datetime
+
+
+class MemoryImpactPreview(CraikModel):
+    """Pre-write preview of memory changes and likely contradictions."""
+
+    schema_: Literal["craik.memory_impact_preview"] = Field(
+        default="craik.memory_impact_preview",
+        alias="schema",
+    )
+    version: Literal["0.1.0"] = "0.1.0"
+    id: str
+    task_id: str
+    facts_to_add: list[MemoryFactReference] = Field(default_factory=list)
+    facts_to_invalidate: list[MemoryFactReference] = Field(default_factory=list)
+    likely_contradictions: list[MemoryContradictionPreview] = Field(default_factory=list)
+    evidence_missing: list[str] = Field(default_factory=list)
+    scope_summary: dict[MemoryScope, int] = Field(default_factory=dict)
+    created_at: datetime
 
 
 class ContradictionReport(CraikModel):

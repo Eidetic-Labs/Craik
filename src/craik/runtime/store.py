@@ -19,6 +19,8 @@ from craik.contracts.models import (
     EvidenceReference,
     Handoff,
     IntentLock,
+    MemoryDiff,
+    MemoryImpactPreview,
     MemoryProposal,
     ProjectProfile,
     TaskRequest,
@@ -39,6 +41,8 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.handoff": "handoffs",
     "craik.intent_lock": "intent_locks",
     "craik.memory_proposal": "proposals",
+    "craik.memory_diff": "memory_diffs",
+    "craik.memory_impact_preview": "memory_previews",
     "craik.assumption": "assumptions",
     "craik.evidence_reference": "evidence",
     "craik.work_graph_event": "graph_events",
@@ -242,6 +246,29 @@ class LocalStore:
 
     def list_proposals(self) -> list[MemoryProposal]:
         return _cast_list(MemoryProposal, self.list_contracts("craik.memory_proposal"))
+
+    def put_memory_diff(self, diff: MemoryDiff) -> None:
+        self.put_contract(diff)
+
+    def get_memory_diff(self, diff_id: str) -> MemoryDiff | None:
+        contract = self.get_contract("craik.memory_diff", diff_id)
+        return _cast_optional(MemoryDiff, contract)
+
+    def list_memory_diffs(self) -> list[MemoryDiff]:
+        return _cast_list(MemoryDiff, self.list_contracts("craik.memory_diff"))
+
+    def put_memory_impact_preview(self, preview: MemoryImpactPreview) -> None:
+        self.put_contract(preview)
+
+    def get_memory_impact_preview(self, preview_id: str) -> MemoryImpactPreview | None:
+        contract = self.get_contract("craik.memory_impact_preview", preview_id)
+        return _cast_optional(MemoryImpactPreview, contract)
+
+    def list_memory_impact_previews(self) -> list[MemoryImpactPreview]:
+        return _cast_list(
+            MemoryImpactPreview,
+            self.list_contracts("craik.memory_impact_preview"),
+        )
 
     def put_assumption(self, assumption: Assumption) -> None:
         self.put_contract(assumption)

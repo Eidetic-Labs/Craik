@@ -49,3 +49,16 @@ Use `craik connect stigmem` to detect compatibility. Configure the node with `CR
 - `rejected`
 
 Approval records reviewer identity, decision reason, and decision timestamp.
+
+## Diff And Preview
+
+`craik.memory_diff` explains task-scoped memory activity: proposals created, proposals approved or rejected, facts written, write failures, and facts read.
+
+`craik.memory_impact_preview` shows the expected impact before promotion or direct writes: facts to add, facts to invalidate, likely contradictions, missing evidence, and scope counts.
+
+Use:
+
+```sh
+craik memory diff <task-id>
+craik memory preview <task-id>
+```
