@@ -35,6 +35,7 @@ from craik.contracts.models import (
     InstructionSourceRegistry,
     InstructionSourceSnapshot,
     IntentLock,
+    KnowledgeFreshnessProbe,
     MemoryDiff,
     MemoryImpactPreview,
     MemoryProposal,
@@ -52,6 +53,7 @@ from craik.contracts.models import (
     ScopeChangeResult,
     TaskRequest,
     TaskRun,
+    ToolResultAttestation,
     WorkerResult,
     WorkGraphEvent,
 )
@@ -86,6 +88,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.instruction_source_registry": "instruction_source_registries",
     "craik.instruction_source_snapshot": "instruction_source_snapshots",
     "craik.intent_lock": "intent_locks",
+    "craik.knowledge_freshness_probe": "knowledge_freshness_probes",
     "craik.memory_proposal": "proposals",
     "craik.memory_diff": "memory_diffs",
     "craik.memory_impact_preview": "memory_previews",
@@ -105,6 +108,7 @@ CONTRACT_KINDS: dict[str, str] = {
     "craik.scope_change_result": "scope_change_results",
     "craik.run_delta": "run_deltas",
     "craik.runtime_critic_finding": "runtime_critic_findings",
+    "craik.tool_result_attestation": "tool_result_attestations",
 }
 
 
@@ -599,6 +603,38 @@ class LocalStore:
 
     def list_intent_locks(self) -> list[IntentLock]:
         return _cast_list(IntentLock, self.list_contracts("craik.intent_lock"))
+
+    def put_tool_result_attestation(self, attestation: ToolResultAttestation) -> None:
+        self.put_contract(attestation)
+
+    def get_tool_result_attestation(
+        self,
+        attestation_id: str,
+    ) -> ToolResultAttestation | None:
+        contract = self.get_contract("craik.tool_result_attestation", attestation_id)
+        return _cast_optional(ToolResultAttestation, contract)
+
+    def list_tool_result_attestations(self) -> list[ToolResultAttestation]:
+        return _cast_list(
+            ToolResultAttestation,
+            self.list_contracts("craik.tool_result_attestation"),
+        )
+
+    def put_knowledge_freshness_probe(self, probe: KnowledgeFreshnessProbe) -> None:
+        self.put_contract(probe)
+
+    def get_knowledge_freshness_probe(
+        self,
+        probe_id: str,
+    ) -> KnowledgeFreshnessProbe | None:
+        contract = self.get_contract("craik.knowledge_freshness_probe", probe_id)
+        return _cast_optional(KnowledgeFreshnessProbe, contract)
+
+    def list_knowledge_freshness_probes(self) -> list[KnowledgeFreshnessProbe]:
+        return _cast_list(
+            KnowledgeFreshnessProbe,
+            self.list_contracts("craik.knowledge_freshness_probe"),
+        )
 
     def put_handoff(self, handoff: Handoff) -> None:
         self.put_contract(handoff)
