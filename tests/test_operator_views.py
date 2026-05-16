@@ -12,6 +12,8 @@ from craik.contracts.models import (
     InstructionProvenance,
     InstructionSource,
     InstructionSourceSnapshot,
+    MemoryImpactPreview,
+    MemoryProposal,
     PluginReceipt,
     RedTeamFinding,
     RuntimeCriticFinding,
@@ -22,6 +24,7 @@ from craik.contracts.models import (
 from craik.runtime.operator_views import (
     BudgetQuotaSnapshot,
     InstructionDistillationSnapshot,
+    MemoryImpactPreviewSnapshot,
     QualityGateSnapshot,
     format_budget_quota_view,
     format_contradiction_inbox,
@@ -29,6 +32,7 @@ from craik.runtime.operator_views import (
     format_evidence_assumption_view,
     format_handoff_viewer,
     format_instruction_distillation_view,
+    format_memory_impact_preview_view,
     format_quality_gate_view,
     format_receipt_viewer,
     format_work_graph_explorer,
@@ -589,6 +593,112 @@ def test_quality_gate_view_clear_empty_state() -> None:
     ]
 
 
+def test_memory_impact_preview_view_separates_proposals_from_facts() -> None:
+    add_proposal = _memory_proposal(
+        "memprop_add_docs",
+        operation="add",
+        value="Craik uses reviewable memory proposals.",
+    )
+    invalidation = _memory_proposal(
+        "memprop_invalidate_docs",
+        operation="invalidate",
+        value="Craik writes durable facts directly.",
+        evidence=False,
+    )
+    preview = MemoryImpactPreview.model_validate(
+        {
+            "id": "mempreview_task_docs",
+            "task_id": "task_docs",
+            "facts_to_add": [
+                {
+                    "entity": "repo:craik",
+                    "relation": "craik:memory_policy",
+                    "value": "Craik uses reviewable memory proposals.",
+                    "source": "docs/guides/memory-proposals.md",
+                    "scope": "local",
+                    "trust_class": "observed",
+                }
+            ],
+            "facts_to_invalidate": [
+                {
+                    "entity": "repo:craik",
+                    "relation": "craik:memory_policy",
+                    "value": "Craik writes durable facts directly.",
+                    "source": "docs/old-memory.md",
+                    "scope": "local",
+                    "trust_class": "stale-risk",
+                }
+            ],
+            "likely_contradictions": [
+                {
+                    "entity": "repo:craik",
+                    "relation": "craik:memory_policy",
+                    "existing_value": "Craik writes durable facts directly.",
+                    "proposed_value": "Craik uses reviewable memory proposals.",
+                    "reason": "Proposal updates an existing memory policy value.",
+                }
+            ],
+            "evidence_missing": ["memprop_invalidate_docs"],
+            "scope_summary": {"local": 2},
+            "created_at": "2026-05-16T17:50:00Z",
+        }
+    )
+
+    lines = format_memory_impact_preview_view(
+        MemoryImpactPreviewSnapshot(
+            preview=preview,
+            proposals=[invalidation, add_proposal],
+            policy_envelope_id="policy_memory_review",
+            receipt_ids=["receipt_memory_preview"],
+        )
+    )
+
+    assert lines[:6] == [
+        "Memory Impact Preview: mempreview_task_docs",
+        "Task: task_docs",
+        "Policy: policy_memory_review",
+        "Receipts: receipt_memory_preview",
+        "",
+        "Proposed Memory Writes",
+    ]
+    assert "- memprop_add_docs [pending/add]" in lines
+    assert "- memprop_invalidate_docs [pending/invalidate]" in lines
+    assert "  Evidence: none" in lines
+    assert any(
+        line.startswith(
+            "- repo:craik craik:memory_policy='Craik uses reviewable memory proposals.'"
+        )
+        for line in lines
+    )
+    assert "- memprop_invalidate_docs" in lines
+    assert "- repo:craik craik:memory_policy" in lines
+    assert "  Existing: Craik writes durable facts directly." in lines
+    assert "  Proposed: Craik uses reviewable memory proposals." in lines
+    assert "- local: 2" in lines
+
+
+def test_memory_impact_preview_view_empty_preview_sections() -> None:
+    preview = MemoryImpactPreview.model_validate(
+        {
+            "id": "mempreview_task_empty",
+            "task_id": "task_empty",
+            "created_at": "2026-05-16T17:50:00Z",
+        }
+    )
+
+    lines = format_memory_impact_preview_view(MemoryImpactPreviewSnapshot(preview=preview))
+
+    assert lines[:6] == [
+        "Memory Impact Preview: mempreview_task_empty",
+        "Task: task_empty",
+        "Policy: none",
+        "Receipts: none",
+        "",
+        "Proposed Memory Writes",
+    ]
+    assert lines.count("- none") == 6
+
+
 def _delegation(
     delegation_id: str,
     status: str,
@@ -612,6 +722,46 @@ def _delegation(
             "created_at": "2026-05-16T17:20:00Z",
             "resolved_at": "2026-05-16T17:25:00Z" if resolution else None,
             "resolution": resolution,
+        }
+    )
+
+
+def _memory_proposal(
+    proposal_id: str,
+    *,
+    operation: str,
+    value: str,
+    evidence: bool = True,
+) -> MemoryProposal:
+    return MemoryProposal.model_validate(
+        {
+            "id": proposal_id,
+            "task_id": "task_docs",
+            "run_id": "run_docs",
+            "step_id": "step_memory",
+            "handoff_id": "handoff_docs",
+            "operation": operation,
+            "fact": {
+                "entity": "repo:craik",
+                "relation": "craik:memory_policy",
+                "value": value,
+                "source": "docs/guides/memory-proposals.md",
+                "confidence": 0.9,
+                "scope": "local",
+                "trust_class": "observed",
+            },
+            "evidence": [
+                {
+                    "id": "evidence_memory_docs",
+                    "source": "docs/guides/memory-proposals.md",
+                    "kind": "file",
+                    "locator": "docs/guides/memory-proposals.md#promotion-rules",
+                    "summary": "Memory proposals require review.",
+                    "captured_at": "2026-05-16T17:49:00Z",
+                }
+            ]
+            if evidence
+            else [],
         }
     )
 
