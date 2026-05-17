@@ -118,6 +118,7 @@ project.
 - [Work Graph Visual Workspace Bridge](reference/work-graph-visual-bridge.md)
 - [Accessibility Requirements](reference/accessibility-requirements.md)
 - [Adjacent-Tool Migration Assessment](reference/adjacent-tool-migration.md)
+- [Multi-Agent Workflow Migration Assessment](reference/multi-agent-workflow-migration.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
