@@ -118,6 +118,26 @@ def test_http_transport_builds_headers_for_each_request() -> None:
     assert seen_authorizations == ["Bearer first-token", "Bearer second-token"]
 
 
+def test_http_transport_does_not_duplicate_v1_prefix_for_openai_compatible_base_url() -> None:
+    seen: dict[str, Any] = {}
+
+    def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
+        seen["path"] = headers["X-Request-Path"]
+        return _json_response({"id": "chatcmpl_1", "choices": []})
+
+    with _stub_server(handle) as server:
+        transport = HTTPTransport(
+            family="chat_completions",
+            base_url=f"{server.url}/v1",
+            headers_factory=dict,
+            timeout_seconds=5,
+        )
+
+        list(transport.send({"_path": "/v1/chat/completions"}, stream=False))
+
+    assert seen["path"] == "/v1/chat/completions"
+
+
 def test_live_enabled_adapter_executes_round_trip_through_http_transport() -> None:
     seen: dict[str, Any] = {}
 
@@ -226,7 +246,9 @@ def _stub_server(handler: Any) -> _Node:
         def do_POST(self) -> None:
             content_length = int(self.headers.get("Content-Length", "0"))
             payload = json.loads(self.rfile.read(content_length).decode("utf-8") or "{}")
-            response = handler(payload, dict(self.headers.items()))
+            headers = dict(self.headers.items())
+            headers["X-Request-Path"] = self.path
+            response = handler(payload, headers)
             self.send_response(response.status)
             for key, value in response.headers.items():
                 self.send_header(key, value)
