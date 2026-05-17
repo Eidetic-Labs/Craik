@@ -3,19 +3,26 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import UTC, datetime
 from typing import Annotated, Any, cast
 
 import typer
 from pydantic import ValidationError
 
-from craik.cli import auth_app
+from craik.cli import app, auth_app
 from craik.runtime.auth import (
     AuthProfile,
     AuthProfileNotFoundError,
     AuthProfileStore,
     CredentialKind,
     CredentialStatus,
+)
+from craik.runtime.auth.operator import (
+    OIDCAuthenticator,
+    OIDCConfig,
+    OperatorSessionNotFoundError,
+    OperatorSessionStore,
 )
 from craik.runtime.auth.sources import source_for_auth_profile
 from craik.runtime.providers.provider_transport import ProviderFamily
@@ -142,6 +149,99 @@ def auth_status() -> None:
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
+@app.command("login")
+def login(
+    issuer: Annotated[
+        str | None,
+        typer.Option("--issuer", help="OIDC issuer URL. Defaults to CRAIK_OIDC_ISSUER."),
+    ] = None,
+    client_id: Annotated[
+        str,
+        typer.Option("--client-id", help="OIDC client id. Defaults to CRAIK_OIDC_CLIENT_ID."),
+    ] = "",
+    audience: Annotated[
+        str | None,
+        typer.Option("--audience", help="Optional OIDC audience value."),
+    ] = None,
+    max_wait_seconds: Annotated[
+        int,
+        typer.Option("--max-wait-seconds", help="Maximum device-code polling duration."),
+    ] = 600,
+) -> None:
+    """Authenticate the local operator with OIDC device-code flow."""
+    resolved_issuer = issuer or os.environ.get("CRAIK_OIDC_ISSUER")
+    if not resolved_issuer:
+        raise typer.BadParameter("--issuer or CRAIK_OIDC_ISSUER is required")
+    resolved_client_id = client_id or os.environ.get("CRAIK_OIDC_CLIENT_ID", "craik-cli")
+    authenticator = OIDCAuthenticator(
+        OIDCConfig(
+            issuer=resolved_issuer.rstrip("/"),
+            client_id=resolved_client_id,
+            audience=audience,
+        )
+    )
+    authorization = authenticator.device_authorization()
+    user_code = authorization.get("user_code")
+    verification_uri = authorization.get("verification_uri") or authorization.get(
+        "verification_uri_complete"
+    )
+    typer.echo(
+        json.dumps(
+            {
+                "status": "authorization_pending",
+                "verification_uri": verification_uri,
+                "user_code": user_code,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    session, refresh_token = authenticator.session_and_refresh_from_token_response(
+        authenticator.poll_device_token_response(
+            str(authorization["device_code"]),
+            interval_seconds=int(authorization.get("interval", 5) or 5),
+            max_wait_seconds=max_wait_seconds,
+        )
+    )
+    OperatorSessionStore.from_env().put(session, refresh_token=refresh_token)
+    typer.echo(json.dumps(_operator_session_payload(session), indent=2, sort_keys=True))
+
+
+@app.command("logout")
+def logout(
+    issuer: Annotated[
+        str | None,
+        typer.Option("--issuer", help="OIDC issuer URL for best-effort revocation."),
+    ] = None,
+    client_id: Annotated[
+        str,
+        typer.Option("--client-id", help="OIDC client id for best-effort revocation."),
+    ] = "",
+) -> None:
+    """Clear the active operator session."""
+    authenticator = None
+    resolved_issuer = issuer or os.environ.get("CRAIK_OIDC_ISSUER")
+    if resolved_issuer:
+        authenticator = OIDCAuthenticator(
+            OIDCConfig(
+                issuer=resolved_issuer.rstrip("/"),
+                client_id=client_id or os.environ.get("CRAIK_OIDC_CLIENT_ID", "craik-cli"),
+            )
+        )
+    revoked = OperatorSessionStore.from_env().delete(authenticator=authenticator)
+    typer.echo(json.dumps({"logged_out": True, "revoked": revoked}, indent=2, sort_keys=True))
+
+
+@app.command("whoami")
+def whoami() -> None:
+    """Print the active operator identity."""
+    try:
+        session = OperatorSessionStore.from_env().get()
+    except OperatorSessionNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    typer.echo(json.dumps(_operator_session_payload(session), indent=2, sort_keys=True))
+
+
 def _source_status(profile: AuthProfile) -> CredentialStatus:
     try:
         return source_for_auth_profile(profile).status()
@@ -181,3 +281,16 @@ def _masked_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
         else:
             masked[key] = value
     return masked
+
+
+def _operator_session_payload(session: Any) -> dict[str, Any]:
+    return {
+        "subject": session.subject,
+        "email": session.email,
+        "display_name": session.display_name,
+        "groups": session.groups,
+        "issuer": session.issuer,
+        "id_token_jti": session.id_token_jti,
+        "expires_at": session.expires_at.isoformat(),
+        "refresh_token_ref": session.refresh_token_ref,
+    }

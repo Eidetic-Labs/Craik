@@ -144,7 +144,7 @@ def test_device_code_flow_returns_operator_session() -> None:
     assert session.groups == ["platform", "agents"]
     assert session.issuer == idp.issuer
     assert session.id_token_jti == "token-1"
-    assert session.refresh_token_ref == "token_response.refresh_token"
+    assert session.refresh_token_ref == "operator-session.refresh_token"
     assert idp.seen_forms[0]["client_id"] == "craik-cli"
     assert idp.seen_forms[1]["grant_type"] == "urn:ietf:params:oauth:grant-type:device_code"
 

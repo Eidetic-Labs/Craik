@@ -70,6 +70,22 @@ class OIDCAuthenticator:
         max_wait_seconds: int = 600,
     ) -> OperatorSession:
         """Poll the token endpoint until the device-code flow completes."""
+        return self.session_from_token_response(
+            self.poll_device_token_response(
+                device_code,
+                interval_seconds=interval_seconds,
+                max_wait_seconds=max_wait_seconds,
+            )
+        )
+
+    def poll_device_token_response(
+        self,
+        device_code: str,
+        *,
+        interval_seconds: int = 5,
+        max_wait_seconds: int = 600,
+    ) -> dict[str, Any]:
+        """Poll the token endpoint until it returns a token response payload."""
         endpoint = _string_endpoint(self.discovery(), "token_endpoint")
         deadline = time.monotonic() + max_wait_seconds
         interval = max(1, interval_seconds)
@@ -81,7 +97,7 @@ class OIDCAuthenticator:
             }
             response = self._post_form(endpoint, payload, allow_oauth_error=True)
             if "id_token" in response:
-                return self.session_from_token_response(response)
+                return response
             oauth_error = response.get("error")
             if oauth_error == "authorization_pending":
                 time.sleep(interval)
@@ -141,12 +157,21 @@ class OIDCAuthenticator:
 
     def session_from_token_response(self, payload: dict[str, Any]) -> OperatorSession:
         """Validate an ID token response and return a normalized session."""
+        session, _refresh_token = self.session_and_refresh_from_token_response(payload)
+        return session
+
+    def session_and_refresh_from_token_response(
+        self,
+        payload: dict[str, Any],
+    ) -> tuple[OperatorSession, str | None]:
+        """Validate an ID token response and return the session plus refresh token."""
         id_token = payload.get("id_token")
         if not isinstance(id_token, str):
             raise OIDCAuthenticationError("OIDC token response did not include an ID token")
         claims = self.validate_id_token(id_token)
-        refresh_token_ref = "token_response.refresh_token" if payload.get("refresh_token") else None
-        return OperatorSession(
+        refresh_token = payload.get("refresh_token")
+        refresh_token = refresh_token if isinstance(refresh_token, str) and refresh_token else None
+        session = OperatorSession(
             subject=_required_string(claims, "sub"),
             email=_optional_string(claims, "email"),
             display_name=_optional_string(claims, "name"),
@@ -154,8 +179,42 @@ class OIDCAuthenticator:
             issuer=_required_string(claims, "iss"),
             id_token_jti=_token_identifier(claims),
             expires_at=_timestamp_claim(claims, "exp"),
-            refresh_token_ref=refresh_token_ref,
+            refresh_token_ref="operator-session.refresh_token" if refresh_token else None,
         )
+        return session, refresh_token
+
+    def refresh_session(self, refresh_token: str) -> tuple[OperatorSession, str | None]:
+        """Refresh an operator session with a stored refresh token."""
+        endpoint = _string_endpoint(self.discovery(), "token_endpoint")
+        response = self._post_form(
+            endpoint,
+            {
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token,
+                "client_id": self.config.client_id,
+            },
+        )
+        session, new_refresh_token = self.session_and_refresh_from_token_response(response)
+        return session, new_refresh_token or refresh_token
+
+    def revoke_refresh_token(self, refresh_token: str) -> bool:
+        """Best-effort refresh-token revocation."""
+        endpoint = self.discovery().get("revocation_endpoint")
+        if not isinstance(endpoint, str) or not endpoint:
+            return False
+        try:
+            self._post_form(
+                endpoint,
+                {
+                    "token": refresh_token,
+                    "token_type_hint": "refresh_token",
+                    "client_id": self.config.client_id,
+                },
+                allow_oauth_error=True,
+            )
+        except OIDCAuthenticationError:
+            return False
+        return True
 
     def validate_id_token(self, token: str) -> dict[str, Any]:
         """Validate an OIDC ID token against discovery metadata and JWKS."""
