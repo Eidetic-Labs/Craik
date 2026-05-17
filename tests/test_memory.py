@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from craik.contracts.models import CapabilityGrant, CapabilityTarget
-from craik.runtime.memory import (
+from craik.runtime.memory.memory import (
     DirectMemoryWriteDeniedError,
     EphemeralMemoryStore,
     EvidenceRequiredError,
@@ -25,7 +25,7 @@ from craik.runtime.memory import (
     preview_memory_impact,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.policy import generate_policy_envelope
+from craik.runtime.policy.policy import generate_policy_envelope
 from craik.runtime.store import LocalStore
 
 
@@ -42,12 +42,14 @@ def store(tmp_path: Path):
 
 def test_memory_proposal_helpers_keep_legacy_import_surface() -> None:
     from craik.runtime import memory
-    from craik.runtime.memory_errors import (
+    from craik.runtime.memory.memory_errors import (
         DirectMemoryWriteDeniedError as extracted_direct_write_error,
     )
-    from craik.runtime.memory_errors import EvidenceRequiredError as extracted_evidence_error
-    from craik.runtime.memory_proposals import create_proposal as extracted_create_proposal
-    from craik.runtime.memory_proposals import evidence_reference as extracted_evidence_reference
+    from craik.runtime.memory.memory_errors import EvidenceRequiredError as extracted_evidence_error
+    from craik.runtime.memory.memory_proposals import create_proposal as extracted_create_proposal
+    from craik.runtime.memory.memory_proposals import (
+        evidence_reference as extracted_evidence_reference,
+    )
 
     assert memory.create_proposal is extracted_create_proposal
     assert memory.evidence_reference is extracted_evidence_reference

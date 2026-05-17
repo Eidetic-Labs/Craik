@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import SandboxBackend, SandboxBackendCapability
-from craik.runtime.remote_shell_backend import (
+from craik.runtime.sandbox.remote_shell_backend import (
     RemoteShellRequest,
     RemoteShellTarget,
     remote_shell_decision,

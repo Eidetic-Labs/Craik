@@ -4,11 +4,11 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import InstructionProvenance, InstructionSourceSnapshot
-from craik.runtime.instruction_sources import (
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.projects.instruction_sources import (
     render_instruction_provenance_markdown,
     render_instruction_snapshot_json,
 )
-from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
 
 

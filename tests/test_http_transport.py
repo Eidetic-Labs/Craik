@@ -7,15 +7,15 @@ from typing import Any
 
 import pytest
 
-from craik.runtime.http_transport import HTTPTransport
-from craik.runtime.provider_runtime import (
+from craik.runtime.providers.http_transport import HTTPTransport
+from craik.runtime.providers.provider_runtime import (
     OPENAI_OFFICIAL_DOCS,
     ChatCompletionsProviderAdapter,
     ProviderMessage,
     ProviderRuntimeConfig,
     ProviderRuntimeRequest,
 )
-from craik.runtime.provider_transport import ProviderTransportError
+from craik.runtime.providers.provider_transport import ProviderTransportError
 
 
 def test_http_transport_yields_non_streaming_json_response() -> None:

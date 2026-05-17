@@ -10,12 +10,12 @@ from craik.contracts.models import (
     SelfAudit,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.quality_scores import (
+from craik.runtime.store import LocalStore
+from craik.runtime.work.quality_scores import (
     persist_handoff_scores,
     score_evidence_coverage,
     score_handoff_quality,
 )
-from craik.runtime.store import LocalStore
 
 
 def _store(tmp_path: Path) -> LocalStore:

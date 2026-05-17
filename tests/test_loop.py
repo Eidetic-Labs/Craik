@@ -12,16 +12,16 @@ from craik.contracts.models import (
     RunnerStepRequest,
     RunnerStepResult,
 )
-from craik.runtime.loop import (
+from craik.runtime.memory.memory import LocalMemoryStore
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.policy.policy import generate_policy_envelope
+from craik.runtime.store import LocalStore
+from craik.runtime.work.loop import (
     FixtureStepRunner,
     LoopMaxIterationsError,
     LoopStep,
     SingleAgentLoopExecutor,
 )
-from craik.runtime.memory import LocalMemoryStore
-from craik.runtime.paths import ensure_craik_home
-from craik.runtime.policy import generate_policy_envelope
-from craik.runtime.store import LocalStore
 
 
 @pytest.fixture

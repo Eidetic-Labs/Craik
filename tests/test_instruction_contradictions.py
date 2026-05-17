@@ -1,11 +1,11 @@
 from pathlib import Path
 
 from craik.contracts.models import DistilledInstructionProposal
-from craik.runtime.instruction_sources import (
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.projects.instruction_sources import (
     detect_instruction_contradictions,
     promotable_distilled_instructions,
 )
-from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
 
 

@@ -13,9 +13,9 @@ from craik.contracts.models import (
     MemoryProposal,
     TaskRequest,
 )
-from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
+from craik.runtime.work.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "contracts" / "v0_1" / "contracts.json"
 

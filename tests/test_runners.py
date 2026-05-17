@@ -10,7 +10,7 @@ from craik.contracts.models import (
     RunnerMetadata,
     RunnerResultStatus,
 )
-from craik.runtime.runners import (
+from craik.runtime.runners.runners import (
     FixtureRunnerAdapter,
     RunnerAdapter,
     capability_requires_grant,

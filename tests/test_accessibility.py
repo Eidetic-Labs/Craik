@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.accessibility import AccessibilityRequirements, accessibility_check
+from craik.runtime.companions.accessibility import AccessibilityRequirements, accessibility_check
 
 
 def test_accessibility_check_passes_when_all_requirements_are_present() -> None:

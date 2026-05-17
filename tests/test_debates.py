@@ -1,8 +1,12 @@
 from pathlib import Path
 
 from craik.contracts.models import DebateSummary, DebateTurn
-from craik.runtime.debates import DebateManager, render_debate_json, render_debate_markdown
 from craik.runtime.paths import ensure_craik_home
+from craik.runtime.reviewing.debates import (
+    DebateManager,
+    render_debate_json,
+    render_debate_markdown,
+)
 from craik.runtime.store import LocalStore
 
 

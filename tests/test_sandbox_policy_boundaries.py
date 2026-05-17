@@ -1,9 +1,12 @@
 from craik.contracts.models import SandboxBackend, SandboxBackendCapability
-from craik.runtime.browser_tool_boundary import BrowserToolRequest, browser_tool_decision
-from craik.runtime.docker_sandbox_backend import DockerSandboxRequest, docker_sandbox_decision
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
-from craik.runtime.local_process_backend import LocalProcessRequest, local_process_decision
-from craik.runtime.remote_shell_backend import (
+from craik.runtime.sandbox.browser_tool_boundary import BrowserToolRequest, browser_tool_decision
+from craik.runtime.sandbox.docker_sandbox_backend import (
+    DockerSandboxRequest,
+    docker_sandbox_decision,
+)
+from craik.runtime.sandbox.local_process_backend import LocalProcessRequest, local_process_decision
+from craik.runtime.sandbox.remote_shell_backend import (
     RemoteShellRequest,
     RemoteShellTarget,
     remote_shell_decision,

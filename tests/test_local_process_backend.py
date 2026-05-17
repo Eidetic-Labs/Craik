@@ -2,7 +2,7 @@ from craik.contracts.models import (
     SandboxBackend,
     SandboxBackendCapability,
 )
-from craik.runtime.local_process_backend import (
+from craik.runtime.sandbox.local_process_backend import (
     LocalProcessRequest,
     local_process_decision,
 )

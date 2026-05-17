@@ -7,8 +7,8 @@ from typing import Annotated
 
 import typer
 
-from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.store import LocalStore
+from craik.runtime.work.receipts import ReceiptNotFoundError, ReceiptStore
 
 receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
 

@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.provider_certification import (
+from craik.runtime.providers.provider_certification import (
     MVP_PROVIDER_REQUIREMENTS,
     ProviderCertification,
     provider_certification_decision,

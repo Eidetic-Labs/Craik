@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from craik.contracts.models import WorkGraphEdge, WorkGraphExport, WorkGraphNode
-from craik.runtime.work_graph_visual import work_graph_visual_workspace
+from craik.runtime.companions.work_graph_visual import work_graph_visual_workspace
 
 NOW = datetime(2026, 5, 16, 19, 5, tzinfo=UTC)
 

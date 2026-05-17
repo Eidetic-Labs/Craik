@@ -23,34 +23,37 @@ from craik.cli import (
     task_app,
 )
 from craik.contracts.models import PolicyProfile, Priority, TaskMode
-from craik.runtime.case_files import (
+from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
+from craik.runtime.memory.memory import StigmemClient, StigmemConfig, StigmemMemoryStore
+from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
+from craik.runtime.policy.intent_locks import IntentLockManager, IntentLockNotFoundError
+from craik.runtime.policy.policy import FailOpenNotAllowedError
+from craik.runtime.projects.demos import StigmemDocsDemo
+from craik.runtime.projects.onboarding import AgentOnboardingBuilder, OnboardingProjectNotFoundError
+from craik.runtime.projects.project_registry import NotGitRepositoryError, ProjectRegistry
+from craik.runtime.projects.prompts import (
+    PromptCaseFileNotFoundError,
+    PromptCompiler,
+    PromptTaskNotFoundError,
+)
+from craik.runtime.providers.model_providers import (
+    ModelProviderNotFoundError,
+    default_model_provider_registry,
+    provider_selection_payload,
+)
+from craik.runtime.runners.runners import (
+    default_runner_capability_matrices,
+    get_runner_capability_matrix,
+)
+from craik.runtime.store import LocalStore
+from craik.runtime.work.case_files import (
     CaseFileAssembler,
     DiscoveryOverrides,
     ProjectNotFoundError,
     TaskNotFoundError,
 )
-from craik.runtime.demos import StigmemDocsDemo
-from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
-from craik.runtime.handoffs import HandoffContextError
-from craik.runtime.intent_locks import IntentLockManager, IntentLockNotFoundError
-from craik.runtime.memory import StigmemClient, StigmemConfig, StigmemMemoryStore
-from craik.runtime.model_providers import (
-    ModelProviderNotFoundError,
-    default_model_provider_registry,
-    provider_selection_payload,
-)
-from craik.runtime.onboarding import AgentOnboardingBuilder, OnboardingProjectNotFoundError
-from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
-from craik.runtime.policy import FailOpenNotAllowedError
-from craik.runtime.project_registry import NotGitRepositoryError, ProjectRegistry
-from craik.runtime.prompts import (
-    PromptCaseFileNotFoundError,
-    PromptCompiler,
-    PromptTaskNotFoundError,
-)
-from craik.runtime.runners import default_runner_capability_matrices, get_runner_capability_matrix
-from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.handoffs import HandoffContextError
+from craik.runtime.work.tasks import create_task
 
 
 @runners_app.command("matrix")

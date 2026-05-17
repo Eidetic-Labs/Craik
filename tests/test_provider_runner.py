@@ -7,10 +7,10 @@ import pytest
 
 from craik.contracts.models import CapabilityGrant, CapabilityTarget
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import ProjectRegistry
-from craik.runtime.provider_runner import ProviderBackedRunExecutor
+from craik.runtime.projects.project_registry import ProjectRegistry
+from craik.runtime.providers.provider_runner import ProviderBackedRunExecutor
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.tasks import create_task
 
 
 @pytest.fixture

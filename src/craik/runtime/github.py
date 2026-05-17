@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any
 from urllib import error, parse, request
 
-from craik.runtime.redaction import redact
+from craik.runtime.policy.redaction import redact
 
 
 class GitHubError(RuntimeError):

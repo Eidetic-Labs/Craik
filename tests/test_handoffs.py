@@ -12,13 +12,13 @@ from craik.contracts.models import (
     TaskRun,
     TaskRunStatus,
 )
-from craik.runtime.case_files import CaseFileAssembler
-from craik.runtime.handoffs import HandoffContextError, HandoffWriter, render_markdown
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import ProjectRegistry
-from craik.runtime.receipts import ReceiptStore
+from craik.runtime.projects.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.case_files import CaseFileAssembler
+from craik.runtime.work.handoffs import HandoffContextError, HandoffWriter, render_markdown
+from craik.runtime.work.receipts import ReceiptStore
+from craik.runtime.work.tasks import create_task
 
 
 @pytest.fixture

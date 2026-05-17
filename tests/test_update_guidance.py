@@ -3,7 +3,7 @@ import json
 from typer.testing import CliRunner
 
 from craik.cli import app, package_version
-from craik.runtime.update_guidance import update_guidance_payload
+from craik.runtime.projects.update_guidance import update_guidance_payload
 
 runner = CliRunner()
 

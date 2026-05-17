@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import SandboxBackend, SandboxBackendCapability
-from craik.runtime.docker_sandbox_backend import (
+from craik.runtime.sandbox.docker_sandbox_backend import (
     DockerMount,
     DockerSandboxRequest,
     docker_sandbox_decision,

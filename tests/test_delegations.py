@@ -10,8 +10,8 @@ from craik.contracts.models import (
     ScopeChangeResult,
     SelfAudit,
 )
-from craik.runtime.delegations import HumanDelegationManager, must_stop_for_human_decision
 from craik.runtime.paths import ensure_craik_home
+from craik.runtime.reviewing.delegations import HumanDelegationManager, must_stop_for_human_decision
 from craik.runtime.store import LocalStore
 
 

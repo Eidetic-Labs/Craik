@@ -4,9 +4,9 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import KnownTrap, NegativeKnowledge
-from craik.runtime.known_traps import active_known_traps, active_negative_knowledge
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
+from craik.runtime.work.known_traps import active_known_traps, active_negative_knowledge
 
 NOW = datetime(2026, 5, 16, 9, 40, tzinfo=UTC)
 

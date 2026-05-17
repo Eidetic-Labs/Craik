@@ -16,15 +16,8 @@ from craik.contracts.models import (
     RunStatus,
     TrustClass,
 )
-from craik.runtime.contradictions import ContradictionManager, ContradictionNotFoundError
-from craik.runtime.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
-from craik.runtime.handoffs import (
-    HandoffContextError,
-    HandoffNotFoundError,
-    HandoffWriter,
-    render_markdown,
-)
-from craik.runtime.memory import (
+from craik.runtime.memory.contradictions import ContradictionManager, ContradictionNotFoundError
+from craik.runtime.memory.memory import (
     EvidenceRequiredError,
     LocalMemoryStore,
     MemoryProposalNotFoundError,
@@ -33,13 +26,20 @@ from craik.runtime.memory import (
     evidence_reference,
     preview_memory_impact,
 )
-from craik.runtime.policy import (
+from craik.runtime.policy.policy import (
     FailOpenNotAllowedError,
     fail_open_receipt,
     generate_policy_envelope,
 )
-from craik.runtime.policy_tests import PolicyTestHarness
+from craik.runtime.policy.policy_tests import PolicyTestHarness
 from craik.runtime.store import LocalStore
+from craik.runtime.work.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
+from craik.runtime.work.handoffs import (
+    HandoffContextError,
+    HandoffNotFoundError,
+    HandoffWriter,
+    render_markdown,
+)
 
 
 @contradictions_app.command("open")

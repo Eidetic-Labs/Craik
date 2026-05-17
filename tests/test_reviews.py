@@ -12,7 +12,7 @@ from craik.contracts.models import (
     SelfAudit,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.reviews import ReviewAdjudicationManager
+from craik.runtime.reviewing.reviews import ReviewAdjudicationManager
 from craik.runtime.store import LocalStore
 
 

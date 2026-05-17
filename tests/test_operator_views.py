@@ -27,7 +27,7 @@ from craik.contracts.models import (
     WorkGraphExport,
     WorkGraphNode,
 )
-from craik.runtime.operator_views import (
+from craik.runtime.companions.operator_views import (
     BudgetQuotaSnapshot,
     InstructionDistillationSnapshot,
     KnownTrapsSnapshot,

@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.preference_facts import PreferenceFact, review_preference_fact
+from craik.runtime.memory.preference_facts import PreferenceFact, review_preference_fact
 
 NOW = datetime(2026, 5, 16, 21, 20, tzinfo=UTC)
 

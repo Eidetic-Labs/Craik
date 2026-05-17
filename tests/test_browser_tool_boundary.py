@@ -1,5 +1,5 @@
 from craik.contracts.models import SandboxBackend, SandboxBackendCapability
-from craik.runtime.browser_tool_boundary import (
+from craik.runtime.sandbox.browser_tool_boundary import (
     BrowserToolRequest,
     browser_tool_decision,
 )

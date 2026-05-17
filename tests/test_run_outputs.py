@@ -4,10 +4,10 @@ from pathlib import Path
 import pytest
 
 from craik.contracts.models import RunnerMetadata, RunnerStepResult
-from craik.runtime.memory import LocalMemoryStore
+from craik.runtime.memory.memory import LocalMemoryStore
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.run_outputs import RunOutputProposalSpec, RunOutputRecorder, run_output_id
 from craik.runtime.store import LocalStore
+from craik.runtime.work.run_outputs import RunOutputProposalSpec, RunOutputRecorder, run_output_id
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from craik.runtime.provider_failover import (
+from craik.runtime.providers.provider_failover import (
     ProviderFailoverPolicy,
     ProviderFailoverRule,
     provider_failover_decision,

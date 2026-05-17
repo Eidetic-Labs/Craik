@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from craik.runtime.public_docs import public_docs_findings
+from craik.runtime.projects.public_docs import public_docs_findings
 
 ROOT = Path(__file__).resolve().parents[1]
 

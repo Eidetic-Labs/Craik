@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from craik.runtime.demos import DEMO_TASK_ID, StigmemDocsDemo
 from craik.runtime.paths import ensure_craik_home
+from craik.runtime.projects.demos import DEMO_TASK_ID, StigmemDocsDemo
 from craik.runtime.store import LocalStore
 
 

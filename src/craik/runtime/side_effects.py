@@ -15,7 +15,7 @@ from craik.contracts.models import (
     PolicyEnvelope,
 )
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
-from craik.runtime.policy import (
+from craik.runtime.policy.policy import (
     GrantDecision,
     check_file_write_grant,
     check_github_grant,
@@ -23,7 +23,7 @@ from craik.runtime.policy import (
     check_shell_grant,
     denial_receipt,
 )
-from craik.runtime.redaction import redact
+from craik.runtime.policy.redaction import redact
 from craik.runtime.store import LocalStore
 
 SideEffectKind = Literal["shell", "file_write", "memory_write", "github_write"]

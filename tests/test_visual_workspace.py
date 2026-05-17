@@ -1,4 +1,4 @@
-from craik.runtime.visual_workspace import (
+from craik.runtime.companions.visual_workspace import (
     VisualWorkspaceSurface,
     visual_workspace_decision,
 )

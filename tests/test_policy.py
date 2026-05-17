@@ -1,7 +1,7 @@
 import pytest
 
 from craik.contracts.models import CapabilityGrant, CapabilityTarget, DocsProfile
-from craik.runtime.policy import (
+from craik.runtime.policy.policy import (
     FailOpenNotAllowedError,
     check_file_write_grant,
     check_github_grant,

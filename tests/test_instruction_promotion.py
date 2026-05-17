@@ -1,11 +1,11 @@
 import pytest
 
 from craik.contracts.models import DistilledInstructionProposal
-from craik.runtime.instruction_sources import (
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.projects.instruction_sources import (
     InstructionPromotionError,
     review_instruction_promotion,
 )
-from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
 
 

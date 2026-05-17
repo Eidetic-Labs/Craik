@@ -1,4 +1,4 @@
-from craik.runtime.desktop_companion import (
+from craik.runtime.companions.desktop_companion import (
     DesktopCompanionSurface,
     desktop_companion_decision,
 )

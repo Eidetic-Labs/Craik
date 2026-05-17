@@ -17,8 +17,8 @@ from craik.contracts.registry import schema_model, schema_names
 from craik.runtime.doctor import run_doctor
 from craik.runtime.gateway import default_gateway_config
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
+from craik.runtime.projects.update_guidance import update_guidance_payload
 from craik.runtime.store import LocalStore
-from craik.runtime.update_guidance import update_guidance_payload
 
 PACKAGE_NAME = "craik"
 

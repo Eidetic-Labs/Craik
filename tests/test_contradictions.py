@@ -3,10 +3,10 @@ from pathlib import Path
 import pytest
 
 from craik.contracts.models import EvidenceReference, TaskRequest
-from craik.runtime.contradictions import ContradictionManager, ContradictionNotFoundError
-from craik.runtime.graph import WorkGraphExporter
+from craik.runtime.memory.contradictions import ContradictionManager, ContradictionNotFoundError
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
+from craik.runtime.work.graph import WorkGraphExporter
 
 
 @pytest.fixture

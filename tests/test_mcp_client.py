@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.mcp_client import (
+from craik.runtime.sandbox.mcp_client import (
     MCPClientConfig,
     MCPClientRoute,
     mcp_client_compatibility,

@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.speech_to_text import (
+from craik.runtime.voice.speech_to_text import (
     SpeechToTextInputMetadata,
     SpeechToTextResult,
     SpeechToTextTranscript,
