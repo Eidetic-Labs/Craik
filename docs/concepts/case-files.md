@@ -54,10 +54,10 @@ Immutable documentation is marked in evidence metadata:
 
 ## Assumptions
 
-Unsupported conclusions must stay assumptions. The local assembler records open assumptions when context is unavailable, such as memory facts or GitHub issue state before those adapters are implemented.
+Unsupported conclusions must stay assumptions. The local assembler records open assumptions when configured context is unavailable, such as memory facts when no memory backend is provided or GitHub issue state when no GitHub adapter is configured.
 
 Agents should review assumptions before acting and avoid promoting them to facts without evidence.
 
 ## Current Scope
 
-The local assembler can load read-only GitHub issues and pull requests when a GitHub remote is configured. It does not yet load Stigmem facts, recent handoffs, or contradiction reports. Those planned adapter layers will extend the same case file contract.
+The local assembler can load repository files, read-only GitHub issues and pull requests when a GitHub remote is configured, memory facts when a memory backend is provided, recent local handoffs, and local contradiction reports. Missing optional sources are recorded as assumptions so runner prompts can distinguish known project state from unavailable context.

@@ -39,9 +39,12 @@ several surfaces are not yet end-to-end production workflows.
 
 ## Known MVP Gaps
 
-- Generated CLI/reference docs.
-- Package publication dry runs and protected release readiness.
-- Persistent local-store migrations and compatibility fixtures.
+- Live model invocation behind explicit operator configuration.
+- Bounded real tool execution behind least-privilege grants.
+- Remote Stigmem write promotion after proposal review.
+- God-file cleanup and runtime sub-packaging before the MVP freeze.
+- ADR-backed design decisions for runner scope, release posture, and package
+  boundaries.
 - Nightly reliability and artifact depth beyond the current PR gates.
 - Full post-MVP surfaces tracked in [Post-MVP Scope](reference/post-mvp-scope.md).
 
@@ -56,3 +59,6 @@ Local memory proposals remain the default unprivileged path.
 
 The first release target is `0.x.0`. The release must be honest about limits and
 strong enough for a credible MVP, but it is not a `1.0.0` stability guarantee.
+The package remains versioned as `0.0.0` until the release cut; roadmap
+milestones such as v0.13 are implementation gates rather than published package
+versions.

@@ -41,13 +41,13 @@ The MVP should be delivered as a CLI-first runtime with real persisted state and
 
 Commands:
 
-- `craik init`
+- `craik home init`
 - `craik connect stigmem`
 - `craik project add`
 - `craik task create`
-- `craik task run`
+- `craik run execute`
 - `craik handoff show`
-- `craik facts propose`
+- `craik memory propose`
 - `craik receipts list`
 
 The command list should start small. Implementation should prioritize:
@@ -55,9 +55,10 @@ The command list should start small. Implementation should prioritize:
 1. `craik project add`
 2. `craik task create`
 3. `craik case build`
-4. `craik receipts list`
-5. `craik handoff create`
-6. `craik memory diff`
+4. `craik run execute`
+5. `craik receipts list`
+6. `craik handoff create`
+7. `craik memory diff`
 
 ### Runtime Schemas
 

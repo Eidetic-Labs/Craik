@@ -1,8 +1,17 @@
 # Craik
 
-Craik is a durable agent runtime for shared project models and governed multi-agent work.
+Craik is a CLI-first runtime substrate for project case files, policy envelopes,
+prompt compilation, capability receipts, handoffs, work graphs, and deterministic
+provider-backed runner certification.
 
 The project is named after Kenneth Craik, whose work on mental models framed intelligence as the ability to build internal representations of the world and use them to reason before acting. Craik applies that idea to agent systems: agents should not operate as isolated prompt executions. They should work from shared, evidence-backed project models, leave durable handoffs, and act inside explicit governance boundaries.
+
+Today Craik is intentionally conservative. It can assemble local repository
+context, read optional GitHub and Stigmem state, compile governed runner prompts,
+execute deterministic OpenAI- and Anthropic-shaped MVP runner paths, persist
+receipts/handoffs/work graphs, and propose memory updates. It does not yet
+perform live model calls, arbitrary tool execution, file edits, or remote
+Stigmem writes without an explicit grant flow.
 
 ## Thesis
 
@@ -25,13 +34,17 @@ Craik can run in degraded local mode without Stigmem for demos and development, 
 
 ## Agent Integration Model
 
-Craik core is runner-agnostic, but the first implementation should provide direct, first-class runner adapters for:
+Craik core is runner-agnostic. The current MVP path provides deterministic
+OpenAI- and Anthropic-shaped provider runner execution for certification and
+offline validation. Preview prompt-handoff adapters are also available for:
 
 - Codex
 - Claude
 - Gemini
 
-Each runner adapter should consume the same Craik contracts: project case file, policy envelope, capability grants, worker result, receipts, handoff, and memory proposals.
+Each runner path consumes the same Craik contracts: project case file, policy
+envelope, capability grants, worker result, receipts, handoff, and memory
+proposals.
 
 Craik is not built as a dependency layer on another agent framework. It borrows broadly useful product patterns such as gateway ergonomics, workspace identity, persistent sessions, typed tools, skills, and channel integrations while keeping Craik's first agent path focused on direct runner adapters.
 
@@ -49,6 +62,7 @@ Craik is not built as a dependency layer on another agent framework. It borrows 
 
 - [Documentation Index](docs/index.md)
 - [Vision](docs/vision.md)
+- [Architecture Decisions](docs/adr/0001-record-mvp-runner-scope.md)
 - [Product Strategy](docs/product-strategy.md)
 - [Differentiators](docs/differentiators.md)
 - [Architecture](docs/architecture.md)
@@ -118,11 +132,13 @@ operator view formatters, gateway/channel contracts, sandbox/provider routing
 contracts, learning-loop helpers, multimodal decisions, migration/i18n
 contracts, and broad docs/tests through the v0.13 roadmap.
 
-The remaining MVP work is to harden those contract and helper surfaces into one
-complete release-quality workflow: OpenAI and Anthropic provider execution,
-policy-enforced side effects, durable receipts, Stigmem-backed case context,
-accurate Docusaurus docs, release packaging, migrations, and CI/CD depth
-comparable to Stigmem. See [Robust MVP Roadmap](docs/mvp-roadmap.md).
+The remaining MVP work is to harden these contract and helper surfaces into one
+complete release-quality workflow: live model invocation behind explicit
+configuration, bounded tool execution, remote Stigmem write promotion,
+God-file/runtime package cleanup, ADR-backed design decisions, and CI/CD depth
+comparable to Stigmem. The published package version remains `0.0.0` until the
+release cut; roadmap sections are implementation gates, not published version
+numbers. See [Robust MVP Roadmap](docs/mvp-roadmap.md).
 
 ## Implementation Stack
 

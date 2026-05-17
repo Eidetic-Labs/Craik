@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
 
-from craik.contracts.models import DocsProfile, FactValue
+from craik.contracts.models import CapabilityGrant, CapabilityTarget, DocsProfile, FactValue
 from craik.runtime.memory import (
     DirectMemoryWriteDeniedError,
     LocalMemoryStore,
@@ -20,8 +24,11 @@ from craik.runtime.policy import (
     fail_open_receipt,
     generate_policy_envelope,
 )
+from craik.runtime.project_registry import ProjectRegistry
+from craik.runtime.provider_runner import ProviderBackedRunExecutor
 from craik.runtime.redaction import contains_unredacted_secret, redact
 from craik.runtime.store import LocalStore
+from craik.runtime.tasks import create_task
 
 
 @dataclass(frozen=True)
@@ -77,7 +84,7 @@ class PolicyTestHarness:
             ("memory_writes_become_proposals", self._memory_writes_become_proposals),
             ("trusted_local_fail_open_receipts", self._trusted_local_fail_open_receipts),
             ("automation_fails_closed", self._automation_fails_closed),
-            ("runner_grant_boundary_placeholder", self._runner_grant_boundary_placeholder),
+            ("provider_runner_enforces_shell_grants", self._provider_runner_enforces_shell_grants),
             ("redaction_receipts_logs_handoffs_case_files", self._redaction_boundaries),
         )
         results = [_run_check(name, check) for name, check in checks]
@@ -214,13 +221,57 @@ class PolicyTestHarness:
             "memory_denial": memory.reason,
         }
 
-    def _runner_grant_boundary_placeholder(self) -> dict[str, Any]:
+    def _provider_runner_enforces_shell_grants(self) -> dict[str, Any]:
+        with TemporaryDirectory(prefix="craik-policy-runner-") as directory:
+            repo = Path(directory) / "repo"
+            repo.mkdir()
+            (repo / "README.md").write_text("# Policy Runner Boundary\n")
+            _run_git(repo, "init", "-b", "main")
+            _run_git(repo, "add", "README.md")
+            _run_git(repo, "commit", "-m", "initial")
+            project = ProjectRegistry(self.store).add_project(repo, name="Policy Runner Boundary")
+            blocked_task = create_task(
+                self.store,
+                title="Policy runner boundary blocked",
+                objective="Verify provider-backed runner side effects require grants.",
+                project_id=project.id,
+                mode="implement",
+                expected_outputs=["runner_step_result", "handoff"],
+            )
+            allowed_task = create_task(
+                self.store,
+                title="Policy runner boundary allowed",
+                objective="Verify provider-backed runner side effects can complete with grants.",
+                project_id=project.id,
+                mode="implement",
+                expected_outputs=["runner_step_result", "handoff"],
+            )
+            blocked = ProviderBackedRunExecutor(self.store).execute(
+                task_id=blocked_task.id,
+                provider_id="provider_openai",
+                grants=[],
+            )
+            allowed = ProviderBackedRunExecutor(self.store).execute(
+                task_id=allowed_task.id,
+                provider_id="provider_anthropic",
+                grants=[_fixture_shell_grant(allowed_task.id)],
+            )
+            denied_receipts = [
+                receipt
+                for receipt in self.store.list_receipts()
+                if receipt.task_id == blocked_task.id and receipt.result.status == "denied"
+            ]
+        _assert(blocked.run.status == "blocked", "provider runner did not block without grant")
+        _assert(blocked.handoff.status == "blocked", "blocked runner did not leave blocked handoff")
+        _assert(bool(denied_receipts), "provider runner did not persist a grant denial receipt")
+        _assert(allowed.run.status == "completed", "provider runner did not complete with grant")
+        _assert(allowed.handoff.status == "completed", "completed runner handoff status changed")
         return {
-            "status": "placeholder",
-            "expected_boundary": (
-                "runner adapters must call policy grant checks before side effects"
-            ),
-            "tracked_until": "runner adapters are implemented",
+            "blocked_run_id": blocked.run.id,
+            "blocked_handoff_id": blocked.handoff.id,
+            "allowed_run_id": allowed.run.id,
+            "allowed_handoff_id": allowed.handoff.id,
+            "denial_receipt_ids": [receipt.id for receipt in denied_receipts],
         }
 
     def _redaction_boundaries(self) -> dict[str, Any]:
@@ -271,3 +322,32 @@ def _run_check(name: str, check: Callable[[], dict[str, Any]]) -> PolicyTestResu
 def _assert(condition: bool, message: str) -> None:
     if not condition:
         raise AssertionError(message)
+
+
+def _fixture_shell_grant(task_id: str) -> CapabilityGrant:
+    return CapabilityGrant(
+        id=f"grant_{task_id.removeprefix('task_')}_fixture_shell",
+        task_id=task_id,
+        capability="shell.execute",
+        target=CapabilityTarget(paths=["fixture-action"]),
+        operations=["execute"],
+        reason="Allow the deterministic MVP fixture action.",
+        approved_by="user:policy-test",
+    )
+
+
+def _run_git(repo: Path, *args: str) -> None:
+    subprocess.run(
+        ("git", *args),
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_EMAIL": "policy@example.invalid",
+            "GIT_AUTHOR_NAME": "Craik Policy Test",
+            "GIT_COMMITTER_EMAIL": "policy@example.invalid",
+            "GIT_COMMITTER_NAME": "Craik Policy Test",
+        },
+    )

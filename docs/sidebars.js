@@ -25,6 +25,7 @@ const sidebars = {
     },
     'mvp',
     'mvp-roadmap',
+    'adr/record-mvp-runner-scope',
     'roadmap',
     'limitations',
   ],

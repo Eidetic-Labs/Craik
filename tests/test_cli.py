@@ -13,8 +13,10 @@ from craik.contracts.models import (
     TaskRunStatus,
 )
 from craik.runtime.paths import ensure_craik_home
+from craik.runtime.project_registry import ProjectRegistry
 from craik.runtime.receipts import ReceiptStore
 from craik.runtime.store import LocalStore
+from craik.runtime.tasks import create_task
 
 runner = CliRunner()
 
@@ -685,6 +687,60 @@ def test_run_commands_inspect_persisted_run_state(tmp_path: Path) -> None:
     assert payload["receipts"][0]["id"] == "receipt_docs"
 
 
+def test_run_execute_runs_provider_backed_mvp_path(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    task_id = _seed_provider_task(home, tmp_path)
+
+    executed = runner.invoke(
+        app,
+        ["run", "execute", task_id, "--provider-id", "provider_anthropic"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    shown = runner.invoke(
+        app,
+        ["run", "inspect", task_id, "--include-outputs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert executed.exit_code == 0
+    assert shown.exit_code == 0
+    payload = json.loads(executed.stdout)
+    assert payload["schema"] == "craik.provider_backed_run_execution"
+    assert payload["status"] == "completed"
+    assert payload["provider_ids"] == ["provider_anthropic"]
+    assert payload["provider_families"] == ["anthropic"]
+    assert payload["handoff"]["status"] == "completed"
+    assert f"craik run inspect {payload['run']['id']} --include-outputs" in payload["next_commands"]
+    inspection = json.loads(shown.stdout)
+    assert inspection["status"] == "completed"
+    assert len(inspection["outputs"]) == 4
+
+
+def test_run_execute_can_leave_blocked_grant_boundary(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    task_id = _seed_provider_task(home, tmp_path)
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "execute",
+            task_id,
+            "--provider-id",
+            "provider_openai",
+            "--no-allow-fixture-action",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "blocked"
+    assert payload["provider_ids"] == ["provider_openai"]
+    assert payload["provider_families"] == ["openai"]
+    assert payload["handoff"]["status"] == "blocked"
+
+
 def test_run_recover_prints_plan_for_interrupted_run(tmp_path: Path) -> None:
     home = tmp_path / "home"
     _seed_run_state(home, status="interrupted")
@@ -744,6 +800,31 @@ def _seed_receipt(home: Path, receipt: CapabilityReceipt) -> None:
     try:
         store.initialize()
         ReceiptStore(store).record_receipt(receipt)
+    finally:
+        store.close()
+
+
+def _seed_provider_task(home: Path, tmp_path: Path) -> str:
+    repo = tmp_path / "provider-repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Provider Repo\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md")
+    _run_git(repo, "commit", "-m", "initial")
+    paths = ensure_craik_home({"CRAIK_HOME": str(home)})
+    store = LocalStore.from_paths(paths)
+    try:
+        store.initialize()
+        project = ProjectRegistry(store).add_project(repo, name="Provider Repo")
+        task = create_task(
+            store,
+            title="Run provider MVP path",
+            objective="Execute a provider-backed MVP runner path.",
+            project_id=project.id,
+            mode="implement",
+            expected_outputs=["runner_step_result", "handoff"],
+        )
+        return task.id
     finally:
         store.close()
 
