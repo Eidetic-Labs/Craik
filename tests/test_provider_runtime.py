@@ -227,9 +227,9 @@ def test_provider_runtime_receipt_keeps_safe_metadata_and_drops_payload_and_secr
     assert receipt.target == "provider_action:provider_openai"
     assert receipt.result.metadata["provider_family"] == "openai"
     assert receipt.result.metadata["usage"] == {
-        "input_tokens": 3,
-        "output_tokens": 2,
-        "total_tokens": 5,
+        "input": 3,
+        "output": 2,
+        "total": 5,
     }
     assert receipt.result.metadata["tool_call_count"] == 0
     assert "payload" not in receipt.result.metadata

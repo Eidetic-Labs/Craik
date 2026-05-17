@@ -68,11 +68,20 @@ def test_fixture_runner_adapter_rejects_mismatched_request() -> None:
 def test_default_runner_matrix_contains_conservative_profiles() -> None:
     matrices = default_runner_capability_matrices()
 
-    assert sorted(matrices) == ["claude", "codex", "fixture", "gemini"]
+    assert sorted(matrices) == [
+        "claude",
+        "codex",
+        "fixture",
+        "gemini",
+        "provider_anthropic",
+        "provider_openai",
+    ]
     assert matrices["codex"].trust.default_grant_posture == "prompt-for-approval"
     assert matrices["claude"].trust.default_grant_posture == "deny-by-default"
     assert matrices["gemini"].trust.level == "low"
     assert matrices["fixture"].trust.requires_receipts is False
+    assert matrices["provider_openai"].runner.adapter == "provider-runtime"
+    assert matrices["provider_anthropic"].runner.metadata["provider_family"] == "anthropic"
 
 
 def test_runner_capability_lookup_support_and_grant_policy() -> None:

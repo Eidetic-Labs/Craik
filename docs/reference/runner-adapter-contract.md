@@ -170,3 +170,22 @@ profile involved in the work.
 
 See [Runner Preview Workflows](../guides/runner-preview-workflows.md) for the
 end-to-end preview path and smoke-test checklist.
+## Provider-Backed MVP Runner
+
+The MVP provider-backed runner is implemented in
+`craik.runtime.provider_runner`. It uses the normal case-file and prompt compiler
+flow, then runs deterministic provider-normalized steps through the governed
+loop.
+
+Provider-backed runs must persist:
+
+- the compiled prompt;
+- one task run;
+- normalized run outputs for each executed step;
+- provider receipts for each model step;
+- side-effect or denial receipts emitted by the loop;
+- a handoff for completion, block, failure, or interruption.
+
+OpenAI and Anthropic parity is covered by deterministic tests for
+`provider_openai` and `provider_anthropic`. The MVP runner path does not perform
+live API calls by default.

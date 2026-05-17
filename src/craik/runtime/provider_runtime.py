@@ -382,7 +382,7 @@ def provider_runtime_receipt(
             "model": result.model,
             "stream": request.stream,
             "tool_call_count": len(result.tool_calls),
-            "usage": result.usage,
+            "usage": _receipt_usage(result.usage),
             "payload": adapter.build_payload(request),
             "secret_ref_name": adapter.config.secret_ref_name,
         },
@@ -445,6 +445,14 @@ def _retry_after(headers: dict[str, str] | None) -> int | None:
         if key.lower() == "retry-after" and value.isdigit():
             return int(value)
     return None
+
+
+def _receipt_usage(usage: dict[str, int]) -> dict[str, int]:
+    return {
+        "input": usage.get("input_tokens", 0),
+        "output": usage.get("output_tokens", 0),
+        "total": usage.get("total_tokens", 0),
+    }
 
 
 def _redacted_mapping(value: dict[str, Any]) -> dict[str, Any]:

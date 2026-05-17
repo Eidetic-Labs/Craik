@@ -62,6 +62,16 @@ def default_runner_capability_matrices() -> dict[str, RunnerCapabilityMatrix]:
         _claude_matrix(),
         _gemini_matrix(),
         _fixture_matrix(),
+        _provider_matrix(
+            runner_id="provider_openai",
+            name="OpenAI Provider Runner",
+            provider_family="openai",
+        ),
+        _provider_matrix(
+            runner_id="provider_anthropic",
+            name="Anthropic Provider Runner",
+            provider_family="anthropic",
+        ),
     ]
     return {matrix.runner.id: matrix for matrix in matrices}
 
@@ -235,6 +245,60 @@ def _fixture_matrix() -> RunnerCapabilityMatrix:
             _capability("result.structured", "supported", grant_required=False),
         ],
         policy_notes=["Fixture runs should not widen runtime authority."],
+    )
+
+
+def _provider_matrix(
+    *,
+    runner_id: str,
+    name: str,
+    provider_family: str,
+) -> RunnerCapabilityMatrix:
+    return RunnerCapabilityMatrix(
+        runner=RunnerMetadata(
+            id=runner_id,
+            name=name,
+            adapter="provider-runtime",
+            adapter_version="0.1.0",
+            mode="live",
+            capabilities=[
+                "model.chat",
+                "model.streaming",
+                "model.tool_calls",
+                "model.structured_output",
+                "model.usage_metadata",
+                "result.structured",
+            ],
+            metadata={"provider_family": provider_family},
+        ),
+        trust=RunnerTrustProfile(
+            level="medium",
+            boundary=(
+                "Third-party model provider mediated by Craik provider runtime, "
+                "secret references, receipts, and redaction."
+            ),
+            default_grant_posture="prompt-for-approval",
+            notes=["Live calls require explicit provider runtime configuration."],
+        ),
+        capabilities=[
+            _capability("file.read", "unsupported"),
+            _capability("file.write", "unsupported"),
+            _capability("shell.execute", "unsupported"),
+            _capability("network.access", "supported"),
+            _capability("memory.read", "unsupported"),
+            _capability("memory.write", "unsupported"),
+            _capability("review.comment", "unsupported"),
+            _capability("model.chat", "supported"),
+            _capability("model.streaming", "supported"),
+            _capability("model.tool_calls", "supported"),
+            _capability("model.structured_output", "supported"),
+            _capability("model.usage_metadata", "supported", grant_required=False),
+            _capability("result.structured", "supported", grant_required=False),
+        ],
+        policy_notes=[
+            "Provider runs must use secret references, not raw credentials.",
+            "Provider request and response metadata must be covered by receipts.",
+        ],
     )
 
 

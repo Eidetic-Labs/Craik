@@ -57,7 +57,14 @@ def test_runners_matrix_lists_built_in_trust_profiles() -> None:
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
     runner_ids = {entry["runner"]["id"] for entry in payload}
-    assert {"codex", "claude", "gemini", "fixture"} == runner_ids
+    assert {
+        "codex",
+        "claude",
+        "gemini",
+        "fixture",
+        "provider_anthropic",
+        "provider_openai",
+    } == runner_ids
 
 
 def test_runners_matrix_filters_one_runner() -> None:
