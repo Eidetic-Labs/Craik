@@ -10,12 +10,24 @@ from craik.runtime.auth.sources.local_cli_oauth import (
     LocalCLICredentialError,
     LocalCLICredentialSource,
 )
+from craik.runtime.auth.sources.secret_ref import (
+    EnvVarSecretManager,
+    FileSecretManager,
+    SecretManager,
+    SecretRefCredentialError,
+    SecretRefCredentialSource,
+)
 
 __all__ = [
     "DEFAULT_CLAUDE_CREDENTIALS_PATH",
     "CLIBridgeCredentialError",
     "CLIBridgeCredentialSource",
     "EnvVarApiKeySource",
+    "EnvVarSecretManager",
+    "FileSecretManager",
     "LocalCLICredentialError",
     "LocalCLICredentialSource",
+    "SecretManager",
+    "SecretRefCredentialError",
+    "SecretRefCredentialSource",
 ]
