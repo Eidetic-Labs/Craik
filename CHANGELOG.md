@@ -12,7 +12,21 @@ within the `0.x.0` stability expectations described in
 
 ### Added
 
-- Release/package foundation for the robust MVP gate.
+- Next MVP hardening work after the first live provider path.
+
+## 0.1.0 - 2026-05-17
+
+### Added
+
+- Live provider transport path with stdlib HTTP, explicit live access, retries,
+  cancellation, streaming callback capture, and recorded chat-completions
+  integration coverage.
+- Provider adapters for OpenAI Responses, Anthropic Messages, and
+  OpenAI-compatible Chat Completions, including local `/v1` provider metadata.
+- Secret reference resolution for provider credentials without storing raw
+  secret material in transport instances.
+- Governed loop support for dispatchable provider tool calls and replayable
+  streaming output chunks.
 
 ## 0.0.0 - 2026-05-16
 

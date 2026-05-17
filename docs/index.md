@@ -3,6 +3,14 @@
 Craik's v0.1.0 documentation is organized for agents and humans entering a
 project.
 
+Craik v0.1.0 is a governed runtime substrate, not a broad autonomous agent
+release. It supports typed case files, policy envelopes, receipts, prompt
+compilation, fixture and live-shaped provider transports, provider-backed loop
+execution, handoffs, work graphs, and memory proposals. Live model calls are
+explicitly enabled and credentialed through secret references; unbounded tool
+execution, unattended edits, and production multi-agent orchestration remain
+outside the current MVP surface.
+
 ## Start Here
 
 - [Installation](guides/installation.md)

@@ -1,17 +1,10 @@
 # Craik
 
-Craik is a CLI-first runtime substrate for project case files, policy envelopes,
-prompt compilation, capability receipts, handoffs, work graphs, and deterministic
-provider-backed runner certification.
+Craik is a governed agent-runtime substrate: typed case files, policy envelopes,
+capability receipts, prompt compilation, pluggable provider transports, handoffs,
+and work graphs for durable project work.
 
 The project is named after Kenneth Craik, whose work on mental models framed intelligence as the ability to build internal representations of the world and use them to reason before acting. Craik applies that idea to agent systems: agents should not operate as isolated prompt executions. They should work from shared, evidence-backed project models, leave durable handoffs, and act inside explicit governance boundaries.
-
-Today Craik is intentionally conservative. It can assemble local repository
-context, read optional GitHub and Stigmem state, compile governed runner prompts,
-execute deterministic OpenAI- and Anthropic-shaped MVP runner paths, persist
-receipts/handoffs/work graphs, and propose memory updates. It does not yet
-perform live model calls, arbitrary tool execution, file edits, or remote
-Stigmem writes without an explicit grant flow.
 
 ## Thesis
 
@@ -22,6 +15,32 @@ Craik is built around a different premise:
 > Agent systems become useful at organizational scale when they can remember, justify, coordinate, dispute, and hand off work over time.
 
 Craik treats memory, provenance, policy, and work state as runtime concerns rather than optional logging.
+
+## What Works Today
+
+Craik can assemble local repository context, read optional GitHub and Stigmem
+state, compile governed runner prompts, execute fixture-backed and live-shaped
+provider requests through OpenAI Responses, Anthropic Messages, and
+OpenAI-compatible Chat Completions adapters, persist receipts/handoffs/work
+graphs, and propose memory updates for review.
+
+The live provider path is explicit. Runtime callers opt into live access, supply
+provider metadata, and resolve credentials through secret references. The local
+OpenAI-compatible provider path can target a localhost `/v1` server such as
+Ollama for optional live validation without paid API keys.
+
+## What Does Not Work Yet
+
+Craik is not yet a fully autonomous release-quality agent. It does not claim
+unbounded tool execution, unattended file edits, broad remote Stigmem writes, or
+production multi-agent orchestration. Tool execution is policy-bound, and live
+provider calls remain opt-in rather than hidden CI behavior.
+
+## Vision
+
+The long-term direction is a durable agent operating layer where agents work
+from shared project state, leave auditable handoffs, resolve contradictions, and
+coordinate across memory, policy, tools, issues, and release workflows.
 
 ## Relationship to Stigmem
 
@@ -133,12 +152,11 @@ contracts, learning-loop helpers, multimodal decisions, migration/i18n
 contracts, and broad docs/tests through the v0.13 roadmap.
 
 The remaining MVP work is to harden these contract and helper surfaces into one
-complete release-quality workflow: live model invocation behind explicit
-configuration, bounded tool execution, remote Stigmem write promotion,
-God-file/runtime package cleanup, ADR-backed design decisions, and CI/CD depth
-comparable to Stigmem. The published package version remains `0.0.0` until the
-release cut; roadmap sections are implementation gates, not published version
-numbers. See [Robust MVP Roadmap](docs/mvp-roadmap.md).
+complete release-quality workflow: remote Stigmem write promotion,
+God-file/runtime package cleanup, ADR-backed design decisions, and docs/test
+depth comparable to Stigmem. Package version `0.1.0` marks the first live
+provider transport path; roadmap sections remain implementation gates, not
+`1.0.0` readiness claims. See [Robust MVP Roadmap](docs/mvp-roadmap.md).
 
 ## Implementation Stack
 

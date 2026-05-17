@@ -84,7 +84,7 @@ PACKAGE_NAME = "craik"
 
 app = typer.Typer(
     add_completion=False,
-    help="Durable agent runtime for shared project models and governed multi-agent work.",
+    help="Governed agent-runtime substrate for case files, policy, receipts, and providers.",
     no_args_is_help=True,
 )
 schema_app = typer.Typer(help="Inspect Craik runtime contract schemas.")
