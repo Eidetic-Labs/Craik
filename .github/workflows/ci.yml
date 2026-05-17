@@ -160,6 +160,8 @@ jobs:
         run: craik policy test
       - name: Check release readiness
         run: python scripts/check_release_readiness.py
+      - name: Check release version consistency
+        run: python scripts/check_release_version.py
       - name: Check public docs hygiene
         run: python scripts/check_public_docs_hygiene.py
 
