@@ -40,6 +40,24 @@ The minimum endpoint mapping is:
 
 Use `craik connect stigmem` to detect compatibility. Configure the node with `CRAIK_STIGMEM_URL` and authenticated nodes with `CRAIK_STIGMEM_API_KEY`.
 
+## Case File Context
+
+Case files can load queryable memory facts when a memory search backend is
+configured. They also include recent handoff summaries and open local
+contradiction reports so runner prompts carry current continuity and known
+conflicts forward.
+
+If no facts are available, the case file keeps the explicit missing-memory
+assumption. Loaded facts remove that assumption and are counted in the context
+budget alongside recent handoff and contradiction ids.
+
+## Hygiene
+
+`craik.runtime.memory_hygiene.memory_hygiene_report` summarizes pending memory
+proposals, approved proposals, open contradictions, recent handoffs, and release
+warnings. MVP release work should treat pending proposals and unresolved
+contradictions as hygiene items to review before packaging.
+
 ## Proposal Status
 
 `craik.memory_proposal` records use these statuses:

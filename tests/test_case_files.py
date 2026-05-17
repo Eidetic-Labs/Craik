@@ -3,12 +3,15 @@ from pathlib import Path
 
 import pytest
 
+from craik.contracts.models import FactValue
 from craik.runtime.case_files import (
     CaseFileAssembler,
     DiscoveryOverrides,
     ProjectNotFoundError,
     TaskNotFoundError,
 )
+from craik.runtime.contradictions import ContradictionManager
+from craik.runtime.handoffs import HandoffWriter
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
@@ -75,9 +78,7 @@ def test_case_file_labels_immutable_evidence(tmp_path: Path, store: LocalStore) 
     case_file = CaseFileAssembler(store).build(task.id)
 
     immutable = [
-        evidence
-        for evidence in case_file.evidence
-        if evidence.locator == "docs/adr/0001-record.md"
+        evidence for evidence in case_file.evidence if evidence.locator == "docs/adr/0001-record.md"
     ]
     assert immutable
     assert immutable[0].metadata["immutable"] is True
@@ -104,6 +105,58 @@ def test_case_file_tracks_missing_context_as_assumptions(
     assert "No mutable documentation files were discovered for this project." in statements
     assert case_file.github_state == {"status": "not_loaded"}
     assert "Case file contains open assumptions" in case_file.stale_risks[-1]
+
+
+def test_case_file_loads_memory_handoffs_and_contradictions(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+    project = ProjectRegistry(store).add_project(repo, name="Example")
+    task = create_task(
+        store,
+        title="Memory context",
+        objective="Build case with memory.",
+        project_id=project.id,
+    )
+    CaseFileAssembler(store).build(task.id)
+    handoff = HandoffWriter(store).create(
+        task_id=task.id,
+        agent="agent:codex",
+        summary="Prior memory handoff.",
+        tests_run=["pytest"],
+    )
+    contradiction = ContradictionManager(store).open_report(
+        task_id=task.id,
+        facts=["old fact", "new fact"],
+        summary="Facts disagree.",
+        affected_artifacts=["README.md"],
+        evidence_ids=["evidence_memory"],
+    )
+    memory = _FactMemory(
+        [
+            FactValue(
+                entity="repo:Example",
+                relation="memory:note",
+                value="Memory fact loaded.",
+                source="stigmem:fixture",
+                confidence=1.0,
+                scope="local",
+                trust_class="observed",
+            )
+        ]
+    )
+
+    case_file = CaseFileAssembler(store, memory=memory).build(task.id)
+
+    assert case_file.facts == memory.facts
+    assert handoff.id in case_file.recent_handoffs[0]
+    assert case_file.contradictions == [contradiction]
+    assert case_file.context_budget["memory_fact_count"] == 1
+    assert case_file.context_budget["contradiction_ids"] == [contradiction.id]
+    assert "Memory facts were not loaded" not in {
+        assumption.statement for assumption in case_file.assumptions
+    }
 
 
 def test_case_file_reports_omitted_docs_from_context_budget(
@@ -220,6 +273,14 @@ def test_case_file_errors_for_missing_task_or_project(store: LocalStore) -> None
 
     with pytest.raises(ProjectNotFoundError, match="unknown project"):
         assembler.build(task.id)
+
+
+class _FactMemory:
+    def __init__(self, facts: list[FactValue]) -> None:
+        self.facts = facts
+
+    def search(self, query: str) -> list[FactValue]:
+        return self.facts
 
 
 def _repo(tmp_path: Path) -> Path:

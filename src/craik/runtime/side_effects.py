@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal, Protocol
+from typing import Any, Literal
 
 from craik.contracts.models import (
     CapabilityGrant,
@@ -41,13 +41,6 @@ class SideEffectResult:
 
 CommandExecutor = Callable[[str], dict[str, Any]]
 GitHubWriter = Callable[[str, str], dict[str, Any]]
-
-
-class DurableMemoryWriter(Protocol):
-    """Memory backend surface that can perform a granted durable fact write."""
-
-    def write_fact(self, fact: FactValue) -> FactValue:
-        """Write one durable fact."""
 
 
 def run_shell_command_ref(
@@ -122,7 +115,7 @@ def write_policy_file(
 def write_memory_fact(
     *,
     store: LocalStore,
-    memory: DurableMemoryWriter,
+    memory: Any,
     policy: PolicyEnvelope,
     grants: list[CapabilityGrant],
     actor: str,
@@ -134,7 +127,10 @@ def write_memory_fact(
     denied = _persist_denial(store=store, policy=policy, decision=decision, actor=actor)
     if denied is not None:
         return SideEffectResult(kind="memory_write", allowed=False, receipt=denied)
-    written = memory.write_fact(fact)
+    try:
+        written = memory.write_fact(fact, policy=policy, grants=grants)
+    except TypeError:
+        written = memory.write_fact(fact)
     receipt = _passed_receipt(
         policy=policy,
         actor=actor,
