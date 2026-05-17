@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from typing import Any
 from urllib import error, request
 
@@ -19,12 +19,12 @@ class HTTPTransport:
         *,
         family: ProviderFamily,
         base_url: str,
-        headers: dict[str, str],
+        headers_factory: Callable[[], dict[str, str]],
         timeout_seconds: float,
     ) -> None:
         self._family = family
         self._base_url = base_url.rstrip("/")
-        self._headers = dict(headers)
+        self._headers_factory = headers_factory
         self._timeout_seconds = timeout_seconds
 
     @property
@@ -40,7 +40,7 @@ class HTTPTransport:
         headers = {
             "Content-Type": "application/json",
             "Accept": "text/event-stream" if stream else "application/json",
-            **self._headers,
+            **self._headers_factory(),
         }
         http_request = request.Request(
             _join_url(self._base_url, path),

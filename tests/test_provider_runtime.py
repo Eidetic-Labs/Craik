@@ -18,6 +18,7 @@ from craik.runtime.provider_runtime import (
     provider_runtime_receipt,
 )
 from craik.runtime.provider_transport import FixtureTransport, ProviderFamily, ProviderTransport
+from craik.runtime.secrets import SecretResolver
 
 
 def _openai_adapter(*, live_enabled: bool = False) -> OpenAIProviderAdapter:
@@ -414,6 +415,14 @@ def test_provider_runtime_rejects_raw_secret_config_and_missing_docs() -> None:
             secret_ref_name="CRAIK_OPENAI_API_KEY",
             docs_refs=["docs/reference/model-providers.md"],
         )
+
+
+def test_provider_runtime_config_resolves_secret_reference(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_OPENAI_API_KEY", "resolved-secret")
+
+    assert _openai_adapter().config.resolve_secret(SecretResolver()) == "resolved-secret"
 
 
 def test_provider_runtime_receipt_keeps_safe_metadata_and_drops_payload_and_secret_ref() -> None:
