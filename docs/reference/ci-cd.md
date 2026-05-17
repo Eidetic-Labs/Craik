@@ -52,12 +52,11 @@ as `CRAIK_RUN_LIVE_TESTS=1` and are not part of the default pull request gate.
 
 ## Code Scanning
 
-GitHub CodeQL default setup publishes the repository's code-scanning results.
-The repo-owned CodeQL workflow also runs Python analysis on pull requests and
-pushes to `main`, using the default query suite with `build-mode: none`, but
-keeps SARIF upload disabled while default setup remains active. This preserves
-a visible workflow definition without conflicting with GitHub's default
-code-scanning publisher.
+The repo-owned CodeQL workflow runs Python analysis on pull requests and pushes
+to `main`, using the default query suite with `build-mode: none`. The analyze
+step uses its default SARIF upload behavior, so results are published to GitHub
+Security -> Code scanning when repository code-scanning configuration permits
+advanced workflow uploads.
 
 ## Changed-File Strictness
 
