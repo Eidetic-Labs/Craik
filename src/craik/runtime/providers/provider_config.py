@@ -36,6 +36,9 @@ class ProviderRuntimeConfig(CraikModel):
     timeout_seconds: float = Field(default=30.0, gt=0)
     max_retries: int = Field(default=3, ge=0)
     live_enabled: bool = False
+    auth_profile_id: str | None = None
+    credential_pool_id: str | None = None
+    last_auth_profile_id: str | None = Field(default=None, exclude=True)
     docs_verified_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     docs_refs: list[str] = Field(min_length=1)
 
@@ -47,6 +50,10 @@ class ProviderRuntimeConfig(CraikModel):
         ):
             raise ValueError(
                 "provider runtime secret_ref_name must not contain raw secret material"
+            )
+        if self.auth_profile_id and self.credential_pool_id:
+            raise ValueError(
+                "provider runtime auth_profile_id and credential_pool_id are mutually exclusive"
             )
         expected_refs = (
             ANTHROPIC_OFFICIAL_DOCS
