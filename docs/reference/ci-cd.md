@@ -1,0 +1,55 @@
+# CI/CD Gates
+
+Craik CI is split by surface so failures point at the area that regressed.
+
+## Pull Request Gates
+
+| Gate | Purpose |
+| --- | --- |
+| `lint` | Ruff import, style, and modernization checks. |
+| `type` | Strict mypy checks for the `craik` package. |
+| `unit` | Full pytest suite with coverage XML and JUnit artifacts. |
+| `contract` | Runtime contract fixture conformance and report generation. |
+| `security` | Policy baseline, release readiness, and public documentation hygiene. |
+| `docs` | Generated CLI docs, docs hygiene, and Docusaurus build. |
+| `package` | Source distribution and wheel build, metadata validation, smoke install. |
+
+## Coverage Ratchet
+
+Coverage is configured in `pyproject.toml` and currently fails below 75 percent
+line coverage. The threshold is intentionally conservative for the MVP ramp. It
+should only move upward after CI has been green at the higher threshold on
+`main`.
+
+Coverage artifacts are uploaded from the `unit` job:
+
+- `reports/tests/unit.xml`;
+- `reports/coverage/coverage.xml`.
+
+## Conformance Reports
+
+The contract job validates every registered runtime schema against the pinned
+fixture bundle and writes:
+
+- `reports/conformance/contracts.json`;
+- `reports/conformance/contracts.md`.
+
+These reports are uploaded as CI artifacts and are also produced by the nightly
+reliability workflow.
+
+## Changed-File Strictness
+
+`scripts/check_changed_file_strictness.py` enforces minimum review discipline:
+
+- package source changes require tests;
+- contract model changes require contract test coverage;
+- workflow-only changes require a docs or scripts rationale change.
+
+This is not a substitute for review. It is a low-friction guard against
+high-risk changes landing without visible verification.
+
+## Nightly Reliability
+
+The nightly workflow runs the full quality, coverage, conformance, security,
+docs, and package checks on `main` and uploads test, coverage, conformance,
+docs, and package artifacts.
