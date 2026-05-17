@@ -1,16 +1,29 @@
+import importlib
 from datetime import UTC, datetime
 
 from craik.contracts.models import ChannelAllowlist
-from craik.runtime.channel_allowlist import evaluate_channel_allowlist
-from craik.runtime.channel_identity import pair_channel_identity, unpaired_channel_identity
-from craik.runtime.channel_policy import (
+from craik.runtime.channels.allowlist import evaluate_channel_allowlist
+from craik.runtime.channels.identity import pair_channel_identity, unpaired_channel_identity
+from craik.runtime.channels.messaging import normalize_inbound_message
+from craik.runtime.channels.policy import (
     channel_capability_allowed,
     channel_policy_denial_receipt,
     select_channel_policy,
 )
-from craik.runtime.messaging_channel import normalize_inbound_message
 
 NOW = datetime(2026, 5, 16, 19, 5, tzinfo=UTC)
+
+
+def test_channel_runtime_package_preserves_legacy_imports() -> None:
+    legacy_policy = importlib.import_module("craik.runtime.channel_policy")
+    legacy_messaging = importlib.import_module("craik.runtime.messaging_channel")
+    legacy_allowlist = importlib.import_module("craik.runtime.channel_allowlist")
+    legacy_identity = importlib.import_module("craik.runtime.channel_identity")
+
+    assert legacy_policy.select_channel_policy is select_channel_policy
+    assert legacy_messaging.normalize_inbound_message is normalize_inbound_message
+    assert legacy_allowlist.evaluate_channel_allowlist is evaluate_channel_allowlist
+    assert legacy_identity.pair_channel_identity is pair_channel_identity
 
 
 def _allowlist() -> ChannelAllowlist:

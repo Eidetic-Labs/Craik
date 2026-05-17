@@ -3,7 +3,7 @@
 Channel ingress uses normal `craik.policy_envelope` records, but the selected
 envelope is narrower than local operator authority.
 
-`craik.runtime.channel_policy` binds a normalized inbound event to a channel
+`craik.runtime.channels.policy` binds a normalized inbound event to a channel
 policy only when:
 
 - the external sender has a paired channel identity;

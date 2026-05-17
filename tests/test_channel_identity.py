@@ -5,7 +5,7 @@ from pydantic import ValidationError
 
 from craik.contracts.models import ChannelIdentityPairing
 from craik.contracts.registry import schema_model
-from craik.runtime.channel_identity import (
+from craik.runtime.channels.identity import (
     allows_privileged_ingress,
     pair_channel_identity,
     revoke_channel_identity,
