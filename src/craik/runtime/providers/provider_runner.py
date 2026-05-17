@@ -173,6 +173,7 @@ class ProviderBackedRunExecutor:
         steps: list[LoopStep] | None = None,
         statuses: list[RunnerResultStatus] | None = None,
         max_iterations: int = 5,
+        live_enabled: bool | None = None,
         started_at: datetime | None = None,
     ) -> ProviderBackedRunResult:
         """Compile the case-file prompt, run through a provider, and leave a handoff."""
@@ -182,7 +183,9 @@ class ProviderBackedRunExecutor:
         provider = default_model_provider_registry().require(provider_id)
         adapter = adapter_for_provider(
             provider,
-            live_enabled=bool(provider.metadata.get("live_enabled", False)),
+            live_enabled=bool(live_enabled)
+            if live_enabled is not None
+            else bool(provider.metadata.get("live_enabled", False)),
         )
         compiled = PromptCompiler(self.store).compile(
             task_id,

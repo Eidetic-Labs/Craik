@@ -74,7 +74,11 @@ def test_default_runner_matrix_contains_conservative_profiles() -> None:
         "fixture",
         "gemini",
         "provider_anthropic",
+        "provider_anthropic_messages",
+        "provider_local_openai_compatible",
         "provider_openai",
+        "provider_openai_chat",
+        "provider_openai_responses",
     ]
     assert matrices["codex"].trust.default_grant_posture == "prompt-for-approval"
     assert matrices["claude"].trust.default_grant_posture == "deny-by-default"
@@ -82,6 +86,10 @@ def test_default_runner_matrix_contains_conservative_profiles() -> None:
     assert matrices["fixture"].trust.requires_receipts is False
     assert matrices["provider_openai"].runner.adapter == "provider-runtime"
     assert matrices["provider_anthropic"].runner.metadata["provider_family"] == "anthropic"
+    assert (
+        matrices["provider_local_openai_compatible"].runner.metadata["provider_family"]
+        == "chat_completions"
+    )
 
 
 def test_runner_capability_lookup_support_and_grant_policy() -> None:

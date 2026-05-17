@@ -29,6 +29,7 @@ from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_pat
 from craik.runtime.policy.intent_locks import IntentLockManager, IntentLockNotFoundError
 from craik.runtime.policy.policy import FailOpenNotAllowedError
 from craik.runtime.projects.demos import StigmemDocsDemo
+from craik.runtime.projects.demos_provider import ProviderBackedStigmemDocsDemo
 from craik.runtime.projects.onboarding import AgentOnboardingBuilder, OnboardingProjectNotFoundError
 from craik.runtime.projects.project_registry import NotGitRepositoryError, ProjectRegistry
 from craik.runtime.projects.prompts import (
@@ -45,6 +46,7 @@ from craik.runtime.runners.runners import (
     default_runner_capability_matrices,
     get_runner_capability_matrix,
 )
+from craik.runtime.secrets import SecretNotFoundError
 from craik.runtime.store import LocalStore
 from craik.runtime.work.case_files import (
     CaseFileAssembler,
@@ -575,6 +577,16 @@ def demo_stigmem_docs(
             ),
         ),
     ] = None,
+    provider: Annotated[
+        str | None,
+        typer.Option(
+            "--provider",
+            help=(
+                "Run one provider-backed demo path and surface model findings. "
+                "Set CRAIK_LIVE=1 for live transport; otherwise fixture transport is used."
+            ),
+        ),
+    ] = None,
     max_tokens: Annotated[
         int,
         typer.Option("--max-tokens", min=1, help="Approximate case-file context budget."),
@@ -584,23 +596,43 @@ def demo_stigmem_docs(
     store = LocalStore.from_env()
     try:
         store.initialize()
-        result = StigmemDocsDemo(
-            store,
-            github_adapter=_github_adapter() if github else None,
-        ).run(
-            repo_path=repo_path,
-            project_name=project_name,
-            stigmem_url=stigmem_url,
-            stigmem_api_key=stigmem_api_key,
-            github=github,
-            provider_ids=tuple(provider_id) if provider_id else None,
-            max_tokens=max_tokens,
-        )
+        github_adapter = _github_adapter() if github else None
+        if provider and provider_id:
+            raise typer.BadParameter("use either --provider or --provider-id, not both")
+        if provider:
+            result = ProviderBackedStigmemDocsDemo(
+                store,
+                github_adapter=github_adapter,
+            ).run(
+                repo_path=repo_path,
+                project_name=project_name,
+                stigmem_url=stigmem_url,
+                stigmem_api_key=stigmem_api_key,
+                github=github,
+                provider_id=provider,
+                live_enabled=_env_flag("CRAIK_LIVE"),
+                max_tokens=max_tokens,
+            )
+        else:
+            result = StigmemDocsDemo(
+                store,
+                github_adapter=github_adapter,
+            ).run(
+                repo_path=repo_path,
+                project_name=project_name,
+                stigmem_url=stigmem_url,
+                stigmem_api_key=stigmem_api_key,
+                github=github,
+                provider_ids=tuple(provider_id) if provider_id else None,
+                max_tokens=max_tokens,
+            )
     except (
         NotGitRepositoryError,
         TaskNotFoundError,
         ProjectNotFoundError,
         HandoffContextError,
+        ModelProviderNotFoundError,
+        SecretNotFoundError,
     ) as error:
         raise typer.BadParameter(str(error)) from None
     finally:
@@ -615,6 +647,10 @@ def _policy_profile(value: str) -> PolicyProfile:
     if value not in {"strict", "trusted-local", "automation", "custom"}:
         raise typer.BadParameter(f"unsupported policy profile: {value}")
     return cast(PolicyProfile, value)
+
+
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _priority(value: str) -> Priority:

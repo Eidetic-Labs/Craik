@@ -13,6 +13,7 @@ from craik.runtime.providers.provider_transport import (
     FixtureTransport,
     ProviderTransport,
 )
+from craik.runtime.secrets import SecretRef, SecretResolver
 
 if TYPE_CHECKING:
     from craik.runtime.providers.provider_runtime import (
@@ -40,15 +41,20 @@ def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
 
 
 def _provider_headers(config: ProviderRuntimeConfig) -> dict[str, str]:
+    secret = (
+        SecretResolver().resolve(SecretRef(env_var=config.secret_ref_name))
+        if config.secret_ref_name
+        else ""
+    )
     if config.provider_family == "anthropic":
         headers = {
             "anthropic-version": "2023-06-01",
         }
-        if config.secret_ref_name:
-            headers["x-api-key"] = config.secret_ref_name
+        if secret:
+            headers["x-api-key"] = secret
         return headers
-    if config.secret_ref_name:
-        return {"Authorization": f"Bearer {config.secret_ref_name}"}
+    if secret:
+        return {"Authorization": f"Bearer {secret}"}
     return {}
 
 
