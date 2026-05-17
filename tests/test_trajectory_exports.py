@@ -8,7 +8,7 @@ from craik.contracts.models import (
     RunnerStepResult,
     TaskRunPhase,
 )
-from craik.runtime.trajectory_exports import (
+from craik.runtime.skills.trajectory_exports import (
     LOCAL_PATH_REDACTION,
     TRAJECTORY_EXPORT_FORMAT,
     build_training_trajectory_export,

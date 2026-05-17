@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.skill_replay import (
+from craik.runtime.skills.skill_replay import (
     SkillReplayFixture,
     SkillReplayObservation,
     replay_skill_fixture,

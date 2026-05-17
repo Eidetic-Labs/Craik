@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import Assumption, CaseFile, ContextDebtRecord
-from craik.runtime.context_debt import (
+from craik.runtime.work.context_debt import (
     carry_forward_context_debt,
     context_debt_summaries,
     records_from_case_file,

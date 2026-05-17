@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import KnowledgeFreshnessProbe, ToolResultAttestation
-from craik.runtime.freshness import (
+from craik.runtime.memory.freshness import (
     attestation_is_fresh,
     classify_probe,
     missing_attestation_warning,

@@ -3,17 +3,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from craik.contracts.models import DistilledInstructionProposal, InstructionSourceSnapshot
-from craik.runtime.case_files import CaseFileAssembler
-from craik.runtime.instruction_sources import (
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.projects.instruction_sources import (
     instruction_stale_risk_warnings,
     invalidate_stale_distillations,
     promotable_distilled_instructions,
 )
-from craik.runtime.onboarding import AgentOnboardingBuilder
-from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import ProjectRegistry
+from craik.runtime.projects.onboarding import AgentOnboardingBuilder
+from craik.runtime.projects.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.case_files import CaseFileAssembler
+from craik.runtime.work.tasks import create_task
 
 
 def _store(tmp_path: Path) -> LocalStore:

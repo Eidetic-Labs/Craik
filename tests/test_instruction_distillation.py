@@ -4,11 +4,11 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import DistilledInstructionProposal
-from craik.runtime.instruction_sources import (
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.projects.instruction_sources import (
     render_distilled_instruction_json,
     render_distilled_instruction_markdown,
 )
-from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
 
 REQUIRED_CATEGORIES = [

@@ -5,7 +5,7 @@ from pydantic import ValidationError
 
 from craik.contracts.models import ModelProvider
 from craik.contracts.registry import schema_model
-from craik.runtime.model_providers import (
+from craik.runtime.providers.model_providers import (
     DuplicateModelProviderError,
     ModelProviderNotFoundError,
     ModelProviderRegistry,
@@ -117,12 +117,14 @@ def test_default_registry_includes_certified_mvp_provider_metadata() -> None:
     local_openai_compatible = registry.require("provider_local_openai_compatible")
 
     assert openai.provider == "openai"
-    assert openai.runtime_path == "craik.runtime.provider_runtime.OpenAIProviderAdapter"
+    assert openai.runtime_path == "craik.runtime.providers.provider_runtime.OpenAIProviderAdapter"
     assert openai.metadata["default_model"] == "gpt-5.2"
     assert "CRAIK_OPENAI_API_KEY" in openai.secret_ref_names
     assert "model.tool_calls" in {capability.name for capability in openai.capabilities}
     assert anthropic.provider == "anthropic"
-    assert anthropic.runtime_path == "craik.runtime.provider_runtime.AnthropicProviderAdapter"
+    assert anthropic.runtime_path == (
+        "craik.runtime.providers.provider_runtime.AnthropicProviderAdapter"
+    )
     assert anthropic.metadata["default_model"] == "claude-sonnet-4-20250514"
     assert "CRAIK_ANTHROPIC_API_KEY" in anthropic.secret_ref_names
     assert anthropic_messages.provider == "anthropic"
@@ -131,12 +133,14 @@ def test_default_registry_includes_certified_mvp_provider_metadata() -> None:
     assert anthropic_messages.metadata["opus_model"] == "claude-opus-4-1-20250805"
     assert anthropic_messages.secret_ref_names == ["ANTHROPIC_API_KEY"]
     assert openai_responses.provider == "openai"
-    assert openai_responses.runtime_path == "craik.runtime.provider_runtime.OpenAIProviderAdapter"
+    assert openai_responses.runtime_path == (
+        "craik.runtime.providers.provider_runtime.OpenAIProviderAdapter"
+    )
     assert openai_responses.metadata["base_url"] == "https://api.openai.com"
     assert openai_responses.secret_ref_names == ["OPENAI_API_KEY"]
     assert openai_chat.provider == "chat_completions"
     assert openai_chat.runtime_path == (
-        "craik.runtime.provider_runtime.ChatCompletionsProviderAdapter"
+        "craik.runtime.providers.provider_runtime.ChatCompletionsProviderAdapter"
     )
     assert openai_chat.metadata["base_url"] == "https://api.openai.com"
     assert openai_chat.secret_ref_names == ["OPENAI_API_KEY"]

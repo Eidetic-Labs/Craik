@@ -1,4 +1,4 @@
-from craik.runtime.multi_agent_workflow_bridge import (
+from craik.runtime.bridges.multi_agent_workflow_bridge import (
     MultiAgentWorkflowBridgeSurface,
     multi_agent_workflow_bridge_decision,
 )

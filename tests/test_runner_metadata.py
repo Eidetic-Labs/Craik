@@ -1,6 +1,6 @@
 from craik.contracts.models import CompiledPrompt, PromptSection
-from craik.runtime.codex_adapter import CodexRunnerAdapter, request_from_compiled_prompt
-from craik.runtime.runner_metadata import runner_metadata_snapshot
+from craik.runtime.runners.codex_adapter import CodexRunnerAdapter, request_from_compiled_prompt
+from craik.runtime.runners.runner_metadata import runner_metadata_snapshot
 
 
 def test_runner_metadata_snapshot_includes_trust_and_redacts_runner_specific_data() -> None:

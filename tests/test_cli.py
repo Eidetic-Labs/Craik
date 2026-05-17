@@ -15,10 +15,10 @@ from craik.contracts.models import (
     TaskRunStatus,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import ProjectRegistry
-from craik.runtime.receipts import ReceiptStore
+from craik.runtime.projects.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.receipts import ReceiptStore
+from craik.runtime.work.tasks import create_task
 
 runner = CliRunner()
 

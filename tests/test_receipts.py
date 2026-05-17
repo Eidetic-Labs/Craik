@@ -6,8 +6,8 @@ import pytest
 
 from craik.contracts.models import CapabilityReceipt, PolicyProfile, ReceiptResult
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore, receipt_links
 from craik.runtime.store import LocalStore, UnredactedSecretError
+from craik.runtime.work.receipts import ReceiptNotFoundError, ReceiptStore, receipt_links
 
 
 @pytest.fixture

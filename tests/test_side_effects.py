@@ -11,7 +11,7 @@ from craik.contracts.models import (
     MemoryProposal,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.policy import generate_policy_envelope
+from craik.runtime.policy.policy import generate_policy_envelope
 from craik.runtime.side_effects import (
     run_github_write,
     run_shell_command_ref,

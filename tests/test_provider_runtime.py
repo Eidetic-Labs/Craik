@@ -2,8 +2,8 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import ModelProvider
-from craik.runtime.model_providers import default_model_provider_registry
-from craik.runtime.provider_runtime import (
+from craik.runtime.providers.model_providers import default_model_provider_registry
+from craik.runtime.providers.provider_runtime import (
     ANTHROPIC_OFFICIAL_DOCS,
     OPENAI_OFFICIAL_DOCS,
     AnthropicProviderAdapter,
@@ -17,7 +17,11 @@ from craik.runtime.provider_runtime import (
     adapter_for_provider,
     provider_runtime_receipt,
 )
-from craik.runtime.provider_transport import FixtureTransport, ProviderFamily, ProviderTransport
+from craik.runtime.providers.provider_transport import (
+    FixtureTransport,
+    ProviderFamily,
+    ProviderTransport,
+)
 from craik.runtime.secrets import SecretResolver
 
 
@@ -427,7 +431,9 @@ def test_adapter_for_provider_dispatches_chat_completions_family() -> None:
             "secret_ref_names": ["OPENAI_API_KEY"],
             "budget_ref": "budget_openai_monthly",
             "quota_ref": "quota_openai_daily",
-            "runtime_path": "craik.runtime.provider_runtime.ChatCompletionsProviderAdapter",
+            "runtime_path": (
+                "craik.runtime.providers.provider_runtime.ChatCompletionsProviderAdapter"
+            ),
             "metadata": {
                 "default_model": "gpt-5.2",
                 "docs_verified": "2026-05-17",

@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from craik.runtime.schedules import (
+from craik.runtime.channels.schedules import (
     GatewaySchedule,
     create_task_from_schedule_tick,
     validate_cron_expression,

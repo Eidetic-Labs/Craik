@@ -9,15 +9,15 @@ from urllib import error, request
 
 import pytest
 
-from craik.runtime.http_transport import HTTPTransport
-from craik.runtime.provider_runtime import (
+from craik.runtime.providers.http_transport import HTTPTransport
+from craik.runtime.providers.provider_runtime import (
     OPENAI_OFFICIAL_DOCS,
     ChatCompletionsProviderAdapter,
     ProviderMessage,
     ProviderRuntimeConfig,
     ProviderRuntimeRequest,
 )
-from craik.runtime.provider_transport import ProviderFamily
+from craik.runtime.providers.provider_transport import ProviderFamily
 
 CASSETTE_PATH = (
     Path(__file__).parents[1] / "fixtures" / "cassettes" / "chat_completions_recorded.json"

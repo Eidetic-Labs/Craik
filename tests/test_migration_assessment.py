@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.migration_assessment import (
+from craik.runtime.projects.migration_assessment import (
     AdjacentToolMapping,
     AdjacentToolMigrationAssessment,
     MultiAgentWorkflowMapping,

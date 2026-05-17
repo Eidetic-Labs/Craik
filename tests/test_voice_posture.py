@@ -1,4 +1,4 @@
-from craik.runtime.voice_posture import VoiceSurface, voice_posture_decision
+from craik.runtime.voice.voice_posture import VoiceSurface, voice_posture_decision
 
 
 def test_voice_posture_allows_supported_documented_surface() -> None:

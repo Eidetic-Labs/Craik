@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from craik.runtime.public_docs import (
+from craik.runtime.projects.public_docs import (
     classify_work_product,
     decision_record_suggestions,
     generated_doc_provenance,

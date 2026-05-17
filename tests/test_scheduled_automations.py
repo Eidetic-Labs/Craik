@@ -1,12 +1,12 @@
 from datetime import UTC, datetime
 
 from craik.contracts.models import PolicyEnvelope
-from craik.runtime.scheduled_automations import (
+from craik.runtime.channels.scheduled_automations import (
     ScheduledAutomation,
     run_scheduled_automation_tick,
     scheduled_automation_receipt,
 )
-from craik.runtime.schedules import GatewaySchedule
+from craik.runtime.channels.schedules import GatewaySchedule
 
 NOW = datetime(2026, 5, 16, 19, 35, tzinfo=UTC)
 

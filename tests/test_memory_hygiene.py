@@ -4,13 +4,13 @@ from pathlib import Path
 import pytest
 
 from craik.contracts.models import FactValue, MemoryProposal
-from craik.runtime.contradictions import ContradictionManager
-from craik.runtime.handoffs import HandoffWriter
-from craik.runtime.memory_hygiene import memory_hygiene_report
+from craik.runtime.memory.contradictions import ContradictionManager
+from craik.runtime.memory.memory_hygiene import memory_hygiene_report
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import ProjectRegistry
+from craik.runtime.projects.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.handoffs import HandoffWriter
+from craik.runtime.work.tasks import create_task
 
 
 @pytest.fixture

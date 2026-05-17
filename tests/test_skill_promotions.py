@@ -3,12 +3,12 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.skill_promotions import (
+from craik.runtime.skills.skill_promotions import (
     SkillPromotionDecision,
     SkillPromotionRequest,
     decide_skill_promotion,
 )
-from craik.runtime.skill_proposals import (
+from craik.runtime.skills.skill_proposals import (
     SkillChangeProposal,
     SkillImprovementEdit,
     SkillImprovementPlan,

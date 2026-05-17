@@ -4,12 +4,12 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import RedTeamFinding, RuntimeCriticFinding
-from craik.runtime.critics import (
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.reviewing.critics import (
     blocking_red_team_findings,
     render_critic_finding_markdown,
     reviewable_critic_findings,
 )
-from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import LocalStore
 
 

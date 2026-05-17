@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.runs import (
+from craik.runtime.store import LocalStore
+from craik.runtime.work.runs import (
     RunTransition,
     TaskRunIterationLimitError,
     TaskRunManager,
@@ -12,7 +13,6 @@ from craik.runtime.runs import (
     TaskRunTransitionError,
     task_run_id,
 )
-from craik.runtime.store import LocalStore
 
 
 @pytest.fixture

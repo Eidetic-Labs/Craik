@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.migration_maps import MigrationFieldMap, MigrationMap
+from craik.runtime.projects.migration_maps import MigrationFieldMap, MigrationMap
 
 
 def test_migration_map_records_memory_field_mappings() -> None:

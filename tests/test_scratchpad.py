@@ -5,8 +5,8 @@ from pydantic import ValidationError
 
 from craik.contracts.models import ScratchpadRecord, UnknownRecord
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.scratchpad import active_scratchpad_records, unknown_summaries
 from craik.runtime.store import LocalStore
+from craik.runtime.work.scratchpad import active_scratchpad_records, unknown_summaries
 
 NOW = datetime(2026, 5, 16, 10, 0, tzinfo=UTC)
 

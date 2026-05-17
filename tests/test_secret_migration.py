@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.secret_migration import (
+from craik.runtime.projects.secret_migration import (
     SecretMigrationDecision,
     SecretMigrationPolicy,
     SecretMigrationPolicyRule,

@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import ContextRequest, Handoff, SelfAudit
-from craik.runtime.exit_discipline import build_exit_discipline_check
+from craik.runtime.work.exit_discipline import build_exit_discipline_check
 
 NOW = datetime(2026, 5, 16, 10, 20, tzinfo=UTC)
 

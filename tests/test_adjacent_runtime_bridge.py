@@ -1,4 +1,4 @@
-from craik.runtime.adjacent_runtime_bridge import (
+from craik.runtime.bridges.adjacent_runtime_bridge import (
     AdjacentRuntimeBridgeSurface,
     adjacent_runtime_bridge_decision,
 )

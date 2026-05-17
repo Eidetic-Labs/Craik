@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from craik.runtime.learning_receipts import LearningReceiptContext, learning_receipt
+from craik.runtime.skills.learning_receipts import LearningReceiptContext, learning_receipt
 
 NOW = datetime(2026, 5, 16, 21, 25, tzinfo=UTC)
 

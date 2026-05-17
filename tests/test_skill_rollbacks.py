@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.skill_rollbacks import (
+from craik.runtime.skills.skill_rollbacks import (
     SkillRollbackDecision,
     SkillRollbackRequest,
     SkillRollbackTarget,

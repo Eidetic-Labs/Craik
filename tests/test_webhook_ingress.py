@@ -1,7 +1,7 @@
 import json
 from datetime import UTC, datetime
 
-from craik.runtime.webhook_ingress import (
+from craik.runtime.channels.webhook_ingress import (
     validate_webhook_request,
     webhook_ingress_receipt,
     webhook_signature,

@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.multimodal_artifacts import (
+from craik.runtime.voice.multimodal_artifacts import (
     LOCAL_PATH_REDACTION,
     MultimodalArtifactReference,
     multimodal_artifact_reference,

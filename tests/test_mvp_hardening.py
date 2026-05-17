@@ -6,27 +6,27 @@ import pytest
 
 from craik.contracts.models import CapabilityReceipt, ReceiptResult
 from craik.contracts.registry import CONTRACT_REGISTRY
-from craik.runtime.case_files import CaseFileAssembler
-from craik.runtime.demos import StigmemDocsDemo
 from craik.runtime.github import GitHubConfig
-from craik.runtime.loop import (
+from craik.runtime.memory.memory import LocalMemoryStore
+from craik.runtime.paths import ensure_craik_home
+from craik.runtime.policy.policy import generate_policy_envelope
+from craik.runtime.policy.redaction import REDACTION
+from craik.runtime.projects.demos import StigmemDocsDemo
+from craik.runtime.projects.prompts import PromptCompiler
+from craik.runtime.providers.model_providers import default_model_provider_registry
+from craik.runtime.providers.provider_budgets import ProviderBudgetStatus, provider_budget_decision
+from craik.runtime.providers.provider_runtime import adapter_for_provider
+from craik.runtime.runners.runners import get_runner_capability_matrix
+from craik.runtime.side_effects import run_github_write
+from craik.runtime.store import CONTRACT_KINDS, LocalStore, UnredactedSecretError
+from craik.runtime.work.case_files import CaseFileAssembler
+from craik.runtime.work.loop import (
     FixtureStepRunner,
     LoopMaxIterationsError,
     LoopStep,
     SingleAgentLoopExecutor,
 )
-from craik.runtime.memory import LocalMemoryStore
-from craik.runtime.model_providers import default_model_provider_registry
-from craik.runtime.paths import ensure_craik_home
-from craik.runtime.policy import generate_policy_envelope
-from craik.runtime.prompts import PromptCompiler
-from craik.runtime.provider_budgets import ProviderBudgetStatus, provider_budget_decision
-from craik.runtime.provider_runtime import adapter_for_provider
-from craik.runtime.redaction import REDACTION
-from craik.runtime.runners import get_runner_capability_matrix
-from craik.runtime.side_effects import run_github_write
-from craik.runtime.store import CONTRACT_KINDS, LocalStore, UnredactedSecretError
-from craik.runtime.tasks import create_task
+from craik.runtime.work.tasks import create_task
 
 
 @pytest.fixture
@@ -207,7 +207,7 @@ def _seed_task(
     *,
     objective: str = "Run hardening regression task.",
 ) -> str:
-    from craik.runtime.project_registry import ProjectRegistry
+    from craik.runtime.projects.project_registry import ProjectRegistry
 
     repo = _repo(tmp_path)
     project = ProjectRegistry(store).add_project(repo, name="Hardening")

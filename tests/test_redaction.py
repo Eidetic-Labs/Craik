@@ -1,6 +1,6 @@
 import re
 
-from craik.runtime.redaction import RedactionConfig, contains_unredacted_secret, redact
+from craik.runtime.policy.redaction import RedactionConfig, contains_unredacted_secret, redact
 
 
 def test_redacts_bearer_header() -> None:

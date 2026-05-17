@@ -1,4 +1,4 @@
-from craik.runtime.mobile_companion import (
+from craik.runtime.companions.mobile_companion import (
     MobileCompanionSurface,
     mobile_companion_decision,
 )

@@ -1,23 +1,23 @@
-from craik.runtime.adjacent_runtime_bridge import (
+from craik.runtime.bridges.adjacent_runtime_bridge import (
     AdjacentRuntimeBridgeSurface,
     adjacent_runtime_bridge_decision,
 )
-from craik.runtime.import_dry_run import (
-    ImportCandidateRecord,
-    ImportDryRunReport,
-    ImportMappedRecord,
+from craik.runtime.bridges.multi_agent_workflow_bridge import (
+    MultiAgentWorkflowBridgeSurface,
+    multi_agent_workflow_bridge_decision,
 )
-from craik.runtime.locale_i18n import (
+from craik.runtime.companions.locale_i18n import (
     LocalePreference,
     TranslatableDocMetadata,
     resolve_doc_locale,
 )
-from craik.runtime.migration_maps import MigrationFieldMap, MigrationMap
-from craik.runtime.multi_agent_workflow_bridge import (
-    MultiAgentWorkflowBridgeSurface,
-    multi_agent_workflow_bridge_decision,
+from craik.runtime.projects.import_dry_run import (
+    ImportCandidateRecord,
+    ImportDryRunReport,
+    ImportMappedRecord,
 )
-from craik.runtime.secret_migration import (
+from craik.runtime.projects.migration_maps import MigrationFieldMap, MigrationMap
+from craik.runtime.projects.secret_migration import (
     SecretMigrationPolicy,
     SecretMigrationPolicyRule,
     evaluate_secret_migration,

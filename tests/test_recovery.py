@@ -10,8 +10,8 @@ from craik.contracts.models import (
     TaskRequest,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.recovery import RecoveryBuilder, render_recovery_markdown
 from craik.runtime.store import LocalStore
+from craik.runtime.work.recovery import RecoveryBuilder, render_recovery_markdown
 
 
 def _store(tmp_path: Path) -> LocalStore:

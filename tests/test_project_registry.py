@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import (
+from craik.runtime.projects.project_registry import (
     NotGitRepositoryError,
     ProjectRegistry,
     detect_default_branch,

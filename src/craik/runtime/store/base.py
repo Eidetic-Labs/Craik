@@ -77,7 +77,7 @@ from craik.contracts.models import (
 )
 from craik.contracts.registry import CONTRACT_REGISTRY, ContractModel
 from craik.runtime.paths import CraikPaths, ensure_craik_home
-from craik.runtime.redaction import contains_unredacted_secret
+from craik.runtime.policy.redaction import contains_unredacted_secret
 from craik.runtime.store_kinds import CONTRACT_KINDS
 
 CURRENT_MIGRATION = 2

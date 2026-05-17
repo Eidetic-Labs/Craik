@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.import_dry_run import (
+from craik.runtime.projects.import_dry_run import (
     ImportCandidateRecord,
     ImportDryRunReport,
     ImportMappedRecord,

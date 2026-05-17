@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.locale_i18n import (
+from craik.runtime.companions.locale_i18n import (
     LocalePreference,
     TranslatableDocMetadata,
     resolve_doc_locale,

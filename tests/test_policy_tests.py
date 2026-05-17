@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.policy_tests import PolicyTestHarness
+from craik.runtime.policy.policy_tests import PolicyTestHarness
 from craik.runtime.store import LocalStore
 
 

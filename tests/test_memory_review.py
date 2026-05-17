@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.memory_review import (
+from craik.runtime.memory.memory_review import (
     MemoryReviewCandidate,
     MemoryReviewNudge,
     memory_review_nudge,

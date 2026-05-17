@@ -6,7 +6,6 @@ from typing import Any
 
 import pytest
 
-from craik.runtime.case_files import CaseFileAssembler
 from craik.runtime.github import (
     GitHubAuthError,
     GitHubClient,
@@ -16,9 +15,10 @@ from craik.runtime.github import (
     parse_github_remote,
 )
 from craik.runtime.paths import ensure_craik_home
-from craik.runtime.project_registry import ProjectRegistry
+from craik.runtime.projects.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.case_files import CaseFileAssembler
+from craik.runtime.work.tasks import create_task
 
 
 @pytest.fixture

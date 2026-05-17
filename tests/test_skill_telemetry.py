@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.skill_telemetry import (
+from craik.runtime.skills.skill_telemetry import (
     SkillPerformanceTelemetry,
     SkillValidationSignal,
     skill_performance_telemetry,

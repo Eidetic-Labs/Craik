@@ -3,12 +3,12 @@ from datetime import UTC, datetime
 import pytest
 
 from craik.contracts.models import CompiledPrompt, PromptSection, RunnerAdapterRequest
-from craik.runtime.codex_adapter import (
+from craik.runtime.runners.codex_adapter import (
     CodexRunnerAdapter,
     CodexRunnerRequestError,
     request_from_compiled_prompt,
 )
-from craik.runtime.runners import RunnerAdapter, get_runner_capability_matrix
+from craik.runtime.runners.runners import RunnerAdapter, get_runner_capability_matrix
 
 
 def test_codex_adapter_fixture_success_returns_normalized_outputs() -> None:

@@ -1,4 +1,4 @@
-from craik.runtime.mcp_export import MCPExportSurface, mcp_export_decision
+from craik.runtime.sandbox.mcp_export import MCPExportSurface, mcp_export_decision
 
 
 def test_mcp_export_allows_stable_documented_surface() -> None:

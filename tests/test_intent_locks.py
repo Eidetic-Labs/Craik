@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from craik.runtime.intent_locks import IntentLockManager, IntentLockNotFoundError
 from craik.runtime.paths import ensure_craik_home
+from craik.runtime.policy.intent_locks import IntentLockManager, IntentLockNotFoundError
 from craik.runtime.store import LocalStore
-from craik.runtime.tasks import create_task
+from craik.runtime.work.tasks import create_task
 
 
 @pytest.fixture
