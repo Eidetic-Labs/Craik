@@ -80,6 +80,25 @@ def test_auth_profile_store_approve_records_marker(tmp_path: Path) -> None:
     }
 
 
+def test_auth_profile_store_grant_authorization_records_receipt(tmp_path: Path) -> None:
+    store = AuthProfileStore(tmp_path)
+    store.put(_profile("openai:work"))
+
+    updated = store.grant_authorization(
+        "openai:work",
+        to_subject="operator-123",
+        to_group="prod-deploy",
+        granted_by="operator:admin",
+        granted_at=datetime(2026, 5, 17, 12, 0, tzinfo=UTC),
+    )
+
+    assert updated.authorized_operators == ["operator-123"]
+    assert updated.authorized_operator_groups == ["prod-deploy"]
+    assert updated.authorization_provenance[0].capability == "credential.authorize"
+    assert updated.authorization_provenance[0].actor == "operator:admin"
+    assert store.get("openai:work").authorization_provenance[0].target == "openai:work"
+
+
 def test_auth_profile_store_writes_owner_only_file_on_posix(tmp_path: Path) -> None:
     store = AuthProfileStore(tmp_path)
 

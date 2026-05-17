@@ -602,6 +602,21 @@ def test_auth_commands_add_list_test_status_and_remove(
     )
     listed = runner.invoke(app, ["auth", "list"], env=env)
     tested = runner.invoke(app, ["auth", "test", "anthropic:work"], env=env)
+    granted = runner.invoke(
+        app,
+        [
+            "auth",
+            "grant",
+            "anthropic:work",
+            "--to-subject",
+            "operator-123",
+            "--to-group",
+            "prod-deploy",
+            "--granted-by",
+            "operator:admin",
+        ],
+        env=env,
+    )
     status = runner.invoke(app, ["auth", "status"], env=env)
     removed = runner.invoke(app, ["auth", "remove", "anthropic:work"], env=env)
     listed_after_remove = runner.invoke(app, ["auth", "list"], env=env)
@@ -611,6 +626,10 @@ def test_auth_commands_add_list_test_status_and_remove(
     assert "anthropic-secret" not in listed.stdout
     assert [profile["id"] for profile in json.loads(listed.stdout)] == ["anthropic:work"]
     assert json.loads(tested.stdout)["status"]["status"] == "ok"
+    granted_payload = json.loads(granted.stdout)
+    assert granted_payload["authorized_operators"] == ["operator-123"]
+    assert granted_payload["authorized_operator_groups"] == ["prod-deploy"]
+    assert granted_payload["authorization_receipt_ids"]
     assert json.loads(status.stdout)[0]["last_status"] == "ok"
     assert json.loads(removed.stdout) == {"removed": "anthropic:work"}
     assert json.loads(listed_after_remove.stdout) == []

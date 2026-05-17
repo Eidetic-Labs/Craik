@@ -15,6 +15,7 @@ from craik.runtime.auth import (
     AuthProfile,
     AuthProfileNotFoundError,
     AuthProfileStore,
+    AuthProfileStoreError,
     CredentialKind,
     CredentialStatus,
 )
@@ -117,7 +118,7 @@ def auth_test(profile_id: str) -> None:
     store = AuthProfileStore.from_env()
     try:
         profile = store.get(profile_id)
-    except AuthProfileNotFoundError as error:
+    except (AuthProfileNotFoundError, AuthProfileStoreError) as error:
         raise typer.BadParameter(str(error)) from None
 
     status = _test_profile_status(profile)
@@ -149,7 +150,36 @@ def auth_approve(
             run_id=run_id,
             approved_by=approved_by,
         )
-    except AuthProfileNotFoundError as error:
+    except (AuthProfileNotFoundError, AuthProfileStoreError) as error:
+        raise typer.BadParameter(str(error)) from None
+    typer.echo(json.dumps(_profile_payload(profile), indent=2, sort_keys=True))
+
+
+@auth_app.command("grant")
+def auth_grant(
+    profile_id: str,
+    to_subject: Annotated[
+        str | None,
+        typer.Option("--to-subject", help="Operator subject authorized for this profile."),
+    ] = None,
+    to_group: Annotated[
+        str | None,
+        typer.Option("--to-group", help="Operator group authorized for this profile."),
+    ] = None,
+    granted_by: Annotated[
+        str,
+        typer.Option("--granted-by", help="Operator or approver recording the grant."),
+    ] = "operator:local",
+) -> None:
+    """Grant an operator subject or group access to an auth profile."""
+    try:
+        profile = AuthProfileStore.from_env().grant_authorization(
+            profile_id,
+            to_subject=to_subject,
+            to_group=to_group,
+            granted_by=granted_by,
+        )
+    except (AuthProfileNotFoundError, AuthProfileStoreError) as error:
         raise typer.BadParameter(str(error)) from None
     typer.echo(json.dumps(_profile_payload(profile), indent=2, sort_keys=True))
 
@@ -293,6 +323,11 @@ def _profile_payload(profile: AuthProfile) -> dict[str, Any]:
         if profile.last_used_at is not None
         else None,
         "last_status": profile.last_status,
+        "authorized_operators": profile.authorized_operators,
+        "authorized_operator_groups": profile.authorized_operator_groups,
+        "authorization_receipt_ids": [
+            receipt.id for receipt in profile.authorization_provenance
+        ],
     }
 
 

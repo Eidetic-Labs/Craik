@@ -247,14 +247,32 @@ def credential_identity_for_config(config: Any) -> tuple[str, CredentialKind]:
         else:
             profile = CredentialPool.from_env().select_from_pool(config.credential_pool_id)
             config.last_auth_profile_id = profile.id
+        _enforce_profile_operator_authorization(profile)
         return profile.id, profile.kind
     if config.auth_profile_id:
         profile = AuthProfileStore.from_env().get(config.auth_profile_id)
         config.last_auth_profile_id = profile.id
+        _enforce_profile_operator_authorization(profile)
         return profile.id, profile.kind
     if config.secret_ref_name:
         return f"{config.provider_family}:legacy-env", CredentialKind.API_KEY
     return f"{config.provider_family}:no-credential", CredentialKind.MARKER
+
+
+def _enforce_profile_operator_authorization(profile: AuthProfile) -> None:
+    if profile.authorized_operators is None and profile.authorized_operator_groups is None:
+        return
+    session = active_operator_session()
+    if session is None:
+        raise ProviderRuntimeError(
+            "credential profile authorization requires operator identity; run craik login"
+        )
+    if profile.authorized_operators is not None and session.subject in profile.authorized_operators:
+        return
+    allowed_groups = set(profile.authorized_operator_groups or [])
+    if allowed_groups and allowed_groups.intersection(session.groups):
+        return
+    raise ProviderRuntimeError("operator is not authorized to use credential profile")
 
 
 def _profile_matches(patterns: list[object], auth_profile_id: str) -> bool:

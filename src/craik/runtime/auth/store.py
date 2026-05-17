@@ -14,6 +14,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from craik.contracts.models import CapabilityReceipt, ReceiptResult
 from craik.runtime.auth.profile import AuthProfile, CredentialHealthStatus
 from craik.runtime.paths import ensure_craik_home, resolve_craik_home
 
@@ -116,6 +117,48 @@ class AuthProfileStore:
             self._write_unlocked(profiles)
             return updated
 
+    def grant_authorization(
+        self,
+        profile_id: str,
+        *,
+        to_subject: str | None = None,
+        to_group: str | None = None,
+        granted_by: str,
+        granted_at: datetime | None = None,
+    ) -> AuthProfile:
+        """Authorize one operator subject or group to use a credential profile."""
+        if not to_subject and not to_group:
+            raise AuthProfileStoreError("authorization grant requires a subject or group")
+        granted_at = granted_at or datetime.now(UTC)
+        with self._locked():
+            profiles = self._read_unlocked()
+            try:
+                current = profiles[profile_id]
+            except KeyError as exc:
+                raise AuthProfileNotFoundError(f"auth profile not found: {profile_id}") from exc
+            subjects = _append_unique(current.authorized_operators, to_subject)
+            groups = _append_unique(current.authorized_operator_groups, to_group)
+            receipt = _authorization_receipt(
+                profile_id=profile_id,
+                to_subject=to_subject,
+                to_group=to_group,
+                granted_by=granted_by,
+                granted_at=granted_at,
+            )
+            updated = current.model_copy(
+                update={
+                    "authorized_operators": subjects,
+                    "authorized_operator_groups": groups,
+                    "authorization_provenance": [
+                        *current.authorization_provenance,
+                        receipt,
+                    ],
+                }
+            )
+            profiles[profile_id] = updated
+            self._write_unlocked(profiles)
+            return updated
+
     def _read_unlocked(self) -> dict[str, AuthProfile]:
         if not self.path.exists():
             return {}
@@ -191,6 +234,47 @@ class AuthProfileStore:
         finally:
             os.close(lock_fd)
             self.lock_path.unlink(missing_ok=True)
+
+
+def _append_unique(existing: list[str] | None, value: str | None) -> list[str] | None:
+    if value is None:
+        return existing
+    values = list(existing or [])
+    if value not in values:
+        values.append(value)
+    return values
+
+
+def _authorization_receipt(
+    *,
+    profile_id: str,
+    to_subject: str | None,
+    to_group: str | None,
+    granted_by: str,
+    granted_at: datetime,
+) -> CapabilityReceipt:
+    target = to_subject or to_group or "unknown"
+    return CapabilityReceipt(
+        id=f"receipt_credential_authorization_{profile_id.replace(':', '_')}_{target}",
+        task_id="auth_profile_authorization",
+        actor=granted_by,
+        capability="credential.authorize",
+        target=profile_id,
+        policy_profile="strict",
+        fail_open=False,
+        reason="Credential profile authorization granted.",
+        result=ReceiptResult(
+            status="passed",
+            summary="Credential profile authorization granted.",
+            metadata={
+                "auth_profile_id": profile_id,
+                "authorized_operator": to_subject,
+                "authorized_operator_group": to_group,
+            },
+        ),
+        redacted=True,
+        created_at=granted_at,
+    )
 
 
 def auth_profile_store_owner_only(path: Path) -> bool:

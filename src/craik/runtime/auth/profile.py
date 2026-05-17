@@ -8,7 +8,7 @@ from typing import Any, Literal, Protocol
 
 from pydantic import Field, model_validator
 
-from craik.contracts.models import CraikModel
+from craik.contracts.models import CapabilityReceipt, CraikModel
 from craik.runtime.providers.provider_transport import ProviderFamily
 
 CredentialHealthStatus = Literal["unknown", "ok", "expired", "rejected", "rate_limited"]
@@ -43,6 +43,9 @@ class AuthProfile(CraikModel):
     created_at: datetime
     last_used_at: datetime | None = None
     last_status: CredentialHealthStatus = "unknown"
+    authorized_operators: list[str] | None = None
+    authorized_operator_groups: list[str] | None = None
+    authorization_provenance: list[CapabilityReceipt] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_profile_id(self) -> AuthProfile:
