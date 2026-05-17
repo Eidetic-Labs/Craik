@@ -68,10 +68,12 @@ from craik.runtime.store import (
     DATABASE_NAME,
     LocalStore,
     LocalStoreCorruptError,
+    LocalStoreMigrationError,
     UnredactedSecretError,
 )
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "contracts" / "v0_1" / "contracts.json"
+V1_STORE_SCHEMA_FIXTURE = Path(__file__).parent / "fixtures" / "local_store" / "v1" / "schema.sql"
 INSERT_RECORD_SQL = """
 INSERT INTO records(kind, id, schema, version, payload_json, created_at, updated_at)
 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -102,6 +104,72 @@ def test_initialize_creates_database_and_migration(tmp_path: Path) -> None:
 
     assert (paths.state / DATABASE_NAME).is_file()
     assert local_store.migration_version() == CURRENT_MIGRATION
+    assert [item["version"] for item in local_store.applied_migrations()] == [1, 2]
+    local_store.close()
+
+
+def test_initialize_records_local_store_metadata(tmp_path: Path) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    local_store = LocalStore.from_paths(paths)
+
+    local_store.initialize()
+
+    with sqlite3.connect(paths.state / DATABASE_NAME) as connection:
+        rows = connection.execute(
+            "SELECT key, value FROM local_store_metadata ORDER BY key"
+        ).fetchall()
+
+    assert ("schema_version", str(CURRENT_MIGRATION)) in rows
+    assert ("contract_registry_count", str(len(CONTRACT_REGISTRY))) in rows
+    local_store.close()
+
+
+def test_v1_fixture_database_migrates_deterministically(tmp_path: Path) -> None:
+    database_path = tmp_path / "fixture-v1.sqlite3"
+    with sqlite3.connect(database_path) as connection:
+        connection.executescript(V1_STORE_SCHEMA_FIXTURE.read_text())
+        connection.execute(
+            INSERT_RECORD_SQL,
+            (
+                "tasks",
+                "task_fixture",
+                "craik.task_request",
+                "0.1.0",
+                json.dumps(
+                    {
+                        "schema": "craik.task_request",
+                        "version": "0.1.0",
+                        "id": "task_fixture",
+                        "project_id": "project_fixture",
+                        "title": "Fixture task",
+                        "objective": "Prove v1 local store migration.",
+                        "requested_by": "user:migration-fixture",
+                        "mode": "implement",
+                        "priority": "normal",
+                        "created_at": "2026-05-16T00:00:00+00:00",
+                    },
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ),
+                "2026-05-16T00:00:00+00:00",
+                "2026-05-16T00:00:00+00:00",
+            ),
+        )
+
+    local_store = LocalStore(database_path)
+    local_store.initialize()
+
+    assert local_store.migration_version() == CURRENT_MIGRATION
+    assert [item["version"] for item in local_store.applied_migrations()] == [1, 2]
+    assert local_store.get_task("task_fixture") is not None
+    with sqlite3.connect(database_path) as connection:
+        indexes = {
+            row[1]
+            for row in connection.execute("PRAGMA index_list(records)").fetchall()
+        }
+        metadata = dict(connection.execute("SELECT key, value FROM local_store_metadata"))
+    assert "idx_records_kind_updated_at" in indexes
+    assert metadata["schema_version"] == str(CURRENT_MIGRATION)
     local_store.close()
 
 
@@ -491,7 +559,7 @@ def test_corrupt_database_raises_clear_error(tmp_path: Path) -> None:
     database_path.write_text("not sqlite")
     local_store = LocalStore(database_path)
 
-    with pytest.raises(LocalStoreCorruptError):
+    with pytest.raises(LocalStoreMigrationError, match="Recovery:"):
         local_store.initialize()
 
     local_store.close()

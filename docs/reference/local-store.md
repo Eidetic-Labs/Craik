@@ -85,7 +85,9 @@ Every stored payload is validated through the Pydantic contract registry before 
 
 ## Migrations
 
-Craik tracks the local store migration through SQLite `PRAGMA user_version`.
+Craik tracks the local store migration through SQLite `PRAGMA user_version` and
+the `migrations` table. Migration `2` adds `local_store_metadata` so diagnostics
+can distinguish the store schema version from the package version.
 
 Rules:
 
@@ -93,6 +95,9 @@ Rules:
 - new stored contract kinds require tests and docs,
 - newer unsupported database versions should fail clearly,
 - and corrupt or unreadable databases should raise a local store error instead of being silently recreated.
+
+See [Local Store Migrations](../guides/local-store-migrations.md) for fixture
+compatibility and recovery guidance.
 
 ## Secrets
 

@@ -64,6 +64,7 @@ const sidebars = {
     'guides/doctor',
     'guides/updating',
     'guides/release-management',
+    'guides/local-store-migrations',
     'guides/agent-onboarding',
     'guides/context-budgeting',
     'guides/learning-loops',
