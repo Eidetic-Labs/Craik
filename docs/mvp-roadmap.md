@@ -169,12 +169,12 @@ Tracking issue: [#307](https://github.com/Eidetic-Labs/Craik/issues/307).
 
 Tracking issue: [#309](https://github.com/Eidetic-Labs/Craik/issues/309).
 
-- [ ] Mark full gateway daemon as post-MVP unless required by the proof workflow.
-- [ ] Mark full TUI/dashboard as post-MVP.
-- [ ] Mark additional live runner adapters as post-MVP.
-- [ ] Mark companion/mobile/visual surfaces as post-MVP.
-- [ ] Mark broad marketplace/community ecosystem as post-MVP.
-- [ ] Keep contract/helper docs honest for deferred surfaces.
+- [x] Mark full gateway daemon as post-MVP unless required by the proof workflow.
+- [x] Mark full TUI/dashboard as post-MVP.
+- [x] Mark additional live runner adapters as post-MVP.
+- [x] Mark companion/mobile/visual surfaces as post-MVP.
+- [x] Mark broad marketplace/community ecosystem as post-MVP.
+- [x] Keep contract/helper docs honest for deferred surfaces.
 
 ## Eighteen Readiness Capabilities
 

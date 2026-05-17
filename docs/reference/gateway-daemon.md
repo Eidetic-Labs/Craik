@@ -1,7 +1,9 @@
 # Gateway Daemon Mode
 
-Gateway daemon mode is the v0.9.0 foundation for running Craik as an always-on
-operator service.
+Gateway daemon mode is post-MVP unless a later proof workflow explicitly pulls
+it forward. The current surface documents contracts and deterministic lifecycle
+helpers, not an operational always-on service. See
+[Post-MVP Scope](post-mvp-scope.md).
 
 The daemon lifecycle is represented by two contracts:
 
@@ -27,9 +29,10 @@ envelope so externally reachable gateway behavior is never implicit.
 ## Boundary
 
 This phase defines lifecycle state, persistence, and inspection boundaries. It
-does not add open inbound messages, webhook handling, channel adapters, or
-scheduled task creation. Those surfaces are separate v0.9.0 work items and must
-attach policy checks and receipts before they can affect runtime state.
+does not add open inbound messages, webhook handling, channel adapters,
+scheduled task creation, or a production dispatch loop. Those surfaces are
+post-MVP work items and must attach policy checks and receipts before they can
+affect runtime state.
 
 Gateway records are safe to inspect from the operator surface and local store.
 Starting a real long-running service remains an explicit supervisor operation;

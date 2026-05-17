@@ -189,3 +189,10 @@ Provider-backed runs must persist:
 OpenAI and Anthropic parity is covered by deterministic tests for
 `provider_openai` and `provider_anthropic`. The MVP runner path does not perform
 live API calls by default.
+
+Additional live runner adapters are post-MVP. Preview adapters may remain useful
+for prompt handoff, local fixtures, and contract validation, but they should not
+be documented as operational live execution paths until they meet the same
+certification, budget, retry, redaction, receipt, and side-effect requirements
+as the MVP OpenAI and Anthropic provider paths. See
+[Post-MVP Scope](post-mvp-scope.md).

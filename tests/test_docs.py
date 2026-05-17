@@ -68,3 +68,30 @@ def test_stigmem_demo_tutorial_matches_quickstart_smoke() -> None:
     assert "python scripts/quickstart_smoke.py" in ci
     assert "provider_openai" in tutorial
     assert "provider_anthropic" in tutorial
+
+
+def test_post_mvp_deferral_docs_keep_scope_honest() -> None:
+    post_mvp = (ROOT / "docs" / "reference" / "post-mvp-scope.md").read_text()
+    limitations = (ROOT / "docs" / "limitations.md").read_text()
+    gateway = (ROOT / "docs" / "reference" / "gateway-daemon.md").read_text()
+    operator = (ROOT / "docs" / "reference" / "operator-surface.md").read_text()
+    runners = (ROOT / "docs" / "reference" / "runner-adapter-contract.md").read_text()
+    skills = (ROOT / "docs" / "guides" / "community-skills.md").read_text()
+    plugins = (ROOT / "docs" / "guides" / "community-plugins.md").read_text()
+
+    for required in [
+        "Gateway Daemon",
+        "Operator UI",
+        "Additional Live Runners",
+        "Companion And Visual Surfaces",
+        "Marketplace And Community Ecosystem",
+    ]:
+        assert required in post_mvp
+
+    assert "Gateway daemon mode is post-MVP" in gateway
+    assert "A complete TUI" in operator
+    assert "dashboard is post-MVP scope" in operator
+    assert "Additional live runner adapters are post-MVP" in runners
+    assert "marketplace workflows are post-MVP scope" in skills
+    assert "marketplace and community ecosystem workflows are post-MVP scope" in plugins
+    assert "Post-MVP Scope](reference/post-mvp-scope.md)" in limitations

@@ -1,13 +1,14 @@
 # Operator Surface
 
-Craik uses a TUI-first operator surface for v0.8.0.
+Craik has read-only operator view contracts and formatter helpers. A complete TUI
+or dashboard is post-MVP scope; see [Post-MVP Scope](post-mvp-scope.md).
 
 ## Decision
 
-The first operator inspection surface is a terminal UI backed by local-store
-queries and contract formatting.
+The first operator inspection work is terminal-friendly formatting backed by
+local-store queries and validated contracts.
 
-A web dashboard remains a later option, but v0.8.0 starts with a TUI because it:
+A full TUI remains a later option because the formatter-first path:
 
 - works in the same terminal where agents and operators already run Craik;
 - can inspect local SQLite state without starting a service;
@@ -23,9 +24,9 @@ the local store, docs, fixtures, and validated contracts. It must not mutate
 memory, approve grants, resolve contradictions, delete records, or execute
 plugins without an explicit future command and policy boundary.
 
-## Initial Navigation
+## Preview Navigation
 
-The TUI should organize views around operator questions:
+Future TUI or dashboard work should organize views around operator questions:
 
 - `Overview`: project, active tasks, recent handoffs, and blocked states;
 - `Work Graph`: graph events, exports, dependencies, and verification links;
@@ -67,6 +68,7 @@ The initial surface should read from existing contracts and store helpers:
 
 ## Follow-On Views
 
-The remaining v0.8.0 work should add these views incrementally behind the same
-read-only TUI boundary. Each view should have focused tests for formatting,
-empty-state behavior, and links to the underlying contracts.
+Post-MVP work can add these views incrementally behind the same read-only
+boundary. Each view should have focused tests for formatting, empty-state
+behavior, and links to the underlying contracts before it is described as
+operational.

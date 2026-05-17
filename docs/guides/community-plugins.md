@@ -4,6 +4,11 @@ Community plugins package executable or callable extensions for Craik. Treat
 them as untrusted until their descriptor, provenance, review state, grants, and
 receipts have been inspected.
 
+Broad plugin marketplace and community ecosystem workflows are post-MVP scope.
+This guide describes safe metadata and review boundaries; it does not imply a
+supported public marketplace or runtime authority. See
+[Post-MVP Scope](../reference/post-mvp-scope.md).
+
 ## Authoring
 
 A community plugin should include:

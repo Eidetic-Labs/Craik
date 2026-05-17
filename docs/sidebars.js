@@ -57,6 +57,7 @@ const sidebars = {
         'reference/public-boundary-provenance',
         'reference/side-effect-wrappers',
         'reference/failure-modes',
+        'reference/post-mvp-scope',
         'reference/memory-backends',
         'reference/local-store',
       ],
