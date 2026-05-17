@@ -18,6 +18,90 @@ Options:
 
 - `--version`: Print the installed Craik version and exit.; default `false`
 
+## `craik auth`
+
+Manage provider credential profiles.
+
+```text
+craik auth COMMAND [ARGS]...
+```
+
+## `craik auth add`
+
+Add or replace an auth profile.
+
+```text
+craik auth add [OPTIONS] PROFILE_ID
+```
+
+Options:
+
+- `--kind`: Credential kind for this profile.
+- `--env-var`: Environment variable containing an API key.
+- `--source`: Optional source hint for future credential kinds.
+- `--credentials-path`: Local CLI credentials file path.
+- `--refresh-endpoint`: OAuth refresh endpoint for local CLI tokens.
+- `--client-id`: OAuth client id for refresh requests.
+
+## `craik auth approve`
+
+Approve first live use of an auth profile for a run.
+
+```text
+craik auth approve [OPTIONS] PROFILE_ID
+```
+
+Options:
+
+- `--run`: Run id requesting first credential use.
+- `--approved-by`: Operator or approver recording approval.; default `operator:local`
+
+## `craik auth grant`
+
+Grant an operator subject or group access to an auth profile.
+
+```text
+craik auth grant [OPTIONS] PROFILE_ID
+```
+
+Options:
+
+- `--to-subject`: Operator subject authorized for this profile.
+- `--to-group`: Operator group authorized for this profile.
+- `--granted-by`: Operator or approver recording the grant.; default `operator:local`
+
+## `craik auth list`
+
+List configured auth profiles.
+
+```text
+craik auth list
+```
+
+## `craik auth remove`
+
+Remove an auth profile.
+
+```text
+craik auth remove [OPTIONS] PROFILE_ID
+```
+
+## `craik auth status`
+
+Show auth profile health and last-use status.
+
+```text
+craik auth status
+```
+
+## `craik auth test`
+
+Check whether an auth profile can resolve credential material.
+
+```text
+craik auth test [OPTIONS] PROFILE_ID
+```
+
 ## `craik case`
 
 Build and inspect Craik case files.
@@ -257,6 +341,34 @@ Show one persisted intent lock by intent lock id or task id.
 ```text
 craik intent show [OPTIONS] INTENT_OR_TASK_ID
 ```
+
+## `craik login`
+
+Authenticate the local operator with OIDC device-code flow.
+
+```text
+craik login [OPTIONS]
+```
+
+Options:
+
+- `--issuer`: OIDC issuer URL. Defaults to CRAIK_OIDC_ISSUER.
+- `--client-id`: OIDC client id. Defaults to CRAIK_OIDC_CLIENT_ID.; default ``
+- `--audience`: Optional OIDC audience value.
+- `--max-wait-seconds`: Maximum device-code polling duration.; default `600`
+
+## `craik logout`
+
+Clear the active operator session.
+
+```text
+craik logout [OPTIONS]
+```
+
+Options:
+
+- `--issuer`: OIDC issuer URL for best-effort revocation.
+- `--client-id`: OIDC client id for best-effort revocation.; default ``
 
 ## `craik memory`
 
@@ -701,4 +813,12 @@ Print the installed Craik version.
 
 ```text
 craik version
+```
+
+## `craik whoami`
+
+Print the active operator identity.
+
+```text
+craik whoami
 ```
