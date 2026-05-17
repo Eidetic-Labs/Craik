@@ -1,5 +1,7 @@
 # Provider Certification
 
+Design rationale: [ADR 0002 Provider Transport And Mode Families](../adr/0002-provider-transport-and-mode-families.md).
+
 Craik's MVP provider surface must support OpenAI and Anthropic through the same
 certification bar. Provider metadata alone is not enough; a provider is MVP-ready
 only when tests and receipts show that the runtime can safely use it in a
@@ -47,7 +49,7 @@ explicitly enabled.
 ## MVP Runtime Certification
 
 The MVP provider runtime certification is implemented as deterministic tests
-against `craik.runtime.provider_runtime`. The tests certify both OpenAI and
+against `craik.runtime.providers.provider_runtime`. The tests certify both OpenAI and
 Anthropic for:
 
 - request payload construction for chat, streaming, tools, and structured

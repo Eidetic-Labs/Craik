@@ -1,5 +1,7 @@
 # Receipt Viewer
 
+Design rationale: [ADR 0005 Receipts And Handoffs As Public Contracts](../adr/0005-receipts-and-handoffs-as-public-contracts.md).
+
 The receipt viewer is a read-only operator view over capability and plugin
 receipt records.
 

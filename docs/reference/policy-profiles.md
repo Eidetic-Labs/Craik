@@ -1,5 +1,7 @@
 # Policy Profiles
 
+Design rationale: [ADR 0004 Policy Envelope Shape](../adr/0004-policy-envelope-shape.md).
+
 Craik ships with conservative v0.1.0 policy profiles.
 
 Every generated policy envelope includes:
