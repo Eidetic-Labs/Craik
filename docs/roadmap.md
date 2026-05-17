@@ -102,7 +102,7 @@ security process, provider certification, public/internal boundaries, provenance
 tracking, memory hygiene, and CI/CD depth.
 
 The checkable MVP plan lives in [Robust MVP Roadmap](mvp-roadmap.md). The
-release gates below describe the contract and feature build-up through v0.13;
+release gates below describe the contract and feature build-up through v0.12;
 the MVP roadmap turns those surfaces into release-quality workflows.
 
 ## Release Gates
@@ -298,7 +298,7 @@ Required capabilities:
 - Instruction distillation CLI: `craik instructions register / list / approve
   / show`.
 
-### v0.6.0 Gate: Quality, Continuity, And Recovery
+### v0.5.0 Gate: Quality, Continuity, and Recovery
 
 Required outcome:
 
@@ -323,7 +323,7 @@ Required capabilities:
 - "what changed since last time" deltas,
 - agent exit discipline.
 
-### v0.7.0 Gate: Skills, Plugins, And Ecosystem Foundations
+### v0.6.0 Gate: Skills, Plugins, and Ecosystem Foundations
 
 Required outcome:
 
@@ -343,7 +343,7 @@ Required capabilities:
 - community skills docs,
 - community plugins docs.
 
-### v0.8.0 Gate: Operator Experience
+### v0.7.0 Gate: Operator Experience
 
 Required outcome:
 
@@ -365,7 +365,7 @@ Required capabilities:
 - known traps view,
 - run delta view.
 
-### v0.9.0 Gate: Operator Integrations And Always-On Gateway
+### v0.8.0 Gate: Operator Integrations and Always-On Gateway
 
 Required outcome:
 
@@ -395,11 +395,12 @@ Explicitly deferred until this phase or later:
 - open inbound DM behavior,
 - and mobile companion surfaces.
 
-### v0.10.0 Gate: Execution Environments, Sandboxes, And Provider Routing
+### v0.9.0 Gate: Execution Environments, Sandboxes, and Provider Routing
 
 Required outcome:
 
-> Craik can choose model/provider/runtime execution paths and enforce environment boundaries explicitly.
+> Craik can choose model/provider/runtime execution paths and enforce
+> environment boundaries explicitly across multiple sandbox backends.
 
 Required capabilities:
 
@@ -409,7 +410,7 @@ Required capabilities:
 - provider budget and quota links,
 - MCP client integration,
 - MCP server/export decision,
-- sandbox backend contract,
+<!-- TBD: remove local-process or docker once v0.2.0 picks -->
 - local process backend,
 - Docker sandbox backend,
 - SSH or remote shell backend,
@@ -418,7 +419,7 @@ Required capabilities:
 - sandbox policy tests,
 - provider routing docs.
 
-### v0.11.0 Gate: Self-Improving Skills And Learning Loops
+### v0.10.0 Gate: Self-Improving Skills and Learning Loops
 
 Required outcome:
 
@@ -441,7 +442,7 @@ Required capabilities:
 
 This phase should build on instruction distillation and the skill/plugin system. Agents may propose changes to skills, but those changes must remain reviewable until policy allows promotion.
 
-### v0.12.0 Gate: Multimodal And Companion Surfaces
+### v0.11.0 Gate: Multimodal and Companion Surfaces
 
 Required outcome:
 
@@ -463,7 +464,7 @@ Required capabilities:
 
 This phase is optional unless Craik deliberately competes with personal-assistant surfaces. It should not block server-side software-delivery workflows.
 
-### v0.13.0 Gate: Migration, Internationalization, And Ecosystem Compatibility
+### v0.12.0 Gate: Migration, Internationalization, and Ecosystem Compatibility
 
 Required outcome:
 
