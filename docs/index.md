@@ -125,6 +125,7 @@ project.
 - [Secret Migration Policy](reference/secret-migration-policy.md)
 - [Adjacent Runtime Bridge](reference/adjacent-runtime-bridge.md)
 - [Multi-Agent Workflow Bridge](reference/multi-agent-workflow-bridge.md)
+- [Locale I18n Framework](reference/locale-i18n-framework.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
