@@ -10,9 +10,7 @@ within the `0.x.0` stability expectations described in
 
 ## Unreleased
 
-### Added
-
-- Next MVP hardening work after the first live provider path.
+_No unreleased changes._
 
 ## 0.1.0 - 2026-05-17
 
