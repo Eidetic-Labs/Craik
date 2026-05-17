@@ -52,12 +52,20 @@ class FixtureTransport:
     response_id: str = "provider_response_fixture"
     phase: str = "fixture"
     status: RunnerResultStatus = "completed"
+    stream_chunks: tuple[str, ...] = ()
 
     def send(self, payload: dict[str, Any], *, stream: bool) -> Iterator[dict[str, Any]]:
         """Yield a deterministic provider-shaped fixture response."""
-        _ = stream
         context = payload.get("_fixture", {})
         context = context if isinstance(context, dict) else {}
+        if stream and self.stream_chunks:
+            yield from _fixture_stream_response(
+                provider_family=self.family,
+                model=self.model,
+                response_id=str(context.get("response_id") or self.response_id),
+                chunks=self.stream_chunks,
+            )
+            return
         yield _fixture_response(
             provider_family=self.family,
             model=self.model,
@@ -135,3 +143,40 @@ def _fixture_response(
         ],
         "usage": {"input_tokens": 22, "output_tokens": 11},
     }
+
+
+def _fixture_stream_response(
+    *,
+    provider_family: ProviderFamily,
+    model: str,
+    response_id: str,
+    chunks: tuple[str, ...],
+) -> Iterator[dict[str, Any]]:
+    if provider_family != "chat_completions":
+        yield _fixture_response(
+            provider_family=provider_family,
+            model=model,
+            response_id=response_id,
+            phase="stream",
+            status="completed",
+        )
+        return
+    for index, chunk in enumerate(chunks):
+        final = index == len(chunks) - 1
+        yield {
+            "id": response_id,
+            "model": model,
+            "choices": [
+                {
+                    "delta": {"content": chunk},
+                    "finish_reason": "stop" if final else None,
+                }
+            ],
+            "usage": {
+                "prompt_tokens": 20,
+                "completion_tokens": len(chunks),
+                "total_tokens": 20 + len(chunks),
+            }
+            if final
+            else {},
+        }

@@ -306,6 +306,32 @@ def test_chat_completions_stream_chunk_normalizes_delta_content_and_tool_calls()
     assert chunk.response_id == "chatcmpl_chunk"
 
 
+def test_chat_completions_stream_execute_emits_callback_chunks() -> None:
+    chunks: list[str] = []
+    adapter = ChatCompletionsProviderAdapter(
+        _chat_completions_adapter().config,
+        transport=FixtureTransport(
+            family="chat_completions",
+            model="gpt-5.2",
+            response_id="chatcmpl_stream_fixture",
+            stream_chunks=("Hel", "lo", "!"),
+        ),
+    )
+
+    result = adapter.execute(
+        ProviderRuntimeRequest(
+            messages=[ProviderMessage(role="user", content="Say hello.")],
+            stream=True,
+        ),
+        stream_callback=chunks.append,
+    )
+
+    assert chunks == ["Hel", "lo", "!"]
+    assert result.text == "Hello!"
+    assert result.response_id == "chatcmpl_stream_fixture"
+    assert result.usage == {"input_tokens": 20, "output_tokens": 3, "total_tokens": 23}
+
+
 def test_live_provider_access_requires_explicit_enablement() -> None:
     with pytest.raises(ProviderLiveAccessNotConfiguredError):
         _openai_adapter().require_live_access()

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
 from craik.contracts.models import (
@@ -42,6 +42,7 @@ class RunOutputCapture:
     output: RunOutput
     proposals: list[MemoryProposal]
     skipped_reasons: list[str]
+    chunks: list[str] = field(default_factory=list)
 
 
 class RunOutputRecorder:
@@ -89,7 +90,12 @@ class RunOutputRecorder:
 
         output = output.model_copy(update={"memory_proposal_ids": [item.id for item in proposals]})
         self.store.put_run_output(output)
-        return RunOutputCapture(output=output, proposals=proposals, skipped_reasons=skipped_reasons)
+        return RunOutputCapture(
+            output=output,
+            proposals=proposals,
+            skipped_reasons=skipped_reasons,
+            chunks=_stream_chunks(step.observed_output),
+        )
 
     def _proposal_from_output(
         self,
@@ -136,3 +142,10 @@ def _redacted_dict(value: dict[str, object]) -> dict[str, object]:
     if isinstance(redacted, dict):
         return redacted
     return {}
+
+
+def _stream_chunks(observed_output: dict[str, object]) -> list[str]:
+    raw_chunks = observed_output.get("stream_chunks", [])
+    if not isinstance(raw_chunks, list):
+        return []
+    return [str(redact(chunk).value) for chunk in raw_chunks]

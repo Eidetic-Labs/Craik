@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any, Literal, Protocol, cast
 
@@ -152,7 +153,12 @@ class ProviderRuntimeAdapter(Protocol):
     config: ProviderRuntimeConfig
     transport: ProviderTransport
 
-    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+    def execute(
+        self,
+        request: ProviderRuntimeRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> ProviderRuntimeResult:
         """Execute one provider request through the configured transport."""
         ...
 
@@ -213,9 +219,14 @@ class OpenAIProviderAdapter:
             payload["max_output_tokens"] = request.max_output_tokens
         return payload
 
-    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+    def execute(
+        self,
+        request: ProviderRuntimeRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> ProviderRuntimeResult:
         """Execute one OpenAI Responses request through the configured transport."""
-        return _execute_provider_request(self, request)
+        return _execute_provider_request(self, request, stream_callback=stream_callback)
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         output = response.get("output", [])
@@ -318,9 +329,14 @@ class AnthropicProviderAdapter:
             }
         return payload
 
-    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+    def execute(
+        self,
+        request: ProviderRuntimeRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> ProviderRuntimeResult:
         """Execute one Anthropic Messages request through the configured transport."""
-        return _execute_provider_request(self, request)
+        return _execute_provider_request(self, request, stream_callback=stream_callback)
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         text_parts: list[str] = []
@@ -421,9 +437,19 @@ class ChatCompletionsProviderAdapter:
             }
         return payload
 
-    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+    def execute(
+        self,
+        request: ProviderRuntimeRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> ProviderRuntimeResult:
         """Execute one Chat Completions request through the configured transport."""
-        return _execute_provider_request(self, request, chunk_normalizer=self.normalize_chunk)
+        return _execute_provider_request(
+            self,
+            request,
+            chunk_normalizer=self.normalize_chunk,
+            stream_callback=stream_callback,
+        )
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         choices = response.get("choices", [])
@@ -532,29 +558,39 @@ def _execute_provider_request(
     request: ProviderRuntimeRequest,
     *,
     chunk_normalizer: Any | None = None,
+    stream_callback: Callable[[str], None] | None = None,
 ) -> ProviderRuntimeResult:
     if adapter.config.live_enabled:
         adapter.require_live_access()
     payload = adapter.build_payload(request)
-    chunks = list(adapter.transport.send(payload, stream=request.stream))
-    if not chunks:
-        raise ProviderRuntimeError("provider transport returned no response chunks")
     if not request.stream:
+        chunks = list(adapter.transport.send(payload, stream=False))
+        if not chunks:
+            raise ProviderRuntimeError("provider transport returned no response chunks")
         return adapter.normalize_response(chunks[-1])
     if chunk_normalizer is None:
+        chunks = list(adapter.transport.send(payload, stream=True))
+        if not chunks:
+            raise ProviderRuntimeError("provider transport returned no response chunks")
         return adapter.normalize_response(chunks[-1])
     text_parts: list[str] = []
     tool_calls: list[dict[str, Any]] = []
     usage: dict[str, int] = {}
     response_id: str | None = None
     model = adapter.config.model
-    for chunk in chunks:
+    received_chunk = False
+    for chunk in adapter.transport.send(payload, stream=True):
+        received_chunk = True
         normalized = chunk_normalizer(chunk)
         text_parts.append(normalized.text_delta)
+        if normalized.text_delta and stream_callback is not None:
+            stream_callback(normalized.text_delta)
         tool_calls.extend(normalized.tool_calls)
         usage.update(normalized.usage)
         response_id = normalized.response_id or response_id
         model = normalized.model or model
+    if not received_chunk:
+        raise ProviderRuntimeError("provider transport returned no response chunks")
     text = "".join(text_parts)
     return ProviderRuntimeResult(
         provider_id=adapter.config.provider_id,
