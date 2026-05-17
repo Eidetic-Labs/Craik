@@ -92,6 +92,19 @@ docs/
 
 Root-level project governance files remain authoritative for contribution, security disclosure, trademarks, and maintainership.
 
+## MVP Release Strategy
+
+Craik's first public release target is a robust `0.x.0` MVP, not `1.0.0`.
+`1.0.0` remains a later stability signal after real-world usage, compatibility
+confidence, and security soak. The MVP still pulls forward readiness work that
+affects trust: migrations, release hygiene, package publication, generated docs,
+security process, provider certification, public/internal boundaries, provenance
+tracking, memory hygiene, and CI/CD depth.
+
+The checkable MVP plan lives in [Robust MVP Roadmap](mvp-roadmap.md). The
+release gates below describe the contract and feature build-up through v0.13;
+the MVP roadmap turns those surfaces into release-quality workflows.
+
 ## Release Gates
 
 Craik should remain on `0.x.0` releases until the maintainers are very confident that the product is stable enough to call `1.0`. The gates below are sequencing targets, not promises that `1.0.0` follows immediately after `0.7.0`. Additional `0.x.0` releases should be added whenever the product needs more soak time, compatibility work, security hardening, or real-user validation.
@@ -431,15 +444,19 @@ Required capabilities:
 - translated docs strategy,
 - ecosystem compatibility tests.
 
-### Future 1.0 Graduation Gate: Professional Agent Runtime
+### Post-MVP Stability Gate: Professional Agent Runtime
 
 Required outcome:
 
 > Craik is stable enough for external teams to use for real multi-agent software delivery workflows.
 
-This is a graduation gate, not a scheduled release. Craik should continue shipping `0.x.0` releases until this bar is clearly met by real usage, documentation maturity, compatibility confidence, and security posture.
+This is a graduation gate, not a scheduled release and not the first release
+target. Craik should ship a robust `0.x.0` MVP first, then continue shipping
+`0.x.0` releases until the bar below is clearly met by real usage,
+documentation maturity, compatibility confidence, and security posture.
 
-Required capabilities:
+Required capabilities. Items marked as MVP readiness are tracked in
+[Robust MVP Roadmap](mvp-roadmap.md) before the first usable `0.x.0`:
 
 - stable core schemas,
 - migration path for persisted state,

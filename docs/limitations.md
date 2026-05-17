@@ -1,24 +1,62 @@
 # Limitations
 
-Craik is pre-0.1.0.
+Craik is preparing for a robust `0.x.0` MVP release. The repository has broad
+contract, helper, CLI, and documentation coverage through the v0.13 roadmap, but
+several surfaces are not yet end-to-end production workflows.
 
-Current limitations:
+## Current End-To-End Surfaces
 
-- The package and CLI scaffold exist, but end-to-end runtime workflows are not implemented yet.
-- The local SQLite store, project registry, task creation, intent locks, local case file assembler, read-only GitHub context, work graph export, handoff writer, local contradiction reports, local memory proposal backend, minimum Stigmem backend compatibility, policy profiles, capability grant checks, central redaction utility, and receipt store exist, but no full policy enforcement engine, runner adapter, or automatic receipt-producing workflow is available yet.
-- Local memory search returns approved local proposals only; direct durable writes remain unavailable without a future memory-write grant path.
-- Stigmem direct writes require explicit `memory.write` grants; proposal review remains the default path.
-- Memory diffs and impact previews currently derive from local proposal state and approved local facts; runner-normalized fact reads, direct Stigmem write receipts, and write-failure ingestion are not wired into full workflows yet.
-- Handoffs currently derive context debt from local case files only; they do not yet include runner result normalization or remote artifact upload.
-- Agent onboarding summarizes local state and configured Stigmem environment presence, but it does not perform live Stigmem backend discovery.
-- Case files currently load local project/task/repo/docs context and read-only GitHub state when configured; Stigmem facts, recent handoffs, and local contradiction report loading are not wired into case assembly yet.
-- The Stigmem documentation demo creates local proposed updates and artifacts; it does not edit documentation files or directly write Stigmem facts by default.
-- Policy tests cover current policy primitives and keep runner grant boundaries visible, but full live runner adapters are not implemented yet.
-- Runner capability matrices, trust profiles, prompt compilation, and Codex/Claude/Gemini fixture/prompt-handoff adapters are available for preview runner workflows.
-- Prompt compilation produces deterministic runner-ready prompts, but it does not invoke live runners or enforce grants at execution time yet.
-- The Codex runner adapter does not invoke an external Codex process or finalize receipts from live side effects in v0.2.0.
-- The Claude runner adapter does not invoke an external Claude process, capture live transcripts, or finalize receipts from live side effects in v0.2.0.
-- The Gemini runner adapter does not invoke an external Gemini process, capture live responses, or finalize receipts from live side effects in v0.2.0.
-- Runner metadata in receipts and handoffs is descriptive and redacted. It does not prove live execution or replace policy receipts for concrete side effects.
-- The CLI does not request tool authority or write runtime state.
-- Stigmem integration is limited to compatibility detection, fact query/get/provenance mapping, and policy-gated direct fact writes.
+- Local home and store initialization.
+- Project registration and task creation.
+- Case-file assembly from local repository state and optional read-only GitHub
+  context.
+- Local receipt, handoff, memory proposal, contradiction, and work graph
+  inspection.
+- Policy profile generation, capability grant checks, and policy regression
+  tests.
+- Stigmem compatibility detection and policy-gated direct fact write helpers.
+- Deterministic fixture loop and runner preview contracts.
+
+## Contract Or Helper Surfaces
+
+- OpenAI and Anthropic provider execution are not yet implemented. The MVP must
+  add provider adapters, certification fixtures, usage metadata, retries,
+  streaming/tool-call boundaries, and receipts.
+- Runner adapters are currently preview and fixture-oriented. They do not yet
+  provide a complete provider-backed MVP workflow.
+- Execution backends evaluate boundaries and policy requirements, but they do
+  not execute shell commands, start containers, open remote shells, or drive
+  browsers.
+- Gateway, webhook, messaging, channel, and scheduled automation surfaces are
+  contracts/helpers. They do not yet run a production daemon or dispatch loop.
+- Operator experience is formatter and view-contract level. A full TUI or
+  dashboard is post-MVP unless explicitly pulled into the proof workflow.
+- Companion, mobile, visual, and multimodal surfaces are posture decisions and
+  adapter contracts, not shipped product applications.
+
+## Known MVP Gaps
+
+- Docusaurus documentation site with Learn / Build / Operate / Secure
+  information architecture.
+- Generated CLI/reference docs.
+- Release, package publication, and security release workflows.
+- Persistent local-store migrations and compatibility fixtures.
+- CI/CD depth comparable to Stigmem: path-filtered jobs, coverage ratchets,
+  docs builds, conformance tests, nightly reliability, and artifact uploads.
+- Public/internal boundary classifier and provenance-aware documentation
+  workflow.
+- Memory hygiene workflow, work product classification, and decision record
+  suggestions.
+- One complete provider-backed workflow using OpenAI and Anthropic.
+
+## Write Authority
+
+Craik does not grant ambient write authority. Direct durable memory writes,
+GitHub writes, shell commands, file writes, and external side effects must be
+policy-gated, redacted, and receipt-backed before they are considered MVP-ready.
+Local memory proposals remain the default unprivileged path.
+
+## Release Posture
+
+The first release target is `0.x.0`. The release must be honest about limits and
+strong enough for a credible MVP, but it is not a `1.0.0` stability guarantee.
