@@ -112,10 +112,23 @@ def provider_runtime_receipt(
             "stream": request.stream,
             "tool_call_count": len(result.tool_calls),
             "usage": _receipt_usage(result.usage),
+            **_receipt_operator_metadata(request),
             "payload": adapter.build_payload(request),
             "secret_ref_name": adapter.config.secret_ref_name,
         },
     )
+
+
+def _receipt_operator_metadata(request: ProviderRuntimeRequest) -> dict[str, Any]:
+    metadata = request.metadata
+    if not metadata.get("operator_subject"):
+        return {}
+    return {
+        "operator_subject": metadata.get("operator_subject"),
+        "operator_issuer": metadata.get("operator_issuer"),
+        "operator_email": metadata.get("operator_email"),
+        "operator_groups": metadata.get("operator_groups", []),
+    }
 
 
 def _openai_message(message: ProviderMessage) -> dict[str, Any]:

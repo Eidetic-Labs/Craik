@@ -1,5 +1,11 @@
 """Operator identity primitives for Craik auth."""
 
+from craik.runtime.auth.operator.context import (
+    OPERATOR_REQUIRED_METADATA_KEY,
+    active_operator_session,
+    bind_operator_metadata,
+    operator_identity_required,
+)
 from craik.runtime.auth.operator.oidc import (
     OIDCAuthenticationError,
     OIDCAuthenticator,
@@ -19,9 +25,13 @@ __all__ = [
     "OIDCAuthenticator",
     "OIDCConfig",
     "OPERATOR_SESSION_SCHEMA_VERSION",
+    "OPERATOR_REQUIRED_METADATA_KEY",
     "OperatorSessionNotFoundError",
     "OperatorSession",
     "OperatorSessionStore",
     "OperatorSessionStoreError",
+    "active_operator_session",
+    "bind_operator_metadata",
+    "operator_identity_required",
     "operator_session_store_owner_only",
 ]

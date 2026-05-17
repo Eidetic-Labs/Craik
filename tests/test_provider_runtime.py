@@ -1,5 +1,7 @@
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -13,6 +15,8 @@ from craik.runtime.auth import (
     CredentialPoolConfig,
     CredentialPoolEntry,
 )
+from craik.runtime.auth.operator import OperatorSession, OperatorSessionStore
+from craik.runtime.paths import ensure_craik_home
 from craik.runtime.providers.model_providers import default_model_provider_registry
 from craik.runtime.providers.provider_runtime import (
     ANTHROPIC_OFFICIAL_DOCS,
@@ -23,6 +27,7 @@ from craik.runtime.providers.provider_runtime import (
     ProviderLiveAccessNotConfiguredError,
     ProviderMessage,
     ProviderRuntimeConfig,
+    ProviderRuntimeError,
     ProviderRuntimeRequest,
     ProviderTool,
     adapter_for_provider,
@@ -630,3 +635,84 @@ def test_provider_runtime_receipt_keeps_safe_metadata_and_drops_payload_and_secr
     assert receipt.result.metadata["tool_call_count"] == 0
     assert "payload" not in receipt.result.metadata
     assert "secret_ref_name" not in receipt.result.metadata
+
+
+def test_provider_request_requires_operator_identity_before_transport(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path / "home"))
+    transport = _CountingTransport()
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        ),
+        transport=transport,
+    )
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={"operator_identity_required": True},
+    )
+
+    with pytest.raises(ProviderRuntimeError, match="run craik login"):
+        adapter.execute(request)
+
+    assert transport.calls == 0
+
+
+def test_provider_request_binds_active_operator_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    OperatorSessionStore(paths.home).put(
+        OperatorSession(
+            subject="operator-123",
+            email="operator@example.test",
+            display_name="Operator",
+            groups=["platform"],
+            issuer="https://issuer.example.test",
+            id_token_jti="token-1",
+            expires_at=datetime(2026, 5, 18, tzinfo=UTC),
+        )
+    )
+    adapter = _openai_adapter()
+    request = ProviderRuntimeRequest(messages=[ProviderMessage(role="user", content="hi")])
+    result = adapter.execute(request)
+
+    receipt = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime",
+        actor="agent:codex",
+    )
+
+    assert request.metadata["operator_subject"] == "operator-123"
+    assert request.metadata["operator_issuer"] == "https://issuer.example.test"
+    assert receipt.result.metadata["operator_subject"] == "operator-123"
+    assert receipt.result.metadata["operator_groups"] == ["platform"]
+
+
+class _CountingTransport:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    @property
+    def family(self) -> ProviderFamily:
+        return "openai"
+
+    def send(self, payload: dict[str, Any], *, stream: bool) -> Iterator[dict[str, Any]]:
+        self.calls += 1
+        yield {
+            "id": "resp_counting",
+            "model": "gpt-5.2",
+            "output_text": "ok",
+        }

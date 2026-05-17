@@ -7,6 +7,11 @@ from collections.abc import Callable
 from typing import Any
 
 from craik.runtime.auth import CredentialPool
+from craik.runtime.auth.operator import (
+    active_operator_session,
+    bind_operator_metadata,
+    operator_identity_required,
+)
 from craik.runtime.auth.pool import PoolOutcome
 from craik.runtime.providers.provider_models import (
     ProviderRuntimeAdapter,
@@ -26,6 +31,7 @@ def execute_provider_request(
     stream_callback: Callable[[str], None] | None = None,
 ) -> ProviderRuntimeResult:
     """Execute one provider request with retry and streaming normalization."""
+    request = _request_with_operator_context(request)
     if adapter.config.live_enabled:
         adapter.require_live_access()
     payload = adapter.build_payload(request)
@@ -125,6 +131,18 @@ def _retryable_transport_error(
         headers=error.headers,
     )
     return bool(error.retryable or decision.retryable)
+
+
+def _request_with_operator_context(
+    request: ProviderRuntimeRequest,
+) -> ProviderRuntimeRequest:
+    session = active_operator_session()
+    if session is None:
+        if operator_identity_required(request.metadata):
+            raise ProviderRuntimeError("operator identity required; run craik login")
+        return request
+    request.metadata = bind_operator_metadata(request.metadata, session)
+    return request
 
 
 def _sleep_before_retry(
