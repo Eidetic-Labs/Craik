@@ -82,6 +82,10 @@ class Handoff(CraikModel):
     receipt_ids: list[str] = Field(default_factory=list)
     memory_proposal_ids: list[str] = Field(default_factory=list)
     runner_metadata: list[dict[str, Any]] = Field(default_factory=list)
+    auth_profile_id: str | None = None
+    auth_identity_hash: str | None = None
+    operator_subject: str | None = None
+    operator_issuer: str | None = None
     created_at: datetime
 
 
@@ -186,3 +190,7 @@ class TaskRun(CraikModel):
     receipt_ids: list[str] = Field(default_factory=list)
     handoff_id: str | None = None
     runner_metadata: list[dict[str, Any]] = Field(default_factory=list)
+    auth_profile_id: str | None = None
+    auth_identity_hash: str | None = None
+    operator_subject: str | None = None
+    operator_issuer: str | None = None

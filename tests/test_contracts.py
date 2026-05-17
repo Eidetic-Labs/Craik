@@ -124,6 +124,50 @@ def test_task_request_auth_context_fields_round_trip(
     assert dumped["expected_duration_minutes"] == 90
 
 
+def test_handoff_identity_fields_round_trip(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.handoff"])
+    payload.update(
+        {
+            "auth_profile_id": "openai:reader",
+            "auth_identity_hash": "a" * 64,
+            "operator_subject": "operator-a",
+            "operator_issuer": "https://issuer.example.test",
+        }
+    )
+
+    parsed = CONTRACT_REGISTRY["craik.handoff"].model_validate(payload)
+    dumped = parsed.model_dump(mode="json", by_alias=True)
+
+    assert dumped["auth_profile_id"] == "openai:reader"
+    assert dumped["auth_identity_hash"] == "a" * 64
+    assert dumped["operator_subject"] == "operator-a"
+    assert dumped["operator_issuer"] == "https://issuer.example.test"
+
+
+def test_task_run_identity_fields_round_trip(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.task_run"])
+    payload.update(
+        {
+            "auth_profile_id": "openai:writer",
+            "auth_identity_hash": "b" * 64,
+            "operator_subject": "operator-b",
+            "operator_issuer": "https://issuer.example.test",
+        }
+    )
+
+    parsed = CONTRACT_REGISTRY["craik.task_run"].model_validate(payload)
+    dumped = parsed.model_dump(mode="json", by_alias=True)
+
+    assert dumped["auth_profile_id"] == "openai:writer"
+    assert dumped["auth_identity_hash"] == "b" * 64
+    assert dumped["operator_subject"] == "operator-b"
+    assert dumped["operator_issuer"] == "https://issuer.example.test"
+
+
 def test_runner_contract_models_keep_legacy_import_surface() -> None:
     from craik.contracts import models
     from craik.contracts.runner_models import RunnerMetadata

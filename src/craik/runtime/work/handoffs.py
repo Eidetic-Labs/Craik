@@ -72,6 +72,10 @@ class HandoffWriter:
         runner_metadata: list[dict[str, Any]] | None = None,
         policy_exceptions: list[str] | None = None,
         self_audit_notes: list[str] | None = None,
+        auth_profile_id: str | None = None,
+        auth_identity_hash: str | None = None,
+        operator_subject: str | None = None,
+        operator_issuer: str | None = None,
     ) -> Handoff:
         """Create, validate, persist, and return a structured handoff."""
         task = self.store.get_task(task_id)
@@ -105,6 +109,13 @@ class HandoffWriter:
             policy_exceptions_disclosed=True,
             notes=self_audit_notes or [],
         )
+        identity = _handoff_identity(
+            receipts,
+            auth_profile_id=auth_profile_id,
+            auth_identity_hash=auth_identity_hash,
+            operator_subject=operator_subject,
+            operator_issuer=operator_issuer,
+        )
         handoff = Handoff(
             id=handoff_id(task_id),
             task_id=task_id,
@@ -130,6 +141,10 @@ class HandoffWriter:
             receipt_ids=[receipt.id for receipt in receipts],
             memory_proposal_ids=proposals,
             runner_metadata=_runner_metadata(receipts, runner_metadata),
+            auth_profile_id=identity["auth_profile_id"],
+            auth_identity_hash=identity["auth_identity_hash"],
+            operator_subject=identity["operator_subject"],
+            operator_issuer=identity["operator_issuer"],
             created_at=datetime.now(UTC),
         )
         self.store.put_handoff(handoff)
@@ -153,6 +168,14 @@ class HandoffWriter:
         diagnostics = _run_diagnostics(outputs)
         output_receipt_ids = [receipt for output in outputs for receipt in output.receipt_ids]
         receipt_ids = _unique([*run.receipt_ids, *output_receipt_ids])
+        run_receipts = _receipts_by_id(self.store, receipt_ids)
+        identity = _handoff_identity(
+            run_receipts,
+            auth_profile_id=run.auth_profile_id,
+            auth_identity_hash=run.auth_identity_hash,
+            operator_subject=run.operator_subject,
+            operator_issuer=run.operator_issuer,
+        )
         proposals = _unique(
             [proposal for output in outputs for proposal in output.memory_proposal_ids]
         )
@@ -176,8 +199,22 @@ class HandoffWriter:
             risks=_run_risks(run, diagnostics),
             next_steps=_run_next_steps(run),
             self_audit_notes=diagnostics,
+            auth_profile_id=identity["auth_profile_id"],
+            auth_identity_hash=identity["auth_identity_hash"],
+            operator_subject=identity["operator_subject"],
+            operator_issuer=identity["operator_issuer"],
         )
-        self.store.put_task_run(run.model_copy(update={"handoff_id": handoff.id}))
+        self.store.put_task_run(
+            run.model_copy(
+                update={
+                    "handoff_id": handoff.id,
+                    "auth_profile_id": handoff.auth_profile_id,
+                    "auth_identity_hash": handoff.auth_identity_hash,
+                    "operator_subject": handoff.operator_subject,
+                    "operator_issuer": handoff.operator_issuer,
+                }
+            )
+        )
         for receipt_id in receipt_ids:
             if receipt_id not in handoff.receipt_ids:
                 handoff = handoff.model_copy(
@@ -210,6 +247,8 @@ def render_markdown(handoff: Handoff) -> str:
         f"- Agent: {handoff.agent}",
         f"- Project: {handoff.project_id}",
         f"- Intent lock: {handoff.intent_lock_id or 'none'}",
+        f"- Auth profile: {handoff.auth_profile_id or 'none'}",
+        f"- Operator: {_operator_label(handoff)}",
         "",
         "## Summary",
         "",
@@ -262,6 +301,58 @@ def render_markdown(handoff: Handoff) -> str:
 def handoff_id(task_id: str) -> str:
     """Return the stable handoff id for a task id."""
     return f"handoff_{task_id.removeprefix('task_')}"
+
+
+def _handoff_identity(
+    receipts: list[CapabilityReceipt],
+    *,
+    auth_profile_id: str | None,
+    auth_identity_hash: str | None,
+    operator_subject: str | None,
+    operator_issuer: str | None,
+) -> dict[str, str | None]:
+    return {
+        "auth_profile_id": auth_profile_id or _single_receipt_value(
+            receipts,
+            "auth_profile_id",
+        ),
+        "auth_identity_hash": auth_identity_hash or _single_receipt_value(
+            receipts,
+            "auth_identity_hash",
+        ),
+        "operator_subject": operator_subject or _single_receipt_value(
+            receipts,
+            "operator_subject",
+        ),
+        "operator_issuer": operator_issuer or _single_receipt_value(
+            receipts,
+            "operator_issuer",
+        ),
+    }
+
+
+def _single_receipt_value(receipts: list[CapabilityReceipt], field: str) -> str | None:
+    values = {
+        value
+        for receipt in receipts
+        if isinstance(value := getattr(receipt, field), str) and value
+    }
+    if len(values) == 1:
+        return next(iter(values))
+    return None
+
+
+def _receipts_by_id(store: LocalStore, receipt_ids: list[str]) -> list[CapabilityReceipt]:
+    wanted = set(receipt_ids)
+    return [receipt for receipt in store.list_receipts() if receipt.id in wanted]
+
+
+def _operator_label(handoff: Handoff) -> str:
+    if handoff.operator_subject is None:
+        return "none"
+    if handoff.operator_issuer:
+        return f"{handoff.operator_issuer}#{handoff.operator_subject}"
+    return handoff.operator_subject
 
 
 def _handoff_status(status: TaskRunStatus) -> RunStatus:

@@ -183,6 +183,82 @@ def test_handoff_writer_creates_run_outcome_handoffs(
     assert "## Runner Metadata" in render_markdown(handoff)
 
 
+def test_handoff_records_run_credential_and_operator_identity(
+    store: LocalStore,
+    tmp_path: Path,
+) -> None:
+    task_id = _seed_case(store, tmp_path)
+    run = _task_run(task_id, status="completed")
+    receipt = _receipt(
+        task_id,
+        receipt_id="receipt_reader",
+        auth_profile_id="openai:reader",
+        auth_identity_hash="reader-hash",
+        operator_subject="operator-a",
+        operator_issuer="https://issuer.example.test",
+    )
+    store.put_task_run(run)
+    ReceiptStore(store).record_receipt(receipt)
+
+    handoff = HandoffWriter(store).create_from_run(run.id, tests_run=["pytest"])
+    updated_run = store.get_task_run(run.id)
+    markdown = render_markdown(handoff)
+
+    assert handoff.auth_profile_id == "openai:reader"
+    assert handoff.auth_identity_hash == "reader-hash"
+    assert handoff.operator_subject == "operator-a"
+    assert handoff.operator_issuer == "https://issuer.example.test"
+    assert updated_run is not None
+    assert updated_run.auth_profile_id == "openai:reader"
+    assert updated_run.operator_subject == "operator-a"
+    assert "- Auth profile: openai:reader" in markdown
+    assert "- Operator: https://issuer.example.test#operator-a" in markdown
+
+
+def test_follow_up_handoff_keeps_distinct_credential_and_operator_identity(
+    store: LocalStore,
+    tmp_path: Path,
+) -> None:
+    first_task_id = _seed_case(store, tmp_path, title="Read docs")
+    first_run = _task_run(first_task_id, status="completed")
+    ReceiptStore(store).record_receipt(
+        _receipt(
+            first_task_id,
+            receipt_id="receipt_reader",
+            auth_profile_id="openai:reader",
+            auth_identity_hash="reader-hash",
+            operator_subject="operator-a",
+            operator_issuer="https://issuer.example.test",
+        )
+    )
+    store.put_task_run(first_run)
+    first_handoff = HandoffWriter(store).create_from_run(first_run.id, tests_run=["pytest"])
+
+    second_task_id = _seed_case(store, tmp_path, title="Write docs")
+    second_run = _task_run(second_task_id, status="completed")
+    ReceiptStore(store).record_receipt(
+        _receipt(
+            second_task_id,
+            receipt_id="receipt_writer",
+            auth_profile_id="openai:writer",
+            auth_identity_hash="writer-hash",
+            operator_subject="operator-b",
+            operator_issuer="https://issuer.example.test",
+        )
+    )
+    store.put_task_run(second_run)
+    second_handoff = HandoffWriter(store).create_from_run(second_run.id, tests_run=["pytest"])
+    stored_first = store.get_handoff(first_handoff.id)
+
+    assert stored_first is not None
+    assert stored_first.auth_profile_id == "openai:reader"
+    assert stored_first.auth_identity_hash == "reader-hash"
+    assert stored_first.operator_subject == "operator-a"
+    assert second_handoff.auth_profile_id == "openai:writer"
+    assert second_handoff.auth_identity_hash == "writer-hash"
+    assert second_handoff.operator_subject == "operator-b"
+
+
 def test_handoff_requires_existing_task(store: LocalStore) -> None:
     with pytest.raises(HandoffContextError, match="unknown task"):
         HandoffWriter(store).create(
@@ -197,8 +273,8 @@ def test_handoff_from_run_requires_existing_run(store: LocalStore) -> None:
         HandoffWriter(store).create_from_run("run_missing")
 
 
-def _seed_case(store: LocalStore, tmp_path: Path) -> str:
-    repo = tmp_path / "repo"
+def _seed_case(store: LocalStore, tmp_path: Path, *, title: str = "Review docs") -> str:
+    repo = tmp_path / title.lower().replace(" ", "_")
     repo.mkdir()
     (repo / "README.md").write_text("# Repo\n")
     _run_git(repo, "init", "-b", "main")
@@ -207,7 +283,7 @@ def _seed_case(store: LocalStore, tmp_path: Path) -> str:
     project = ProjectRegistry(store).add_project(repo, name="Example")
     task = create_task(
         store,
-        title="Review docs",
+        title=title,
         objective="Review docs against implementation.",
         project_id=project.id,
         mode="review",
@@ -256,9 +332,18 @@ def _run_output(task_id: str, run_id: str, diagnostics: list[str]) -> RunOutput:
     )
 
 
-def _receipt(task_id: str, metadata: dict[str, object] | None = None) -> CapabilityReceipt:
+def _receipt(
+    task_id: str,
+    metadata: dict[str, object] | None = None,
+    *,
+    receipt_id: str = "receipt_pytest",
+    auth_profile_id: str | None = None,
+    auth_identity_hash: str | None = None,
+    operator_subject: str | None = None,
+    operator_issuer: str | None = None,
+) -> CapabilityReceipt:
     return CapabilityReceipt(
-        id="receipt_pytest",
+        id=receipt_id,
         task_id=task_id,
         actor="agent:codex",
         capability="shell.test",
@@ -268,6 +353,10 @@ def _receipt(task_id: str, metadata: dict[str, object] | None = None) -> Capabil
         reason="Validate handoff.",
         result=ReceiptResult(status="passed", summary="Tests passed.", metadata=metadata or {}),
         redacted=True,
+        auth_profile_id=auth_profile_id,
+        auth_identity_hash=auth_identity_hash,
+        operator_subject=operator_subject,
+        operator_issuer=operator_issuer,
         created_at=datetime(2026, 5, 15, 12, 0, tzinfo=UTC),
     )
 
