@@ -134,6 +134,10 @@ class PolicyEnvelope(CraikModel):
     handoff_required: bool = True
     receipt_required: bool = True
     redaction_required: bool = True
+    required_operator: bool = False
+    allowed_operator_groups: list[str] | None = None
+    allowed_operator_subjects: list[str] | None = None
+    required_operator_issuer: str | None = None
 
 
 class CapabilityTarget(CraikModel):

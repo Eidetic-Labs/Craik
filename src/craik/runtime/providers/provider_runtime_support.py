@@ -215,6 +215,7 @@ def _receipt_operator_metadata(request: ProviderRuntimeRequest) -> dict[str, Any
         "operator_issuer": metadata.get("operator_issuer"),
         "operator_email": metadata.get("operator_email"),
         "operator_groups": metadata.get("operator_groups", []),
+        "operator_policy_matched_group": metadata.get("operator_policy_matched_group"),
     }
 
 

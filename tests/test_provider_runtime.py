@@ -770,6 +770,99 @@ def test_provider_request_binds_active_operator_identity(
     assert receipt.result.metadata["operator_groups"] == ["platform"]
 
 
+def test_provider_request_enforces_operator_policy_before_transport(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    OperatorSessionStore(paths.home).put(
+        OperatorSession(
+            subject="operator-123",
+            email="operator@example.test",
+            display_name="Operator",
+            groups=["platform"],
+            issuer="https://issuer.example.test",
+            id_token_jti="token-1",
+            expires_at=datetime(2026, 5, 18, tzinfo=UTC),
+        )
+    )
+    transport = _CountingTransport()
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        ),
+        transport=transport,
+    )
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={
+            "operator_policy": {
+                "policy_id": "policy_provider_runtime",
+                "required_operator": True,
+                "allowed_operator_groups": ["prod-deploy"],
+                "allowed_operator_subjects": [],
+                "required_operator_issuer": None,
+            }
+        },
+    )
+
+    with pytest.raises(ProviderRuntimeError, match="operator groups denied by policy"):
+        adapter.execute(request)
+
+    assert transport.calls == 0
+
+
+def test_provider_receipt_names_matched_operator_policy_group(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    OperatorSessionStore(paths.home).put(
+        OperatorSession(
+            subject="operator-123",
+            email="operator@example.test",
+            display_name="Operator",
+            groups=["platform", "prod-deploy"],
+            issuer="https://issuer.example.test",
+            id_token_jti="token-1",
+            expires_at=datetime(2026, 5, 18, tzinfo=UTC),
+        )
+    )
+    adapter = _openai_adapter()
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={
+            "operator_policy": {
+                "policy_id": "policy_provider_runtime",
+                "required_operator": True,
+                "allowed_operator_groups": ["prod-deploy"],
+                "allowed_operator_subjects": [],
+                "required_operator_issuer": "https://issuer.example.test",
+            }
+        },
+    )
+    result = adapter.execute(request)
+    receipt = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime",
+        actor="agent:codex",
+    )
+
+    assert request.metadata["operator_policy_matched_group"] == "prod-deploy"
+    assert receipt.result.metadata["operator_policy_matched_group"] == "prod-deploy"
+    assert receipt.operator_groups == ["platform", "prod-deploy"]
+
+
 def test_live_provider_requires_first_use_credential_approval(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

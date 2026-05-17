@@ -1,6 +1,7 @@
 import pytest
 
 from craik.contracts.models import CapabilityGrant, CapabilityTarget, DocsProfile
+from craik.runtime.policy.operator_policy import check_operator_policy
 from craik.runtime.policy.policy import (
     FailOpenNotAllowedError,
     check_file_write_grant,
@@ -210,6 +211,46 @@ def test_shell_github_and_memory_hooks_require_matching_grants() -> None:
         operation="write",
         target="scope:team",
     ).allowed is True
+
+
+def test_operator_policy_requires_matching_group() -> None:
+    envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
+    envelope = envelope.model_copy(
+        update={"required_operator": True, "allowed_operator_groups": ["prod-deploy"]}
+    )
+
+    denied = check_operator_policy(
+        policy=envelope,
+        operator_subject="operator-123",
+        operator_issuer="https://issuer.example.test",
+        operator_groups=["platform"],
+    )
+    allowed = check_operator_policy(
+        policy=envelope,
+        operator_subject="operator-123",
+        operator_issuer="https://issuer.example.test",
+        operator_groups=["platform", "prod-deploy"],
+    )
+
+    assert denied.allowed is False
+    assert denied.reason == "operator groups denied by policy"
+    assert allowed.allowed is True
+    assert allowed.receipt_metadata["matched_operator_group"] == "prod-deploy"
+
+
+def test_operator_policy_requires_identity_when_configured() -> None:
+    envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
+    envelope = envelope.model_copy(update={"required_operator": True})
+
+    decision = check_operator_policy(
+        policy=envelope,
+        operator_subject=None,
+        operator_issuer=None,
+        operator_groups=[],
+    )
+
+    assert decision.allowed is False
+    assert "run craik login" in decision.reason
 
 
 def test_denied_decision_can_create_receipt() -> None:
