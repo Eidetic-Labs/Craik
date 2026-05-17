@@ -30,7 +30,7 @@ def test_policy_test_harness_passes_core_regressions(store: LocalStore) -> None:
         "memory_writes_become_proposals",
         "trusted_local_fail_open_receipts",
         "automation_fails_closed",
-        "runner_grant_boundary_placeholder",
+        "provider_runner_enforces_shell_grants",
         "redaction_receipts_logs_handoffs_case_files",
     }
 

@@ -33,7 +33,7 @@ Each result includes:
 | `memory_writes_become_proposals` | Confirms memory updates follow the proposal path and direct local writes are denied. |
 | `trusted_local_fail_open_receipts` | Confirms trusted-local fail-open is explicit and receipt-backed. |
 | `automation_fails_closed` | Confirms automation does not widen authority or prompt for approvals. |
-| `runner_grant_boundary_placeholder` | Keeps runner-side grant enforcement visible until runner adapters exist. |
+| `provider_runner_enforces_shell_grants` | Confirms the provider-backed runner blocks fixture side effects without a shell grant and completes with the scoped grant. |
 | `redaction_receipts_logs_handoffs_case_files` | Confirms policy-relevant payload shapes redact secret-like material. |
 
 ## Failure Behavior

@@ -13,6 +13,8 @@ from pydantic import ValidationError
 
 from craik import __version__
 from craik.contracts.models import (
+    CapabilityGrant,
+    CapabilityTarget,
     ContradictionStatus,
     MemoryScope,
     PolicyProfile,
@@ -74,6 +76,7 @@ from craik.runtime.prompts import (
     PromptCompiler,
     PromptTaskNotFoundError,
 )
+from craik.runtime.provider_runner import ProviderBackedRunExecutor, ProviderBackedRunResult
 from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.runners import default_runner_capability_matrices, get_runner_capability_matrix
 from craik.runtime.store import LocalStore
@@ -115,7 +118,7 @@ policy_app = typer.Typer(help="Inspect Craik policy profiles.")
 app.add_typer(policy_app, name="policy")
 receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
 app.add_typer(receipts_app, name="receipts")
-run_app = typer.Typer(help="Inspect and recover single-agent task runs.")
+run_app = typer.Typer(help="Execute, inspect, and recover single-agent task runs.")
 app.add_typer(run_app, name="run")
 runners_app = typer.Typer(help="Inspect runner capabilities and trust profiles.")
 app.add_typer(runners_app, name="runners")
@@ -372,6 +375,55 @@ def prompt_compile(
     )
 
 
+@run_app.command("execute")
+def run_execute(
+    task_id: Annotated[str, typer.Argument(help="Task id to execute.")],
+    provider_id: Annotated[
+        str,
+        typer.Option(
+            "--provider-id",
+            help="Configured provider runner id. Use provider list to inspect options.",
+        ),
+    ] = "provider_openai",
+    allow_fixture_action: Annotated[
+        bool,
+        typer.Option(
+            "--allow-fixture-action/--no-allow-fixture-action",
+            help=(
+                "Grant the deterministic fixture shell action required by the MVP loop. "
+                "This records a governed receipt; it does not execute arbitrary shell."
+            ),
+        ),
+    ] = True,
+    max_iterations: Annotated[
+        int,
+        typer.Option("--max-iterations", help="Maximum single-agent loop iterations."),
+    ] = 5,
+) -> None:
+    """Execute a deterministic provider-backed MVP runner path for a task."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        grants = [_fixture_shell_grant(task_id)] if allow_fixture_action else []
+        result = ProviderBackedRunExecutor(store).execute(
+            task_id=task_id,
+            provider_id=provider_id,
+            grants=grants,
+            max_iterations=max_iterations,
+        )
+        payload = _provider_run_payload(result)
+    except (
+        ModelProviderNotFoundError,
+        ProjectNotFoundError,
+        TaskNotFoundError,
+        ValueError,
+    ) as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
 @run_app.command("list")
 def run_list(
     task_id: Annotated[
@@ -473,6 +525,55 @@ def _paths_payload(paths: CraikPaths) -> dict[str, str]:
         "receipts": str(paths.receipts),
         "secrets": str(paths.secrets),
         "state": str(paths.state),
+    }
+
+
+def _fixture_shell_grant(task_id: str) -> CapabilityGrant:
+    return CapabilityGrant(
+        id=f"grant_{task_id.removeprefix('task_')}_fixture_shell",
+        task_id=task_id,
+        capability="shell.execute",
+        target=CapabilityTarget(paths=["fixture-action"]),
+        operations=["execute"],
+        reason="Allow the deterministic MVP fixture action.",
+        approved_by="user:local-operator",
+    )
+
+
+def _provider_run_payload(result: ProviderBackedRunResult) -> dict[str, Any]:
+    provider_results = [
+        provider_result.model_dump(mode="json", by_alias=True)
+        for provider_result in result.provider_results
+    ]
+    receipt_ids = sorted(
+        {
+            receipt_id
+            for output in (result.loop.output_captures if result.loop else [])
+            for receipt_id in output.output.receipt_ids
+        }
+        | set(result.run.receipt_ids)
+    )
+    return {
+        "schema": "craik.provider_backed_run_execution",
+        "version": "0.1.0",
+        "status": result.run.status,
+        "run": result.run.model_dump(mode="json", by_alias=True),
+        "handoff": result.handoff.model_dump(mode="json", by_alias=True),
+        "compiled_prompt": result.compiled_prompt.model_dump(mode="json", by_alias=True),
+        "provider_results": provider_results,
+        "provider_ids": sorted(
+            {provider_result["provider_id"] for provider_result in provider_results}
+        ),
+        "provider_families": sorted(
+            {provider_result["provider_family"] for provider_result in provider_results}
+        ),
+        "receipt_ids": receipt_ids,
+        "interrupted_error": result.interrupted_error,
+        "next_commands": [
+            f"craik run inspect {result.run.id} --include-outputs",
+            f"craik handoff show {result.handoff.id}",
+            f"craik receipts list --task-id {result.run.task_id}",
+        ],
     }
 
 

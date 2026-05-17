@@ -536,11 +536,25 @@ craik receipts show [OPTIONS] RECEIPT_ID
 
 ## `craik run`
 
-Inspect and recover single-agent task runs.
+Execute, inspect, and recover single-agent task runs.
 
 ```text
 craik run COMMAND [ARGS]...
 ```
+
+## `craik run execute`
+
+Execute a deterministic provider-backed MVP runner path for a task.
+
+```text
+craik run execute [OPTIONS] TASK_ID
+```
+
+Options:
+
+- `--provider-id`: Configured provider runner id. Use provider list to inspect options.; default `provider_openai`
+- `--allow-fixture-action, --no-allow-fixture-action`: Grant the deterministic fixture shell action required by the MVP loop. This records a governed receipt; it does not execute arbitrary shell.; default `true`
+- `--max-iterations`: Maximum single-agent loop iterations.; default `5`
 
 ## `craik run inspect`
 
