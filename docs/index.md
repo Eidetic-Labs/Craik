@@ -42,6 +42,7 @@ project.
 - [Runner Preview Workflows](guides/runner-preview-workflows.md)
 - [Single-Agent Fixture Loop](guides/single-agent-fixture-loop.md)
 - [Learning Loops](guides/learning-loops.md)
+- [Companion App Security](guides/companion-app-security.md)
 - [Community Skills](guides/community-skills.md)
 - [Community Plugins](guides/community-plugins.md)
 - [Development Checks](guides/development.md)
