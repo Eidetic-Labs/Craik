@@ -14,7 +14,10 @@ The workflow:
 - records a receipt,
 - creates a handoff,
 - creates a local memory proposal,
+- records the memory write path as a reviewable proposal instead of a direct
+  write,
 - opens a local contradiction report,
+- executes deterministic OpenAI and Anthropic provider-backed runner paths,
 - and exports a task-scoped work graph.
 
 ## Run It
@@ -35,6 +38,14 @@ For an offline local run without GitHub or live Stigmem:
 uv run --python 3.12 --extra dev craik demo stigmem-docs --repo-path . --no-github
 ```
 
+That offline command is the quickstart smoke path used by CI.
+
+To limit deterministic provider execution to one provider while debugging:
+
+```sh
+uv run --python 3.12 --extra dev craik demo stigmem-docs --repo-path . --no-github --provider-id provider_openai
+```
+
 The command prints a `craik.demo.stigmem_docs_reconciliation` JSON payload.
 
 ## Expected Artifacts
@@ -49,6 +60,8 @@ The demo creates deterministic local records:
 - graph: `graph_task_stigmem_documentation_reconciliation`,
 - one local memory proposal,
 - and one local contradiction report.
+- provider-backed OpenAI and Anthropic run summaries under
+  `provider_executions`.
 
 Inspect follow-up artifacts:
 
@@ -73,7 +86,16 @@ internal-only labels, private planning names, local filesystem paths, or secrets
 
 The demo creates a local memory proposal. It does not write directly to Stigmem
 because direct durable memory writes require explicit policy grants. This keeps
-the workflow safe for first runs and CI.
+the workflow safe for first runs and CI. The JSON payload includes
+`memory_write.status = "proposal_created"` so release acceptance can verify that
+the memory write path remained explicit.
+
+## Provider Behavior
+
+The demo exercises `provider_openai` and `provider_anthropic` through the
+deterministic provider-backed runner. These runs normalize provider payloads,
+record provider receipts, create run-scoped handoffs, and do not require live
+OpenAI or Anthropic credentials.
 
 ## Expected Output Shape
 
@@ -85,7 +107,12 @@ the workflow safe for first runs and CI.
   "receipt_ids": ["receipt_demo_stigmem_documentation_reconciliation"],
   "handoff_id": "handoff_stigmem_documentation_reconciliation",
   "memory_proposal_ids": ["memprop_..."],
+  "memory_write": {"status": "proposal_created"},
   "contradiction_ids": ["contradiction_..."],
+  "provider_executions": [
+    {"provider_id": "provider_openai", "run_status": "completed"},
+    {"provider_id": "provider_anthropic", "run_status": "completed"}
+  ],
   "work_graph_id": "graph_task_stigmem_documentation_reconciliation"
 }
 ```

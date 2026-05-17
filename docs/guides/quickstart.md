@@ -87,5 +87,7 @@ craik demo stigmem-docs --repo-path . --no-github
 ```
 
 The demo creates local project, task, case-file, contradiction, memory proposal,
-receipt, handoff, and work-graph artifacts without editing files or directly
-writing Stigmem facts.
+receipt, handoff, provider execution, and work-graph artifacts without editing
+files or directly writing Stigmem facts. It also runs deterministic OpenAI and
+Anthropic provider-backed paths, so the same command is used by quickstart smoke
+CI without live model credentials.

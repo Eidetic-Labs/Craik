@@ -54,3 +54,17 @@ def test_v0_docs_tree_covers_required_areas() -> None:
     ]
 
     assert [path for path in required if not (ROOT / path).exists()] == []
+
+
+def test_stigmem_demo_tutorial_matches_quickstart_smoke() -> None:
+    tutorial = (ROOT / "docs" / "guides" / "stigmem-docs-demo.md").read_text()
+    quickstart = (ROOT / "docs" / "guides" / "quickstart.md").read_text()
+    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+
+    smoke_command = "craik demo stigmem-docs --repo-path . --no-github"
+
+    assert smoke_command in tutorial
+    assert smoke_command in quickstart
+    assert "python scripts/quickstart_smoke.py" in ci
+    assert "provider_openai" in tutorial
+    assert "provider_anthropic" in tutorial

@@ -950,6 +950,16 @@ def demo_stigmem_docs(
         bool,
         typer.Option("--github/--no-github", help="Load read-only GitHub context."),
     ] = True,
+    provider_id: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--provider-id",
+            help=(
+                "Provider id to exercise through the deterministic demo runner. "
+                "Repeat to override the default OpenAI and Anthropic run."
+            ),
+        ),
+    ] = None,
     max_tokens: Annotated[
         int,
         typer.Option("--max-tokens", min=1, help="Approximate case-file context budget."),
@@ -968,6 +978,7 @@ def demo_stigmem_docs(
             stigmem_url=stigmem_url,
             stigmem_api_key=stigmem_api_key,
             github=github,
+            provider_ids=tuple(provider_id) if provider_id else None,
             max_tokens=max_tokens,
         )
     except (

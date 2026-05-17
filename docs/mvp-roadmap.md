@@ -147,12 +147,12 @@ Tracking issue: [#306](https://github.com/Eidetic-Labs/Craik/issues/306).
 
 Tracking issue: [#308](https://github.com/Eidetic-Labs/Craik/issues/308).
 
-- [ ] Build the Stigmem docs reconciliation demo as the release acceptance path.
-- [ ] Support OpenAI and Anthropic provider execution for the demo.
-- [ ] Produce case file, receipts, handoff, memory proposal/write, and graph
+- [x] Build the Stigmem docs reconciliation demo as the release acceptance path.
+- [x] Support OpenAI and Anthropic provider execution for the demo.
+- [x] Produce case file, receipts, handoff, memory proposal/write, and graph
   export.
-- [ ] Add quickstart smoke CI.
-- [ ] Add Docusaurus tutorial that mirrors the executable demo exactly.
+- [x] Add quickstart smoke CI.
+- [x] Add Docusaurus tutorial that mirrors the executable demo exactly.
 
 ### 11. Hardening And Failure Modes
 
