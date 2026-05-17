@@ -687,6 +687,14 @@ def test_run_commands_inspect_persisted_run_state(tmp_path: Path) -> None:
     assert payload["receipts"][0]["id"] == "receipt_docs"
 
 
+def test_run_command_group_stays_mounted_after_module_extraction() -> None:
+    result = runner.invoke(app, ["run", "--help"])
+
+    assert result.exit_code == 0
+    assert "execute" in result.stdout
+    assert "recover" in result.stdout
+
+
 def test_run_execute_runs_provider_backed_mvp_path(tmp_path: Path) -> None:
     home = tmp_path / "home"
     task_id = _seed_provider_task(home, tmp_path)
