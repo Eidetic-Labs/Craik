@@ -7,7 +7,7 @@ from typing import Any, Literal
 
 from pydantic import Field
 
-from craik.contracts.models import (
+from craik.contracts.models.base import (
     CraikModel,
     RunnerCapabilitySupport,
     RunnerGrantPosture,

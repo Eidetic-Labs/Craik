@@ -1,0 +1,317 @@
+"""Adapter, skill, plugin, instruction, and critic store methods."""
+
+# ruff: noqa: F403,F405,I001
+
+from __future__ import annotations
+
+from .base import *
+
+
+class ExtensionStoreMixin(LocalStoreCore):
+    def put_adapter_package(self, package: AdapterPackage) -> None:
+        self.put_contract(package)
+
+    def get_adapter_package(self, package_id: str) -> AdapterPackage | None:
+        contract = self.get_contract("craik.adapter_package", package_id)
+        return _cast_optional(AdapterPackage, contract)
+
+    def list_adapter_packages(self) -> list[AdapterPackage]:
+        return _cast_list(AdapterPackage, self.list_contracts("craik.adapter_package"))
+
+    def put_human_delegation(self, delegation: HumanDelegationPoint) -> None:
+        self.put_contract(delegation)
+
+    def get_human_delegation(self, delegation_id: str) -> HumanDelegationPoint | None:
+        contract = self.get_contract("craik.human_delegation_point", delegation_id)
+        return _cast_optional(HumanDelegationPoint, contract)
+
+    def list_human_delegations(self) -> list[HumanDelegationPoint]:
+        return _cast_list(
+            HumanDelegationPoint,
+            self.list_contracts("craik.human_delegation_point"),
+        )
+
+    def put_scope_change_request(self, request: ScopeChangeRequest) -> None:
+        self.put_contract(request)
+
+    def get_scope_change_request(self, request_id: str) -> ScopeChangeRequest | None:
+        contract = self.get_contract("craik.scope_change_request", request_id)
+        return _cast_optional(ScopeChangeRequest, contract)
+
+    def list_scope_change_requests(self) -> list[ScopeChangeRequest]:
+        return _cast_list(
+            ScopeChangeRequest,
+            self.list_contracts("craik.scope_change_request"),
+        )
+
+    def put_scope_change_result(self, result: ScopeChangeResult) -> None:
+        self.put_contract(result)
+
+    def get_scope_change_result(self, result_id: str) -> ScopeChangeResult | None:
+        contract = self.get_contract("craik.scope_change_result", result_id)
+        return _cast_optional(ScopeChangeResult, contract)
+
+    def list_scope_change_results(self) -> list[ScopeChangeResult]:
+        return _cast_list(
+            ScopeChangeResult,
+            self.list_contracts("craik.scope_change_result"),
+        )
+
+    def put_skill_package(self, package: SkillPackage) -> None:
+        self.put_contract(package)
+
+    def get_skill_package(self, package_id: str) -> SkillPackage | None:
+        contract = self.get_contract("craik.skill_package", package_id)
+        return _cast_optional(SkillPackage, contract)
+
+    def list_skill_packages(self) -> list[SkillPackage]:
+        return _cast_list(SkillPackage, self.list_contracts("craik.skill_package"))
+
+    def put_skill_registry(self, registry: SkillRegistry) -> None:
+        self.put_contract(registry)
+
+    def get_skill_registry(self, registry_id: str) -> SkillRegistry | None:
+        contract = self.get_contract("craik.skill_registry", registry_id)
+        return _cast_optional(SkillRegistry, contract)
+
+    def list_skill_registries(self) -> list[SkillRegistry]:
+        return _cast_list(SkillRegistry, self.list_contracts("craik.skill_registry"))
+
+    def put_skill_invocation_context(self, context: SkillInvocationContext) -> None:
+        self.put_contract(context)
+
+    def get_skill_invocation_context(
+        self,
+        context_id: str,
+    ) -> SkillInvocationContext | None:
+        contract = self.get_contract("craik.skill_invocation_context", context_id)
+        return _cast_optional(SkillInvocationContext, contract)
+
+    def list_skill_invocation_contexts(self) -> list[SkillInvocationContext]:
+        return _cast_list(
+            SkillInvocationContext,
+            self.list_contracts("craik.skill_invocation_context"),
+        )
+
+    def put_plugin_capability_grant(self, grant: PluginCapabilityGrant) -> None:
+        self.put_contract(grant)
+
+    def get_plugin_capability_grant(
+        self,
+        grant_id: str,
+    ) -> PluginCapabilityGrant | None:
+        contract = self.get_contract("craik.plugin_capability_grant", grant_id)
+        return _cast_optional(PluginCapabilityGrant, contract)
+
+    def list_plugin_capability_grants(self) -> list[PluginCapabilityGrant]:
+        return _cast_list(
+            PluginCapabilityGrant,
+            self.list_contracts("craik.plugin_capability_grant"),
+        )
+
+    def put_plugin_descriptor(self, descriptor: PluginDescriptor) -> None:
+        self.put_contract(descriptor)
+
+    def get_plugin_descriptor(self, descriptor_id: str) -> PluginDescriptor | None:
+        contract = self.get_contract("craik.plugin_descriptor", descriptor_id)
+        return _cast_optional(PluginDescriptor, contract)
+
+    def list_plugin_descriptors(self) -> list[PluginDescriptor]:
+        return _cast_list(
+            PluginDescriptor,
+            self.list_contracts("craik.plugin_descriptor"),
+        )
+
+    def put_plugin_probation(self, probation: PluginProbation) -> None:
+        self.put_contract(probation)
+
+    def get_plugin_probation(self, probation_id: str) -> PluginProbation | None:
+        contract = self.get_contract("craik.plugin_probation", probation_id)
+        return _cast_optional(PluginProbation, contract)
+
+    def list_plugin_probations(self) -> list[PluginProbation]:
+        return _cast_list(PluginProbation, self.list_contracts("craik.plugin_probation"))
+
+    def put_plugin_receipt(self, receipt: PluginReceipt) -> None:
+        self.put_contract(receipt)
+
+    def get_plugin_receipt(self, receipt_id: str) -> PluginReceipt | None:
+        contract = self.get_contract("craik.plugin_receipt", receipt_id)
+        return _cast_optional(PluginReceipt, contract)
+
+    def list_plugin_receipts(self) -> list[PluginReceipt]:
+        return _cast_list(PluginReceipt, self.list_contracts("craik.plugin_receipt"))
+
+    def put_instruction_source(self, source: InstructionSource) -> None:
+        self.put_contract(source)
+
+    def get_instruction_source(self, source_id: str) -> InstructionSource | None:
+        contract = self.get_contract("craik.instruction_source", source_id)
+        return _cast_optional(InstructionSource, contract)
+
+    def list_instruction_sources(self) -> list[InstructionSource]:
+        return _cast_list(
+            InstructionSource,
+            self.list_contracts("craik.instruction_source"),
+        )
+
+    def put_instruction_source_registry(self, registry: InstructionSourceRegistry) -> None:
+        self.put_contract(registry)
+
+    def get_instruction_source_registry(
+        self,
+        registry_id: str,
+    ) -> InstructionSourceRegistry | None:
+        contract = self.get_contract("craik.instruction_source_registry", registry_id)
+        return _cast_optional(InstructionSourceRegistry, contract)
+
+    def list_instruction_source_registries(self) -> list[InstructionSourceRegistry]:
+        return _cast_list(
+            InstructionSourceRegistry,
+            self.list_contracts("craik.instruction_source_registry"),
+        )
+
+    def put_instruction_source_snapshot(self, snapshot: InstructionSourceSnapshot) -> None:
+        self.put_contract(snapshot)
+
+    def get_instruction_source_snapshot(
+        self,
+        snapshot_id: str,
+    ) -> InstructionSourceSnapshot | None:
+        contract = self.get_contract("craik.instruction_source_snapshot", snapshot_id)
+        return _cast_optional(InstructionSourceSnapshot, contract)
+
+    def list_instruction_source_snapshots(self) -> list[InstructionSourceSnapshot]:
+        return _cast_list(
+            InstructionSourceSnapshot,
+            self.list_contracts("craik.instruction_source_snapshot"),
+        )
+
+    def put_instruction_provenance(self, provenance: InstructionProvenance) -> None:
+        self.put_contract(provenance)
+
+    def get_instruction_provenance(self, provenance_id: str) -> InstructionProvenance | None:
+        contract = self.get_contract("craik.instruction_provenance", provenance_id)
+        return _cast_optional(InstructionProvenance, contract)
+
+    def list_instruction_provenance(self) -> list[InstructionProvenance]:
+        return _cast_list(
+            InstructionProvenance,
+            self.list_contracts("craik.instruction_provenance"),
+        )
+
+    def put_distilled_instruction_proposal(
+        self,
+        proposal: DistilledInstructionProposal,
+    ) -> None:
+        self.put_contract(proposal)
+
+    def get_distilled_instruction_proposal(
+        self,
+        proposal_id: str,
+    ) -> DistilledInstructionProposal | None:
+        contract = self.get_contract("craik.distilled_instruction_proposal", proposal_id)
+        return _cast_optional(DistilledInstructionProposal, contract)
+
+    def list_distilled_instruction_proposals(self) -> list[DistilledInstructionProposal]:
+        return _cast_list(
+            DistilledInstructionProposal,
+            self.list_contracts("craik.distilled_instruction_proposal"),
+        )
+
+    def put_instruction_promotion_review(self, review: InstructionPromotionReview) -> None:
+        self.put_contract(review)
+
+    def get_instruction_promotion_review(
+        self,
+        review_id: str,
+    ) -> InstructionPromotionReview | None:
+        contract = self.get_contract("craik.instruction_promotion_review", review_id)
+        return _cast_optional(InstructionPromotionReview, contract)
+
+    def list_instruction_promotion_reviews(self) -> list[InstructionPromotionReview]:
+        return _cast_list(
+            InstructionPromotionReview,
+            self.list_contracts("craik.instruction_promotion_review"),
+        )
+
+    def put_promoted_instruction_constraint(
+        self,
+        constraint: PromotedInstructionConstraint,
+    ) -> None:
+        self.put_contract(constraint)
+
+    def get_promoted_instruction_constraint(
+        self,
+        constraint_id: str,
+    ) -> PromotedInstructionConstraint | None:
+        contract = self.get_contract("craik.promoted_instruction_constraint", constraint_id)
+        return _cast_optional(PromotedInstructionConstraint, contract)
+
+    def list_promoted_instruction_constraints(self) -> list[PromotedInstructionConstraint]:
+        return _cast_list(
+            PromotedInstructionConstraint,
+            self.list_contracts("craik.promoted_instruction_constraint"),
+        )
+
+    def put_reference_integration(self, integration: ReferenceIntegration) -> None:
+        self.put_contract(integration)
+
+    def get_reference_integration(
+        self,
+        integration_id: str,
+    ) -> ReferenceIntegration | None:
+        contract = self.get_contract("craik.reference_integration", integration_id)
+        return _cast_optional(ReferenceIntegration, contract)
+
+    def list_reference_integrations(self) -> list[ReferenceIntegration]:
+        return _cast_list(
+            ReferenceIntegration,
+            self.list_contracts("craik.reference_integration"),
+        )
+
+    def put_run_delta(self, delta: RunDelta) -> None:
+        self.put_contract(delta)
+
+    def get_run_delta(self, delta_id: str) -> RunDelta | None:
+        contract = self.get_contract("craik.run_delta", delta_id)
+        return _cast_optional(RunDelta, contract)
+
+    def list_run_deltas(self) -> list[RunDelta]:
+        return _cast_list(RunDelta, self.list_contracts("craik.run_delta"))
+
+    def put_recovery_session(self, session: RecoverySession) -> None:
+        self.put_contract(session)
+
+    def get_recovery_session(self, session_id: str) -> RecoverySession | None:
+        contract = self.get_contract("craik.recovery_session", session_id)
+        return _cast_optional(RecoverySession, contract)
+
+    def list_recovery_sessions(self) -> list[RecoverySession]:
+        return _cast_list(RecoverySession, self.list_contracts("craik.recovery_session"))
+
+    def put_runtime_critic_finding(self, finding: RuntimeCriticFinding) -> None:
+        self.put_contract(finding)
+
+    def get_runtime_critic_finding(
+        self,
+        finding_id: str,
+    ) -> RuntimeCriticFinding | None:
+        contract = self.get_contract("craik.runtime_critic_finding", finding_id)
+        return _cast_optional(RuntimeCriticFinding, contract)
+
+    def list_runtime_critic_findings(self) -> list[RuntimeCriticFinding]:
+        return _cast_list(
+            RuntimeCriticFinding,
+            self.list_contracts("craik.runtime_critic_finding"),
+        )
+
+    def put_red_team_finding(self, finding: RedTeamFinding) -> None:
+        self.put_contract(finding)
+
+    def get_red_team_finding(self, finding_id: str) -> RedTeamFinding | None:
+        contract = self.get_contract("craik.red_team_finding", finding_id)
+        return _cast_optional(RedTeamFinding, contract)
+
+    def list_red_team_findings(self) -> list[RedTeamFinding]:
+        return _cast_list(RedTeamFinding, self.list_contracts("craik.red_team_finding"))
