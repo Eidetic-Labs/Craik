@@ -1,4 +1,4 @@
-# 0001 Package And Runtime Layout
+# ADR 0006: Package And Runtime Layout
 
 ## Context
 
