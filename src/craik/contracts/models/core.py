@@ -189,6 +189,9 @@ class CapabilityReceipt(CraikModel):
     reason: str
     result: ReceiptResult
     redacted: bool = True
+    auth_profile_id: str | None = None
+    auth_kind: str | None = None
+    auth_identity_hash: str | None = None
     created_at: datetime
 
 
@@ -264,4 +267,3 @@ class CompiledPrompt(CraikModel):
     stop_conditions: list[str] = Field(default_factory=list)
     sections: list[PromptSection] = Field(default_factory=list)
     prompt: str
-
