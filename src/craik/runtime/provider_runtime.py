@@ -10,7 +10,8 @@ from pydantic import Field, model_validator
 
 from craik.contracts.models import CapabilityReceipt, CraikModel, ModelProvider
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
-from craik.runtime.provider_transport import ProviderFamily
+from craik.runtime.http_transport import HTTPTransport
+from craik.runtime.provider_transport import FixtureTransport, ProviderFamily, ProviderTransport
 from craik.runtime.redaction import redact
 
 ProviderMessageRole = Literal["system", "user", "assistant", "tool"]
@@ -60,6 +61,8 @@ class ProviderRuntimeConfig(CraikModel):
     provider_family: ProviderFamily
     model: str
     secret_ref_name: str
+    base_url: str | None = None
+    timeout_seconds: float = Field(default=30.0, gt=0)
     live_enabled: bool = False
     docs_verified_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     docs_refs: list[str] = Field(min_length=1)
@@ -140,6 +143,11 @@ class ProviderRuntimeAdapter(Protocol):
     """Runtime adapter contract for provider-specific payloads."""
 
     config: ProviderRuntimeConfig
+    transport: ProviderTransport
+
+    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+        """Execute one provider request through the configured transport."""
+        ...
 
     def build_payload(self, request: ProviderRuntimeRequest) -> dict[str, Any]:
         """Build a provider-specific request payload."""
@@ -163,13 +171,20 @@ class ProviderRuntimeAdapter(Protocol):
 class OpenAIProviderAdapter:
     """OpenAI Responses API payload and response normalization."""
 
-    def __init__(self, config: ProviderRuntimeConfig) -> None:
+    def __init__(
+        self,
+        config: ProviderRuntimeConfig,
+        transport: ProviderTransport | None = None,
+    ) -> None:
         if config.provider_family != "openai":
             raise ValueError("OpenAIProviderAdapter requires provider_family='openai'")
         self.config = config
+        self.transport = transport or FixtureTransport(family="openai", model=config.model)
 
     def build_payload(self, request: ProviderRuntimeRequest) -> dict[str, Any]:
         payload: dict[str, Any] = {
+            "_path": "/v1/responses",
+            "_fixture": _fixture_context(request),
             "model": self.config.model,
             "input": [_openai_message(message) for message in request.messages],
             "stream": request.stream,
@@ -190,6 +205,10 @@ class OpenAIProviderAdapter:
         if request.max_output_tokens:
             payload["max_output_tokens"] = request.max_output_tokens
         return payload
+
+    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+        """Execute one OpenAI Responses request through the configured transport."""
+        return _execute_provider_request(self, request)
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         output = response.get("output", [])
@@ -250,10 +269,15 @@ class OpenAIProviderAdapter:
 class AnthropicProviderAdapter:
     """Anthropic Messages API payload and response normalization."""
 
-    def __init__(self, config: ProviderRuntimeConfig) -> None:
+    def __init__(
+        self,
+        config: ProviderRuntimeConfig,
+        transport: ProviderTransport | None = None,
+    ) -> None:
         if config.provider_family != "anthropic":
             raise ValueError("AnthropicProviderAdapter requires provider_family='anthropic'")
         self.config = config
+        self.transport = transport or FixtureTransport(family="anthropic", model=config.model)
 
     def build_payload(self, request: ProviderRuntimeRequest) -> dict[str, Any]:
         system_messages = [
@@ -261,6 +285,8 @@ class AnthropicProviderAdapter:
         ]
         chat_messages = [message for message in request.messages if message.role != "system"]
         payload: dict[str, Any] = {
+            "_path": "/v1/messages",
+            "_fixture": _fixture_context(request),
             "model": self.config.model,
             "max_tokens": request.max_output_tokens,
             "messages": [_anthropic_message(message) for message in chat_messages],
@@ -284,6 +310,10 @@ class AnthropicProviderAdapter:
                 "name": request.structured_output_name,
             }
         return payload
+
+    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+        """Execute one Anthropic Messages request through the configured transport."""
+        return _execute_provider_request(self, request)
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         text_parts: list[str] = []
@@ -347,15 +377,24 @@ class AnthropicProviderAdapter:
 class ChatCompletionsProviderAdapter:
     """OpenAI-compatible Chat Completions payload and response normalization."""
 
-    def __init__(self, config: ProviderRuntimeConfig) -> None:
+    def __init__(
+        self,
+        config: ProviderRuntimeConfig,
+        transport: ProviderTransport | None = None,
+    ) -> None:
         if config.provider_family != "chat_completions":
             raise ValueError(
                 "ChatCompletionsProviderAdapter requires provider_family='chat_completions'"
             )
         self.config = config
+        self.transport = transport or FixtureTransport(
+            family="chat_completions", model=config.model
+        )
 
     def build_payload(self, request: ProviderRuntimeRequest) -> dict[str, Any]:
         payload: dict[str, Any] = {
+            "_path": "/v1/chat/completions",
+            "_fixture": _fixture_context(request),
             "model": self.config.model,
             "messages": [_chat_completions_message(message) for message in request.messages],
             "stream": request.stream,
@@ -374,6 +413,10 @@ class ChatCompletionsProviderAdapter:
                 },
             }
         return payload
+
+    def execute(self, request: ProviderRuntimeRequest) -> ProviderRuntimeResult:
+        """Execute one Chat Completions request through the configured transport."""
+        return _execute_provider_request(self, request, chunk_normalizer=self.normalize_chunk)
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         choices = response.get("choices", [])
@@ -456,21 +499,101 @@ def adapter_for_provider(
     if not model:
         raise ValueError(f"provider {provider.id} metadata requires default_model")
     secret_ref_name = provider.secret_ref_names[0] if provider.secret_ref_names else ""
+    live_configured = live_enabled or bool(provider.metadata.get("live_enabled", False))
     config = ProviderRuntimeConfig(
         provider_id=provider.id,
         provider_family=cast(ProviderFamily, family),
         model=model,
         secret_ref_name=secret_ref_name,
-        live_enabled=live_enabled,
+        base_url=_provider_base_url(provider),
+        timeout_seconds=float(provider.metadata.get("timeout_seconds", 30.0)),
+        live_enabled=live_configured,
         docs_refs=list(
             ANTHROPIC_OFFICIAL_DOCS if family == "anthropic" else OPENAI_OFFICIAL_DOCS
         ),
     )
+    transport = _transport_for_config(config)
     if family == "openai":
-        return OpenAIProviderAdapter(config)
+        return OpenAIProviderAdapter(config, transport=transport)
     if family == "anthropic":
-        return AnthropicProviderAdapter(config)
-    return ChatCompletionsProviderAdapter(config)
+        return AnthropicProviderAdapter(config, transport=transport)
+    return ChatCompletionsProviderAdapter(config, transport=transport)
+
+
+def _execute_provider_request(
+    adapter: ProviderRuntimeAdapter,
+    request: ProviderRuntimeRequest,
+    *,
+    chunk_normalizer: Any | None = None,
+) -> ProviderRuntimeResult:
+    if adapter.config.live_enabled:
+        adapter.require_live_access()
+    payload = adapter.build_payload(request)
+    chunks = list(adapter.transport.send(payload, stream=request.stream))
+    if not chunks:
+        raise ProviderRuntimeError("provider transport returned no response chunks")
+    if not request.stream:
+        return adapter.normalize_response(chunks[-1])
+    if chunk_normalizer is None:
+        return adapter.normalize_response(chunks[-1])
+    text_parts: list[str] = []
+    tool_calls: list[dict[str, Any]] = []
+    usage: dict[str, int] = {}
+    response_id: str | None = None
+    model = adapter.config.model
+    for chunk in chunks:
+        normalized = chunk_normalizer(chunk)
+        text_parts.append(normalized.text_delta)
+        tool_calls.extend(normalized.tool_calls)
+        usage.update(normalized.usage)
+        response_id = normalized.response_id or response_id
+        model = normalized.model or model
+    text = "".join(text_parts)
+    return ProviderRuntimeResult(
+        provider_id=adapter.config.provider_id,
+        provider_family=adapter.config.provider_family,
+        model=model,
+        text=text,
+        tool_calls=tool_calls,
+        structured_output=_json_object_or_none(text),
+        usage=usage,
+        response_id=response_id,
+    )
+
+
+def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
+    if not config.live_enabled:
+        return FixtureTransport(family=config.provider_family, model=config.model)
+    if config.base_url is None:
+        raise ProviderRuntimeError(f"provider {config.provider_id} requires base_url")
+    return HTTPTransport(
+        family=config.provider_family,
+        base_url=config.base_url,
+        headers=_provider_headers(config),
+        timeout_seconds=config.timeout_seconds,
+    )
+
+
+def _provider_headers(config: ProviderRuntimeConfig) -> dict[str, str]:
+    if config.provider_family == "anthropic":
+        headers = {
+            "anthropic-version": "2023-06-01",
+        }
+        if config.secret_ref_name:
+            headers["x-api-key"] = config.secret_ref_name
+        return headers
+    if config.secret_ref_name:
+        return {"Authorization": f"Bearer {config.secret_ref_name}"}
+    return {}
+
+
+def _provider_base_url(provider: ModelProvider) -> str:
+    configured = provider.metadata.get("base_url")
+    if isinstance(configured, str) and configured:
+        return configured
+    if provider.provider == "anthropic":
+        return "https://api.anthropic.com"
+    return "https://api.openai.com"
 
 
 def provider_runtime_receipt(
@@ -571,6 +694,21 @@ def _chat_completions_tool_calls(value: Any) -> list[dict[str, Any]]:
             }
         )
     return tool_calls
+
+
+def _fixture_context(request: ProviderRuntimeRequest) -> dict[str, str]:
+    context: dict[str, str] = {}
+    if "phase" in request.metadata:
+        context["phase"] = str(request.metadata["phase"])
+    if "status" in request.metadata:
+        context["status"] = str(request.metadata["status"])
+    if "response_id" in request.metadata:
+        context["response_id"] = str(request.metadata["response_id"])
+    elif "run_id" in request.metadata and "phase" in request.metadata:
+        context["response_id"] = (
+            f"provider_response_{request.metadata['run_id']}_{request.metadata['phase']}"
+        )
+    return context
 
 
 def _openai_usage(value: Any) -> dict[str, int]:

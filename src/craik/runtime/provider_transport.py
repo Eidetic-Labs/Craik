@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, cast
 
 from craik.contracts.models import RunnerResultStatus
 
@@ -55,13 +55,15 @@ class FixtureTransport:
 
     def send(self, payload: dict[str, Any], *, stream: bool) -> Iterator[dict[str, Any]]:
         """Yield a deterministic provider-shaped fixture response."""
-        _ = (payload, stream)
+        _ = stream
+        context = payload.get("_fixture", {})
+        context = context if isinstance(context, dict) else {}
         yield _fixture_response(
             provider_family=self.family,
             model=self.model,
-            response_id=self.response_id,
-            phase=self.phase,
-            status=self.status,
+            response_id=str(context.get("response_id") or self.response_id),
+            phase=str(context.get("phase") or self.phase),
+            status=cast(RunnerResultStatus, context.get("status") or self.status),
         )
 
 
@@ -94,6 +96,30 @@ def _fixture_response(
                 },
             ],
             "usage": {"input_tokens": 20, "output_tokens": 10, "total_tokens": 30},
+        }
+    if provider_family == "chat_completions":
+        return {
+            "id": response_id,
+            "model": model,
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": text,
+                        "tool_calls": [
+                            {
+                                "id": f"call_{phase}",
+                                "type": "function",
+                                "function": {
+                                    "name": "record_runner_step",
+                                    "arguments": "{}",
+                                },
+                            }
+                        ],
+                    }
+                }
+            ],
+            "usage": {"prompt_tokens": 20, "completion_tokens": 10, "total_tokens": 30},
         }
     return {
         "id": response_id,

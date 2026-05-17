@@ -6,6 +6,13 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
 
 from craik.runtime.http_transport import HTTPTransport
+from craik.runtime.provider_runtime import (
+    OPENAI_OFFICIAL_DOCS,
+    ChatCompletionsProviderAdapter,
+    ProviderMessage,
+    ProviderRuntimeConfig,
+    ProviderRuntimeRequest,
+)
 from craik.runtime.provider_transport import ProviderTransportError
 
 
@@ -86,6 +93,61 @@ def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
     assert "secret-auth-token" not in str(error)
     assert error.body is not None
     assert "sk-test-secret" not in error.body
+
+
+def test_live_enabled_adapter_executes_round_trip_through_http_transport() -> None:
+    seen: dict[str, Any] = {}
+
+    def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
+        seen["payload"] = payload
+        return _json_response(
+            {
+                "id": "chatcmpl_live_stub",
+                "model": payload["model"],
+                "choices": [{"message": {"role": "assistant", "content": "live stub ok"}}],
+                "usage": {
+                    "prompt_tokens": 4,
+                    "completion_tokens": 3,
+                    "total_tokens": 7,
+                },
+            }
+        )
+
+    with _stub_server(handle) as server:
+        config = ProviderRuntimeConfig(
+            provider_id="provider_openai_chat_stub",
+            provider_family="chat_completions",
+            model="gpt-test",
+            secret_ref_name="TEST_API_KEY",
+            base_url=server.url,
+            live_enabled=True,
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
+        adapter = ChatCompletionsProviderAdapter(
+            config,
+            transport=HTTPTransport(
+                family="chat_completions",
+                base_url=server.url,
+                headers={},
+                timeout_seconds=5,
+            ),
+        )
+
+        result = adapter.execute(
+            ProviderRuntimeRequest(
+                messages=[ProviderMessage(role="user", content="Say ok.")],
+            )
+        )
+
+    assert seen["payload"] == {
+        "model": "gpt-test",
+        "messages": [{"role": "user", "content": "Say ok."}],
+        "stream": False,
+        "max_tokens": 1024,
+    }
+    assert result.text == "live stub ok"
+    assert result.response_id == "chatcmpl_live_stub"
+    assert result.usage == {"input_tokens": 4, "output_tokens": 3, "total_tokens": 7}
 
 
 class _StubResponse:
