@@ -109,13 +109,13 @@ the MVP roadmap turns those surfaces into release-quality workflows.
 
 Craik should remain on `0.x.0` releases until the maintainers are very confident that the product is stable enough to call `1.0`. The gates below are sequencing targets, not promises that `1.0.0` follows immediately after `0.7.0`. Additional `0.x.0` releases should be added whenever the product needs more soak time, compatibility work, security hardening, or real-user validation.
 
-### v0.1.0 Gate: Durable Single-Agent Runtime
+### v0.1.0 Gate: Governed Agent-Runtime Substrate
 
 `v0.1.0` must prove Craik's core value without requiring the full north-star surface.
 
 Required outcome:
 
-> A single agent can register a real repo, assemble a governed case file, use Stigmem-backed memory context, perform the Stigmem documentation reconciliation demo, record receipts, produce a durable handoff, and leave memory proposals without relying on chat history.
+> A user can register a real repo, assemble a governed case file, compile runner prompts, execute provider requests against OpenAI Responses / Anthropic Messages / OpenAI-compatible Chat Completions adapters (fixture-backed by default, live opt-in), record receipts, produce durable handoffs, propose memory updates, and export the work graph.
 
 Required capabilities:
 
@@ -143,6 +143,13 @@ Required capabilities:
 - memory diff for local proposals and Stigmem writes.
 - work graph export for task, handoff, receipt, fact/proposal, evidence, and contradiction nodes.
 - GitHub read adapter.
+- pluggable provider transport with `FixtureTransport` and `HTTPTransport`.
+- provider adapter families for OpenAI Responses, Anthropic Messages, and
+  OpenAI-compatible Chat Completions.
+- secret reference resolution.
+- tool-call round-trip in the execution loop.
+- streaming chunk capture.
+- retry, timeout, and cancellation handling for provider execution.
 - first demo workflow for Stigmem docs reconciliation.
 - agent-native onboarding for the demo project.
 - policy tests for the core security baseline.
@@ -158,43 +165,6 @@ Explicitly not required for `v0.1.0`:
 - full plugin runtime.
 
 `v0.1.0` should still define contracts and docs that make those later features possible.
-
-### v0.2.0 Gate: Runner Adapter Preview
-
-Required outcome:
-
-> Codex, Claude, and Gemini can consume Craik case files and return normalized handoffs/results through first-class adapter contracts.
-
-Required capabilities:
-
-- repository context discovery defaults with project/user overrides,
-- runner adapter interface,
-- Codex adapter,
-- Claude adapter,
-- Gemini adapter,
-- runner capability matrix,
-- policy-aware prompt compiler,
-- real-runner contract test fixtures,
-- runner metadata in receipts and handoffs,
-- runner trust boundaries,
-- runner-specific onboarding output.
-
-Context discovery defaults are part of `v0.2.0` because runner adapters depend on
-bounded, inspectable case-file context. The `v0.3.0` loop validates that clean
-context under live execution, but the discovery and override mechanics should be
-available before runners consume case files.
-
-Tracking issues:
-
-- #48: repository context discovery defaults.
-- #49: runner adapter contract.
-- #50: runner capability matrix and trust profiles.
-- #51: policy-aware prompt compiler.
-- #52: Codex runner adapter preview.
-- #53: Claude runner adapter preview.
-- #54: Gemini runner adapter preview.
-- #55: runner metadata in receipts and handoffs.
-- #56: runner adapter preview documentation.
 
 ### v0.3.0 Gate: Single-Agent Execution Loop
 
