@@ -1,5 +1,5 @@
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -614,6 +614,48 @@ def test_auth_commands_add_list_test_status_and_remove(
     assert json.loads(status.stdout)[0]["last_status"] == "ok"
     assert json.loads(removed.stdout) == {"removed": "anthropic:work"}
     assert json.loads(listed_after_remove.stdout) == []
+
+
+def test_auth_oauth_local_cli_profile_tests_against_credentials_file(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    credentials = tmp_path / "credentials.json"
+    credentials.write_text(
+        json.dumps(
+            {
+                "access_token": "local-access-token",
+                "refresh_token": "local-refresh-token",
+                "expires_at": (datetime.now(UTC) + timedelta(hours=1)).isoformat(),
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    added = runner.invoke(
+        app,
+        [
+            "auth",
+            "add",
+            "anthropic:local-cli",
+            "--kind",
+            "oauth-token",
+            "--source",
+            "local-cli",
+            "--credentials-path",
+            str(credentials),
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    tested = runner.invoke(
+        app,
+        ["auth", "test", "anthropic:local-cli"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert added.exit_code == 0
+    assert json.loads(added.stdout)["metadata"]["credentials_path"] == str(credentials)
+    assert tested.exit_code == 0
+    assert json.loads(tested.stdout)["status"]["status"] == "ok"
+    assert "local-access-token" not in tested.stdout
 
 
 def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:

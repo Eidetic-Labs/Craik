@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Annotated, Any, cast
 
 import typer
@@ -17,7 +18,12 @@ from craik.runtime.auth import (
     CredentialKind,
     CredentialStatus,
 )
-from craik.runtime.auth.sources import EnvVarApiKeySource
+from craik.runtime.auth.sources import (
+    DEFAULT_CLAUDE_CREDENTIALS_PATH,
+    EnvVarApiKeySource,
+    LocalCLICredentialError,
+    LocalCLICredentialSource,
+)
 from craik.runtime.providers.provider_transport import ProviderFamily
 
 
@@ -44,6 +50,18 @@ def auth_add(
         str | None,
         typer.Option("--source", help="Optional source hint for future credential kinds."),
     ] = None,
+    credentials_path: Annotated[
+        Path | None,
+        typer.Option("--credentials-path", help="Local CLI credentials file path."),
+    ] = None,
+    refresh_endpoint: Annotated[
+        str | None,
+        typer.Option("--refresh-endpoint", help="OAuth refresh endpoint for local CLI tokens."),
+    ] = None,
+    client_id: Annotated[
+        str | None,
+        typer.Option("--client-id", help="OAuth client id for refresh requests."),
+    ] = None,
 ) -> None:
     """Add or replace an auth profile."""
     try:
@@ -58,8 +76,16 @@ def auth_add(
         metadata["env_var"] = env_var
     if source is not None:
         metadata["source"] = source
+    if credentials_path is not None:
+        metadata["credentials_path"] = str(credentials_path)
+    if refresh_endpoint is not None:
+        metadata["refresh_endpoint"] = refresh_endpoint
+    if client_id is not None:
+        metadata["client_id"] = client_id
     if credential_kind is CredentialKind.API_KEY and not env_var:
         raise typer.BadParameter("--env-var is required for api-key profiles")
+    if credential_kind is CredentialKind.OAUTH_TOKEN and source != "local-cli":
+        raise typer.BadParameter("--source=local-cli is required for oauth-token profiles")
 
     family = profile_id.split(":", 1)[0]
     try:
@@ -93,7 +119,7 @@ def auth_test(profile_id: str) -> None:
     except AuthProfileNotFoundError as error:
         raise typer.BadParameter(str(error)) from None
 
-    status = _source_status(profile)
+    status = _test_profile_status(profile)
     store.mark_used(profile.id, status.status)
     payload = {
         "id": profile.id,
@@ -127,9 +153,35 @@ def _source_status(profile: AuthProfile) -> CredentialStatus:
         env_var = profile.metadata.get("env_var")
         env_var = env_var if isinstance(env_var, str) else ""
         return EnvVarApiKeySource(env_var).status()
+    if profile.kind is CredentialKind.OAUTH_TOKEN and profile.metadata.get("source") == "local-cli":
+        return _local_cli_source(profile).status()
     return CredentialStatus(
         status="unknown",
         detail=f"{profile.kind.value} credential tests are not implemented yet",
+    )
+
+
+def _test_profile_status(profile: AuthProfile) -> CredentialStatus:
+    if profile.kind is CredentialKind.OAUTH_TOKEN and profile.metadata.get("source") == "local-cli":
+        source = _local_cli_source(profile)
+        try:
+            source.headers_for(profile.provider_family)
+        except LocalCLICredentialError as exc:
+            return CredentialStatus(status="rejected", detail=str(exc))
+        return source.status()
+    return _source_status(profile)
+
+
+def _local_cli_source(profile: AuthProfile) -> LocalCLICredentialSource:
+    credentials_path = profile.metadata.get("credentials_path")
+    refresh_endpoint = profile.metadata.get("refresh_endpoint")
+    client_id = profile.metadata.get("client_id")
+    return LocalCLICredentialSource(
+        credentials_path=Path(credentials_path)
+        if isinstance(credentials_path, str)
+        else DEFAULT_CLAUDE_CREDENTIALS_PATH,
+        refresh_endpoint=refresh_endpoint if isinstance(refresh_endpoint, str) else None,
+        client_id=client_id if isinstance(client_id, str) else None,
     )
 
 
