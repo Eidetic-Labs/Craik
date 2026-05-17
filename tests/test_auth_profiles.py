@@ -1,4 +1,8 @@
+import json
+import threading
 from datetime import UTC, datetime
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -8,6 +12,8 @@ from craik.runtime.auth.sources import (
     CLIBridgeCredentialSource,
     EnvVarApiKeySource,
     SecretRefCredentialSource,
+    StigmemCredentialError,
+    StigmemCredentialSource,
     source_for_auth_profile,
 )
 
@@ -87,7 +93,100 @@ def test_source_for_auth_profile_maps_supported_kinds() -> None:
             created_at=created_at,
         )
     )
+    stigmem_ref = source_for_auth_profile(
+        AuthProfile(
+            id="openai:stigmem",
+            kind=CredentialKind.STIGMEM_REF,
+            provider_family="openai",
+            metadata={
+                "node_url": "http://127.0.0.1:1",
+                "entity": "credential:openai:work",
+            },
+            created_at=created_at,
+        )
+    )
 
     assert isinstance(api_key, EnvVarApiKeySource)
     assert isinstance(secret_ref, SecretRefCredentialSource)
     assert isinstance(cli_bridge, CLIBridgeCredentialSource)
+    assert isinstance(stigmem_ref, StigmemCredentialSource)
+
+
+def test_stigmem_credential_source_resolves_fact_value() -> None:
+    server, thread = _stigmem_credential_server("sk-stigmem-secret")
+    try:
+        source = StigmemCredentialSource.from_config(
+            node_url=_server_url(server),
+            api_key="test-key",
+            entity="credential:openai:work",
+        )
+
+        assert source.headers_for("openai") == {
+            "Authorization": "Bearer sk-stigmem-secret"
+        }
+        assert source.status().status == "ok"
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
+def test_stigmem_credential_source_fails_when_fact_is_revoked() -> None:
+    server, thread = _stigmem_credential_server(None)
+    try:
+        source = StigmemCredentialSource.from_config(
+            node_url=_server_url(server),
+            api_key="test-key",
+            entity="credential:openai:work",
+        )
+
+        with pytest.raises(StigmemCredentialError, match="could not resolve"):
+            source.headers_for("openai")
+        assert source.status().status == "rejected"
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
+def _stigmem_credential_server(secret: str | None) -> tuple[HTTPServer, threading.Thread]:
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:
+            if self.path.startswith("/v1/facts"):
+                if self.headers.get("Authorization") != "Bearer test-key":
+                    self._json({"error": "unauthorized"}, status=401)
+                    return
+                facts: list[dict[str, Any]] = []
+                if secret is not None:
+                    facts.append(
+                        {
+                            "entity": "credential:openai:work",
+                            "relation": "craik:credential:value",
+                            "value": {"type": "text", "v": secret},
+                            "source": "stigmem:test",
+                            "confidence": 1.0,
+                            "scope": "team",
+                            "trust_class": "policy",
+                        }
+                    )
+                self._json({"facts": facts})
+                return
+            self._json({"error": "not found"}, status=404)
+
+        def log_message(self, format: str, *args: Any) -> None:
+            return
+
+        def _json(self, payload: dict[str, Any], *, status: int = 200) -> None:
+            body = json.dumps(payload).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return server, thread
+
+
+def _server_url(server: HTTPServer) -> str:
+    return f"http://127.0.0.1:{server.server_port}"

@@ -16,6 +16,7 @@ from craik.runtime.auth.sources.secret_ref import (
     FileSecretManager,
     SecretRefCredentialSource,
 )
+from craik.runtime.auth.sources.stigmem_ref import StigmemCredentialSource
 
 
 class AuthProfileSourceError(ValueError):
@@ -32,6 +33,8 @@ def source_for_auth_profile(profile: AuthProfile) -> CredentialSource:
         return _local_cli_source(profile)
     if profile.kind is CredentialKind.SECRET_REF:
         return _secret_ref_source(profile)
+    if profile.kind is CredentialKind.STIGMEM_REF:
+        return _stigmem_ref_source(profile)
     if profile.kind is CredentialKind.CLI_BRIDGE:
         return _cli_bridge_source(profile)
     raise AuthProfileSourceError(f"unsupported auth profile kind/source: {profile.kind.value}")
@@ -57,6 +60,35 @@ def _secret_ref_source(profile: AuthProfile) -> SecretRefCredentialSource:
         raise AuthProfileSourceError("secret-ref auth profile requires metadata.ref")
     secret_manager = FileSecretManager() if manager == "file" else EnvVarSecretManager()
     return SecretRefCredentialSource(ref=ref, manager=secret_manager)
+
+
+def _stigmem_ref_source(profile: AuthProfile) -> StigmemCredentialSource:
+    node_url = profile.metadata.get("node_url")
+    entity = profile.metadata.get("entity")
+    api_key = profile.metadata.get("api_key")
+    scope = profile.metadata.get("scope", "team")
+    relation = profile.metadata.get("relation", "craik:credential:value")
+    timeout_seconds = profile.metadata.get("timeout_seconds", 5.0)
+    if not isinstance(node_url, str) or not node_url:
+        raise AuthProfileSourceError("stigmem-ref auth profile requires metadata.node_url")
+    if not isinstance(entity, str) or not entity:
+        raise AuthProfileSourceError("stigmem-ref auth profile requires metadata.entity")
+    if scope not in {"local", "team", "company", "public"}:
+        raise AuthProfileSourceError("stigmem-ref auth profile has unsupported scope")
+    if not isinstance(relation, str) or not relation:
+        raise AuthProfileSourceError("stigmem-ref auth profile requires metadata.relation")
+    try:
+        timeout = float(timeout_seconds)
+    except (TypeError, ValueError):
+        timeout = 5.0
+    return StigmemCredentialSource.from_config(
+        node_url=node_url,
+        entity=entity,
+        api_key=api_key if isinstance(api_key, str) else None,
+        scope=scope,
+        relation=relation,
+        timeout_seconds=timeout,
+    )
 
 
 def _cli_bridge_source(profile: AuthProfile) -> CLIBridgeCredentialSource:
