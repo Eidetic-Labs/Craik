@@ -1,9 +1,12 @@
 import subprocess
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from craik.contracts.models import FactValue
+from craik.runtime.auth.profile import AuthProfile, CredentialKind
+from craik.runtime.auth.store import AuthProfileStore
 from craik.runtime.memory.contradictions import ContradictionManager
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.projects.project_registry import ProjectRegistry
@@ -205,6 +208,74 @@ def test_case_file_reports_omitted_docs_from_context_budget(
     assert any("omitted from the case file" in item.statement for item in case_file.assumptions)
 
 
+def test_case_file_records_credential_expiry_risk(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+    project = ProjectRegistry(store).add_project(repo, name="Example")
+    expires_at = datetime.now(UTC) + timedelta(minutes=30)
+    _put_auth_profile(
+        store,
+        "anthropic:local-cli",
+        kind=CredentialKind.OAUTH_TOKEN,
+        metadata={"source": "local-cli", "expires_at": expires_at.isoformat()},
+    )
+    task = create_task(
+        store,
+        title="Credential expiry",
+        objective="Build case with credential expiry context.",
+        project_id=project.id,
+        auth_profile_id="anthropic:local-cli",
+        expected_duration_minutes=60,
+    )
+
+    case_file = CaseFileAssembler(store).build(task.id)
+
+    auth_evidence = [
+        evidence
+        for evidence in case_file.evidence
+        if evidence.id == f"evidence_{task.id}_auth_profile"
+    ]
+    assert auth_evidence
+    assert auth_evidence[0].metadata["auth_profile_id"] == "anthropic:local-cli"
+    assert auth_evidence[0].metadata["expires_at"] == expires_at.isoformat()
+    assert any("credential_expiry_risk" in risk for risk in case_file.stale_risks)
+
+
+def test_case_file_skips_credential_expiry_risk_for_long_lived_token(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+    project = ProjectRegistry(store).add_project(repo, name="Example")
+    _put_auth_profile(
+        store,
+        "anthropic:local-cli",
+        kind=CredentialKind.OAUTH_TOKEN,
+        metadata={
+            "source": "local-cli",
+            "expires_at": (datetime.now(UTC) + timedelta(days=30)).isoformat(),
+        },
+    )
+    task = create_task(
+        store,
+        title="Long lived credential",
+        objective="Build case with credential expiry context.",
+        project_id=project.id,
+        auth_profile_id="anthropic:local-cli",
+        expected_duration_minutes=60,
+    )
+
+    case_file = CaseFileAssembler(store).build(task.id)
+
+    assert any(
+        evidence.metadata.get("auth_profile_id") == "anthropic:local-cli"
+        for evidence in case_file.evidence
+    )
+    assert not any("credential_expiry_risk" in risk for risk in case_file.stale_risks)
+
+
 def test_case_file_excludes_generated_dependency_and_archive_paths_by_default(
     tmp_path: Path,
     store: LocalStore,
@@ -305,6 +376,24 @@ class _FactMemory:
 
     def search(self, query: str) -> list[FactValue]:
         return self.facts
+
+
+def _put_auth_profile(
+    store: LocalStore,
+    profile_id: str,
+    *,
+    kind: CredentialKind,
+    metadata: dict[str, object],
+) -> None:
+    AuthProfileStore(store.database_path.parent.parent).put(
+        AuthProfile(
+            id=profile_id,
+            kind=kind,
+            provider_family=profile_id.split(":", 1)[0],
+            metadata=metadata,
+            created_at=datetime.now(UTC),
+        )
+    )
 
 
 def _repo(tmp_path: Path) -> Path:
