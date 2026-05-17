@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime
 from typing import Any, Literal
 
@@ -41,6 +42,11 @@ _PRIVATE_ARTIFACT_KEYS = {
     "raw_video",
     "video_payload",
 }
+LOCAL_PATH_REDACTION = "[LOCAL_PATH]"
+_LOCAL_PATH_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"(?<![\w.-])/(?:Users|private|tmp|var/folders)/[^\s'\"),\]}]+"),
+    re.compile(r"(?i)\b[A-Z]:\\Users\\[^\s'\"),\]}]+"),
+)
 
 
 class MultimodalArtifactReference(CraikModel):
@@ -119,6 +125,8 @@ def _safe_value(value: Any, redacted_paths: list[str]) -> Any:
 
 
 def _drop_private_media_payloads(value: Any, path: str, redacted_paths: list[str]) -> Any:
+    if isinstance(value, str):
+        return _redact_local_paths(value, path, redacted_paths)
     if isinstance(value, dict):
         safe: dict[str, Any] = {}
         for key, item in value.items():
@@ -136,3 +144,12 @@ def _drop_private_media_payloads(value: Any, path: str, redacted_paths: list[str
             for index, item in enumerate(value)
         ]
     return value
+
+
+def _redact_local_paths(value: str, path: str, redacted_paths: list[str]) -> str:
+    redacted = value
+    for pattern in _LOCAL_PATH_PATTERNS:
+        redacted = pattern.sub(LOCAL_PATH_REDACTION, redacted)
+    if redacted != value:
+        redacted_paths.append(path)
+    return redacted

@@ -122,3 +122,68 @@ def test_memory_proposal_shape_redaction_regression() -> None:
     result = redact(payload)
 
     assert result.value["fact"]["value"] == "token=[REDACTED]"
+
+
+def test_multimodal_transcript_shape_redaction_regression() -> None:
+    payload = {
+        "schema": "craik.speech_to_text_result",
+        "transcript": {
+            "text": "Authorization: Bearer redactionfixture123",
+            "metadata": {
+                "private_transcript_metadata": "private speaker detail",
+                "confidence_model": "fixture",
+            },
+        },
+        "policy_envelope_id": "policy_voice",
+        "evidence_ids": ["evidence_voice"],
+        "receipt_ids": ["receipt_voice"],
+    }
+
+    result = redact(payload)
+
+    assert result.value["transcript"]["text"] == "Authorization: Bearer [REDACTED]"
+    assert result.value["policy_envelope_id"] == "policy_voice"
+    assert result.value["evidence_ids"] == ["evidence_voice"]
+    assert result.value["receipt_ids"] == ["receipt_voice"]
+
+
+def test_multimodal_media_metadata_shape_redaction_regression() -> None:
+    payload = {
+        "schema": "craik.multimodal_artifact_reference",
+        "locator": "artifact?token=redactionfixture123",
+        "media_metadata": {
+            "api_token": "redaction-fixture-value",
+            "duration_ms": 2400,
+            "codec": "wav",
+        },
+        "policy_envelope_id": "policy_voice",
+        "evidence_ids": ["evidence_media"],
+        "receipt_ids": ["receipt_media"],
+    }
+
+    result = redact(payload)
+
+    assert result.value["locator"] == "artifact?token=[REDACTED]"
+    assert result.value["media_metadata"]["api_token"] == "[REDACTED]"
+    assert result.value["media_metadata"]["duration_ms"] == 2400
+    assert result.value["media_metadata"]["codec"] == "wav"
+
+
+def test_companion_state_shape_redaction_regression() -> None:
+    payload = {
+        "schema": "craik.companion_state",
+        "last_viewed_task_id": "task_review",
+        "notification": {
+            "summary": "token=redactionfixture123",
+            "receipt_id": "receipt_review",
+        },
+        "credentials": "private",
+        "local_path": "/Users/example/private-state.json",
+    }
+
+    result = redact(payload)
+
+    assert result.value["notification"]["summary"] == "token=[REDACTED]"
+    assert result.value["credentials"] == "[REDACTED]"
+    assert result.value["notification"]["receipt_id"] == "receipt_review"
+    assert contains_unredacted_secret(payload)
