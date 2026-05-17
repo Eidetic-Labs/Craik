@@ -9,11 +9,11 @@ from typing import Annotated, Any, cast
 
 import typer
 
+from craik import cli_connect as _cli_connect  # noqa: F401
+from craik import cli_demos as _cli_demos  # noqa: F401
+from craik import cli_onboarding as _cli_onboarding  # noqa: F401
 from craik.cli import (
-    app,
     case_app,
-    connect_app,
-    demo_app,
     home_app,
     intent_app,
     project_app,
@@ -22,15 +22,10 @@ from craik.cli import (
     runners_app,
     task_app,
 )
-from craik.contracts.models import PolicyProfile, Priority, TaskMode
+from craik.contracts.models import Priority, TaskMode
 from craik.runtime.github import GitHubClient, GitHubConfig, GitHubReadAdapter
-from craik.runtime.memory.memory import StigmemClient, StigmemConfig, StigmemMemoryStore
 from craik.runtime.paths import CraikPaths, ensure_craik_home, resolve_craik_paths
 from craik.runtime.policy.intent_locks import IntentLockManager, IntentLockNotFoundError
-from craik.runtime.policy.policy import FailOpenNotAllowedError
-from craik.runtime.projects.demos import StigmemDocsDemo
-from craik.runtime.projects.demos_provider import ProviderBackedStigmemDocsDemo
-from craik.runtime.projects.onboarding import AgentOnboardingBuilder, OnboardingProjectNotFoundError
 from craik.runtime.projects.project_registry import NotGitRepositoryError, ProjectRegistry
 from craik.runtime.projects.prompts import (
     PromptCaseFileNotFoundError,
@@ -46,7 +41,6 @@ from craik.runtime.runners.runners import (
     default_runner_capability_matrices,
     get_runner_capability_matrix,
 )
-from craik.runtime.secrets import SecretNotFoundError
 from craik.runtime.store import LocalStore
 from craik.runtime.work.case_files import (
     CaseFileAssembler,
@@ -54,7 +48,6 @@ from craik.runtime.work.case_files import (
     ProjectNotFoundError,
     TaskNotFoundError,
 )
-from craik.runtime.work.handoffs import HandoffContextError
 from craik.runtime.work.tasks import create_task
 
 
@@ -461,196 +454,6 @@ def case_show(case_or_task_id: str) -> None:
     typer.echo(
         json.dumps(case_file.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
     )
-
-
-@connect_app.command("stigmem")
-def connect_stigmem(
-    url: Annotated[
-        str,
-        typer.Option(
-            "--url",
-            envvar="CRAIK_STIGMEM_URL",
-            help="Stigmem node URL.",
-        ),
-    ],
-    api_key: Annotated[
-        str | None,
-        typer.Option(
-            "--api-key",
-            envvar="CRAIK_STIGMEM_API_KEY",
-            help="Bearer API key. Prefer CRAIK_STIGMEM_API_KEY.",
-        ),
-    ] = None,
-    timeout: Annotated[
-        float,
-        typer.Option(
-            "--timeout",
-            envvar="CRAIK_STIGMEM_TIMEOUT",
-            help="Request timeout in seconds.",
-        ),
-    ] = 5.0,
-) -> None:
-    """Detect Stigmem backend compatibility."""
-    config = StigmemConfig(node_url=url, api_key=api_key, timeout_seconds=timeout)
-    capabilities = StigmemMemoryStore(StigmemClient(config)).discover()
-    typer.echo(
-        json.dumps(capabilities.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True)
-    )
-
-
-@app.command("onboard")
-def onboard(
-    project: Annotated[
-        str,
-        typer.Option("--project", help="Registered project id or name to onboard."),
-    ],
-    policy_profile: Annotated[
-        str,
-        typer.Option(
-            "--policy-profile",
-            help="Policy profile: strict, trusted-local, or automation.",
-        ),
-    ] = "strict",
-    trusted_local_fail_open: Annotated[
-        bool,
-        typer.Option(
-            "--trusted-local-fail-open",
-            help="Explicitly opt in to trusted-local fail-open semantics.",
-        ),
-    ] = False,
-    max_recent_handoffs: Annotated[
-        int,
-        typer.Option("--max-recent-handoffs", min=0, help="Recent handoffs to include."),
-    ] = 5,
-) -> None:
-    """Print runner-readable onboarding context for a project."""
-    store = LocalStore.from_env()
-    try:
-        store.initialize()
-        report = AgentOnboardingBuilder(store).build(
-            project,
-            policy_profile=_policy_profile(policy_profile),
-            trusted_local_fail_open=trusted_local_fail_open,
-            max_recent_handoffs=max_recent_handoffs,
-        )
-    except (OnboardingProjectNotFoundError, FailOpenNotAllowedError) as error:
-        raise typer.BadParameter(str(error)) from None
-    finally:
-        store.close()
-
-    typer.echo(json.dumps(report.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
-
-
-@demo_app.command("stigmem-docs")
-def demo_stigmem_docs(
-    repo_path: Annotated[
-        Path,
-        typer.Option("--repo-path", help="Path inside the Stigmem Git repository."),
-    ] = Path("."),
-    project_name: Annotated[
-        str,
-        typer.Option("--project-name", help="Project name to register for the demo."),
-    ] = "Stigmem",
-    stigmem_url: Annotated[
-        str | None,
-        typer.Option("--stigmem-url", envvar="CRAIK_STIGMEM_URL", help="Stigmem node URL."),
-    ] = None,
-    stigmem_api_key: Annotated[
-        str | None,
-        typer.Option(
-            "--stigmem-api-key",
-            envvar="CRAIK_STIGMEM_API_KEY",
-            help="Bearer API key. Prefer CRAIK_STIGMEM_API_KEY.",
-        ),
-    ] = None,
-    github: Annotated[
-        bool,
-        typer.Option("--github/--no-github", help="Load read-only GitHub context."),
-    ] = True,
-    provider_id: Annotated[
-        list[str] | None,
-        typer.Option(
-            "--provider-id",
-            help=(
-                "Provider id to exercise through the deterministic demo runner. "
-                "Repeat to override the default OpenAI and Anthropic run."
-            ),
-        ),
-    ] = None,
-    provider: Annotated[
-        str | None,
-        typer.Option(
-            "--provider",
-            help=(
-                "Run one provider-backed demo path and surface model findings. "
-                "Set CRAIK_LIVE=1 for live transport; otherwise fixture transport is used."
-            ),
-        ),
-    ] = None,
-    max_tokens: Annotated[
-        int,
-        typer.Option("--max-tokens", min=1, help="Approximate case-file context budget."),
-    ] = 24000,
-) -> None:
-    """Run the Stigmem documentation reconciliation demo."""
-    store = LocalStore.from_env()
-    try:
-        store.initialize()
-        github_adapter = _github_adapter() if github else None
-        if provider and provider_id:
-            raise typer.BadParameter("use either --provider or --provider-id, not both")
-        if provider:
-            result = ProviderBackedStigmemDocsDemo(
-                store,
-                github_adapter=github_adapter,
-            ).run(
-                repo_path=repo_path,
-                project_name=project_name,
-                stigmem_url=stigmem_url,
-                stigmem_api_key=stigmem_api_key,
-                github=github,
-                provider_id=provider,
-                live_enabled=_env_flag("CRAIK_LIVE"),
-                max_tokens=max_tokens,
-            )
-        else:
-            result = StigmemDocsDemo(
-                store,
-                github_adapter=github_adapter,
-            ).run(
-                repo_path=repo_path,
-                project_name=project_name,
-                stigmem_url=stigmem_url,
-                stigmem_api_key=stigmem_api_key,
-                github=github,
-                provider_ids=tuple(provider_id) if provider_id else None,
-                max_tokens=max_tokens,
-            )
-    except (
-        NotGitRepositoryError,
-        TaskNotFoundError,
-        ProjectNotFoundError,
-        HandoffContextError,
-        ModelProviderNotFoundError,
-        SecretNotFoundError,
-    ) as error:
-        raise typer.BadParameter(str(error)) from None
-    finally:
-        store.close()
-
-    typer.echo(json.dumps(result, indent=2, sort_keys=True))
-
-
-
-
-def _policy_profile(value: str) -> PolicyProfile:
-    if value not in {"strict", "trusted-local", "automation", "custom"}:
-        raise typer.BadParameter(f"unsupported policy profile: {value}")
-    return cast(PolicyProfile, value)
-
-
-def _env_flag(name: str) -> bool:
-    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _priority(value: str) -> Priority:
