@@ -16,7 +16,6 @@ EXEMPT = {
     "src/craik/runtime/providers/provider_runtime.py",
     "src/craik/cli_project.py",
     "src/craik/runtime/memory/memory.py",
-    "src/craik/runtime/companions/operator_views.py",
     "src/craik/runtime/work/case_files.py",
     "src/craik/cli_operations.py",
 }
