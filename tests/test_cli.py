@@ -553,6 +553,14 @@ def test_handoff_commands_create_and_show_json_and_markdown(tmp_path: Path) -> N
     assert "- [x] Validation recorded" in shown.stdout
 
 
+def test_handoff_command_group_stays_mounted_after_module_extraction() -> None:
+    result = runner.invoke(app, ["handoff", "--help"])
+
+    assert result.exit_code == 0
+    assert "create" in result.stdout
+    assert "show" in result.stdout
+
+
 def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
     home = tmp_path / "home"
 

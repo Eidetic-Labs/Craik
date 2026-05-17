@@ -15,7 +15,6 @@ EXEMPT = {
     # Existing implementation debt being split in follow-up Task 5 PRs.
     "src/craik/runtime/providers/provider_runtime.py",
     "src/craik/cli_project.py",
-    "src/craik/cli_operations.py",
 }
 
 
