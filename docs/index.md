@@ -108,6 +108,7 @@ project.
 - [Training Trajectory Exports](reference/trajectory-exports.md)
 - [Skill Rollbacks](reference/skill-rollbacks.md)
 - [Voice Input And Output Posture](reference/voice-posture.md)
+- [Multimodal Artifact References](reference/multimodal-artifacts.md)
 - [Speech-To-Text Adapter Contract](reference/speech-to-text-adapters.md)
 - [Text-To-Speech Adapter Contract](reference/text-to-speech-adapters.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
