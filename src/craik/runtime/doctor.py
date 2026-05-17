@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from craik.contracts.models import GatewayConfig
+from craik.runtime.auth import (
+    AuthProfile,
+    AuthProfileStore,
+    AuthProfileStoreError,
+    CredentialStatus,
+)
+from craik.runtime.auth.sources import source_for_auth_profile
 from craik.runtime.paths import CraikPaths
 from craik.runtime.store import DATABASE_NAME, LocalStore, LocalStoreError
 
@@ -32,7 +40,13 @@ class DiagnosticCheck:
 
 def run_doctor(paths: CraikPaths, *, env: dict[str, str]) -> dict[str, object]:
     """Run read-only diagnostics without creating local state."""
-    checks = [_home_check(paths), *_store_checks(paths), _memory_backend_check(env)]
+    auth_profile_checks, auth_profile_payloads = _auth_profile_checks(paths)
+    checks = [
+        _home_check(paths),
+        *_store_checks(paths),
+        _memory_backend_check(env),
+        *auth_profile_checks,
+    ]
     store = _open_existing_store(paths)
     if store is None:
         checks.extend(
@@ -72,6 +86,7 @@ def run_doctor(paths: CraikPaths, *, env: dict[str, str]) -> dict[str, object]:
     return {
         "status": _overall_status(checks),
         "checks": [check.to_payload() for check in checks],
+        "auth_profiles": auth_profile_payloads,
     }
 
 
@@ -136,6 +151,104 @@ def _memory_backend_check(env: dict[str, str]) -> DiagnosticCheck:
         status="warning",
         summary="Stigmem URL is not configured; local proposal memory remains available.",
         action="Set CRAIK_STIGMEM_URL and run craik connect stigmem when shared memory is needed.",
+    )
+
+
+def _auth_profile_checks(paths: CraikPaths) -> tuple[list[DiagnosticCheck], list[dict[str, Any]]]:
+    store = AuthProfileStore(paths.home)
+    if not paths.home.exists() or not store.path.exists():
+        return [
+            DiagnosticCheck(
+                name="auth_profiles",
+                status="pass",
+                summary="No auth profiles are configured.",
+            )
+        ], []
+
+    try:
+        profiles = store.list()
+    except AuthProfileStoreError as error:
+        return [
+            DiagnosticCheck(
+                name="auth_profiles",
+                status="fail",
+                summary=f"Auth profile store could not be inspected: {error}",
+                action="Inspect or recreate auth-profiles.json.",
+            )
+        ], []
+
+    if not profiles:
+        return [
+            DiagnosticCheck(
+                name="auth_profiles",
+                status="pass",
+                summary="No auth profiles are configured.",
+            )
+        ], []
+
+    payloads = [
+        _auth_profile_payload(profile, _auth_profile_status(profile)) for profile in profiles
+    ]
+    checks = [
+        DiagnosticCheck(
+            name="auth_profiles",
+            status=_auth_profiles_status(payloads),
+            summary=f"Inspected {len(payloads)} auth profile(s).",
+        )
+    ]
+    checks.extend(_auth_profile_check(payload) for payload in payloads)
+    return checks, payloads
+
+
+def _auth_profile_status(profile: AuthProfile) -> CredentialStatus:
+    try:
+        return source_for_auth_profile(profile).status()
+    except ValueError as error:
+        return CredentialStatus(status="rejected", detail=str(error))
+
+
+def _auth_profile_payload(
+    profile: AuthProfile,
+    status: CredentialStatus,
+) -> dict[str, Any]:
+    return {
+        "id": profile.id,
+        "kind": profile.kind,
+        "provider_family": profile.provider_family,
+        "last_used_at": profile.last_used_at.isoformat()
+        if profile.last_used_at is not None
+        else None,
+        "last_status": profile.last_status,
+        "health": status.model_dump(mode="json"),
+    }
+
+
+def _auth_profiles_status(payloads: list[dict[str, Any]]) -> DiagnosticStatus:
+    if any(item["health"]["status"] in {"rejected", "expired"} for item in payloads):
+        return "warning"
+    if any(item["health"]["status"] in {"unknown", "rate_limited"} for item in payloads):
+        return "warning"
+    return "pass"
+
+
+def _auth_profile_check(payload: dict[str, Any]) -> DiagnosticCheck:
+    health = payload["health"]
+    health_status = health["status"]
+    status = "pass" if health_status == "ok" else "warning"
+    detail = health.get("detail")
+    summary = f"Auth profile {payload['id']} is {health_status}."
+    if detail:
+        summary = f"{summary} {detail}"
+    action = None
+    if health_status in {"expired", "rejected"}:
+        action = "Refresh or replace the credential before running live providers."
+    elif health_status == "unknown":
+        action = "Complete the auth profile metadata before use."
+    return DiagnosticCheck(
+        name=f"auth_profile:{payload['id']}",
+        status=status,
+        summary=summary,
+        action=action,
     )
 
 

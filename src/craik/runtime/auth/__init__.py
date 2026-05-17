@@ -14,6 +14,7 @@ from craik.runtime.auth.profile import (
     CredentialSource,
     CredentialStatus,
 )
+from craik.runtime.auth.sources import AuthProfileSourceError, source_for_auth_profile
 from craik.runtime.auth.store import (
     AUTH_PROFILES_SCHEMA_VERSION,
     AuthProfileNotFoundError,
@@ -25,6 +26,7 @@ __all__ = [
     "AUTH_PROFILES_SCHEMA_VERSION",
     "CREDENTIAL_POOL_SCHEMA_VERSION",
     "AuthProfile",
+    "AuthProfileSourceError",
     "AuthProfileNotFoundError",
     "AuthProfileStore",
     "AuthProfileStoreError",
@@ -36,4 +38,5 @@ __all__ = [
     "CredentialPoolError",
     "CredentialSource",
     "CredentialStatus",
+    "source_for_auth_profile",
 ]

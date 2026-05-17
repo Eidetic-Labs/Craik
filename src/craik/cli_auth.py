@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Annotated, Any, cast
 
 import typer
@@ -18,12 +17,7 @@ from craik.runtime.auth import (
     CredentialKind,
     CredentialStatus,
 )
-from craik.runtime.auth.sources import (
-    DEFAULT_CLAUDE_CREDENTIALS_PATH,
-    EnvVarApiKeySource,
-    LocalCLICredentialError,
-    LocalCLICredentialSource,
-)
+from craik.runtime.auth.sources import source_for_auth_profile
 from craik.runtime.providers.provider_transport import ProviderFamily
 
 
@@ -51,7 +45,7 @@ def auth_add(
         typer.Option("--source", help="Optional source hint for future credential kinds."),
     ] = None,
     credentials_path: Annotated[
-        Path | None,
+        str | None,
         typer.Option("--credentials-path", help="Local CLI credentials file path."),
     ] = None,
     refresh_endpoint: Annotated[
@@ -149,40 +143,19 @@ def auth_status() -> None:
 
 
 def _source_status(profile: AuthProfile) -> CredentialStatus:
-    if profile.kind is CredentialKind.API_KEY:
-        env_var = profile.metadata.get("env_var")
-        env_var = env_var if isinstance(env_var, str) else ""
-        return EnvVarApiKeySource(env_var).status()
-    if profile.kind is CredentialKind.OAUTH_TOKEN and profile.metadata.get("source") == "local-cli":
-        return _local_cli_source(profile).status()
-    return CredentialStatus(
-        status="unknown",
-        detail=f"{profile.kind.value} credential tests are not implemented yet",
-    )
+    try:
+        return source_for_auth_profile(profile).status()
+    except ValueError as exc:
+        return CredentialStatus(status="unknown", detail=str(exc))
 
 
 def _test_profile_status(profile: AuthProfile) -> CredentialStatus:
-    if profile.kind is CredentialKind.OAUTH_TOKEN and profile.metadata.get("source") == "local-cli":
-        source = _local_cli_source(profile)
-        try:
-            source.headers_for(profile.provider_family)
-        except LocalCLICredentialError as exc:
-            return CredentialStatus(status="rejected", detail=str(exc))
-        return source.status()
-    return _source_status(profile)
-
-
-def _local_cli_source(profile: AuthProfile) -> LocalCLICredentialSource:
-    credentials_path = profile.metadata.get("credentials_path")
-    refresh_endpoint = profile.metadata.get("refresh_endpoint")
-    client_id = profile.metadata.get("client_id")
-    return LocalCLICredentialSource(
-        credentials_path=Path(credentials_path)
-        if isinstance(credentials_path, str)
-        else DEFAULT_CLAUDE_CREDENTIALS_PATH,
-        refresh_endpoint=refresh_endpoint if isinstance(refresh_endpoint, str) else None,
-        client_id=client_id if isinstance(client_id, str) else None,
-    )
+    try:
+        source = source_for_auth_profile(profile)
+        source.headers_for(profile.provider_family)
+    except (RuntimeError, ValueError) as exc:
+        return CredentialStatus(status="rejected", detail=str(exc))
+    return source.status()
 
 
 def _profile_payload(profile: AuthProfile) -> dict[str, Any]:
