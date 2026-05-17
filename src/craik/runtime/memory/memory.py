@@ -2,30 +2,45 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Literal, Protocol, cast
+from typing import Any, Literal, cast
 from urllib import error, parse, request
 
 from craik.contracts.models import (
     CapabilityGrant,
     FactValue,
     MemoryBackendCapabilities,
-    MemoryContradictionPreview,
-    MemoryDiff,
-    MemoryFactReference,
-    MemoryImpactPreview,
     MemoryOptionalCapabilities,
     MemoryProposal,
     MemoryRequiredCapabilities,
     MemoryScope,
-    MemoryWriteFailure,
     PolicyEnvelope,
     TrustClass,
 )
 from craik.runtime.memory import memory_errors as _memory_errors
 from craik.runtime.memory import memory_proposals as _memory_proposals
+from craik.runtime.memory.diff import (
+    build_memory_diff as build_memory_diff,
+)
+from craik.runtime.memory.diff import (
+    fact_reference as fact_reference,
+)
+from craik.runtime.memory.diff import (
+    memory_write_failure as memory_write_failure,
+)
+from craik.runtime.memory.diff import (
+    preview_memory_impact as preview_memory_impact,
+)
+from craik.runtime.memory.local_stores import (
+    EphemeralMemoryStore as EphemeralMemoryStore,
+)
+from craik.runtime.memory.local_stores import (
+    LocalMemoryStore as LocalMemoryStore,
+)
+from craik.runtime.memory.local_stores import (
+    MemoryStore as MemoryStore,
+)
 from craik.runtime.memory.memory_errors import (
     DirectMemoryWriteDeniedError as DirectMemoryWriteDeniedError,
 )
@@ -46,124 +61,8 @@ from craik.runtime.memory.memory_errors import (
 )
 from craik.runtime.policy.policy import check_memory_grant
 from craik.runtime.policy.redaction import redact
-from craik.runtime.store import LocalStore
 
 LiteralSourceAttestation = Literal["warn", "enforce", "off"]
-
-
-class MemoryStore(Protocol):
-    """Common memory backend behavior used by Craik."""
-
-    def propose(self, proposal: MemoryProposal) -> MemoryProposal:
-        """Store a reviewable memory proposal."""
-
-    def get_proposal(self, proposal_id: str) -> MemoryProposal | None:
-        """Load one proposal."""
-
-    def list_proposals(
-        self,
-        *,
-        task_id: str | None = None,
-        status: str | None = None,
-    ) -> list[MemoryProposal]:
-        """List proposals with optional filters."""
-
-    def approve(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
-        """Approve a proposal for local memory use."""
-
-    def reject(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
-        """Reject a proposal."""
-
-    def search(self, query: str) -> list[FactValue]:
-        """Search approved local facts."""
-
-
-class EphemeralMemoryStore:
-    """In-memory backend for tests and demos."""
-
-    def __init__(self) -> None:
-        self._proposals: dict[str, MemoryProposal] = {}
-
-    def propose(self, proposal: MemoryProposal) -> MemoryProposal:
-        self._proposals[proposal.id] = proposal
-        return proposal
-
-    def get_proposal(self, proposal_id: str) -> MemoryProposal | None:
-        return self._proposals.get(proposal_id)
-
-    def list_proposals(
-        self,
-        *,
-        task_id: str | None = None,
-        status: str | None = None,
-    ) -> list[MemoryProposal]:
-        proposals = sorted(self._proposals.values(), key=lambda proposal: proposal.id)
-        return _filter_proposals(proposals, task_id=task_id, status=status)
-
-    def approve(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
-        proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        approved = _memory_proposals.approve_proposal(
-            proposal, decided_by=decided_by, reason=reason
-        )
-        self._proposals[proposal_id] = approved
-        return approved
-
-    def reject(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
-        proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        rejected = _memory_proposals.reject_proposal(
-            proposal, decided_by=decided_by, reason=reason
-        )
-        self._proposals[proposal_id] = rejected
-        return rejected
-
-    def search(self, query: str) -> list[FactValue]:
-        return _search_facts(self._proposals.values(), query)
-
-
-class LocalMemoryStore:
-    """SQLite-backed local memory proposal store."""
-
-    def __init__(self, store: LocalStore) -> None:
-        self._store = store
-
-    def propose(self, proposal: MemoryProposal) -> MemoryProposal:
-        self._store.put_proposal(proposal)
-        return proposal
-
-    def get_proposal(self, proposal_id: str) -> MemoryProposal | None:
-        return self._store.get_proposal(proposal_id)
-
-    def list_proposals(
-        self,
-        *,
-        task_id: str | None = None,
-        status: str | None = None,
-    ) -> list[MemoryProposal]:
-        return _filter_proposals(self._store.list_proposals(), task_id=task_id, status=status)
-
-    def approve(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
-        proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        approved = _memory_proposals.approve_proposal(
-            proposal, decided_by=decided_by, reason=reason
-        )
-        self._store.put_proposal(approved)
-        return approved
-
-    def reject(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
-        proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        rejected = _memory_proposals.reject_proposal(
-            proposal, decided_by=decided_by, reason=reason
-        )
-        self._store.put_proposal(rejected)
-        return rejected
-
-    def search(self, query: str) -> list[FactValue]:
-        return _search_facts(self._store.list_proposals(), query)
-
-    def write_fact(self, fact: FactValue) -> FactValue:
-        """Reject direct durable writes until a policy-granted path exists."""
-        message = "direct local memory writes require a memory.write grant"
-        raise DirectMemoryWriteDeniedError(message)
 
 
 @dataclass(frozen=True)
@@ -383,178 +282,6 @@ class StigmemMemoryStore:
         if not decision.allowed:
             raise DirectMemoryWriteDeniedError(decision.reason)
         return self._client.post_fact(fact)
-
-
-def build_memory_diff(
-    *,
-    task_id: str,
-    proposals: Iterable[MemoryProposal],
-    facts_written: Iterable[MemoryFactReference] = (),
-    write_failures: Iterable[MemoryWriteFailure] = (),
-    facts_read: Iterable[MemoryFactReference] = (),
-) -> MemoryDiff:
-    """Build a run-scoped memory diff from proposal and fact activity."""
-    scoped = [proposal for proposal in proposals if proposal.task_id == task_id]
-    return MemoryDiff(
-        id=f"memdiff_{task_id}",
-        task_id=task_id,
-        proposals_created=sorted(proposal.id for proposal in scoped),
-        proposals_approved=sorted(
-            proposal.id for proposal in scoped if proposal.status == "approved"
-        ),
-        proposals_rejected=sorted(
-            proposal.id for proposal in scoped if proposal.status == "rejected"
-        ),
-        facts_written=sorted(facts_written, key=_fact_reference_sort_key),
-        write_failures=sorted(
-            write_failures,
-            key=lambda failure: _fact_reference_sort_key(failure.fact),
-        ),
-        facts_read=sorted(facts_read, key=_fact_reference_sort_key),
-        created_at=datetime.now(UTC),
-    )
-
-
-def preview_memory_impact(
-    *,
-    task_id: str,
-    proposals: Iterable[MemoryProposal],
-    existing_facts: Iterable[FactValue],
-) -> MemoryImpactPreview:
-    """Preview memory additions, invalidations, evidence gaps, and likely contradictions."""
-    scoped = [proposal for proposal in proposals if proposal.task_id == task_id]
-    additions = [
-        fact_reference(proposal.fact)
-        for proposal in scoped
-        if proposal.operation in {"add", "update"}
-    ]
-    invalidations = [
-        fact_reference(proposal.fact) for proposal in scoped if proposal.operation == "invalidate"
-    ]
-    evidence_missing = sorted(proposal.id for proposal in scoped if not proposal.evidence)
-    contradictions = _likely_contradictions(scoped, existing_facts)
-    return MemoryImpactPreview(
-        id=f"mempreview_{task_id}",
-        task_id=task_id,
-        facts_to_add=sorted(additions, key=_fact_reference_sort_key),
-        facts_to_invalidate=sorted(invalidations, key=_fact_reference_sort_key),
-        likely_contradictions=contradictions,
-        evidence_missing=evidence_missing,
-        scope_summary=_scope_summary(scoped),
-        created_at=datetime.now(UTC),
-    )
-
-
-def fact_reference(
-    fact: FactValue,
-    *,
-    fact_id: str | None = None,
-    cid: str | None = None,
-) -> MemoryFactReference:
-    """Create a redacted fact reference for diffs and previews."""
-    return MemoryFactReference(
-        id=fact_id,
-        cid=cid,
-        entity=str(redact(fact.entity).value),
-        relation=str(redact(fact.relation).value),
-        value=str(redact(fact.value).value),
-        source=str(redact(fact.source).value),
-        scope=fact.scope,
-        trust_class=fact.trust_class,
-    )
-
-
-def memory_write_failure(
-    *,
-    fact: FactValue,
-    reason: str,
-) -> MemoryWriteFailure:
-    """Create a redacted memory write failure record."""
-    return MemoryWriteFailure(
-        fact=fact_reference(fact),
-        reason=str(redact(reason).value),
-        attempted_at=datetime.now(UTC),
-    )
-
-
-def _filter_proposals(
-    proposals: list[MemoryProposal],
-    *,
-    task_id: str | None,
-    status: str | None,
-) -> list[MemoryProposal]:
-    filtered = proposals
-    if task_id is not None:
-        filtered = [proposal for proposal in filtered if proposal.task_id == task_id]
-    if status is not None:
-        filtered = [proposal for proposal in filtered if proposal.status == status]
-    return sorted(filtered, key=lambda proposal: proposal.id)
-
-
-def _search_facts(proposals: Iterable[MemoryProposal], query: str) -> list[FactValue]:
-    needle = query.lower()
-    facts: list[FactValue] = []
-    for proposal in proposals:
-        if proposal.status != "approved":
-            continue
-        haystack = " ".join(
-            (
-                proposal.fact.entity,
-                proposal.fact.relation,
-                proposal.fact.value,
-                proposal.fact.source,
-            )
-        ).lower()
-        if needle in haystack:
-            facts.append(proposal.fact)
-    return sorted(facts, key=lambda fact: (fact.entity, fact.relation, fact.source))
-
-
-def _likely_contradictions(
-    proposals: Iterable[MemoryProposal],
-    existing_facts: Iterable[FactValue],
-) -> list[MemoryContradictionPreview]:
-    existing_by_key: dict[tuple[str, str], list[FactValue]] = {}
-    for fact in existing_facts:
-        existing_by_key.setdefault((fact.entity, fact.relation), []).append(fact)
-
-    contradictions: list[MemoryContradictionPreview] = []
-    for proposal in proposals:
-        if proposal.operation == "invalidate":
-            continue
-        for existing in existing_by_key.get((proposal.fact.entity, proposal.fact.relation), []):
-            if existing.value == proposal.fact.value:
-                continue
-            contradictions.append(
-                MemoryContradictionPreview(
-                    entity=proposal.fact.entity,
-                    relation=proposal.fact.relation,
-                    existing_value=existing.value,
-                    proposed_value=proposal.fact.value,
-                    reason="same entity and relation with a different value",
-                )
-            )
-    return sorted(
-        contradictions,
-        key=lambda item: (item.entity, item.relation, item.existing_value, item.proposed_value),
-    )
-
-
-def _scope_summary(proposals: Iterable[MemoryProposal]) -> dict[MemoryScope, int]:
-    summary: dict[MemoryScope, int] = {}
-    for proposal in proposals:
-        summary[proposal.fact.scope] = summary.get(proposal.fact.scope, 0) + 1
-    return dict(sorted(summary.items()))
-
-
-def _fact_reference_sort_key(fact: MemoryFactReference) -> tuple[str, str, str, str]:
-    return (fact.entity, fact.relation, fact.value, fact.source)
-
-
-def _require_proposal(proposal: MemoryProposal | None, proposal_id: str) -> MemoryProposal:
-    if proposal is None:
-        raise MemoryProposalNotFoundError(f"unknown memory proposal: {proposal_id}")
-    return proposal
 
 
 def _raise_stigmem_http_error(exc: error.HTTPError) -> None:
