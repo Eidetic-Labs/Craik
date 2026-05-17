@@ -38,6 +38,13 @@ def test_contract_fixtures_pin_schema_version(fixtures: dict[str, dict[str, Any]
         assert payload["version"] == SCHEMA_VERSION
 
 
+def test_runner_contract_models_keep_legacy_import_surface() -> None:
+    from craik.contracts import models
+    from craik.contracts.runner_models import RunnerMetadata
+
+    assert models.RunnerMetadata is RunnerMetadata
+
+
 @pytest.mark.parametrize("name", sorted(CONTRACT_REGISTRY))
 def test_wrong_schema_name_is_rejected(
     fixtures: dict[str, dict[str, Any]],
@@ -72,4 +79,3 @@ def test_extra_fields_are_rejected(
 
     with pytest.raises(ValidationError):
         CONTRACT_REGISTRY[name].model_validate(payload)
-
