@@ -18,6 +18,9 @@ from craik.runtime.providers.provider_config import (
 )
 from craik.runtime.providers.provider_execution import execute_provider_request
 from craik.runtime.providers.provider_models import (
+    CredentialApprovalRequiredError as CredentialApprovalRequiredError,
+)
+from craik.runtime.providers.provider_models import (
     ProviderLiveAccessNotConfiguredError,
     ProviderRuntimeChunk,
     ProviderRuntimeErrorDecision,

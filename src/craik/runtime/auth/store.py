@@ -90,6 +90,32 @@ class AuthProfileStore:
             self._write_unlocked(profiles)
             return updated
 
+    def approve(
+        self,
+        profile_id: str,
+        *,
+        run_id: str,
+        approved_by: str,
+        approved_at: datetime | None = None,
+    ) -> AuthProfile:
+        """Record an approval marker for a credential profile."""
+        with self._locked():
+            profiles = self._read_unlocked()
+            try:
+                current = profiles[profile_id]
+            except KeyError as exc:
+                raise AuthProfileNotFoundError(f"auth profile not found: {profile_id}") from exc
+            metadata = dict(current.metadata)
+            metadata["approval"] = {
+                "run_id": run_id,
+                "approved_by": approved_by,
+                "approved_at": (approved_at or datetime.now(UTC)).isoformat(),
+            }
+            updated = current.model_copy(update={"metadata": metadata})
+            profiles[profile_id] = updated
+            self._write_unlocked(profiles)
+            return updated
+
     def _read_unlocked(self) -> dict[str, AuthProfile]:
         if not self.path.exists():
             return {}

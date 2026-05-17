@@ -130,6 +130,30 @@ def auth_test(profile_id: str) -> None:
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
+@auth_app.command("approve")
+def auth_approve(
+    profile_id: str,
+    run_id: Annotated[
+        str,
+        typer.Option("--run", help="Run id requesting first credential use."),
+    ],
+    approved_by: Annotated[
+        str,
+        typer.Option("--approved-by", help="Operator or approver recording approval."),
+    ] = "operator:local",
+) -> None:
+    """Approve first live use of an auth profile for a run."""
+    try:
+        profile = AuthProfileStore.from_env().approve(
+            profile_id,
+            run_id=run_id,
+            approved_by=approved_by,
+        )
+    except AuthProfileNotFoundError as error:
+        raise typer.BadParameter(str(error)) from None
+    typer.echo(json.dumps(_profile_payload(profile), indent=2, sort_keys=True))
+
+
 @auth_app.command("status")
 def auth_status() -> None:
     """Show auth profile health and last-use status."""

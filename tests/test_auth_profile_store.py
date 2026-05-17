@@ -62,6 +62,24 @@ def test_auth_profile_store_mark_used_updates_status_and_timestamp(tmp_path: Pat
     assert store.get("openai:work").last_status == "ok"
 
 
+def test_auth_profile_store_approve_records_marker(tmp_path: Path) -> None:
+    store = AuthProfileStore(tmp_path)
+    store.put(_profile("openai:work"))
+
+    updated = store.approve(
+        "openai:work",
+        run_id="run_approval",
+        approved_by="operator:local",
+        approved_at=datetime(2026, 5, 17, 12, 0, tzinfo=UTC),
+    )
+
+    assert updated.metadata["approval"] == {
+        "run_id": "run_approval",
+        "approved_by": "operator:local",
+        "approved_at": "2026-05-17T12:00:00+00:00",
+    }
+
+
 def test_auth_profile_store_writes_owner_only_file_on_posix(tmp_path: Path) -> None:
     store = AuthProfileStore(tmp_path)
 

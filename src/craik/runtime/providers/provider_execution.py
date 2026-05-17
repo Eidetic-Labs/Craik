@@ -6,7 +6,12 @@ import time
 from collections.abc import Callable
 from typing import Any
 
-from craik.runtime.auth import CredentialPool
+from craik.runtime.auth import (
+    AuthProfile,
+    AuthProfileStore,
+    CredentialHealthStatus,
+    CredentialPool,
+)
 from craik.runtime.auth.operator import (
     active_operator_session,
     bind_operator_metadata,
@@ -14,6 +19,7 @@ from craik.runtime.auth.operator import (
 )
 from craik.runtime.auth.pool import PoolOutcome
 from craik.runtime.providers.provider_models import (
+    CredentialApprovalRequiredError,
     ProviderRuntimeAdapter,
     ProviderRuntimeError,
     ProviderRuntimeRequest,
@@ -32,6 +38,7 @@ def execute_provider_request(
 ) -> ProviderRuntimeResult:
     """Execute one provider request with retry and streaming normalization."""
     request = _request_with_operator_context(request)
+    _enforce_credential_approval(adapter, request)
     if adapter.config.live_enabled:
         adapter.require_live_access()
     payload = adapter.build_payload(request)
@@ -46,9 +53,11 @@ def execute_provider_request(
                 stream_callback=stream_callback,
             )
             _report_pool_outcome(adapter, "success")
+            _mark_auth_profile_used(adapter, "ok")
             return result
         except ProviderTransportError as error:
             _report_pool_outcome(adapter, _pool_outcome_for_error(error))
+            _mark_auth_profile_used(adapter, _profile_status_for_error(error))
             if (
                 not _retryable_transport_error(adapter, error)
                 or attempt >= adapter.config.max_retries
@@ -63,6 +72,23 @@ def _report_pool_outcome(adapter: ProviderRuntimeAdapter, outcome: PoolOutcome) 
         return
 
     CredentialPool.from_env().report(adapter.config.last_auth_profile_id, outcome)
+
+
+def _mark_auth_profile_used(
+    adapter: ProviderRuntimeAdapter,
+    status: CredentialHealthStatus,
+) -> None:
+    if adapter.config.credential_pool_id or not adapter.config.auth_profile_id:
+        return
+    AuthProfileStore.from_env().mark_used(adapter.config.auth_profile_id, status)
+
+
+def _profile_status_for_error(error: ProviderTransportError) -> CredentialHealthStatus:
+    if error.status_code == 429:
+        return "rate_limited"
+    if error.status_code in {401, 403}:
+        return "rejected"
+    return "unknown"
 
 
 def _pool_outcome_for_error(error: ProviderTransportError) -> PoolOutcome:
@@ -143,6 +169,31 @@ def _request_with_operator_context(
         return request
     request.metadata = bind_operator_metadata(request.metadata, session)
     return request
+
+
+def _enforce_credential_approval(
+    adapter: ProviderRuntimeAdapter,
+    request: ProviderRuntimeRequest,
+) -> None:
+    if not adapter.config.live_enabled or not adapter.config.auth_profile_id:
+        return
+    profile = AuthProfileStore.from_env().get(adapter.config.auth_profile_id)
+    if profile.last_used_at is not None or _profile_has_approval(profile, request):
+        return
+    run_id = str(request.metadata.get("run_id", "unknown"))
+    raise CredentialApprovalRequiredError(
+        "credential approval required; "
+        f"run craik auth approve {profile.id} --run={run_id}"
+    )
+
+
+def _profile_has_approval(profile: AuthProfile, request: ProviderRuntimeRequest) -> bool:
+    approval = profile.metadata.get("approval")
+    if not isinstance(approval, dict):
+        return False
+    approved_run = approval.get("run_id")
+    request_run = request.metadata.get("run_id")
+    return not request_run or approved_run == request_run
 
 
 def _sleep_before_retry(
