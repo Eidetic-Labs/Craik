@@ -12,6 +12,7 @@ Craik CI is split by surface so failures point at the area that regressed.
 | `contract` | Runtime contract fixture conformance and report generation. |
 | `integration` | Recorded provider integration tests that do not require live credentials. |
 | `security` | Policy baseline, release readiness, and public documentation hygiene. |
+| `CodeQL` | GitHub code scanning for Python on pull requests and pushes to `main`. |
 | `docs` | Generated CLI docs, docs hygiene, and Docusaurus build. |
 | `package` | Source distribution and wheel build, metadata validation, smoke install. |
 
@@ -48,6 +49,15 @@ secret material in CI.
 
 Optional live provider checks stay gated behind explicit environment flags such
 as `CRAIK_RUN_LIVE_TESTS=1` and are not part of the default pull request gate.
+
+## Code Scanning
+
+GitHub CodeQL default setup publishes the repository's code-scanning results.
+The repo-owned CodeQL workflow also runs Python analysis on pull requests and
+pushes to `main`, using the default query suite with `build-mode: none`, but
+keeps SARIF upload disabled while default setup remains active. This preserves
+a visible workflow definition without conflicting with GitHub's default
+code-scanning publisher.
 
 ## Changed-File Strictness
 
