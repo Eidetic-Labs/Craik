@@ -107,6 +107,7 @@ project.
 - [Learning Receipts](reference/learning-receipts.md)
 - [Training Trajectory Exports](reference/trajectory-exports.md)
 - [Skill Rollbacks](reference/skill-rollbacks.md)
+- [Voice Input And Output Posture](reference/voice-posture.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
