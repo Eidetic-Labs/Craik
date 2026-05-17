@@ -46,6 +46,7 @@ project.
 - [Companion App Security](guides/companion-app-security.md)
 - [Community Skills](guides/community-skills.md)
 - [Community Plugins](guides/community-plugins.md)
+- [Translated Documentation Strategy](guides/translated-docs.md)
 - [Development Checks](guides/development.md)
 
 ## Reference
