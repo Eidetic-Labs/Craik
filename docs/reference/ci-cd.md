@@ -10,6 +10,7 @@ Craik CI is split by surface so failures point at the area that regressed.
 | `type` | Strict mypy checks for the `craik` package. |
 | `unit` | Full pytest suite with coverage XML and JUnit artifacts. |
 | `contract` | Runtime contract fixture conformance and report generation. |
+| `integration` | Recorded provider integration tests that do not require live credentials. |
 | `security` | Policy baseline, release readiness, and public documentation hygiene. |
 | `docs` | Generated CLI docs, docs hygiene, and Docusaurus build. |
 | `package` | Source distribution and wheel build, metadata validation, smoke install. |
@@ -36,6 +37,17 @@ fixture bundle and writes:
 
 These reports are uploaded as CI artifacts and are also produced by the nightly
 reliability workflow.
+
+## Provider Integration
+
+The `integration` job runs recorded provider integration tests with
+`pytest -m "integration and not live" tests/integration`. These tests exercise
+live-shaped provider payloads through cassettes so pull requests can validate
+provider wiring without requiring paid API keys, localhost model servers, or
+secret material in CI.
+
+Optional live provider checks stay gated behind explicit environment flags such
+as `CRAIK_RUN_LIVE_TESTS=1` and are not part of the default pull request gate.
 
 ## Changed-File Strictness
 

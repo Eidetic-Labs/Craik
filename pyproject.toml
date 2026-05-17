@@ -57,6 +57,10 @@ artifacts = ["src/craik/py.typed"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+markers = [
+  "integration: recorded or optional live provider integration tests",
+  "live: tests that require an explicitly enabled live local provider",
+]
 
 [tool.coverage.run]
 branch = true
