@@ -9,6 +9,7 @@ from craik.runtime.model_providers import (
     DuplicateModelProviderError,
     ModelProviderNotFoundError,
     ModelProviderRegistry,
+    default_model_provider_registry,
 )
 
 NOW = datetime(2026, 5, 16, 19, 40, tzinfo=UTC)
@@ -103,3 +104,20 @@ def test_model_provider_registry_requires_known_provider() -> None:
 
     with pytest.raises(ModelProviderNotFoundError, match="unknown model provider"):
         registry.require("missing")
+
+
+def test_default_registry_includes_certified_mvp_provider_metadata() -> None:
+    registry = default_model_provider_registry()
+
+    openai = registry.require("provider_openai")
+    anthropic = registry.require("provider_anthropic")
+
+    assert openai.provider == "openai"
+    assert openai.runtime_path == "craik.runtime.provider_runtime.OpenAIProviderAdapter"
+    assert openai.metadata["default_model"] == "gpt-5.2"
+    assert "CRAIK_OPENAI_API_KEY" in openai.secret_ref_names
+    assert "model.tool_calls" in {capability.name for capability in openai.capabilities}
+    assert anthropic.provider == "anthropic"
+    assert anthropic.runtime_path == "craik.runtime.provider_runtime.AnthropicProviderAdapter"
+    assert anthropic.metadata["default_model"] == "claude-sonnet-4-20250514"
+    assert "CRAIK_ANTHROPIC_API_KEY" in anthropic.secret_ref_names

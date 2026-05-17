@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from craik.contracts.models import ModelProvider
+from craik.runtime.provider_runtime import ANTHROPIC_OFFICIAL_DOCS, OPENAI_OFFICIAL_DOCS
 
 
 class ModelProviderRegistryError(RuntimeError):
@@ -52,7 +53,7 @@ class ModelProviderRegistry:
 
 
 def default_model_provider_registry() -> ModelProviderRegistry:
-    """Return built-in provider metadata for local fixture workflows."""
+    """Return built-in provider metadata for local and certified MVP workflows."""
     return ModelProviderRegistry(
         [
             ModelProvider.model_validate(
@@ -85,9 +86,107 @@ def default_model_provider_registry() -> ModelProviderRegistry:
                     "docs": ["docs/reference/model-providers.md"],
                     "created_at": datetime.now(UTC),
                 }
-            )
+            ),
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_anthropic",
+                    "name": "Anthropic Claude Provider",
+                    "provider": "anthropic",
+                    "modes": ["chat", "tool", "runner"],
+                    "capabilities": _mvp_provider_capabilities(),
+                    "trust_boundary": "third-party",
+                    "config_refs": [
+                        "CRAIK_ANTHROPIC_MODEL",
+                        "CRAIK_ANTHROPIC_BASE_URL",
+                        "CRAIK_ANTHROPIC_VERSION",
+                    ],
+                    "secret_ref_names": ["CRAIK_ANTHROPIC_API_KEY"],
+                    "budget_ref": "budget_anthropic_monthly",
+                    "quota_ref": "quota_anthropic_daily",
+                    "runtime_path": "craik.runtime.provider_runtime.AnthropicProviderAdapter",
+                    "metadata": {
+                        "default_model": "claude-sonnet-4-20250514",
+                        "docs_verified": "2026-05-17",
+                    },
+                    "docs": [
+                        "docs/reference/model-providers.md",
+                        "docs/reference/provider-certification.md",
+                        *ANTHROPIC_OFFICIAL_DOCS,
+                    ],
+                    "created_at": datetime.now(UTC),
+                }
+            ),
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_openai",
+                    "name": "OpenAI Provider",
+                    "provider": "openai",
+                    "modes": ["chat", "tool", "runner"],
+                    "capabilities": _mvp_provider_capabilities(),
+                    "trust_boundary": "third-party",
+                    "config_refs": [
+                        "CRAIK_OPENAI_MODEL",
+                        "CRAIK_OPENAI_BASE_URL",
+                    ],
+                    "secret_ref_names": ["CRAIK_OPENAI_API_KEY"],
+                    "budget_ref": "budget_openai_monthly",
+                    "quota_ref": "quota_openai_daily",
+                    "runtime_path": "craik.runtime.provider_runtime.OpenAIProviderAdapter",
+                    "metadata": {
+                        "default_model": "gpt-5.2",
+                        "docs_verified": "2026-05-17",
+                    },
+                    "docs": [
+                        "docs/reference/model-providers.md",
+                        "docs/reference/provider-certification.md",
+                        *OPENAI_OFFICIAL_DOCS,
+                    ],
+                    "created_at": datetime.now(UTC),
+                }
+            ),
         ]
     )
+
+
+def _mvp_provider_capabilities() -> list[dict[str, object]]:
+    return [
+        {
+            "name": "model.chat",
+            "mode": "chat",
+            "description": "Provider chat request execution.",
+            "grant_required": True,
+        },
+        {
+            "name": "model.streaming",
+            "mode": "chat",
+            "description": "Provider streaming response support.",
+            "grant_required": True,
+        },
+        {
+            "name": "model.tool_calls",
+            "mode": "tool",
+            "description": "Provider tool call support.",
+            "grant_required": True,
+        },
+        {
+            "name": "model.structured_output",
+            "mode": "chat",
+            "description": "Provider structured output support.",
+            "grant_required": True,
+        },
+        {
+            "name": "model.usage_metadata",
+            "mode": "chat",
+            "description": "Provider usage metadata normalization.",
+            "grant_required": True,
+        },
+        {
+            "name": "runner.execute",
+            "mode": "runner",
+            "description": "Provider-backed runner execution.",
+            "grant_required": True,
+        },
+    ]
 
 
 def provider_selection_payload(

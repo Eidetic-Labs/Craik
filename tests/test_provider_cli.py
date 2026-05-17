@@ -12,9 +12,17 @@ def test_provider_list_prints_redacted_registry() -> None:
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
-    assert payload[0]["id"] == "provider_fixture_local"
-    assert payload[0]["secret_ref_names"] == ["CRAIK_PROVIDER_FIXTURE_TOKEN"]
-    assert "api_key" not in payload[0]["metadata"]
+    providers = {item["id"]: item for item in payload}
+    assert set(providers) >= {
+        "provider_anthropic",
+        "provider_fixture_local",
+        "provider_openai",
+    }
+    assert providers["provider_fixture_local"]["secret_ref_names"] == [
+        "CRAIK_PROVIDER_FIXTURE_TOKEN"
+    ]
+    assert providers["provider_openai"]["secret_ref_names"] == ["CRAIK_OPENAI_API_KEY"]
+    assert "api_key" not in providers["provider_fixture_local"]["metadata"]
 
 
 def test_provider_show_prints_one_provider() -> None:
@@ -24,6 +32,17 @@ def test_provider_show_prints_one_provider() -> None:
     payload = json.loads(result.stdout)
     assert payload["id"] == "provider_fixture_local"
     assert payload["trust_boundary"] == "local"
+
+
+def test_provider_show_prints_certified_openai_metadata() -> None:
+    result = runner.invoke(app, ["provider", "show", "provider_openai"])
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["id"] == "provider_openai"
+    assert payload["provider"] == "openai"
+    assert payload["trust_boundary"] == "third-party"
+    assert payload["metadata"]["default_model"] == "gpt-5.2"
 
 
 def test_provider_select_prints_policy_and_receipt_context() -> None:

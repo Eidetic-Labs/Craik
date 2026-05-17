@@ -43,3 +43,31 @@ Before implementing live API behavior, provider-specific assumptions should be
 verified against official provider documentation. Certification tests should
 remain deterministic by default and use fixtures unless a live smoke profile is
 explicitly enabled.
+
+## MVP Runtime Certification
+
+The MVP provider runtime certification is implemented as deterministic tests
+against `craik.runtime.provider_runtime`. The tests certify both OpenAI and
+Anthropic for:
+
+- request payload construction for chat, streaming, tools, and structured
+  output;
+- response normalization for text, tool calls, structured output, response ids,
+  and usage metadata;
+- retry decisions for provider throttling, transient failures, and overloads;
+- secret-reference-only configuration;
+- redacted provider receipts;
+- explicit live-access gating.
+
+Live provider calls remain disabled unless a caller constructs an adapter with
+`live_enabled=true` and supplies credentials through an external secret resolver.
+Provider metadata, receipts, CLI output, docs, and test fixtures must continue to
+name secret references only.
+
+## Official Provider References
+
+OpenAI MVP assumptions were verified against official OpenAI docs for Responses,
+streaming responses, structured outputs, function calling, and models.
+
+Anthropic MVP assumptions were verified against official Anthropic docs for
+Messages, streaming messages, tool use, model names, and rate limits.
