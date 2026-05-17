@@ -112,6 +112,7 @@ project.
 - [Speech-To-Text Adapter Contract](reference/speech-to-text-adapters.md)
 - [Text-To-Speech Adapter Contract](reference/text-to-speech-adapters.md)
 - [Desktop Companion App Decision](reference/desktop-companion.md)
+- [Mobile Companion App Decision](reference/mobile-companion.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
