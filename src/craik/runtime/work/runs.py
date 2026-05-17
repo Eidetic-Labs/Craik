@@ -39,6 +39,10 @@ class RunTransition:
     receipt_id: str | None = None
     handoff_id: str | None = None
     stop_reason: str | None = None
+    auth_profile_id: str | None = None
+    auth_identity_hash: str | None = None
+    operator_subject: str | None = None
+    operator_issuer: str | None = None
     at: datetime | None = None
 
 
@@ -60,6 +64,10 @@ class TaskRunManager:
         run_id: str | None = None,
         max_iterations: int = 5,
         runner_metadata: list[dict[str, object]] | None = None,
+        auth_profile_id: str | None = None,
+        auth_identity_hash: str | None = None,
+        operator_subject: str | None = None,
+        operator_issuer: str | None = None,
         created_at: datetime | None = None,
     ) -> TaskRun:
         now = created_at or datetime.now(UTC)
@@ -76,6 +84,10 @@ class TaskRunManager:
             phase_started_at=now,
             updated_at=now,
             runner_metadata=list(runner_metadata or []),
+            auth_profile_id=auth_profile_id,
+            auth_identity_hash=auth_identity_hash,
+            operator_subject=operator_subject,
+            operator_issuer=operator_issuer,
         )
         self.store.put_task_run(run)
         return run
@@ -120,6 +132,10 @@ class TaskRunManager:
                 "stop_reason": transition.stop_reason or run.stop_reason,
                 "receipt_ids": receipt_ids,
                 "handoff_id": transition.handoff_id or run.handoff_id,
+                "auth_profile_id": transition.auth_profile_id or run.auth_profile_id,
+                "auth_identity_hash": transition.auth_identity_hash or run.auth_identity_hash,
+                "operator_subject": transition.operator_subject or run.operator_subject,
+                "operator_issuer": transition.operator_issuer or run.operator_issuer,
             }
         )
         self.store.put_task_run(updated)
