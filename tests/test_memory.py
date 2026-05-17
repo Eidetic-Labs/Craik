@@ -42,6 +42,12 @@ def store(tmp_path: Path):
 
 def test_memory_proposal_helpers_keep_legacy_import_surface() -> None:
     from craik.runtime import memory
+    from craik.runtime.memory.diff import build_memory_diff as extracted_build_memory_diff
+    from craik.runtime.memory.diff import fact_reference as extracted_fact_reference
+    from craik.runtime.memory.local_stores import (
+        EphemeralMemoryStore as extracted_ephemeral_store,
+    )
+    from craik.runtime.memory.local_stores import LocalMemoryStore as extracted_local_store
     from craik.runtime.memory.memory_errors import (
         DirectMemoryWriteDeniedError as extracted_direct_write_error,
     )
@@ -55,6 +61,10 @@ def test_memory_proposal_helpers_keep_legacy_import_surface() -> None:
     assert memory.evidence_reference is extracted_evidence_reference
     assert memory.EvidenceRequiredError is extracted_evidence_error
     assert memory.DirectMemoryWriteDeniedError is extracted_direct_write_error
+    assert memory.LocalMemoryStore is extracted_local_store
+    assert memory.EphemeralMemoryStore is extracted_ephemeral_store
+    assert memory.build_memory_diff is extracted_build_memory_diff
+    assert memory.fact_reference is extracted_fact_reference
 
 
 def test_ephemeral_backend_proposal_lifecycle() -> None:
