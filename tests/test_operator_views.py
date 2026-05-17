@@ -51,6 +51,23 @@ from craik.runtime.companions.operator_views import (
 NOW = datetime(2026, 5, 16, 17, 55, tzinfo=UTC)
 
 
+def test_operator_views_reexports_artifact_formatters() -> None:
+    from craik.runtime.companions import operator_artifact_views, operator_views
+
+    assert (
+        operator_views.format_receipt_viewer
+        is operator_artifact_views.format_receipt_viewer
+    )
+    assert (
+        operator_views.format_handoff_viewer
+        is operator_artifact_views.format_handoff_viewer
+    )
+    assert (
+        operator_views.format_work_graph_explorer
+        is operator_artifact_views.format_work_graph_explorer
+    )
+
+
 def test_work_graph_explorer_formats_nodes_and_edges() -> None:
     export = WorkGraphExport(
         id="graph_task_docs_reconcile",
