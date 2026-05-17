@@ -12,6 +12,7 @@ import typer
 from pydantic import ValidationError
 
 from craik import __version__
+from craik.cli_receipts import receipts_app
 from craik.cli_runs import run_app
 from craik.contracts.models import (
     ContradictionStatus,
@@ -74,7 +75,6 @@ from craik.runtime.prompts import (
     PromptCompiler,
     PromptTaskNotFoundError,
 )
-from craik.runtime.receipts import ReceiptNotFoundError, ReceiptStore
 from craik.runtime.runners import default_runner_capability_matrices, get_runner_capability_matrix
 from craik.runtime.store import LocalStore
 from craik.runtime.tasks import create_task
@@ -113,7 +113,6 @@ memory_app = typer.Typer(help="Create and review local memory proposals.")
 app.add_typer(memory_app, name="memory")
 policy_app = typer.Typer(help="Inspect Craik policy profiles.")
 app.add_typer(policy_app, name="policy")
-receipts_app = typer.Typer(help="Inspect persisted capability receipts.")
 app.add_typer(receipts_app, name="receipts")
 app.add_typer(run_app, name="run")
 runners_app = typer.Typer(help="Inspect runner capabilities and trust profiles.")
@@ -1325,54 +1324,6 @@ def policy_test() -> None:
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
     if report.status != "passed":
         raise typer.Exit(code=1)
-
-
-@receipts_app.command("list")
-def receipts_list(
-    task_id: Annotated[
-        str | None,
-        typer.Option("--task-id", help="Only include receipts for this task id."),
-    ] = None,
-    policy_id: Annotated[
-        str | None,
-        typer.Option("--policy-id", help="Only include receipts linked to this policy envelope."),
-    ] = None,
-    handoff_id: Annotated[
-        str | None,
-        typer.Option("--handoff-id", help="Only include receipts linked to this handoff."),
-    ] = None,
-) -> None:
-    """Print persisted capability receipts as JSON."""
-    store = LocalStore.from_env()
-    try:
-        store.initialize()
-        receipt_store = ReceiptStore(store)
-        receipts = receipt_store.list_receipts(
-            task_id=task_id,
-            policy_id=policy_id,
-            handoff_id=handoff_id,
-        )
-    finally:
-        store.close()
-
-    payload = [receipt.model_dump(mode="json", by_alias=True) for receipt in receipts]
-    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
-
-
-@receipts_app.command("show")
-def receipts_show(receipt_id: str) -> None:
-    """Print one capability receipt by id as JSON."""
-    store = LocalStore.from_env()
-    try:
-        store.initialize()
-        receipt_store = ReceiptStore(store)
-        receipt = receipt_store.require_receipt(receipt_id)
-    except ReceiptNotFoundError as error:
-        raise typer.BadParameter(str(error)) from None
-    finally:
-        store.close()
-
-    typer.echo(json.dumps(receipt.model_dump(mode="json", by_alias=True), indent=2, sort_keys=True))
 
 
 def _policy_profile(value: str) -> PolicyProfile:

@@ -5,6 +5,8 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from craik.cli import app, package_version
+from craik.cli import receipts_app as mounted_receipts_app
+from craik.cli_receipts import receipts_app
 from craik.contracts.models import (
     CapabilityReceipt,
     ReceiptResult,
@@ -30,6 +32,14 @@ def test_version_option_prints_version() -> None:
 
     assert result.exit_code == 0
     assert result.stdout.strip() == package_version()
+
+
+def test_receipts_app_is_mounted_from_extracted_module() -> None:
+    result = runner.invoke(app, ["receipts", "--help"])
+
+    assert mounted_receipts_app is receipts_app
+    assert result.exit_code == 0
+    assert "Inspect persisted capability receipts." in result.output
 
 
 def test_version_command_prints_version() -> None:
