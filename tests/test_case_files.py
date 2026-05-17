@@ -14,6 +14,7 @@ from craik.runtime.work.case_files import (
     ProjectNotFoundError,
     TaskNotFoundError,
 )
+from craik.runtime.work.case_support import context_budget
 from craik.runtime.work.handoffs import HandoffWriter
 from craik.runtime.work.tasks import create_task
 
@@ -105,6 +106,29 @@ def test_case_file_tracks_missing_context_as_assumptions(
     assert "No mutable documentation files were discovered for this project." in statements
     assert case_file.github_state == {"status": "not_loaded"}
     assert "Case file contains open assumptions" in case_file.stale_risks[-1]
+
+
+def test_case_context_budget_counts_extracted_context_inputs() -> None:
+    budget = context_budget(
+        max_tokens=128,
+        docs=["README.md"],
+        adrs=["docs/adr/0001-record.md"],
+        omitted_docs=["docs/large.md"],
+        excluded_docs=[{"path": "docs/build", "reason": "excluded by pattern"}],
+        discovery_rules={"default_exclude": ["docs/build/**"]},
+        evidence=[],
+        assumptions=[],
+        active_instruction_constraints=[{"path": "AGENTS.md"}],
+        memory_fact_count=2,
+        recent_handoffs=["handoff_1: completed: Done"],
+        contradiction_ids=["contradiction_1"],
+    )
+
+    assert budget["docs_included"] == 1
+    assert budget["adrs_included"] == 1
+    assert budget["docs_omitted"] == ["docs/large.md"]
+    assert budget["memory_fact_count"] == 2
+    assert budget["contradiction_ids"] == ["contradiction_1"]
 
 
 def test_case_file_loads_memory_handoffs_and_contradictions(

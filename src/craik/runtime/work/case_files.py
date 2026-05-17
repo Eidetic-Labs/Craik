@@ -10,9 +10,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from craik.contracts.models import (
-    Assumption,
     CaseFile,
-    ContradictionReport,
     EvidenceReference,
     FactValue,
     ProjectProfile,
@@ -27,6 +25,15 @@ from craik.runtime.projects.instruction_sources import (
     instruction_stale_risk_warnings,
 )
 from craik.runtime.store import LocalStore
+from craik.runtime.work.case_support import (
+    case_assumptions,
+    context_budget,
+    open_contradictions,
+    verification_plan,
+)
+from craik.runtime.work.case_support import (
+    stale_risks as case_stale_risks,
+)
 from craik.runtime.work.known_traps import known_trap_summaries
 from craik.runtime.work.scratchpad import unknown_summaries
 
@@ -139,8 +146,8 @@ class CaseFileAssembler:
         evidence = _evidence(task, project, discovered.docs, discovered.adrs, repo_state)
         facts = _memory_facts(self.memory, task)
         recent_handoffs = _recent_handoffs(self.store, task.id)
-        contradictions = _open_contradictions(self.store, task.id, project.id)
-        assumptions = _assumptions(
+        contradictions = open_contradictions(self.store, task.id, project.id)
+        assumptions = case_assumptions(
             task,
             project,
             discovered.docs,
@@ -149,7 +156,7 @@ class CaseFileAssembler:
             facts,
         )
         stale_risks = [
-            *_stale_risks(repo_state, discovered.docs, assumptions),
+            *case_stale_risks(repo_state, discovered.docs, assumptions),
             *instruction_stale_risk_warnings(self.store, project.id),
             *known_trap_summaries(self.store, project.id),
             *unknown_summaries(self.store, task.id),
@@ -173,8 +180,8 @@ class CaseFileAssembler:
             recent_handoffs=recent_handoffs,
             stale_risks=stale_risks,
             contradictions=contradictions,
-            verification_plan=_verification_plan(task),
-            context_budget=_context_budget(
+            verification_plan=verification_plan(task),
+            context_budget=context_budget(
                 max_tokens=max_tokens,
                 docs=discovered.docs,
                 adrs=discovered.adrs,
@@ -433,153 +440,6 @@ def _recent_handoffs(store: LocalStore, task_id: str, limit: int = 5) -> list[st
         f"{handoff.id}: {handoff.status}: {handoff.summary}"
         for handoff in sorted(handoffs, key=lambda item: item.created_at, reverse=True)[:limit]
     ]
-
-
-def _open_contradictions(
-    store: LocalStore,
-    task_id: str,
-    project_id: str,
-) -> list[ContradictionReport]:
-    return sorted(
-        [
-            report
-            for report in store.list_contradictions()
-            if report.status == "open"
-            and (report.task_id == task_id or getattr(report, "project_id", None) == project_id)
-        ],
-        key=lambda report: report.id,
-    )
-
-
-def _assumptions(
-    task: TaskRequest,
-    project: ProjectProfile,
-    docs: list[str],
-    omitted_docs: list[str],
-    github_state: dict[str, Any],
-    facts: list[FactValue],
-) -> list[Assumption]:
-    assumptions = []
-    if not facts:
-        assumptions.append(
-            Assumption(
-                id=f"assumption_{task.id}_memory_not_loaded",
-                task_id=task.id,
-                statement="No memory facts were loaded into this case file.",
-                rationale=(
-                    f"The configured memory backend is {project.memory.backend}, but no "
-                    "queryable facts were available for this task."
-                ),
-                confidence=1.0,
-                status="open",
-            )
-        )
-    if github_state.get("status") != "loaded":
-        assumptions.append(
-            Assumption(
-                id=f"assumption_{task.id}_github_not_loaded",
-                task_id=task.id,
-                statement="No GitHub issue or pull request state was loaded into this case file.",
-                rationale=_github_assumption_rationale(github_state),
-                confidence=1.0,
-                status="open",
-            )
-        )
-    if not docs:
-        assumptions.append(
-            Assumption(
-                id=f"assumption_{task.id}_docs_missing",
-                task_id=task.id,
-                statement="No mutable documentation files were discovered for this project.",
-                rationale=(
-                    "Configured documentation paths were missing or only contained immutable docs."
-                ),
-                confidence=0.9,
-                status="open",
-            )
-        )
-    if omitted_docs:
-        assumptions.append(
-            Assumption(
-                id=f"assumption_{task.id}_context_omitted",
-                task_id=task.id,
-                statement="Some documentation was omitted from the case file context budget.",
-                rationale="Configured docs exceeded the requested context budget.",
-                confidence=1.0,
-                status="open",
-            )
-        )
-    return assumptions
-
-
-def _github_assumption_rationale(github_state: dict[str, Any]) -> str:
-    status = github_state.get("status")
-    if status == "not_configured":
-        return "Project remote is not configured as a GitHub repository."
-    if status == "error":
-        warnings = github_state.get("warnings")
-        if isinstance(warnings, list) and warnings:
-            return f"GitHub read adapter could not load state: {warnings[0]}"
-        return "GitHub read adapter could not load state."
-    return "GitHub read adapter was not configured for this case file build."
-
-
-def _stale_risks(
-    repo_state: dict[str, Any],
-    docs: list[str],
-    assumptions: list[Assumption],
-) -> list[str]:
-    risks: list[str] = []
-    if docs:
-        risks.append("Documentation may be stale relative to implementation and memory state.")
-    if repo_state["dirty"]:
-        risks.append("Repository has uncommitted changes that may affect case file accuracy.")
-    if assumptions:
-        risks.append("Case file contains open assumptions that require downstream review.")
-    return risks
-
-
-def _verification_plan(task: TaskRequest) -> list[str]:
-    plan = ["Review case file assumptions before acting.", "Run repository-appropriate tests."]
-    if task.mode in {"review", "verify"}:
-        plan.insert(0, "Compare findings against cited evidence.")
-    return plan
-
-
-def _context_budget(
-    *,
-    max_tokens: int,
-    docs: list[str],
-    adrs: list[str],
-    omitted_docs: list[str],
-    excluded_docs: list[dict[str, str]],
-    discovery_rules: dict[str, list[str]],
-    evidence: list[EvidenceReference],
-    assumptions: list[Assumption],
-    active_instruction_constraints: list[dict[str, object]],
-    memory_fact_count: int,
-    recent_handoffs: list[str],
-    contradiction_ids: list[str],
-) -> dict[str, Any]:
-    return {
-        "max_tokens": max_tokens,
-        "estimated_tokens": _estimate_tokens(docs + adrs),
-        "docs_included": len(docs),
-        "adrs_included": len(adrs),
-        "docs_omitted": omitted_docs,
-        "docs_excluded": excluded_docs,
-        "discovery_rules": discovery_rules,
-        "evidence_count": len(evidence),
-        "assumption_count": len(assumptions),
-        "active_instruction_constraints": active_instruction_constraints,
-        "memory_fact_count": memory_fact_count,
-        "recent_handoffs": recent_handoffs,
-        "contradiction_ids": contradiction_ids,
-    }
-
-
-def _estimate_tokens(paths: list[str]) -> int:
-    return sum(max(1, len(path) // 4) for path in paths)
 
 
 def _is_immutable(path: str, immutable_prefixes: tuple[str, ...]) -> bool:
