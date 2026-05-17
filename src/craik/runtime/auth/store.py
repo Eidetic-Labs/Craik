@@ -1,0 +1,175 @@
+"""File-backed auth profile store."""
+
+from __future__ import annotations
+
+import json
+import os
+import stat
+import tempfile
+import time
+from collections.abc import Iterator
+from contextlib import contextmanager
+from datetime import UTC, datetime
+from pathlib import Path
+
+from pydantic import ValidationError
+
+from craik.runtime.auth.profile import AuthProfile, CredentialHealthStatus
+from craik.runtime.paths import ensure_craik_home, resolve_craik_home
+
+AUTH_PROFILES_FILENAME = "auth-profiles.json"
+AUTH_PROFILES_SCHEMA_VERSION = 1
+OWNER_ONLY_FILE_MODE = 0o600
+
+
+class AuthProfileStoreError(RuntimeError):
+    """Raised when auth profile state cannot be loaded or written."""
+
+
+class AuthProfileNotFoundError(AuthProfileStoreError):
+    """Raised when a requested auth profile does not exist."""
+
+
+class AuthProfileStore:
+    """Read and write auth profiles in a local Craik home directory."""
+
+    def __init__(self, home: Path) -> None:
+        self.home = home.expanduser().resolve()
+        self.path = self.home / AUTH_PROFILES_FILENAME
+        self.lock_path = self.home / f"{AUTH_PROFILES_FILENAME}.lock"
+
+    @classmethod
+    def from_env(cls, env: dict[str, str] | None = None) -> AuthProfileStore:
+        """Create a store from CRAIK_HOME, ensuring the home layout exists."""
+        ensure_craik_home(env)
+        return cls(resolve_craik_home(env))
+
+    def list(self) -> list[AuthProfile]:
+        """Return all configured auth profiles."""
+        with self._locked():
+            return sorted(self._read_unlocked().values(), key=lambda profile: profile.id)
+
+    def get(self, profile_id: str) -> AuthProfile:
+        """Return one auth profile by id."""
+        with self._locked():
+            profiles = self._read_unlocked()
+            try:
+                return profiles[profile_id]
+            except KeyError as exc:
+                raise AuthProfileNotFoundError(f"auth profile not found: {profile_id}") from exc
+
+    def put(self, profile: AuthProfile) -> None:
+        """Create or replace one auth profile."""
+        with self._locked():
+            profiles = self._read_unlocked()
+            profiles[profile.id] = profile
+            self._write_unlocked(profiles)
+
+    def delete(self, profile_id: str) -> None:
+        """Delete one auth profile if present."""
+        with self._locked():
+            profiles = self._read_unlocked()
+            profiles.pop(profile_id, None)
+            self._write_unlocked(profiles)
+
+    def mark_used(self, profile_id: str, status: CredentialHealthStatus) -> AuthProfile:
+        """Record profile use and return the updated profile."""
+        with self._locked():
+            profiles = self._read_unlocked()
+            try:
+                current = profiles[profile_id]
+            except KeyError as exc:
+                raise AuthProfileNotFoundError(f"auth profile not found: {profile_id}") from exc
+            updated = current.model_copy(
+                update={
+                    "last_used_at": datetime.now(UTC),
+                    "last_status": status,
+                }
+            )
+            profiles[profile_id] = updated
+            self._write_unlocked(profiles)
+            return updated
+
+    def _read_unlocked(self) -> dict[str, AuthProfile]:
+        if not self.path.exists():
+            return {}
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise AuthProfileStoreError("auth profile store contains invalid JSON") from exc
+        if not isinstance(payload, dict) or payload.get("version") != AUTH_PROFILES_SCHEMA_VERSION:
+            raise AuthProfileStoreError("auth profile store has unsupported schema version")
+        raw_profiles = payload.get("profiles", [])
+        if not isinstance(raw_profiles, list):
+            raise AuthProfileStoreError("auth profile store profiles must be a list")
+        profiles: dict[str, AuthProfile] = {}
+        try:
+            for item in raw_profiles:
+                profile = AuthProfile.model_validate(item)
+                profiles[profile.id] = profile
+        except ValidationError as exc:
+            raise AuthProfileStoreError("auth profile store contains invalid profile data") from exc
+        return profiles
+
+    def _write_unlocked(self, profiles: dict[str, AuthProfile]) -> None:
+        self.home.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "version": AUTH_PROFILES_SCHEMA_VERSION,
+            "profiles": [
+                profile.model_dump(mode="json")
+                for profile in sorted(profiles.values(), key=lambda item: item.id)
+            ],
+        }
+        fd, temp_name = tempfile.mkstemp(
+            prefix=".auth-profiles.",
+            suffix=".tmp",
+            dir=self.home,
+            text=True,
+        )
+        temp_path = Path(temp_name)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, indent=2, sort_keys=True)
+                handle.write("\n")
+            if os.name == "posix":
+                temp_path.chmod(OWNER_ONLY_FILE_MODE)
+            os.replace(temp_path, self.path)
+            if os.name == "posix":
+                self.path.chmod(OWNER_ONLY_FILE_MODE)
+        finally:
+            if temp_path.exists():
+                temp_path.unlink()
+
+    @contextmanager
+    def _locked(self) -> Iterator[None]:
+        self.home.mkdir(parents=True, exist_ok=True)
+        if os.name == "posix":
+            import fcntl
+
+            with self.lock_path.open("a+", encoding="utf-8") as lock_file:
+                fcntl.flock(lock_file, fcntl.LOCK_EX)
+                try:
+                    yield
+                finally:
+                    fcntl.flock(lock_file, fcntl.LOCK_UN)
+            return
+
+        lock_fd: int | None = None
+        while lock_fd is None:
+            try:
+                lock_fd = os.open(str(self.lock_path), os.O_CREAT | os.O_EXCL | os.O_RDWR)
+            except FileExistsError:
+                time.sleep(0.01)
+        try:
+            yield
+        finally:
+            os.close(lock_fd)
+            self.lock_path.unlink(missing_ok=True)
+
+
+def auth_profile_store_owner_only(path: Path) -> bool:
+    """Return whether an auth profile store file is owner-readable/writable only."""
+    if os.name != "posix":
+        return True
+    mode = stat.S_IMODE(path.stat().st_mode)
+    return mode == OWNER_ONLY_FILE_MODE
