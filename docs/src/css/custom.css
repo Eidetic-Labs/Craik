@@ -1,0 +1,70 @@
+:root {
+  --ifm-color-primary: #235c7a;
+  --ifm-color-primary-dark: #1f526e;
+  --ifm-color-primary-darker: #1d4d67;
+  --ifm-color-primary-darkest: #183f55;
+  --ifm-color-primary-light: #276686;
+  --ifm-color-primary-lighter: #296b8d;
+  --ifm-color-primary-lightest: #2f799f;
+  --ifm-code-font-size: 95%;
+}
+
+html[data-theme='dark'] {
+  --ifm-color-primary: #7ec8d9;
+  --ifm-color-primary-dark: #5bb9cf;
+  --ifm-color-primary-darker: #49b1ca;
+  --ifm-color-primary-darkest: #3196ad;
+  --ifm-color-primary-light: #a1d7e3;
+  --ifm-color-primary-lighter: #b3dfeb;
+  --ifm-color-primary-lightest: #d7eff5;
+}
+
+.markdown h1:first-child {
+  letter-spacing: 0;
+}
+
+.craik-home {
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 64px 24px;
+}
+
+.craik-home__hero {
+  margin-bottom: 48px;
+}
+
+.craik-home__hero h1 {
+  font-size: 3rem;
+  letter-spacing: 0;
+  margin-bottom: 12px;
+}
+
+.craik-home__hero p {
+  font-size: 1.2rem;
+  max-width: 640px;
+}
+
+.craik-home__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.craik-home__card {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-font-color-base);
+  display: block;
+  padding: 20px;
+}
+
+.craik-home__card:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+}
+
+.craik-home__card h2 {
+  font-size: 1.2rem;
+  letter-spacing: 0;
+}

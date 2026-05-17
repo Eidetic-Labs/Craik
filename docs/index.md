@@ -10,6 +10,7 @@ project.
 - [Stigmem Documentation Demo](guides/stigmem-docs-demo.md)
 - [CLI Reference](reference/cli.md)
 - [Limitations](limitations.md)
+- [Robust MVP Roadmap](mvp-roadmap.md)
 
 ## Concepts
 
@@ -79,6 +80,7 @@ project.
 - [Scheduled Automations](reference/scheduled-automations.md)
 - [Gateway Receipts](reference/gateway-receipts.md)
 - [Model Providers](reference/model-providers.md)
+- [Provider Certification](reference/provider-certification.md)
 - [Provider Switching](reference/provider-switching.md)
 - [Provider Failover](reference/provider-failover.md)
 - [MCP Export Boundary](reference/mcp-export-boundary.md)

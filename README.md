@@ -107,11 +107,22 @@ Craik is not built as a dependency layer on another agent framework. It borrows 
 
 ## Current Status
 
-Craik is in pre-0.1.0 implementation. The immediate goal is to validate the product shape, define the runtime contracts, and build a narrow MVP around software delivery workflows.
+Craik is moving toward a robust `0.x.0` MVP release. `1.0.0` is a later
+stability signal, not the first release target.
 
-The Python package and `craik` CLI scaffold now exist. Project registration, task creation, local SQLite persistence, case file assembly, agent onboarding, the Stigmem documentation reconciliation demo, read-only GitHub context, work graph export, handoff writing, local contradiction reports, policy profile generation, policy regression tests, capability grant checks, central redaction, receipt storage, local memory proposals, and minimum Stigmem compatibility are implemented. Runtime workflows such as governed execution wrappers and runner adapters are still planned work.
+The repository now includes the CLI package, strict runtime contracts, local
+SQLite state, project/task/case-file workflows, policy and receipt primitives,
+runner preview contracts, governed loop fixtures, multi-agent review contracts,
+instruction distillation, quality/recovery helpers, skills/plugins foundations,
+operator view formatters, gateway/channel contracts, sandbox/provider routing
+contracts, learning-loop helpers, multimodal decisions, migration/i18n
+contracts, and broad docs/tests through the v0.13 roadmap.
 
-The first useful demo should show an agent entering a real repository, assembling the current project model, identifying stale or contradictory documentation, producing a governed plan, and leaving a durable handoff for the next agent.
+The remaining MVP work is to harden those contract and helper surfaces into one
+complete release-quality workflow: OpenAI and Anthropic provider execution,
+policy-enforced side effects, durable receipts, Stigmem-backed case context,
+accurate Docusaurus docs, release packaging, migrations, and CI/CD depth
+comparable to Stigmem. See [Robust MVP Roadmap](docs/mvp-roadmap.md).
 
 ## Implementation Stack
 

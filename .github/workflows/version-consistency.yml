@@ -1,0 +1,33 @@
+name: Version Consistency
+
+on:
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "src/craik/__init__.py"
+      - "docs/package.json"
+      - "scripts/check_version_consistency.py"
+      - ".github/workflows/version-consistency.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "pyproject.toml"
+      - "src/craik/__init__.py"
+      - "docs/package.json"
+      - "scripts/check_version_consistency.py"
+      - ".github/workflows/version-consistency.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  version-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check version declarations
+        run: python scripts/check_version_consistency.py
