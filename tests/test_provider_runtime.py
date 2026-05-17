@@ -25,6 +25,27 @@ from craik.runtime.providers.provider_transport import (
 from craik.runtime.secrets import SecretResolver
 
 
+def test_provider_runtime_keeps_extracted_import_surface() -> None:
+    from craik.runtime.providers.provider_config import (
+        ProviderRuntimeConfig as extracted_config,
+    )
+    from craik.runtime.providers.provider_models import ProviderMessage as extracted_message
+    from craik.runtime.providers.provider_models import (
+        ProviderRuntimeRequest as extracted_request,
+    )
+    from craik.runtime.providers.provider_runtime import ProviderMessage as runtime_message
+    from craik.runtime.providers.provider_runtime import (
+        ProviderRuntimeConfig as runtime_config,
+    )
+    from craik.runtime.providers.provider_runtime import (
+        ProviderRuntimeRequest as runtime_request,
+    )
+
+    assert runtime_config is extracted_config
+    assert runtime_message is extracted_message
+    assert runtime_request is extracted_request
+
+
 def _openai_adapter(*, live_enabled: bool = False) -> OpenAIProviderAdapter:
     return OpenAIProviderAdapter(
         ProviderRuntimeConfig(
