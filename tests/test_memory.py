@@ -40,6 +40,21 @@ def store(tmp_path: Path):
         local_store.close()
 
 
+def test_memory_proposal_helpers_keep_legacy_import_surface() -> None:
+    from craik.runtime import memory
+    from craik.runtime.memory_errors import (
+        DirectMemoryWriteDeniedError as extracted_direct_write_error,
+    )
+    from craik.runtime.memory_errors import EvidenceRequiredError as extracted_evidence_error
+    from craik.runtime.memory_proposals import create_proposal as extracted_create_proposal
+    from craik.runtime.memory_proposals import evidence_reference as extracted_evidence_reference
+
+    assert memory.create_proposal is extracted_create_proposal
+    assert memory.evidence_reference is extracted_evidence_reference
+    assert memory.EvidenceRequiredError is extracted_evidence_error
+    assert memory.DirectMemoryWriteDeniedError is extracted_direct_write_error
+
+
 def test_ephemeral_backend_proposal_lifecycle() -> None:
     backend = EphemeralMemoryStore()
     proposal = _proposal()

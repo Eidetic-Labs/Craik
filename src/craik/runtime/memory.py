@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -11,7 +10,6 @@ from urllib import error, parse, request
 
 from craik.contracts.models import (
     CapabilityGrant,
-    EvidenceReference,
     FactValue,
     MemoryBackendCapabilities,
     MemoryContradictionPreview,
@@ -24,46 +22,33 @@ from craik.contracts.models import (
     MemoryScope,
     MemoryWriteFailure,
     PolicyEnvelope,
-    ProposalOperation,
     TrustClass,
+)
+from craik.runtime import memory_errors as _memory_errors
+from craik.runtime import memory_proposals as _memory_proposals
+from craik.runtime.memory_errors import (
+    DirectMemoryWriteDeniedError as DirectMemoryWriteDeniedError,
+)
+from craik.runtime.memory_errors import (
+    MemoryProposalNotFoundError as MemoryProposalNotFoundError,
+)
+from craik.runtime.memory_errors import (
+    StigmemAuthError as StigmemAuthError,
+)
+from craik.runtime.memory_errors import (
+    StigmemCapabilityError as StigmemCapabilityError,
+)
+from craik.runtime.memory_errors import (
+    StigmemPermissionError as StigmemPermissionError,
+)
+from craik.runtime.memory_errors import (
+    StigmemRequestError as StigmemRequestError,
 )
 from craik.runtime.policy import check_memory_grant
 from craik.runtime.redaction import redact
 from craik.runtime.store import LocalStore
 
 LiteralSourceAttestation = Literal["warn", "enforce", "off"]
-
-
-class MemoryError(RuntimeError):
-    """Base error for memory backend failures."""
-
-
-class MemoryProposalNotFoundError(MemoryError):
-    """Raised when a proposal cannot be found."""
-
-
-class EvidenceRequiredError(MemoryError):
-    """Raised when promotion is attempted without evidence."""
-
-
-class DirectMemoryWriteDeniedError(MemoryError):
-    """Raised when direct writes are attempted without a policy grant."""
-
-
-class StigmemAuthError(MemoryError):
-    """Raised when a Stigmem node rejects authentication."""
-
-
-class StigmemPermissionError(MemoryError):
-    """Raised when a Stigmem node rejects an authorized action."""
-
-
-class StigmemRequestError(MemoryError):
-    """Raised when a Stigmem request fails."""
-
-
-class StigmemCapabilityError(MemoryError):
-    """Raised when a Stigmem node lacks required v0.1.0 compatibility."""
 
 
 class MemoryStore(Protocol):
@@ -117,13 +102,17 @@ class EphemeralMemoryStore:
 
     def approve(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
         proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        approved = approve_proposal(proposal, decided_by=decided_by, reason=reason)
+        approved = _memory_proposals.approve_proposal(
+            proposal, decided_by=decided_by, reason=reason
+        )
         self._proposals[proposal_id] = approved
         return approved
 
     def reject(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
         proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        rejected = reject_proposal(proposal, decided_by=decided_by, reason=reason)
+        rejected = _memory_proposals.reject_proposal(
+            proposal, decided_by=decided_by, reason=reason
+        )
         self._proposals[proposal_id] = rejected
         return rejected
 
@@ -154,13 +143,17 @@ class LocalMemoryStore:
 
     def approve(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
         proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        approved = approve_proposal(proposal, decided_by=decided_by, reason=reason)
+        approved = _memory_proposals.approve_proposal(
+            proposal, decided_by=decided_by, reason=reason
+        )
         self._store.put_proposal(approved)
         return approved
 
     def reject(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
         proposal = _require_proposal(self.get_proposal(proposal_id), proposal_id)
-        rejected = reject_proposal(proposal, decided_by=decided_by, reason=reason)
+        rejected = _memory_proposals.reject_proposal(
+            proposal, decided_by=decided_by, reason=reason
+        )
         self._store.put_proposal(rejected)
         return rejected
 
@@ -484,99 +477,6 @@ def memory_write_failure(
     )
 
 
-def create_proposal(
-    *,
-    task_id: str,
-    entity: str,
-    relation: str,
-    value: str,
-    source: str,
-    confidence: float,
-    scope: MemoryScope,
-    trust_class: TrustClass,
-    evidence: list[EvidenceReference],
-    operation: ProposalOperation = "add",
-) -> MemoryProposal:
-    """Create a redacted reviewable memory proposal."""
-    fact = FactValue(
-        entity=str(redact(entity).value),
-        relation=str(redact(relation).value),
-        value=str(redact(value).value),
-        source=str(redact(source).value),
-        confidence=confidence,
-        scope=scope,
-        trust_class=trust_class,
-    )
-    return MemoryProposal(
-        id=proposal_id(task_id, entity, relation),
-        task_id=task_id,
-        operation=operation,
-        fact=fact,
-        evidence=evidence,
-        requires_approval=True,
-        status="pending",
-    )
-
-
-def approve_proposal(
-    proposal: MemoryProposal,
-    *,
-    decided_by: str,
-    reason: str,
-) -> MemoryProposal:
-    """Approve a proposal after enforcing evidence requirements."""
-    if not proposal.evidence:
-        raise EvidenceRequiredError(f"proposal {proposal.id} requires evidence before approval")
-    return proposal.model_copy(
-        update={
-            "status": "approved",
-            "decision_reason": reason,
-            "decided_by": decided_by,
-            "decided_at": datetime.now(UTC),
-        }
-    )
-
-
-def reject_proposal(
-    proposal: MemoryProposal,
-    *,
-    decided_by: str,
-    reason: str,
-) -> MemoryProposal:
-    """Reject a proposal with reviewer context."""
-    return proposal.model_copy(
-        update={
-            "status": "rejected",
-            "decision_reason": reason,
-            "decided_by": decided_by,
-            "decided_at": datetime.now(UTC),
-        }
-    )
-
-
-def proposal_id(task_id: str, entity: str, relation: str) -> str:
-    """Create a stable proposal id."""
-    return f"memprop_{task_id.removeprefix('task_')}_{_slug(entity)}_{_slug(relation)}"
-
-
-def evidence_reference(
-    *,
-    task_id: str,
-    source: str,
-    locator: str,
-    summary: str,
-) -> EvidenceReference:
-    """Create an evidence reference for a memory proposal."""
-    return EvidenceReference(
-        id=f"evidence_{task_id}_{_slug(source)}_{_slug(locator)}",
-        source=str(redact(source).value),
-        kind="other",
-        locator=str(redact(locator).value),
-        summary=str(redact(summary).value),
-        captured_at=datetime.now(UTC),
-    )
-
-
 def _filter_proposals(
     proposals: list[MemoryProposal],
     *,
@@ -655,11 +555,6 @@ def _require_proposal(proposal: MemoryProposal | None, proposal_id: str) -> Memo
     if proposal is None:
         raise MemoryProposalNotFoundError(f"unknown memory proposal: {proposal_id}")
     return proposal
-
-
-def _slug(value: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
-    return slug or "value"
 
 
 def _raise_stigmem_http_error(exc: error.HTTPError) -> None:
@@ -750,3 +645,12 @@ def _trust_class_from_payload(value: Any) -> TrustClass:
     if value in {"observed", "reported", "inferred", "policy", "external", "stale-risk"}:
         return cast(TrustClass, value)
     return "reported"
+
+
+create_proposal = _memory_proposals.create_proposal
+approve_proposal = _memory_proposals.approve_proposal
+reject_proposal = _memory_proposals.reject_proposal
+proposal_id = _memory_proposals.proposal_id
+evidence_reference = _memory_proposals.evidence_reference
+MemoryError = _memory_errors.MemoryError
+EvidenceRequiredError = _memory_errors.EvidenceRequiredError
