@@ -114,6 +114,7 @@ project.
 - [Desktop Companion App Decision](reference/desktop-companion.md)
 - [Mobile Companion App Decision](reference/mobile-companion.md)
 - [Live Visual Workspace Decision](reference/visual-workspace.md)
+- [Work Graph Visual Workspace Bridge](reference/work-graph-visual-bridge.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
