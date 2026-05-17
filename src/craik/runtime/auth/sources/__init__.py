@@ -19,6 +19,11 @@ from craik.runtime.auth.sources.secret_ref import (
     SecretRefCredentialError,
     SecretRefCredentialSource,
 )
+from craik.runtime.auth.sources.stigmem_ref import (
+    STIGMEM_CREDENTIAL_RELATION,
+    StigmemCredentialError,
+    StigmemCredentialSource,
+)
 
 __all__ = [
     "DEFAULT_CLAUDE_CREDENTIALS_PATH",
@@ -34,5 +39,8 @@ __all__ = [
     "SecretManager",
     "SecretRefCredentialError",
     "SecretRefCredentialSource",
+    "STIGMEM_CREDENTIAL_RELATION",
+    "StigmemCredentialError",
+    "StigmemCredentialSource",
     "source_for_auth_profile",
 ]
