@@ -113,6 +113,7 @@ project.
 - [Text-To-Speech Adapter Contract](reference/text-to-speech-adapters.md)
 - [Desktop Companion App Decision](reference/desktop-companion.md)
 - [Mobile Companion App Decision](reference/mobile-companion.md)
+- [Live Visual Workspace Decision](reference/visual-workspace.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
