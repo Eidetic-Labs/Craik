@@ -68,8 +68,28 @@ def default_runner_capability_matrices() -> dict[str, RunnerCapabilityMatrix]:
             provider_family="openai",
         ),
         _provider_matrix(
+            runner_id="provider_openai_responses",
+            name="OpenAI Responses Provider Runner",
+            provider_family="openai",
+        ),
+        _provider_matrix(
+            runner_id="provider_openai_chat",
+            name="OpenAI Chat Completions Provider Runner",
+            provider_family="chat_completions",
+        ),
+        _provider_matrix(
+            runner_id="provider_local_openai_compatible",
+            name="Local OpenAI-Compatible Provider Runner",
+            provider_family="chat_completions",
+        ),
+        _provider_matrix(
             runner_id="provider_anthropic",
             name="Anthropic Provider Runner",
+            provider_family="anthropic",
+        ),
+        _provider_matrix(
+            runner_id="provider_anthropic_messages",
+            name="Anthropic Messages Provider Runner",
             provider_family="anthropic",
         ),
     ]

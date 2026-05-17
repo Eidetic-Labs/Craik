@@ -24,6 +24,7 @@ _LEGACY_MODULE_TARGETS = {
     "craik.runtime.debates": "craik.runtime.reviewing.debates",
     "craik.runtime.delegations": "craik.runtime.reviewing.delegations",
     "craik.runtime.demos": "craik.runtime.projects.demos",
+    "craik.runtime.demos_provider": "craik.runtime.projects.demos_provider",
     "craik.runtime.desktop_companion": "craik.runtime.companions.desktop_companion",
     "craik.runtime.docker_sandbox_backend": "craik.runtime.sandbox.docker_sandbox_backend",
     "craik.runtime.exit_discipline": "craik.runtime.work.exit_discipline",

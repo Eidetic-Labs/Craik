@@ -73,6 +73,7 @@ class StigmemDocsDemo:
         stigmem_api_key: str | None = None,
         github: bool = True,
         provider_ids: tuple[str, ...] | None = None,
+        live_provider_enabled: bool = False,
         max_tokens: int = 24000,
     ) -> dict[str, Any]:
         selected_provider_ids = provider_ids or DEMO_PROVIDER_IDS
@@ -209,6 +210,7 @@ class StigmemDocsDemo:
                     task_id=task.id,
                     provider_id=provider_id,
                     grants=[_demo_shell_grant(task.id)],
+                    live_enabled=live_provider_enabled,
                 )
                 for provider_id in selected_provider_ids
             )
@@ -443,6 +445,17 @@ def _demo_shell_grant(task_id: str) -> CapabilityGrant:
 
 
 def _provider_execution_payload(execution: Any) -> dict[str, Any]:
+    provider_results = [
+        {
+            "provider_id": result.provider_id,
+            "provider_family": result.provider_family,
+            "model": result.model,
+            "response_id": result.response_id,
+            "text": result.text,
+            "usage": result.usage,
+        }
+        for result in execution.provider_results
+    ]
     return {
         "provider_id": execution.compiled_prompt.runner_id,
         "run_id": execution.run.id,
@@ -451,6 +464,8 @@ def _provider_execution_payload(execution: Any) -> dict[str, Any]:
         "handoff_status": execution.handoff.status,
         "receipt_ids": execution.run.receipt_ids,
         "provider_result_ids": [result.response_id for result in execution.provider_results],
+        "provider_results": provider_results,
+        "model_findings": [result["text"] for result in provider_results if result["text"]],
         "provider_families": sorted(
             {result.provider_family for result in execution.provider_results}
         ),

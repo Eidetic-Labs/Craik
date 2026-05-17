@@ -82,7 +82,11 @@ def test_runners_matrix_lists_built_in_trust_profiles() -> None:
         "gemini",
         "fixture",
         "provider_anthropic",
+        "provider_anthropic_messages",
         "provider_openai",
+        "provider_openai_chat",
+        "provider_openai_responses",
+        "provider_local_openai_compatible",
     } == runner_ids
 
 
@@ -391,6 +395,44 @@ def test_demo_stigmem_docs_command_runs_without_live_stigmem(tmp_path: Path) -> 
         "provider_anthropic",
     ]
     assert payload["next_commands"]
+
+
+def test_demo_stigmem_docs_command_surfaces_provider_findings(tmp_path: Path) -> None:
+    repo = tmp_path / "stigmem"
+    (repo / "docs" / "adr").mkdir(parents=True)
+    (repo / "src").mkdir()
+    (repo / "README.md").write_text("# Stigmem\n\nUse `MissingBridge`.\n")
+    (repo / "src" / "runtime.py").write_text("class ExistingBridge:\n    pass\n")
+    (repo / "docs" / "adr" / "0001-record.md").write_text("# ADR\n")
+    _run_git(repo, "init", "-b", "main")
+    _run_git(repo, "add", "README.md", "docs", "src")
+    _run_git(repo, "commit", "-m", "initial")
+
+    result = runner.invoke(
+        app,
+        [
+            "demo",
+            "stigmem-docs",
+            "--repo-path",
+            str(repo),
+            "--no-github",
+            "--provider",
+            "provider_openai_chat",
+        ],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["provider_demo"]["mode"] == "fixture"
+    assert payload["provider_demo"]["provider_id"] == "provider_openai_chat"
+    assert payload["provider_demo"]["findings"]
+    provider_result = payload["provider_demo"]["results"][0]
+    assert provider_result["provider_family"] == "chat_completions"
+    assert provider_result["model"]
+    assert provider_result["usage"]["total_tokens"] > 0
+    assert payload["provider_demo"]["receipt_ids"]
+    assert "MissingBridge" in payload["findings"]["docs_code_mismatches"][0]
 
 
 def test_intent_show_reports_task_intent_lock(tmp_path: Path) -> None:
