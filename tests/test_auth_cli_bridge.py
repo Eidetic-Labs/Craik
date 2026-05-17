@@ -1,0 +1,60 @@
+import json
+import sys
+from pathlib import Path
+
+from craik.runtime.auth.sources import CLIBridgeCredentialSource
+
+
+def test_cli_bridge_stdout_json_extracts_token_without_leaking_in_status() -> None:
+    source = CLIBridgeCredentialSource(
+        command=(
+            sys.executable,
+            "-c",
+            "import json; print(json.dumps({'token': 'sk-test'}))",
+        ),
+        token_extractor="stdout_json",
+    )
+
+    headers = source.headers_for("chat_completions")
+
+    assert headers == {"Authorization": "Bearer sk-test"}
+    assert source.status().status == "ok"
+    assert "sk-test" not in str(source.status())
+
+
+def test_cli_bridge_stdout_line_extracts_first_nonempty_line() -> None:
+    source = CLIBridgeCredentialSource(
+        command=(sys.executable, "-c", "print('\\nline-token\\n')"),
+        token_extractor="stdout_line",
+    )
+
+    assert source.headers_for("openai") == {"Authorization": "Bearer line-token"}
+
+
+def test_cli_bridge_credentials_file_extracts_nested_token(tmp_path: Path) -> None:
+    credentials = tmp_path / "bridge.json"
+    credentials.write_text(json.dumps({"auth": {"token": "file-token"}}), encoding="utf-8")
+    source = CLIBridgeCredentialSource(
+        command=(),
+        token_extractor="credentials_file",
+        key_path=("auth", "token"),
+        credentials_file_path=credentials,
+    )
+
+    assert source.headers_for("anthropic") == {
+        "Authorization": "Bearer file-token",
+        "anthropic-version": "2023-06-01",
+    }
+
+
+def test_cli_bridge_error_messages_do_not_include_stdout_token_material() -> None:
+    source = CLIBridgeCredentialSource(
+        command=(sys.executable, "-c", "print('sk-test'); raise SystemExit(1)"),
+        token_extractor="stdout_line",
+    )
+
+    status = source.status()
+
+    assert status.status == "rejected"
+    assert status.detail == "CLI bridge command failed"
+    assert "sk-test" not in str(status)
