@@ -561,6 +561,23 @@ def test_handoff_command_group_stays_mounted_after_module_extraction() -> None:
     assert "show" in result.stdout
 
 
+def test_demo_command_group_stays_mounted_after_module_extraction() -> None:
+    result = runner.invoke(app, ["demo", "--help"])
+
+    assert result.exit_code == 0
+    assert "stigmem-docs" in result.stdout
+
+
+def test_connect_and_onboard_commands_stay_mounted_after_module_extraction() -> None:
+    connect_result = runner.invoke(app, ["connect", "--help"])
+    onboard_result = runner.invoke(app, ["onboard", "--help"])
+
+    assert connect_result.exit_code == 0
+    assert "stigmem" in connect_result.stdout
+    assert onboard_result.exit_code == 0
+    assert "name to onboard" in onboard_result.stdout
+
+
 def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
     home = tmp_path / "home"
 

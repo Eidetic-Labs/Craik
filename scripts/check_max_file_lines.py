@@ -12,8 +12,6 @@ EXEMPT = {
     "src/craik/contracts/models/memory.py",
     "src/craik/contracts/models/skills.py",
     "src/craik/contracts/models/review.py",
-    # Existing implementation debt being split in follow-up Task 5 PRs.
-    "src/craik/cli_project.py",
 }
 
 
