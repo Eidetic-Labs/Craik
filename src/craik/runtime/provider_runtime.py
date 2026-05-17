@@ -13,6 +13,7 @@ from craik.runtime.environment_receipts import EnvironmentReceiptContext, enviro
 from craik.runtime.http_transport import HTTPTransport
 from craik.runtime.provider_transport import FixtureTransport, ProviderFamily, ProviderTransport
 from craik.runtime.redaction import redact
+from craik.runtime.secrets import SecretRef, SecretResolver
 
 ProviderMessageRole = Literal["system", "user", "assistant", "tool"]
 
@@ -85,6 +86,10 @@ class ProviderRuntimeConfig(CraikModel):
         if missing:
             raise ValueError(f"provider runtime docs_refs missing official refs: {missing}")
         return self
+
+    def resolve_secret(self, resolver: SecretResolver) -> str:
+        """Resolve the configured secret reference at request time."""
+        return resolver.resolve(SecretRef(env_var=self.secret_ref_name))
 
 
 class ProviderRuntimeRequest(CraikModel):
@@ -569,7 +574,7 @@ def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
     return HTTPTransport(
         family=config.provider_family,
         base_url=config.base_url,
-        headers=_provider_headers(config),
+        headers_factory=lambda: _provider_headers(config),
         timeout_seconds=config.timeout_seconds,
     )
 

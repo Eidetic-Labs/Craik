@@ -28,7 +28,7 @@ def test_http_transport_yields_non_streaming_json_response() -> None:
         transport = HTTPTransport(
             family="openai",
             base_url=server.url,
-            headers={"Authorization": "Bearer test-token"},
+            headers_factory=lambda: {"Authorization": "Bearer test-token"},
             timeout_seconds=5,
         )
 
@@ -55,7 +55,7 @@ def test_http_transport_yields_sse_json_chunks() -> None:
         transport = HTTPTransport(
             family="anthropic",
             base_url=server.url,
-            headers={},
+            headers_factory=dict,
             timeout_seconds=5,
         )
 
@@ -76,7 +76,7 @@ def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
         transport = HTTPTransport(
             family="openai",
             base_url=server.url,
-            headers={"Authorization": "Bearer secret-auth-token"},
+            headers_factory=lambda: {"Authorization": "Bearer secret-auth-token"},
             timeout_seconds=5,
         )
 
@@ -93,6 +93,29 @@ def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
     assert "secret-auth-token" not in str(error)
     assert error.body is not None
     assert "sk-test-secret" not in error.body
+
+
+def test_http_transport_builds_headers_for_each_request() -> None:
+    seen_authorizations: list[str | None] = []
+    token = {"value": "first-token"}
+
+    def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
+        seen_authorizations.append(headers.get("Authorization"))
+        return _json_response({"id": "resp", "output_text": "ok"})
+
+    with _stub_server(handle) as server:
+        transport = HTTPTransport(
+            family="openai",
+            base_url=server.url,
+            headers_factory=lambda: {"Authorization": f"Bearer {token['value']}"},
+            timeout_seconds=5,
+        )
+
+        list(transport.send({"_path": "/v1/responses"}, stream=False))
+        token["value"] = "second-token"
+        list(transport.send({"_path": "/v1/responses"}, stream=False))
+
+    assert seen_authorizations == ["Bearer first-token", "Bearer second-token"]
 
 
 def test_live_enabled_adapter_executes_round_trip_through_http_transport() -> None:
@@ -128,7 +151,7 @@ def test_live_enabled_adapter_executes_round_trip_through_http_transport() -> No
             transport=HTTPTransport(
                 family="chat_completions",
                 base_url=server.url,
-                headers={},
+                headers_factory=dict,
                 timeout_seconds=5,
             ),
         )
