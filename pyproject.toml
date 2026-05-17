@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "craik"
-version = "0.0.0"
-description = "Durable agent runtime for shared project models and governed multi-agent work."
+version = "0.1.0"
+description = "Governed agent-runtime substrate for case files, policy, receipts, prompt compilation, and provider transports."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }

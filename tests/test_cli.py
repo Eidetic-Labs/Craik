@@ -49,6 +49,13 @@ def test_version_command_prints_version() -> None:
     assert result.stdout.strip() == package_version()
 
 
+def test_root_help_describes_governed_runtime_substrate() -> None:
+    result = runner.invoke(app, ["--help"])
+
+    assert result.exit_code == 0
+    assert "Governed agent-runtime substrate" in result.output
+
+
 def test_schema_list_includes_task_request() -> None:
     result = runner.invoke(app, ["schema", "list"])
 

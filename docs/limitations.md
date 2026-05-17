@@ -59,6 +59,6 @@ Local memory proposals remain the default unprivileged path.
 
 The first release target is `0.x.0`. The release must be honest about limits and
 strong enough for a credible MVP, but it is not a `1.0.0` stability guarantee.
-The package remains versioned as `0.0.0` until the release cut; roadmap
-milestones such as v0.13 are implementation gates rather than published package
-versions.
+Package version `0.1.0` marks the first explicit live provider transport path.
+Roadmap milestones such as v0.13 remain implementation gates rather than
+published package compatibility guarantees.

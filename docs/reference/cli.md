@@ -8,7 +8,7 @@ Craik exposes the `craik` command.
 
 ## `craik`
 
-Durable agent runtime for shared project models and governed multi-agent work.
+Governed agent-runtime substrate for case files, policy, receipts, and providers.
 
 ```text
 craik [OPTIONS] COMMAND [ARGS]...
