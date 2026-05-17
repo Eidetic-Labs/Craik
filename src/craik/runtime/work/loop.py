@@ -23,6 +23,7 @@ from craik.contracts.models import (
 )
 from craik.runtime.auth.operator import active_operator_session
 from craik.runtime.memory.memory import MemoryStore
+from craik.runtime.policy.credential_policy import credential_policy_metadata
 from craik.runtime.policy.operator_policy import check_operator_policy
 from craik.runtime.policy.policy import (
     GrantDecision,
@@ -186,6 +187,7 @@ class SingleAgentLoopExecutor:
             )
             return LoopExecutionResult(run, step_results, output_captures, receipts)
         operator_policy = operator_policy_decision.receipt_metadata
+        credential_policy = credential_policy_metadata(policy)
 
         for index, step in enumerate(active_steps, start=1):
             if iteration >= max_iterations:
@@ -238,7 +240,11 @@ class SingleAgentLoopExecutor:
                     return LoopExecutionResult(run, step_results, output_captures, receipts)
 
             message_history = _message_history_from_context(step.context)
-            step_context = _context_with_operator_policy(step.context, operator_policy)
+            step_context = _context_with_runtime_policies(
+                step.context,
+                operator_policy=operator_policy,
+                credential_policy=credential_policy,
+            )
             tool_round = 0
             request = RunnerStepRequest(
                 id="",
@@ -420,8 +426,6 @@ def default_loop_steps() -> list[LoopStep]:
         LoopStep(phase="observe", input_prompt="Capture observed output."),
         LoopStep(phase="evaluate", input_prompt="Evaluate whether the task is complete."),
     ]
-
-
 def _intent_stop_reason(intent_lock: IntentLock | None, step: LoopStep) -> str | None:
     if intent_lock is None:
         return None
@@ -438,8 +442,6 @@ def _request_id(run_id: str, index: int, phase: TaskRunPhase, tool_round: int) -
     if tool_round == 0:
         return base
     return f"{base}_tool_round_{tool_round}"
-
-
 def _message_history_from_context(context: dict[str, object]) -> list[dict[str, str]]:
     raw_messages = context.get("message_history") or context.get("messages")
     if not isinstance(raw_messages, list):
@@ -458,8 +460,6 @@ def _message_history_from_context(context: dict[str, object]) -> list[dict[str, 
             message["tool_call_id"] = str(tool_call_id)
         messages.append(message)
     return messages
-
-
 def _context_with_message_history(
     context: dict[str, object],
     message_history: list[dict[str, str]],
@@ -467,17 +467,18 @@ def _context_with_message_history(
     if not message_history:
         return dict(context)
     return {**context, "message_history": list(message_history)}
-
-
-def _context_with_operator_policy(
+def _context_with_runtime_policies(
     context: dict[str, object],
+    *,
     operator_policy: dict[str, object],
+    credential_policy: dict[str, object],
 ) -> dict[str, object]:
-    if not operator_policy:
-        return dict(context)
-    return {**context, "operator_policy": dict(operator_policy)}
-
-
+    updated = dict(context)
+    policies = {"operator_policy": operator_policy, "credential_policy": credential_policy}
+    for key, value in policies.items():
+        if value:
+            updated[key] = dict(value)
+    return updated
 def _check_operator_policy(policy: PolicyEnvelope) -> GrantDecision:
     session = active_operator_session()
     return check_operator_policy(

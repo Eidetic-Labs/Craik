@@ -53,8 +53,11 @@ def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
 
 def _provider_headers(config: ProviderRuntimeConfig) -> dict[str, str]:
     if config.credential_pool_id:
-        pool = CredentialPool.from_env()
-        profile = pool.select_from_pool(config.credential_pool_id)
+        if config.last_auth_profile_id:
+            profile = AuthProfileStore.from_env().get(config.last_auth_profile_id)
+        else:
+            pool = CredentialPool.from_env()
+            profile = pool.select_from_pool(config.credential_pool_id)
         if profile.provider_family != config.provider_family:
             raise ValueError("credential pool selected profile for the wrong provider family")
         config.last_auth_profile_id = profile.id

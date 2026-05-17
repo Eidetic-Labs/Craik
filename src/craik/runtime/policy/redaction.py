@@ -9,7 +9,14 @@ from typing import Any
 
 REDACTION = "[REDACTED]"
 SECRET_KEY_PARTS = ("secret", "token", "password", "api_key", "apikey", "credential")
-NON_SECRET_KEYS = frozenset({"max_tokens", "estimated_tokens"})
+NON_SECRET_KEYS = frozenset(
+    {
+        "allowed_credential_kinds",
+        "allowed_credential_profiles",
+        "estimated_tokens",
+        "max_tokens",
+    }
+)
 REDACTED_VALUES = ("[REDACTED]", "<redacted>", "redacted")
 REDACTED_VALUE_KEYS = frozenset(value.lower() for value in REDACTED_VALUES)
 
