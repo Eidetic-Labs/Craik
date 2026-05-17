@@ -15,6 +15,7 @@ from craik.runtime.provider_runtime import (
     adapter_for_provider,
     provider_runtime_receipt,
 )
+from craik.runtime.provider_transport import FixtureTransport, ProviderFamily, ProviderTransport
 
 
 def _openai_adapter(*, live_enabled: bool = False) -> OpenAIProviderAdapter:
@@ -167,6 +168,34 @@ def test_live_provider_access_requires_explicit_enablement() -> None:
 
     _openai_adapter(live_enabled=True).require_live_access()
     _anthropic_adapter(live_enabled=True).require_live_access()
+
+
+@pytest.mark.parametrize(
+    ("adapter", "family"),
+    [
+        (_openai_adapter(), "openai"),
+        (_anthropic_adapter(), "anthropic"),
+    ],
+)
+def test_fixture_transport_yields_provider_family_response(
+    adapter: OpenAIProviderAdapter | AnthropicProviderAdapter,
+    family: ProviderFamily,
+) -> None:
+    transport: ProviderTransport = FixtureTransport(
+        family=family,
+        model=adapter.config.model,
+        response_id="provider_response_fixture_plan",
+        phase="plan",
+        status="completed",
+    )
+
+    chunks = list(transport.send(adapter.build_payload(_request()), stream=False))
+    result = adapter.normalize_response(chunks[0])
+
+    assert len(chunks) == 1
+    assert result.response_id == "provider_response_fixture_plan"
+    assert result.model == adapter.config.model
+    assert result.text == f"{family} fixture completed plan with status completed."
 
 
 def test_adapter_for_default_mvp_providers_uses_verified_docs_and_secret_references() -> None:

@@ -37,6 +37,7 @@ from craik.runtime.provider_runtime import (
     adapter_for_provider,
     provider_runtime_receipt,
 )
+from craik.runtime.provider_transport import FixtureTransport
 from craik.runtime.runners import get_runner_capability_matrix
 from craik.runtime.store import LocalStore
 
@@ -68,14 +69,21 @@ class ProviderBackedStepRunner:
         """Normalize one runner step through the configured provider adapter."""
         status = self.statuses.pop(0) if self.statuses else "completed"
         provider_request = self._provider_request(request)
-        provider_result = self.adapter.normalize_response(
-            _fixture_response(
-                provider_family=self.adapter.config.provider_family,
-                model=self.adapter.config.model,
-                response_id=f"provider_response_{request.run_id}_{request.phase}",
-                phase=request.phase,
-                status=status,
+        transport = FixtureTransport(
+            family=self.adapter.config.provider_family,
+            model=self.adapter.config.model,
+            response_id=f"provider_response_{request.run_id}_{request.phase}",
+            phase=request.phase,
+            status=status,
+        )
+        response = next(
+            transport.send(
+                self.adapter.build_payload(provider_request),
+                stream=provider_request.stream,
             )
+        )
+        provider_result = self.adapter.normalize_response(
+            response
         )
         receipt = provider_runtime_receipt(
             adapter=self.adapter,
@@ -242,52 +250,6 @@ def _latest_run_for_task(store: LocalStore, task_id: str) -> TaskRun:
     if not matches:
         raise ValueError(f"no task run was recorded for task: {task_id}")
     return matches[-1]
-
-
-def _fixture_response(
-    *,
-    provider_family: str,
-    model: str,
-    response_id: str,
-    phase: str,
-    status: RunnerResultStatus,
-) -> dict[str, Any]:
-    text = f"{provider_family} fixture completed {phase} with status {status}."
-    structured = {
-        "phase": phase,
-        "status": status,
-        "summary": text,
-    }
-    if provider_family == "openai":
-        return {
-            "id": response_id,
-            "model": model,
-            "output": [
-                {"type": "message", "content": [{"type": "output_text", "text": text}]},
-                {
-                    "type": "function_call",
-                    "id": f"fc_{phase}",
-                    "call_id": f"call_{phase}",
-                    "name": "record_runner_step",
-                    "arguments": "{}",
-                },
-            ],
-            "usage": {"input_tokens": 20, "output_tokens": 10, "total_tokens": 30},
-        }
-    return {
-        "id": response_id,
-        "model": model,
-        "content": [
-            {"type": "text", "text": text},
-            {
-                "type": "tool_use",
-                "id": f"toolu_{phase}",
-                "name": "craik_structured_output",
-                "input": structured,
-            },
-        ],
-        "usage": {"input_tokens": 22, "output_tokens": 11},
-    }
 
 
 def _runner_step_schema() -> dict[str, Any]:
