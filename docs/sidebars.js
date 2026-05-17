@@ -54,6 +54,7 @@ const sidebars = {
         'reference/model-providers',
         'reference/provider-certification',
         'reference/prompt-compiler',
+        'reference/side-effect-wrappers',
         'reference/memory-backends',
         'reference/local-store',
       ],
