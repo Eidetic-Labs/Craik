@@ -19,7 +19,6 @@ EXEMPT = {
     "src/craik/runtime/companions/operator_views.py",
     "src/craik/runtime/work/case_files.py",
     "src/craik/cli_operations.py",
-    "src/craik/runtime/work/loop.py",
 }
 
 
