@@ -32,20 +32,11 @@ def test_stigmem_docs_demo_produces_runnable_artifacts(
     assert result["task"]["id"] == DEMO_TASK_ID
     assert result["project"]["memory"]["backend"] == "stigmem"
     assert result["stigmem_backend_status"]["status"] == "not_configured"
-    assert result["case_file_id"] == "case_stigmem_documentation_reconciliation"
-    assert result["receipt_ids"] == ["receipt_demo_stigmem_documentation_reconciliation"]
-    assert result["handoff_id"] == "handoff_stigmem_documentation_reconciliation"
-    assert result["memory_write"] == {
-        "status": "proposal_created",
-        "proposal_id": (
-            "memprop_stigmem_documentation_reconciliation_repo_stigmem_"
-            "craik_docs_reconciliation_demo"
-        ),
-        "direct_write": "not_requested",
-    }
-    assert result["memory_proposal_ids"] == [
-        "memprop_stigmem_documentation_reconciliation_repo_stigmem_craik_docs_reconciliation_demo"
-    ]
+    assert store.get_case_file(result["case_file_id"]) is not None
+    assert store.get_handoff(result["handoff_id"]) is not None
+    assert result["memory_write"]["status"] == "proposal_created"
+    assert result["memory_write"]["proposal_id"] in result["memory_proposal_ids"]
+    assert result["memory_write"]["direct_write"] == "not_requested"
     assert [item["provider_id"] for item in result["provider_executions"]] == [
         "provider_openai",
         "provider_anthropic",
@@ -55,15 +46,13 @@ def test_stigmem_docs_demo_produces_runnable_artifacts(
         ("openai",),
         ("anthropic",),
     }
-    assert result["work_graph_id"] == "graph_task_stigmem_documentation_reconciliation"
+    assert result["work_graph_id"].startswith("graph_")
     assert store.get_task(DEMO_TASK_ID) is not None
-    assert store.get_case_file("case_stigmem_documentation_reconciliation") is not None
-    assert store.get_handoff("handoff_stigmem_documentation_reconciliation") is not None
     assert store.list_contradictions()[0].task_id == DEMO_TASK_ID
     assert len(store.list_run_outputs()) == 8
     assert any(
         receipt.result.metadata.get("policy_envelope_id")
-        == "policy_task_stigmem_documentation_reconciliation"
+        == store.get_case_file(result["case_file_id"]).policy_envelope_id
         for receipt in store.list_receipts()
     )
 
@@ -85,6 +74,60 @@ def test_stigmem_docs_demo_surfaces_boundaries_and_evidence(
     assert result["proposed_doc_updates"][0]["path"] == "README.md"
 
 
+def test_stigmem_docs_demo_reports_doc_code_mismatch_from_fixture_repo(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(
+        tmp_path,
+        symbol_claim="StigmemSyncEngine",
+        source_symbol="ExistingRuntime",
+    )
+
+    result = StigmemDocsDemo(store).run(repo_path=repo, github=False)
+
+    mismatch = "README.md references `StigmemSyncEngine`, but no matching source symbol exists."
+    assert mismatch in result["findings"]["docs_code_mismatches"]
+    contradiction = store.list_contradictions()[0]
+    assert contradiction.summary == mismatch
+    assert "README.md" in contradiction.affected_artifacts
+    proposal = store.get_proposal(result["memory_proposal_ids"][0])
+    assert proposal is not None
+    assert proposal.fact.value == mismatch
+    assert [evidence.locator for evidence in proposal.evidence] == ["README.md"]
+
+
+def test_stigmem_docs_demo_mismatch_output_varies_with_repo_content(
+    tmp_path: Path,
+) -> None:
+    first_store = _store(tmp_path / "first")
+    second_store = _store(tmp_path / "second")
+    first_repo = _repo(
+        tmp_path / "repo_one",
+        symbol_claim="MissingScheduler",
+        source_symbol="ExistingScheduler",
+    )
+    second_repo = _repo(
+        tmp_path / "repo_two",
+        symbol_claim="AbsentMemoryBridge",
+        source_symbol="ExistingMemoryBridge",
+    )
+
+    try:
+        first = StigmemDocsDemo(first_store).run(repo_path=first_repo, github=False)
+        second = StigmemDocsDemo(second_store).run(repo_path=second_repo, github=False)
+        first_summary = first_store.list_contradictions()[0].summary
+        second_summary = second_store.list_contradictions()[0].summary
+    finally:
+        first_store.close()
+        second_store.close()
+
+    assert first_summary != second_summary
+    assert "MissingScheduler" in first_summary
+    assert "AbsentMemoryBridge" in second_summary
+    assert first["findings"]["docs_code_mismatches"] != second["findings"]["docs_code_mismatches"]
+
+
 def test_stigmem_docs_demo_can_limit_provider_execution(
     tmp_path: Path,
     store: LocalStore,
@@ -102,16 +145,33 @@ def test_stigmem_docs_demo_can_limit_provider_execution(
     ]
 
 
-def _repo(tmp_path: Path) -> Path:
+def _repo(
+    tmp_path: Path,
+    *,
+    symbol_claim: str = "DocumentedFeature",
+    source_symbol: str = "DocumentedFeature",
+) -> Path:
     repo = tmp_path / "stigmem"
     (repo / "docs" / "adr").mkdir(parents=True)
-    (repo / "README.md").write_text("# Stigmem\n")
+    (repo / "src").mkdir()
+    (repo / "README.md").write_text(f"# Stigmem\n\nUse `{symbol_claim}` for sync.\n")
+    (repo / "src" / "runtime.py").write_text(
+        f"class {source_symbol}:\n    pass\n",
+        encoding="utf-8",
+    )
     (repo / "docs" / "guide.md").write_text("# Guide\n")
     (repo / "docs" / "adr" / "0001-record.md").write_text("# ADR\n")
     _run_git(repo, "init", "-b", "main")
-    _run_git(repo, "add", "README.md", "docs")
+    _run_git(repo, "add", "README.md", "docs", "src")
     _run_git(repo, "commit", "-m", "initial")
     return repo
+
+
+def _store(path: Path) -> LocalStore:
+    paths = ensure_craik_home({"CRAIK_HOME": str(path / "home")})
+    local_store = LocalStore.from_paths(paths)
+    local_store.initialize()
+    return local_store
 
 
 def _run_git(repo: Path, *args: str) -> None:

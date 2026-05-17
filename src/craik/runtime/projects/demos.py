@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -39,6 +40,21 @@ from craik.runtime.work.tasks import create_task
 DEMO_TASK_TITLE = "Stigmem documentation reconciliation"
 DEMO_TASK_ID = "task_stigmem_documentation_reconciliation"
 DEMO_PROVIDER_IDS = ("provider_openai", "provider_anthropic")
+SOURCE_SUFFIXES = {".py", ".pyi", ".js", ".jsx", ".ts", ".tsx", ".go", ".rs"}
+DOC_SYMBOL_RE = re.compile(r"`([A-Za-z_][A-Za-z0-9_.]{2,})`")
+SOURCE_IDENTIFIER_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]{2,}\b")
+
+
+@dataclass(frozen=True)
+class DocsCodeMismatch:
+    """Documentation symbol claim that is not supported by source discovery."""
+
+    doc_path: str
+    symbol: str
+
+    @property
+    def summary(self) -> str:
+        return f"{self.doc_path} references `{self.symbol}`, but no matching source symbol exists."
 
 
 @dataclass(frozen=True)
@@ -104,43 +120,43 @@ class StigmemDocsDemo:
         for evidence in case_file.evidence:
             self.store.put_evidence(evidence)
 
-        findings = _findings(case_file)
+        mismatches = _doc_code_mismatches(repo_path, case_file.docs)
+        findings = _findings(case_file, mismatches=mismatches)
         proposed_updates = _proposed_updates(case_file)
+        contradiction_facts = _contradiction_facts(mismatches)
+        contradiction_summary = _contradiction_summary(mismatches)
+        contradiction_evidence_ids = _evidence_ids_for_docs(
+            case_file,
+            [item.doc_path for item in mismatches],
+        )
         contradiction = ContradictionManager(self.store).open_report(
             task_id=task.id,
-            facts=[
-                "Public docs may describe pre-release or planned behavior.",
-                (
-                    "Current runtime state includes implemented CLI, policy, memory, "
-                    "handoff, graph, and onboarding primitives."
-                ),
-            ],
-            summary="Public documentation may be stale relative to current runtime state.",
-            affected_artifacts=case_file.docs[:5],
-            evidence_ids=[evidence.id for evidence in case_file.evidence[:3]],
+            facts=contradiction_facts,
+            summary=contradiction_summary,
+            affected_artifacts=sorted({item.doc_path for item in mismatches}) or case_file.docs[:5],
+            evidence_ids=contradiction_evidence_ids
+            or [evidence.id for evidence in case_file.evidence if evidence.kind == "file"][:3],
             owner="user:maintainer",
             proposed_resolution=(
                 "Review proposed documentation updates and apply supported public-safe changes."
             ),
+        )
+        proposal_evidence = _memory_proposal_evidence(
+            task_id=task.id,
+            mismatch=mismatches[0] if mismatches else None,
+            case_file_id=case_file.id,
         )
         proposal = LocalMemoryStore(self.store).propose(
             create_proposal(
                 task_id=task.id,
                 entity=f"repo:{project.name}",
                 relation="craik:docs:reconciliation_demo",
-                value="Craik can run the Stigmem documentation reconciliation demo workflow.",
+                value=_memory_proposal_value(mismatches),
                 source="craik demo stigmem-docs",
                 confidence=0.9,
                 scope="team",
                 trust_class="observed",
-                evidence=[
-                    evidence_reference(
-                        task_id=task.id,
-                        source="craik demo stigmem-docs",
-                        locator=case_file.id,
-                        summary="Demo assembled a case file and proposed reconciliation state.",
-                    )
-                ],
+                evidence=[proposal_evidence],
             )
         )
         receipt = ReceiptStore(self.store).record_receipt(
@@ -248,7 +264,11 @@ def _stigmem_status(*, url: str | None, api_key: str | None) -> dict[str, Any]:
     }
 
 
-def _findings(case_file: Any) -> dict[str, list[str]]:
+def _findings(
+    case_file: Any,
+    *,
+    mismatches: list[DocsCodeMismatch],
+) -> dict[str, list[str]]:
     risks = list(case_file.stale_risks)
     if case_file.adrs:
         risks.append("ADRs are present and must remain immutable evidence.")
@@ -256,8 +276,11 @@ def _findings(case_file: Any) -> dict[str, list[str]]:
         risks.append("GitHub context is incomplete; review remote issue and PR state manually.")
     if not case_file.facts:
         risks.append("No Stigmem facts were loaded into the case file; use memory proposal review.")
+    if mismatches:
+        risks.extend(item.summary for item in mismatches)
     return {
         "evidence_ids": [evidence.id for evidence in case_file.evidence],
+        "docs_code_mismatches": [item.summary for item in mismatches],
         "risks": sorted(set(str(redact(risk).value) for risk in risks)),
         "public_internal_boundary": [
             "Public docs must describe product state without internal-only labels.",
@@ -289,6 +312,96 @@ def _proposed_updates(case_file: Any) -> list[dict[str, str]]:
             }
         )
     return updates
+
+
+def _doc_code_mismatches(repo_path: Path, docs: list[str]) -> list[DocsCodeMismatch]:
+    source_symbols = _source_symbols(repo_path)
+    mismatches: list[DocsCodeMismatch] = []
+    for doc_path in docs:
+        content = _read_text(repo_path / doc_path)
+        for symbol in sorted(set(DOC_SYMBOL_RE.findall(content))):
+            candidates = {symbol, symbol.rsplit(".", maxsplit=1)[-1]}
+            if not candidates.intersection(source_symbols):
+                mismatches.append(DocsCodeMismatch(doc_path=doc_path, symbol=symbol))
+    return sorted(mismatches, key=lambda item: (item.doc_path, item.symbol))
+
+
+def _source_symbols(repo_path: Path) -> set[str]:
+    symbols: set[str] = set()
+    for path in sorted(repo_path.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in SOURCE_SUFFIXES:
+            continue
+        if any(part in {".git", ".venv", "node_modules", "dist", "build"} for part in path.parts):
+            continue
+        symbols.update(SOURCE_IDENTIFIER_RE.findall(_read_text(path)))
+    return symbols
+
+
+def _read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return ""
+
+
+def _contradiction_facts(mismatches: list[DocsCodeMismatch]) -> list[str]:
+    if not mismatches:
+        return [
+            "Public docs may describe pre-release or planned behavior.",
+            (
+                "Current runtime state includes implemented CLI, policy, memory, "
+                "handoff, graph, and onboarding primitives."
+            ),
+        ]
+    first = mismatches[0]
+    return [
+        f"Public documentation {first.doc_path} references `{first.symbol}`.",
+        "Repository source discovery found no matching symbol definition.",
+    ]
+
+
+def _contradiction_summary(mismatches: list[DocsCodeMismatch]) -> str:
+    if not mismatches:
+        return "Public documentation may be stale relative to current runtime state."
+    if len(mismatches) == 1:
+        return mismatches[0].summary
+    return f"{mismatches[0].summary} {len(mismatches) - 1} additional mismatch(es) found."
+
+
+def _evidence_ids_for_docs(case_file: Any, doc_paths: list[str]) -> list[str]:
+    wanted = set(doc_paths)
+    return [
+        evidence.id
+        for evidence in case_file.evidence
+        if evidence.kind == "file" and evidence.locator in wanted
+    ]
+
+
+def _memory_proposal_evidence(
+    *,
+    task_id: str,
+    mismatch: DocsCodeMismatch | None,
+    case_file_id: str,
+) -> Any:
+    if mismatch is None:
+        return evidence_reference(
+            task_id=task_id,
+            source="craik demo stigmem-docs",
+            locator=case_file_id,
+            summary="Demo assembled a case file and proposed reconciliation state.",
+        )
+    return evidence_reference(
+        task_id=task_id,
+        source=mismatch.doc_path,
+        locator=mismatch.doc_path,
+        summary=f"Documentation mismatch discovered for `{mismatch.symbol}`.",
+    )
+
+
+def _memory_proposal_value(mismatches: list[DocsCodeMismatch]) -> str:
+    if not mismatches:
+        return "Craik can run the Stigmem documentation reconciliation demo workflow."
+    return mismatches[0].summary
 
 
 def _demo_receipt(
