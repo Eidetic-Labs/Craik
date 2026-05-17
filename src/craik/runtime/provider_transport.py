@@ -8,7 +8,7 @@ from typing import Any, Literal, Protocol
 
 from craik.contracts.models import RunnerResultStatus
 
-ProviderFamily = Literal["openai", "anthropic"]
+ProviderFamily = Literal["openai", "anthropic", "chat_completions"]
 
 
 class ProviderTransport(Protocol):

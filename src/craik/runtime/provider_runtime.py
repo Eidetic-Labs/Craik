@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from typing import Any, Literal, Protocol, cast
 
@@ -73,7 +74,9 @@ class ProviderRuntimeConfig(CraikModel):
                 "provider runtime secret_ref_name must not contain raw secret material"
             )
         expected_refs = (
-            OPENAI_OFFICIAL_DOCS if self.provider_family == "openai" else ANTHROPIC_OFFICIAL_DOCS
+            ANTHROPIC_OFFICIAL_DOCS
+            if self.provider_family == "anthropic"
+            else OPENAI_OFFICIAL_DOCS
         )
         missing = [ref for ref in expected_refs if ref not in self.docs_refs]
         if missing:
@@ -105,6 +108,20 @@ class ProviderRuntimeResult(CraikModel):
     structured_output_name: str | None = None
     usage: dict[str, int] = Field(default_factory=dict)
     response_id: str | None = None
+    redacted: bool = True
+
+
+class ProviderRuntimeChunk(CraikModel):
+    """Provider-neutral streaming response chunk."""
+
+    provider_id: str
+    provider_family: ProviderFamily
+    model: str
+    text_delta: str = ""
+    tool_calls: list[dict[str, Any]] = Field(default_factory=list)
+    usage: dict[str, int] = Field(default_factory=dict)
+    response_id: str | None = None
+    finish_reason: str | None = None
     redacted: bool = True
 
 
@@ -327,12 +344,113 @@ class AnthropicProviderAdapter:
             )
 
 
+class ChatCompletionsProviderAdapter:
+    """OpenAI-compatible Chat Completions payload and response normalization."""
+
+    def __init__(self, config: ProviderRuntimeConfig) -> None:
+        if config.provider_family != "chat_completions":
+            raise ValueError(
+                "ChatCompletionsProviderAdapter requires provider_family='chat_completions'"
+            )
+        self.config = config
+
+    def build_payload(self, request: ProviderRuntimeRequest) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "model": self.config.model,
+            "messages": [_chat_completions_message(message) for message in request.messages],
+            "stream": request.stream,
+            "max_tokens": request.max_output_tokens,
+        }
+        if request.tools:
+            payload["tools"] = [_chat_completions_tool(tool) for tool in request.tools]
+            payload["tool_choice"] = "auto"
+        if request.structured_output_schema is not None:
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": request.structured_output_name,
+                    "schema": request.structured_output_schema,
+                    "strict": True,
+                },
+            }
+        return payload
+
+    def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
+        choices = response.get("choices", [])
+        message: dict[str, Any] = {}
+        if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+            raw_message = choices[0].get("message", {})
+            if isinstance(raw_message, dict):
+                message = raw_message
+        content = str(message.get("content") or "")
+        tool_calls = _chat_completions_tool_calls(message.get("tool_calls", []))
+        return ProviderRuntimeResult(
+            provider_id=self.config.provider_id,
+            provider_family="chat_completions",
+            model=str(response.get("model", self.config.model)),
+            text=content,
+            tool_calls=tool_calls,
+            structured_output=_json_object_or_none(content),
+            usage=_chat_completions_usage(response.get("usage", {})),
+            response_id=str(response.get("id")) if response.get("id") else None,
+        )
+
+    def normalize_chunk(self, chunk: dict[str, Any]) -> ProviderRuntimeChunk:
+        choices = chunk.get("choices", [])
+        delta: dict[str, Any] = {}
+        finish_reason: str | None = None
+        if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+            raw_delta = choices[0].get("delta", {})
+            if isinstance(raw_delta, dict):
+                delta = raw_delta
+            raw_finish_reason = choices[0].get("finish_reason")
+            finish_reason = str(raw_finish_reason) if raw_finish_reason is not None else None
+        return ProviderRuntimeChunk(
+            provider_id=self.config.provider_id,
+            provider_family="chat_completions",
+            model=str(chunk.get("model", self.config.model)),
+            text_delta=str(delta.get("content") or ""),
+            tool_calls=_chat_completions_tool_calls(delta.get("tool_calls", [])),
+            usage=_chat_completions_usage(chunk.get("usage", {})),
+            response_id=str(chunk.get("id")) if chunk.get("id") else None,
+            finish_reason=finish_reason,
+        )
+
+    def classify_error(
+        self,
+        *,
+        status_code: int | None,
+        error_type: str | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> ProviderRuntimeErrorDecision:
+        retryable = status_code in {408, 409, 429, 500, 502, 503, 504}
+        return ProviderRuntimeErrorDecision(
+            provider_family="chat_completions",
+            status_code=status_code,
+            error_type=error_type,
+            retryable=retryable,
+            retry_after_seconds=_retry_after(headers),
+            reason=(
+                "retryable Chat Completions API condition"
+                if retryable
+                else "non-retryable Chat Completions API condition"
+            ),
+        )
+
+    def require_live_access(self) -> None:
+        if not self.config.live_enabled:
+            raise ProviderLiveAccessNotConfiguredError(
+                "Chat Completions live access requires live_enabled=true and "
+                "an external secret resolver"
+            )
+
+
 def adapter_for_provider(
     provider: ModelProvider, *, live_enabled: bool = False
 ) -> ProviderRuntimeAdapter:
     """Return the runtime adapter for a configured MVP provider."""
     family = provider.provider
-    if family not in {"openai", "anthropic"}:
+    if family not in {"openai", "anthropic", "chat_completions"}:
         raise ValueError(f"provider {provider.id} is not an MVP live provider")
     model = str(provider.metadata.get("default_model", ""))
     if not model:
@@ -344,11 +462,15 @@ def adapter_for_provider(
         model=model,
         secret_ref_name=secret_ref_name,
         live_enabled=live_enabled,
-        docs_refs=list(OPENAI_OFFICIAL_DOCS if family == "openai" else ANTHROPIC_OFFICIAL_DOCS),
+        docs_refs=list(
+            ANTHROPIC_OFFICIAL_DOCS if family == "anthropic" else OPENAI_OFFICIAL_DOCS
+        ),
     )
     if family == "openai":
         return OpenAIProviderAdapter(config)
-    return AnthropicProviderAdapter(config)
+    if family == "anthropic":
+        return AnthropicProviderAdapter(config)
+    return ChatCompletionsProviderAdapter(config)
 
 
 def provider_runtime_receipt(
@@ -416,6 +538,41 @@ def _anthropic_tool(tool: ProviderTool) -> dict[str, Any]:
     }
 
 
+def _chat_completions_message(message: ProviderMessage) -> dict[str, Any]:
+    return {"role": message.role, "content": message.content}
+
+
+def _chat_completions_tool(tool: ProviderTool) -> dict[str, Any]:
+    return {
+        "type": "function",
+        "function": {
+            "name": tool.name,
+            "description": tool.description,
+            "parameters": tool.input_schema,
+        },
+    }
+
+
+def _chat_completions_tool_calls(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    tool_calls: list[dict[str, Any]] = []
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        function = item.get("function", {})
+        function = function if isinstance(function, dict) else {}
+        tool_calls.append(
+            {
+                "id": item.get("id"),
+                "type": item.get("type"),
+                "name": function.get("name"),
+                "arguments": redact(function.get("arguments", "")).value,
+            }
+        )
+    return tool_calls
+
+
 def _openai_usage(value: Any) -> dict[str, int]:
     if not isinstance(value, dict):
         return {}
@@ -436,6 +593,27 @@ def _anthropic_usage(value: Any) -> dict[str, int]:
         "output_tokens": output_tokens,
         "total_tokens": input_tokens + output_tokens,
     }
+
+
+def _chat_completions_usage(value: Any) -> dict[str, int]:
+    if not isinstance(value, dict):
+        return {}
+    prompt_tokens = int(value.get("prompt_tokens", 0) or 0)
+    completion_tokens = int(value.get("completion_tokens", 0) or 0)
+    total_tokens = int(value.get("total_tokens", prompt_tokens + completion_tokens) or 0)
+    return {
+        "input_tokens": prompt_tokens,
+        "output_tokens": completion_tokens,
+        "total_tokens": total_tokens,
+    }
+
+
+def _json_object_or_none(value: str) -> dict[str, Any] | None:
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
 
 
 def _retry_after(headers: dict[str, str] | None) -> int | None:
