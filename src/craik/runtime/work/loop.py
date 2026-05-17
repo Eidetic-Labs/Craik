@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any, Protocol
+from typing import Protocol
 
 from craik.contracts.models import (
     CapabilityGrant,
@@ -24,12 +23,13 @@ from craik.contracts.models import (
 )
 from craik.runtime.memory.memory import MemoryStore
 from craik.runtime.policy.policy import check_shell_grant, denial_receipt
-from craik.runtime.side_effects import (
-    SideEffectResult,
-    run_github_write,
-    run_shell_command_ref,
-)
 from craik.runtime.store import LocalStore
+from craik.runtime.work.loop_support.tool_dispatch import (
+    dispatch_tool_call_side_effect,
+    dispatchable_tool_calls,
+    result_with_stream_chunks,
+    tool_message,
+)
 from craik.runtime.work.run_outputs import (
     RunOutputCapture,
     RunOutputProposalSpec,
@@ -252,17 +252,18 @@ class SingleAgentLoopExecutor:
                 result = self.runner.run_step(request, stream_callback=stream_chunks.append)
                 iteration += 1
                 if stream_chunks:
-                    result = _result_with_stream_chunks(result, stream_chunks)
+                    result = result_with_stream_chunks(result, stream_chunks)
                 receipt_ids = list(result.receipt_ids)
                 if side_effect_receipt is not None and side_effect_receipt.id not in receipt_ids:
                     receipt_ids.append(side_effect_receipt.id)
 
-                tool_calls = _dispatchable_tool_calls(result)
+                tool_calls = dispatchable_tool_calls(result)
                 tool_messages: list[dict[str, str]] = []
                 denied_tool_receipt: CapabilityReceipt | None = None
                 if tool_calls:
                     for tool_call in tool_calls:
-                        side_effect = self._tool_call_side_effect(
+                        side_effect = dispatch_tool_call_side_effect(
+                            store=self.store,
                             policy=policy,
                             grants=active_grants,
                             tool_call=tool_call,
@@ -273,7 +274,7 @@ class SingleAgentLoopExecutor:
                         receipts.append(side_effect.receipt)
                         if side_effect.receipt.id not in receipt_ids:
                             receipt_ids.append(side_effect.receipt.id)
-                        tool_messages.append(_tool_message(tool_call, side_effect))
+                        tool_messages.append(tool_message(tool_call, side_effect))
                         if not side_effect.allowed:
                             denied_tool_receipt = side_effect.receipt
                             break
@@ -376,41 +377,6 @@ class SingleAgentLoopExecutor:
             created_at=datetime.now(UTC),
         )
 
-    def _tool_call_side_effect(
-        self,
-        *,
-        policy: PolicyEnvelope,
-        grants: list[CapabilityGrant],
-        tool_call: dict[str, Any],
-        actor: str,
-    ) -> SideEffectResult | None:
-        name = _tool_name(tool_call)
-        arguments = _tool_arguments(tool_call)
-        if name in {"shell.execute", "shell_execute", "run_shell_command_ref"}:
-            command_ref = str(
-                arguments.get("command_ref")
-                or arguments.get("command")
-                or arguments.get("target")
-                or ""
-            )
-            return run_shell_command_ref(
-                store=self.store,
-                policy=policy,
-                grants=grants,
-                actor=actor,
-                command_ref=command_ref,
-            )
-        if name in {"github.write", "github_write", "run_github_write"}:
-            return run_github_write(
-                store=self.store,
-                policy=policy,
-                grants=grants,
-                actor=actor,
-                operation=str(arguments.get("operation") or "write"),
-                target=str(arguments.get("target") or ""),
-            )
-        return None
-
 
 def default_loop_steps() -> list[LoopStep]:
     """Return the default deterministic single-agent loop phases."""
@@ -472,81 +438,6 @@ def _context_with_message_history(
     if not message_history:
         return dict(context)
     return {**context, "message_history": list(message_history)}
-
-
-def _dispatchable_tool_calls(result: RunnerStepResult) -> list[dict[str, Any]]:
-    raw_tool_calls = result.observed_output.get("tool_calls", [])
-    if not isinstance(raw_tool_calls, list):
-        return []
-    tool_calls: list[dict[str, Any]] = []
-    for raw_tool_call in raw_tool_calls:
-        if not isinstance(raw_tool_call, dict):
-            continue
-        if _tool_name(raw_tool_call) in {
-            "shell.execute",
-            "shell_execute",
-            "run_shell_command_ref",
-            "github.write",
-            "github_write",
-            "run_github_write",
-        }:
-            tool_calls.append(raw_tool_call)
-    return tool_calls
-
-
-def _result_with_stream_chunks(
-    result: RunnerStepResult,
-    stream_chunks: list[str],
-) -> RunnerStepResult:
-    observed_output = {
-        **result.observed_output,
-        "stream_chunks": list(stream_chunks),
-        "stream_text": "".join(stream_chunks),
-    }
-    return result.model_copy(update={"observed_output": observed_output})
-
-
-def _tool_name(tool_call: dict[str, Any]) -> str:
-    name = tool_call.get("name")
-    if name is not None:
-        return str(name)
-    function = tool_call.get("function")
-    if isinstance(function, dict) and function.get("name") is not None:
-        return str(function["name"])
-    return ""
-
-
-def _tool_arguments(tool_call: dict[str, Any]) -> dict[str, Any]:
-    raw_arguments: Any = tool_call.get("arguments")
-    function = tool_call.get("function")
-    if raw_arguments is None and isinstance(function, dict):
-        raw_arguments = function.get("arguments")
-    if raw_arguments is None:
-        raw_arguments = tool_call.get("input", {})
-    if isinstance(raw_arguments, dict):
-        return raw_arguments
-    if isinstance(raw_arguments, str) and raw_arguments:
-        try:
-            parsed = json.loads(raw_arguments)
-        except json.JSONDecodeError:
-            return {"raw": raw_arguments}
-        return parsed if isinstance(parsed, dict) else {"value": parsed}
-    return {}
-
-
-def _tool_message(tool_call: dict[str, Any], side_effect: SideEffectResult) -> dict[str, str]:
-    content = {
-        "allowed": side_effect.allowed,
-        "receipt_id": side_effect.receipt.id,
-        "summary": side_effect.receipt.result.summary,
-        "output": side_effect.output or {},
-    }
-    tool_call_id = tool_call.get("id") or tool_call.get("call_id") or _tool_name(tool_call)
-    return {
-        "role": "tool",
-        "tool_call_id": str(tool_call_id),
-        "content": json.dumps(content, sort_keys=True),
-    }
 
 
 def _receipt_slug(value: str) -> str:
