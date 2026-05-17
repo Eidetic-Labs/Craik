@@ -6,6 +6,7 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from craik.contracts.models import CapabilityReceipt, ModelProvider
+from craik.runtime.auth.sources.api_key import EnvVarApiKeySource
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
 from craik.runtime.policy.redaction import redact
 from craik.runtime.providers.http_transport import HTTPTransport
@@ -13,7 +14,6 @@ from craik.runtime.providers.provider_transport import (
     FixtureTransport,
     ProviderTransport,
 )
-from craik.runtime.secrets import SecretRef, SecretResolver
 
 if TYPE_CHECKING:
     from craik.runtime.providers.provider_runtime import (
@@ -41,21 +41,7 @@ def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
 
 
 def _provider_headers(config: ProviderRuntimeConfig) -> dict[str, str]:
-    secret = (
-        SecretResolver().resolve(SecretRef(env_var=config.secret_ref_name))
-        if config.secret_ref_name
-        else ""
-    )
-    if config.provider_family == "anthropic":
-        headers = {
-            "anthropic-version": "2023-06-01",
-        }
-        if secret:
-            headers["x-api-key"] = secret
-        return headers
-    if secret:
-        return {"Authorization": f"Bearer {secret}"}
-    return {}
+    return EnvVarApiKeySource(config.secret_ref_name).headers_for(config.provider_family)
 
 
 def _provider_base_url(provider: ModelProvider) -> str:
