@@ -111,11 +111,17 @@ Craik should remain on `0.x.0` releases until the maintainers are very confident
 
 ### v0.1.0 Gate: Governed Agent-Runtime Substrate
 
-`v0.1.0` must prove Craik's core value without requiring the full north-star surface.
-
 Required outcome:
 
-> A user can register a real repo, assemble a governed case file, compile runner prompts, execute provider requests against OpenAI Responses / Anthropic Messages / OpenAI-compatible Chat Completions adapters (fixture-backed by default, live opt-in), record receipts, produce durable handoffs, propose memory updates, and export the work graph.
+> A user can register a real repo, authenticate via OIDC, assemble a governed
+> case file, compile runner prompts, execute provider requests against OpenAI
+> Responses / Anthropic Messages / OpenAI-compatible Chat Completions adapters
+> (fixture-backed by default, live opt-in), resolve provider credentials through
+> typed profiles or workload-federated brokering, record receipts that name both
+> the operator identity and the credential identity, produce durable handoffs,
+> propose memory updates, and export the work graph. Policy can constrain which
+> operators and which credentials a task may use; credential authorization is
+> itself a receipted graph.
 
 Required capabilities:
 
@@ -124,110 +130,173 @@ Required capabilities:
 - `~/.craik` local home and `CRAIK_HOME` override.
 - Pydantic runtime contracts.
 - SQLite local state.
-- project registry.
-- strict policy profile, trusted-local profile, automation profile.
-- capability grants.
-- central redaction utility.
-- receipt store.
-- handoff writer.
-- local memory backend.
-- Stigmem backend with required endpoint compatibility.
-- case file assembler.
-- evidence references.
-- assumption ledger.
-- context budget metadata.
-- default repository context exclusions with project/user overrides.
-- intent lock.
-- self-audit before handoff.
-- memory proposal flow.
-- memory diff for local proposals and Stigmem writes.
-- work graph export for task, handoff, receipt, fact/proposal, evidence, and contradiction nodes.
-- GitHub read adapter.
-- pluggable provider transport with `FixtureTransport` and `HTTPTransport`.
-- provider adapter families for OpenAI Responses, Anthropic Messages, and
-  OpenAI-compatible Chat Completions.
-- secret reference resolution.
-- tool-call round-trip in the execution loop.
-- streaming chunk capture.
-- retry, timeout, and cancellation handling for provider execution.
-- first demo workflow for Stigmem docs reconciliation.
-- agent-native onboarding for the demo project.
-- policy tests for the core security baseline.
+- Project registry.
+- Strict / trusted-local / automation policy profiles.
+- Capability grants.
+- Central redaction utility.
+- Receipt store.
+- Handoff writer.
+- Local memory backend and Stigmem read client.
+- Case file assembler, evidence references, assumption ledger, context budget
+  metadata, default repo context exclusions with project/user overrides.
+- Intent locks and self-audit before handoff.
+- Memory proposal flow with diff and impact preview.
+- Work graph export.
+- Read-only GitHub adapter.
+- Stigmem documentation reconciliation demo and behavior-test acceptance.
+- Pluggable provider transport (`FixtureTransport`, `HTTPTransport` over stdlib
+  urllib with SSE).
+- Provider adapter families: OpenAI Responses, Anthropic Messages, OpenAI-
+  compatible Chat Completions.
+- Provider tool-call round-trip, streaming chunk capture, retry, timeout,
+  cancellation.
+- Single-agent execution loop with task run state machine, plan/act/observe/
+  evaluate phases, runner step contract, max-iteration controls, policy gates
+  per step, receipts per step, run output capture, memory proposal creation,
+  handoff on completion / block / failure.
+- Typed credential abstraction with `auth-profiles.json` and
+  `<provider_family>:<name>` profile IDs.
+- Credential sources: env-var API key, local-CLI OAuth fallback (e.g. Claude
+  Code credentials), vendor-CLI subprocess bridge, external secret manager
+  reference, marker, Stigmem-backed credential reference.
+- Credential pool with rotation, failover, and per-profile health tracking.
+- OIDC operator login with device-code and loopback+PKCE flows; IdP discovery;
+  JWKS-validated ID tokens; refresh handling.
+- Workload identity providers for CI / Kubernetes / generic file / env-var.
+- RFC 8693 token-exchange secret manager for federated credential brokering.
+- Operator session at `<CRAIK_HOME>/operator-session.json` with `craik login`,
+  `craik logout`, `craik whoami`.
+- Credential CLI: `craik auth list / add / remove / test / status / approve /
+  grant`.
+- Credential health surfaced in `craik doctor`.
+- Operator and credential identity bound to every provider call and receipt.
+- Policy-bound operators and credentials: `required_operator`,
+  `allowed_operator_groups`, `allowed_credential_kinds`,
+  `allowed_credential_profiles`.
+- Approval-gated first live use of any credential profile.
+- Operator-credential authorization binding with receipted grant chain.
+- Credential expiry surfaced as evidence/risk in case files.
+- Per-credential redaction patterns.
+- Per-agent credential and operator isolation in handoff records (consumed by
+  the future multi-agent runtime in v0.3.0).
 
-Explicitly not required for `v0.1.0`:
+Explicitly not required for v0.1.0:
 
-- full autonomous multi-agent orchestration,
-- production UI,
-- hosted service,
-- community marketplace,
-- complete Codex/Claude/Gemini execution control,
-- automatic Stigmem conflict resolution,
-- full plugin runtime.
+- Resumable runs across process crashes.
+- Real sandbox tool execution.
+- Provider budget enforcement at the call boundary.
+- Schema migration framework for persisted state.
+- Multi-agent runtime behavior beyond handoff identity bookkeeping.
+- Instruction distillation pipeline.
+- Operator UI / TUI.
+- Gateway daemon and channel adapters.
+- MCP client/server integration.
+- Skill and plugin runtime.
+- Learning loops.
+- Companion surfaces.
+- Migration tooling.
 
-`v0.1.0` should still define contracts and docs that make those later features possible.
-
-### v0.3.0 Gate: Single-Agent Execution Loop
-
-Required outcome:
-
-> Craik can drive one agent through a governed plan/act/observe/evaluate loop without relying on an untracked chat transcript.
-
-Required capabilities:
-
-- task run state machine,
-- run id and run status model,
-- plan/act/observe/evaluate/continue/stop phases,
-- runner step contract,
-- max-iteration controls,
-- time and budget controls,
-- intent-lock stop-condition enforcement,
-- policy approval checks before each side effect,
-- receipts per action or step,
-- observed output capture,
-- memory proposal creation during or after the loop,
-- handoff on completion, block, failure, or interruption,
-- resumable interrupted runs,
-- run inspection command,
-- run recovery command,
-- agent exit discipline.
-
-The LLM remains the reasoning engine, but Craik owns the loop boundary, persistence, policy gates, receipts, and stop conditions.
-
-### v0.4.0 Gate: Multi-Agent Review And Coordination
+### v0.2.0 Gate: Durable Execution Continuity
 
 Required outcome:
 
-> Craik can coordinate role-specific agents, preserve specialist outputs, and structure disagreement without flattening unresolved contradictions.
+> A run interrupted at any phase boundary can be resumed cleanly with no
+> duplicated side effects. Tool calls execute inside at least one real sandbox
+> backend, gated per call. Budgets are enforced at the call boundary, not just
+> declared. Persistent state survives schema changes via a documented migration
+> path.
 
 Required capabilities:
 
-- orchestrator role,
-- specialist roles,
-- implementer/verifier/adversarial reviewer/policy reviewer/docs reviewer/memory curator/adjudicator roles,
-- typed worker results,
-- parallel read-only investigations,
-- structured agent debate,
-- contradiction reports,
-- human delegation points,
-- cross-agent review protocol,
-- scope-change protocol.
+- Resumable interrupted runs: a process crash mid-phase is recovered to the
+  last persisted phase boundary.
+- Step-level idempotency keys preventing duplicated receipts, memory proposals,
+  and tool side effects on replay.
+- Time controls: per-run wall-clock budgets enforced by the loop.
+- Provider budget enforcement: budget ledger decremented per call; abort when
+  exceeded.
+- Run inspection and recovery commands: `craik run show`, `craik run resume`,
+  `craik run cancel`.
+- Agent exit discipline enforced at runtime, not only declared.
+- Tool result attestation: signed or hashed record proving the output came
+  from the declared tool, not from the model.
+- One real sandbox backend (`docker_sandbox` or `local_process`) integrated
+  with policy: every granted tool call dispatches through the sandbox, every
+  call produces an environment receipt.
+- Sandbox cancellation: the existing transport-level cancellation propagates
+  into in-flight tool calls.
+- Schema migration framework: a documented runner that migrates SQLite store
+  state across breaking contract changes; one example migration shipped.
+- Run delta view (CLI-only): "what changed between this run and the prior
+  one" surfaced from durable state.
 
-### v0.5.0 Gate: Runtime Instruction Distillation
+### v0.3.0 Gate: Multi-Agent Review and Coordination
 
 Required outcome:
 
-> Craik can distill declared runtime instruction files into provenance-linked proposals and use them safely in case files, policies, and onboarding.
+> A handoff produced by agent A can be consumed by agent B as the starting
+> state of a new governed run. Two agents working against the same project are
+> coordinated via the work graph and intent locks without colliding.
+> Disagreement between agents produces structured debate artifacts with
+> receipted resolution.
 
 Required capabilities:
 
-- declared instruction source registry,
-- support for `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `HERMES.md`, `SKILLS.md`, `.cursorrules`, `.github/copilot-instructions.md`, `.codex/instructions.md`, and declared policy docs,
-- source hash tracking,
-- line/range provenance where available,
-- instruction/policy/preference/command/boundary/handoff-rule/memory-rule/security-rule/stale-risk extraction categories,
-- stale distillation invalidation,
-- contradiction reports between instruction sources,
-- approval flow for promoted constraints.
+- Handoff consumption: `craik task resume --from-handoff=<id>` starts a new
+  run from a prior agent's handoff record.
+- Role-based dispatch: orchestrator selects role-specific runners
+  (implementer / verifier / adversarial reviewer / policy reviewer / docs
+  reviewer / memory curator / adjudicator).
+- Multi-agent message contract: typed agent-to-agent mailbox with persisted
+  receipts.
+- Concurrent run coordination: intent-lock enforcement across simultaneous
+  loops against the same project.
+- Structured debate runtime: two agents produce typed positions; an
+  adjudicator role or human delegation point resolves with a receipt.
+- Cross-agent review protocol: one agent produces a typed review artifact
+  against another's output.
+- Human delegation points at runtime: a run pauses, posts a delegation, waits
+  for input via the CLI, resumes.
+- Scope-change protocol: discovered new scope triggers a declared protocol
+  (expand / sibling / handoff) rather than silent expansion.
+- Live work graph: the graph is the coordination source of truth, not only
+  an export artifact.
+- Per-agent credential and operator isolation enforced end to end (the
+  consumer agent gets its own profile assignment by default, not inherited).
+  Note: v0.1.0 already records this identity in handoff records; v0.3.0
+  enforces the isolation across the runtime.
+
+### v0.4.0 Gate: Runtime Instruction Distillation
+
+Required outcome:
+
+> Declared instruction files in a repo are ingested into typed,
+> provenance-linked distillation items with categorized extraction, stale
+> invalidation, contradiction surfacing, and an approval flow. Approved
+> distillations participate in case files and prompt compilation as first-class
+> evidence.
+
+Required capabilities:
+
+- Declared instruction source registry with explicit registration and a
+  documented detection order.
+- Source ingestion for `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `HERMES.md`,
+  `SKILLS.md`, `.cursorrules`, `.github/copilot-instructions.md`,
+  `.codex/instructions.md`, and declared policy docs.
+- Source hash tracking and stale-invalidation watcher.
+- Line/range provenance attached to every extracted item.
+- Categorized extraction: instruction / policy / preference / command /
+  boundary / handoff-rule / memory-rule / security-rule / stale-risk.
+- Inter-source contradiction reports surfaced as Stigmem-style contradictions.
+- Approval flow: distilled items become governing only after recorded
+  approval, producing a receipt.
+- Case file integration: approved distillations load into case files as
+  first-class evidence with provenance.
+- Prompt compilation integration: distilled constraints appear in compiled
+  prompts as a separate authoritative section, distinguishable from raw source
+  quotes.
+- Instruction distillation CLI: `craik instructions register / list / approve
+  / show`.
 
 ### v0.6.0 Gate: Quality, Continuity, And Recovery
 
