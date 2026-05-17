@@ -23,6 +23,7 @@ from craik.runtime.providers.provider_runtime import (
     OPENAI_OFFICIAL_DOCS,
     AnthropicProviderAdapter,
     ChatCompletionsProviderAdapter,
+    CredentialApprovalRequiredError,
     OpenAIProviderAdapter,
     ProviderLiveAccessNotConfiguredError,
     ProviderMessage,
@@ -763,6 +764,87 @@ def test_provider_request_binds_active_operator_identity(
     assert request.metadata["operator_issuer"] == "https://issuer.example.test"
     assert receipt.result.metadata["operator_subject"] == "operator-123"
     assert receipt.result.metadata["operator_groups"] == ["platform"]
+
+
+def test_live_provider_requires_first_use_credential_approval(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    AuthProfileStore(tmp_path).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    transport = _CountingTransport()
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            live_enabled=True,
+            auth_profile_id="openai:work",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        ),
+        transport=transport,
+    )
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={"run_id": "run_approval"},
+    )
+
+    with pytest.raises(CredentialApprovalRequiredError, match="craik auth approve"):
+        adapter.execute(request)
+
+    assert transport.calls == 0
+
+
+def test_live_provider_approved_first_use_marks_profile_used(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    store = AuthProfileStore(tmp_path)
+    store.put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    store.approve("openai:work", run_id="run_approval", approved_by="operator:local")
+    transport = _CountingTransport()
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            live_enabled=True,
+            auth_profile_id="openai:work",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        ),
+        transport=transport,
+    )
+
+    adapter.execute(
+        ProviderRuntimeRequest(
+            messages=[ProviderMessage(role="user", content="hi")],
+            metadata={"run_id": "run_approval"},
+        )
+    )
+
+    profile = store.get("openai:work")
+    assert transport.calls == 1
+    assert profile.last_status == "ok"
+    assert profile.last_used_at is not None
 
 
 class _CountingTransport:

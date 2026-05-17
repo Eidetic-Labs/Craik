@@ -22,6 +22,10 @@ class ProviderLiveAccessNotConfiguredError(ProviderRuntimeError):
     """Raised when live provider access is attempted without explicit configuration."""
 
 
+class CredentialApprovalRequiredError(ProviderRuntimeError):
+    """Raised when a live provider credential requires first-use approval."""
+
+
 class ProviderMessage(CraikModel):
     """Provider-neutral chat message."""
 
