@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -64,11 +65,19 @@ class ProviderBackedStepRunner:
     statuses: list[RunnerResultStatus] = field(default_factory=list)
     provider_results: list[ProviderRuntimeResult] = field(default_factory=list)
 
-    def run_step(self, request: RunnerStepRequest) -> RunnerStepResult:
+    def run_step(
+        self,
+        request: RunnerStepRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> RunnerStepResult:
         """Normalize one runner step through the configured provider adapter."""
         status = self.statuses.pop(0) if self.statuses else "completed"
         provider_request = self._provider_request(request, status=status)
-        provider_result = self.adapter.execute(provider_request)
+        provider_result = self.adapter.execute(
+            provider_request,
+            stream_callback=stream_callback,
+        )
         receipt = provider_runtime_receipt(
             adapter=self.adapter,
             request=provider_request,
@@ -137,7 +146,7 @@ class ProviderBackedStepRunner:
                 )
             ],
             structured_output_schema=_runner_step_schema(),
-            stream=False,
+            stream=bool(request.context.get("stream", False)),
             metadata={
                 "user_id": request.task_id,
                 "run_id": request.run_id,

@@ -85,6 +85,17 @@ def test_missing_proposal_specs_records_skipped_reason(store: LocalStore) -> Non
     assert capture.skipped_reasons == ["no memory proposal specs supplied"]
 
 
+def test_capture_step_result_exposes_stream_chunks(store: LocalStore) -> None:
+    recorder = RunOutputRecorder(store, LocalMemoryStore(store))
+
+    capture = recorder.capture_step_result(
+        _step_result(observed_output={"stream_chunks": ["Hel", "lo", "!"]}),
+    )
+
+    assert capture.chunks == ["Hel", "lo", "!"]
+    assert capture.output.observed_output["stream_chunks"] == ["Hel", "lo", "!"]
+
+
 def _step_result(
     *,
     status: str = "completed",

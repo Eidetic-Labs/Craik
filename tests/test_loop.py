@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -194,11 +195,45 @@ def test_loop_executes_tool_call_and_replays_tool_result(store: LocalStore) -> N
     assert result.step_results[-1].observed_output["text"] == "tool result consumed"
 
 
+def test_loop_captures_streaming_chunks(store: LocalStore) -> None:
+    runner = StreamingStepRunner(chunks=["Hel", "lo", "!"])
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    result = executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture"),
+        runner_metadata=_runner(),
+        steps=[LoopStep(phase="act", input_prompt="Stream the answer.")],
+        max_iterations=2,
+    )
+
+    assert result.run.status == "completed"
+    assert result.output_captures[0].chunks == ["Hel", "lo", "!"]
+    assert result.output_captures[0].output.observed_output["stream_chunks"] == [
+        "Hel",
+        "lo",
+        "!",
+    ]
+    assert result.output_captures[0].output.observed_output["stream_text"] == "Hello!"
+    assert result.step_results[0].observed_output["text"] == "Hello!"
+
+
 class ToolCallStepRunner:
     def __init__(self) -> None:
         self.requests: list[RunnerStepRequest] = []
 
-    def run_step(self, request: RunnerStepRequest) -> RunnerStepResult:
+    def run_step(
+        self,
+        request: RunnerStepRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> RunnerStepResult:
+        _ = stream_callback
         self.requests.append(request)
         if len(self.requests) == 1:
             return RunnerStepResult(
@@ -231,6 +266,34 @@ class ToolCallStepRunner:
             status="completed",
             summary="Consumed the tool result.",
             observed_output={"text": "tool result consumed"},
+            created_at=datetime.now(UTC),
+        )
+
+
+class StreamingStepRunner:
+    def __init__(self, *, chunks: list[str]) -> None:
+        self.chunks = chunks
+
+    def run_step(
+        self,
+        request: RunnerStepRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> RunnerStepResult:
+        for chunk in self.chunks:
+            if stream_callback is not None:
+                stream_callback(chunk)
+        text = "".join(self.chunks)
+        return RunnerStepResult(
+            id=f"runner_step_result_{request.run_id}_stream",
+            request_id=request.id,
+            run_id=request.run_id,
+            task_id=request.task_id,
+            phase=request.phase,
+            runner=request.runner,
+            status="completed",
+            summary="Streamed the result.",
+            observed_output={"text": text},
             created_at=datetime.now(UTC),
         )
 
