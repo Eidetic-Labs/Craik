@@ -12,6 +12,7 @@ from craik.contracts.models import (
     RunnerStepRequest,
     RunnerStepResult,
 )
+from craik.runtime.auth.operator import OperatorSession, OperatorSessionStore
 from craik.runtime.memory.memory import LocalMemoryStore
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.policy.policy import generate_policy_envelope
@@ -164,6 +165,83 @@ def test_loop_enforces_intent_stop_condition_before_step(store: LocalStore) -> N
     assert result.run.stop_reason == "intent stop condition triggered: scope changed"
 
 
+def test_loop_denies_operator_missing_required_group(
+    store: LocalStore,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path / "auth_home"))
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=FixtureStepRunner(),
+    )
+    policy = generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture")
+    policy = policy.model_copy(
+        update={"required_operator": True, "allowed_operator_groups": ["prod-deploy"]}
+    )
+
+    result = executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=policy,
+        runner_metadata=_runner(),
+        grants=[_shell_grant()],
+    )
+
+    assert result.run.status == "blocked"
+    assert result.run.stop_reason == "operator identity required by policy; run craik login"
+    assert result.step_results == []
+    assert result.receipts[0].capability == "operator.identity"
+    assert result.receipts[0].result.status == "denied"
+    assert store.get_receipt(result.receipts[0].id) == result.receipts[0]
+
+
+def test_loop_passes_operator_policy_match_to_runner_context(
+    store: LocalStore,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    auth_home = tmp_path / "auth_home"
+    monkeypatch.setenv("CRAIK_HOME", str(auth_home))
+    OperatorSessionStore(auth_home).put(
+        OperatorSession(
+            subject="operator-123",
+            email="operator@example.test",
+            display_name="Operator",
+            groups=["platform", "prod-deploy"],
+            issuer="https://issuer.example.test",
+            id_token_jti="token-1",
+            expires_at=datetime(2026, 5, 18, tzinfo=UTC),
+        )
+    )
+    runner = RecordingStepRunner()
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+    policy = generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture")
+    policy = policy.model_copy(
+        update={"required_operator": True, "allowed_operator_groups": ["prod-deploy"]}
+    )
+
+    result = executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=policy,
+        runner_metadata=_runner(),
+        grants=[_shell_grant()],
+        steps=[LoopStep(phase="act", input_prompt="Act.")],
+        max_iterations=2,
+    )
+
+    assert result.run.status == "completed"
+    assert runner.requests[0].context["operator_policy"]["matched_operator_group"] == (
+        "prod-deploy"
+    )
+
+
 def test_loop_executes_tool_call_and_replays_tool_result(store: LocalStore) -> None:
     runner = ToolCallStepRunner()
     executor = SingleAgentLoopExecutor(
@@ -266,6 +344,32 @@ class ToolCallStepRunner:
             status="completed",
             summary="Consumed the tool result.",
             observed_output={"text": "tool result consumed"},
+            created_at=datetime.now(UTC),
+        )
+
+
+class RecordingStepRunner:
+    def __init__(self) -> None:
+        self.requests: list[RunnerStepRequest] = []
+
+    def run_step(
+        self,
+        request: RunnerStepRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> RunnerStepResult:
+        _ = stream_callback
+        self.requests.append(request)
+        return RunnerStepResult(
+            id=f"runner_step_result_{request.run_id}_{request.phase}",
+            request_id=request.id,
+            run_id=request.run_id,
+            task_id=request.task_id,
+            phase=request.phase,
+            runner=request.runner,
+            status="completed",
+            summary="Recorded step.",
+            observed_output={"phase": request.phase},
             created_at=datetime.now(UTC),
         )
 

@@ -28,6 +28,8 @@ from craik.runtime.providers.provider_models import (
 from craik.runtime.providers.provider_runtime_support import _json_object_or_none, _retry_after
 from craik.runtime.providers.provider_transport import ProviderTransportError
 
+OPERATOR_POLICY_METADATA_KEY = "operator_policy"
+
 
 def execute_provider_request(
     adapter: ProviderRuntimeAdapter,
@@ -164,11 +166,51 @@ def _request_with_operator_context(
 ) -> ProviderRuntimeRequest:
     session = active_operator_session()
     if session is None:
-        if operator_identity_required(request.metadata):
+        if operator_identity_required(request.metadata) or _operator_policy_requires_identity(
+            request.metadata
+        ):
             raise ProviderRuntimeError("operator identity required; run craik login")
+        _enforce_operator_policy_metadata(request.metadata)
         return request
     request.metadata = bind_operator_metadata(request.metadata, session)
+    _enforce_operator_policy_metadata(request.metadata)
     return request
+
+
+def _operator_policy_requires_identity(metadata: dict[str, Any]) -> bool:
+    policy = metadata.get(OPERATOR_POLICY_METADATA_KEY)
+    if not isinstance(policy, dict):
+        return False
+    return bool(
+        policy.get("required_operator")
+        or policy.get("allowed_operator_groups")
+        or policy.get("allowed_operator_subjects")
+        or policy.get("required_operator_issuer")
+    )
+
+
+def _enforce_operator_policy_metadata(metadata: dict[str, Any]) -> None:
+    policy = metadata.get(OPERATOR_POLICY_METADATA_KEY)
+    if not isinstance(policy, dict):
+        return
+    subject = metadata.get("operator_subject")
+    issuer = metadata.get("operator_issuer")
+    groups = metadata.get("operator_groups", [])
+    if not isinstance(subject, str):
+        raise ProviderRuntimeError("operator identity required; run craik login")
+    if policy.get("required_operator_issuer") and issuer != policy["required_operator_issuer"]:
+        raise ProviderRuntimeError("operator issuer denied by policy")
+    allowed_subjects = policy.get("allowed_operator_subjects")
+    if isinstance(allowed_subjects, list) and allowed_subjects and subject not in allowed_subjects:
+        raise ProviderRuntimeError("operator subject denied by policy")
+    if not isinstance(groups, list):
+        groups = []
+    allowed_groups = policy.get("allowed_operator_groups")
+    if isinstance(allowed_groups, list) and allowed_groups:
+        matched = next((group for group in allowed_groups if group in groups), None)
+        if matched is None:
+            raise ProviderRuntimeError("operator groups denied by policy")
+        metadata["operator_policy_matched_group"] = matched
 
 
 def _enforce_credential_approval(

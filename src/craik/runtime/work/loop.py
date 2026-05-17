@@ -21,8 +21,14 @@ from craik.contracts.models import (
     TaskRunPhase,
     TaskRunStatus,
 )
+from craik.runtime.auth.operator import active_operator_session
 from craik.runtime.memory.memory import MemoryStore
-from craik.runtime.policy.policy import check_shell_grant, denial_receipt
+from craik.runtime.policy.operator_policy import check_operator_policy
+from craik.runtime.policy.policy import (
+    GrantDecision,
+    check_shell_grant,
+    denial_receipt,
+)
 from craik.runtime.store import LocalStore
 from craik.runtime.work.loop_support.tool_dispatch import (
     dispatch_tool_call_side_effect,
@@ -158,6 +164,28 @@ class SingleAgentLoopExecutor:
         output_captures: list[RunOutputCapture] = []
         active_grants = grants or []
         iteration = 0
+        operator_policy_decision = _check_operator_policy(policy)
+        if not operator_policy_decision.allowed:
+            receipt = denial_receipt(
+                policy=policy,
+                decision=operator_policy_decision,
+                actor=f"runner:{runner_metadata.id}",
+            )
+            self.store.put_receipt(receipt)
+            receipts.append(receipt)
+            run = self.runs.transition(
+                run.id,
+                RunTransition(
+                    status="blocked",
+                    phase="stop",
+                    iteration=0,
+                    receipt_id=receipt.id,
+                    stop_reason=receipt.reason,
+                    at=datetime.now(UTC),
+                ),
+            )
+            return LoopExecutionResult(run, step_results, output_captures, receipts)
+        operator_policy = operator_policy_decision.receipt_metadata
 
         for index, step in enumerate(active_steps, start=1):
             if iteration >= max_iterations:
@@ -210,6 +238,7 @@ class SingleAgentLoopExecutor:
                     return LoopExecutionResult(run, step_results, output_captures, receipts)
 
             message_history = _message_history_from_context(step.context)
+            step_context = _context_with_operator_policy(step.context, operator_policy)
             tool_round = 0
             request = RunnerStepRequest(
                 id="",
@@ -242,7 +271,7 @@ class SingleAgentLoopExecutor:
                     update={
                         "id": _request_id(run.id, index, step.phase, tool_round),
                         "context": _context_with_message_history(
-                            step.context,
+                            step_context,
                             message_history,
                         ),
                         "created_at": datetime.now(UTC),
@@ -438,6 +467,25 @@ def _context_with_message_history(
     if not message_history:
         return dict(context)
     return {**context, "message_history": list(message_history)}
+
+
+def _context_with_operator_policy(
+    context: dict[str, object],
+    operator_policy: dict[str, object],
+) -> dict[str, object]:
+    if not operator_policy:
+        return dict(context)
+    return {**context, "operator_policy": dict(operator_policy)}
+
+
+def _check_operator_policy(policy: PolicyEnvelope) -> GrantDecision:
+    session = active_operator_session()
+    return check_operator_policy(
+        policy=policy,
+        operator_subject=session.subject if session is not None else None,
+        operator_issuer=session.issuer if session is not None else None,
+        operator_groups=list(session.groups) if session is not None else [],
+    )
 
 
 def _receipt_slug(value: str) -> str:

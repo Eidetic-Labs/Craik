@@ -153,6 +153,7 @@ class ProviderBackedStepRunner:
                 "phase": request.phase,
                 "status": status,
                 "response_id": f"provider_response_{request.run_id}_{request.phase}",
+                **_provider_request_policy_metadata(request.context),
             },
         )
 
@@ -273,6 +274,13 @@ def _provider_messages_from_history(raw_messages: object) -> list[ProviderMessag
             continue
         messages.append(ProviderMessage(role="tool", content=str(content)))
     return messages
+
+
+def _provider_request_policy_metadata(context: dict[str, object]) -> dict[str, object]:
+    policy = context.get("operator_policy")
+    if not isinstance(policy, dict):
+        return {}
+    return {"operator_policy": policy}
 
 
 def _runner_step_schema() -> dict[str, Any]:
