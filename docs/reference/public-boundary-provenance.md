@@ -1,7 +1,7 @@
 # Public Boundary And Provenance
 
 Craik public docs must not expose private paths, raw credentials, internal-only
-task labels, or local secret filenames. `craik.runtime.public_docs` provides the
+task labels, or local secret filenames. `craik.runtime.projects.public_docs` provides the
 machine-checkable MVP boundary.
 
 ## Classification

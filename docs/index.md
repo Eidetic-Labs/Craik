@@ -19,6 +19,7 @@ outside the current MVP surface.
 - [CLI Reference](reference/cli.md)
 - [Limitations](limitations.md)
 - [Robust MVP Roadmap](mvp-roadmap.md)
+- [Architecture Decision Records](adr/index.md)
 
 ## Concepts
 

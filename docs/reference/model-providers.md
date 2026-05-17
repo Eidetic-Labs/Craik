@@ -1,5 +1,7 @@
 # Model Providers
 
+Design rationale: [ADR 0002 Provider Transport And Mode Families](../adr/0002-provider-transport-and-mode-families.md).
+
 `craik.model_provider` records model provider and runtime execution path
 metadata for provider routing.
 
@@ -33,7 +35,7 @@ provider records.
 
 ## Registry
 
-`craik.runtime.model_providers.ModelProviderRegistry` provides in-memory
+`craik.runtime.providers.model_providers.ModelProviderRegistry` provides in-memory
 registration and lookup by stable provider id. Duplicate provider ids are
 rejected, and missing providers raise a clear lookup error.
 
@@ -48,13 +50,15 @@ The default registry includes three built-in providers:
 
 OpenAI and Anthropic records use third-party trust boundaries, external secret
 references, budget and quota references, and runtime adapter paths under
-`craik.runtime.provider_runtime`. Their default model metadata is non-secret and
-may be overridden by the named configuration references before live use.
+`craik.runtime.providers.provider_runtime`. Their default model metadata is
+non-secret and may be overridden by the named configuration references before
+live use.
 
 ## Provider Runtime
 
-`craik.runtime.provider_runtime` defines the provider-neutral request, result,
-adapter, retry decision, and receipt helpers used by the MVP provider path.
+`craik.runtime.providers.provider_runtime` defines the provider-neutral request,
+result, adapter, retry decision, and receipt helpers used by the MVP provider
+path.
 
 The OpenAI adapter builds Responses API-style payloads with:
 

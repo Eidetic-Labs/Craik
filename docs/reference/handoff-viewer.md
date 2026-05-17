@@ -1,5 +1,7 @@
 # Handoff Viewer
 
+Design rationale: [ADR 0005 Receipts And Handoffs As Public Contracts](../adr/0005-receipts-and-handoffs-as-public-contracts.md).
+
 The handoff viewer is a read-only operator view over `craik.handoff` records.
 
 The v0.8.0 TUI surface formats:

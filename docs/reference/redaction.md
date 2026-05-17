@@ -5,8 +5,10 @@ Craik uses a central runtime redaction utility before persistence boundaries.
 Module:
 
 ```text
-craik.runtime.redaction
+craik.runtime.policy.redaction
 ```
+
+The legacy `craik.runtime.redaction` import remains available for compatibility.
 
 Primary APIs:
 
@@ -53,4 +55,3 @@ Craik treats redaction failures as security bugs. Payloads should be redacted be
 - work graph events.
 
 The local SQLite store rejects payloads that still appear to contain unredacted secret material.
-
