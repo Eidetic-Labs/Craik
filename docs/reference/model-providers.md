@@ -77,6 +77,24 @@ Both adapters classify retryable API conditions and gate live access behind an
 explicit `live_enabled=true` runtime setting. Deterministic tests use fixtures
 and normalized payloads; they do not contact live providers.
 
+## Provider-Backed Runner Path
+
+`craik.runtime.provider_runner` connects the provider runtime to the governed
+single-agent loop. The MVP path:
+
+- builds or loads the task case file;
+- compiles a provider-runner prompt from the case file and policy envelope;
+- executes the loop through `provider_openai` or `provider_anthropic`;
+- records provider receipts for every model step;
+- preserves side-effect receipts from the loop;
+- persists normalized run outputs;
+- creates a durable handoff for completed, blocked, failed, and interrupted
+  outcomes.
+
+The default provider-backed path remains deterministic. It certifies the Craik
+handoff, receipt, and output plumbing without contacting live APIs. Live provider
+transport must be enabled explicitly by future caller configuration.
+
 ## Budget And Quota Checks
 
 `craik.runtime.provider_budgets` evaluates non-secret provider budget status

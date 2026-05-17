@@ -100,12 +100,12 @@ Tracking issue: [#304](https://github.com/Eidetic-Labs/Craik/issues/304).
 
 Tracking issue: [#302](https://github.com/Eidetic-Labs/Craik/issues/302).
 
-- [ ] Connect case file assembly to prompt compilation.
-- [ ] Execute one provider-backed run loop.
-- [ ] Persist normalized runner outputs.
-- [ ] Create receipts for side effects and provider calls.
-- [ ] Produce durable handoffs on completion, block, failure, and interruption.
-- [ ] Add OpenAI and Anthropic parity checks for the MVP task path.
+- [x] Connect case file assembly to prompt compilation.
+- [x] Execute one provider-backed run loop.
+- [x] Persist normalized runner outputs.
+- [x] Create receipts for side effects and provider calls.
+- [x] Produce durable handoffs on completion, block, failure, and interruption.
+- [x] Add OpenAI and Anthropic parity checks for the MVP task path.
 
 ### 7. Policy-Enforced Side Effects
 
