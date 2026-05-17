@@ -9,6 +9,7 @@ from typing import Any
 
 from craik.contracts.models import (
     CapabilityGrant,
+    CapabilityReceipt,
     CompiledPrompt,
     Handoff,
     PolicyEnvelope,
@@ -18,8 +19,11 @@ from craik.contracts.models import (
     TaskRun,
 )
 from craik.runtime.memory.memory import LocalMemoryStore, MemoryStore
+from craik.runtime.policy.credential_policy import check_credential_policy
+from craik.runtime.policy.policy import denial_receipt
 from craik.runtime.projects.prompts import PromptCompiler
 from craik.runtime.providers.model_providers import default_model_provider_registry
+from craik.runtime.providers.provider_execution import credential_identity_for_config
 from craik.runtime.providers.provider_runtime import (
     ProviderMessage,
     ProviderRuntimeAdapter,
@@ -74,6 +78,27 @@ class ProviderBackedStepRunner:
         """Normalize one runner step through the configured provider adapter."""
         status = self.statuses.pop(0) if self.statuses else "completed"
         provider_request = self._provider_request(request, status=status)
+        denial = self._credential_policy_denial(request)
+        if denial is not None:
+            self.store.put_receipt(denial)
+            return RunnerStepResult(
+                id=f"runner_step_result_{request.run_id}_{request.phase}_credential_policy",
+                request_id=request.id,
+                run_id=request.run_id,
+                task_id=request.task_id,
+                phase=request.phase,
+                runner=request.runner,
+                status="blocked",
+                summary=denial.reason,
+                observed_output={
+                    "credential_policy_denied": True,
+                    "receipt_id": denial.id,
+                },
+                diagnostics=[denial.reason],
+                receipt_ids=[denial.id],
+                artifacts=[self.compiled_prompt.id],
+                created_at=datetime.now(UTC),
+            )
         provider_result = self.adapter.execute(
             provider_request,
             stream_callback=stream_callback,
@@ -156,6 +181,23 @@ class ProviderBackedStepRunner:
                 **_provider_request_policy_metadata(request.context),
             },
         )
+
+    def _credential_policy_denial(
+        self,
+        request: RunnerStepRequest,
+    ) -> CapabilityReceipt | None:
+        policy = self.store.get_policy_envelope(request.policy_envelope_id)
+        if policy is None:
+            return None
+        auth_profile_id, auth_kind = credential_identity_for_config(self.adapter.config)
+        decision = check_credential_policy(
+            policy=policy,
+            auth_profile_id=auth_profile_id,
+            auth_kind=auth_kind,
+        )
+        if decision.allowed:
+            return None
+        return denial_receipt(policy=policy, decision=decision, actor=self.actor)
 
 
 @dataclass(frozen=True)
@@ -277,10 +319,14 @@ def _provider_messages_from_history(raw_messages: object) -> list[ProviderMessag
 
 
 def _provider_request_policy_metadata(context: dict[str, object]) -> dict[str, object]:
-    policy = context.get("operator_policy")
-    if not isinstance(policy, dict):
-        return {}
-    return {"operator_policy": policy}
+    metadata: dict[str, object] = {}
+    operator_policy = context.get("operator_policy")
+    if isinstance(operator_policy, dict):
+        metadata["operator_policy"] = operator_policy
+    credential_policy = context.get("credential_policy")
+    if isinstance(credential_policy, dict):
+        metadata["credential_policy"] = credential_policy
+    return metadata
 
 
 def _runner_step_schema() -> dict[str, Any]:

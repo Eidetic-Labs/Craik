@@ -64,6 +64,15 @@ def test_context_budget_token_counts_are_not_secret_keys() -> None:
     assert not contains_unredacted_secret({"max_tokens": 24000, "estimated_tokens": 12})
 
 
+def test_policy_credential_constraints_are_not_secret_keys() -> None:
+    assert not contains_unredacted_secret(
+        {
+            "allowed_credential_kinds": ["secret-ref"],
+            "allowed_credential_profiles": ["openai:prod-*"],
+        }
+    )
+
+
 def test_receipt_shape_redaction_regression() -> None:
     payload = {
         "schema": "craik.capability_receipt",

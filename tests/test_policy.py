@@ -1,6 +1,8 @@
 import pytest
 
 from craik.contracts.models import CapabilityGrant, CapabilityTarget, DocsProfile
+from craik.runtime.auth import CredentialKind
+from craik.runtime.policy.credential_policy import check_credential_policy
 from craik.runtime.policy.operator_policy import check_operator_policy
 from craik.runtime.policy.policy import (
     FailOpenNotAllowedError,
@@ -251,6 +253,38 @@ def test_operator_policy_requires_identity_when_configured() -> None:
 
     assert decision.allowed is False
     assert "run craik login" in decision.reason
+
+
+def test_credential_policy_restricts_kind_and_profile() -> None:
+    envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
+    envelope = envelope.model_copy(
+        update={
+            "allowed_credential_kinds": ["secret-ref"],
+            "allowed_credential_profiles": ["openai:prod-*"],
+        }
+    )
+
+    denied_kind = check_credential_policy(
+        policy=envelope,
+        auth_profile_id="openai:prod-main",
+        auth_kind=CredentialKind.API_KEY,
+    )
+    denied_profile = check_credential_policy(
+        policy=envelope,
+        auth_profile_id="openai:personal",
+        auth_kind=CredentialKind.SECRET_REF,
+    )
+    allowed = check_credential_policy(
+        policy=envelope,
+        auth_profile_id="openai:prod-main",
+        auth_kind=CredentialKind.SECRET_REF,
+    )
+
+    assert denied_kind.allowed is False
+    assert denied_kind.reason == "credential kind denied by policy"
+    assert denied_profile.allowed is False
+    assert denied_profile.reason == "credential profile denied by policy"
+    assert allowed.allowed is True
 
 
 def test_denied_decision_can_create_receipt() -> None:

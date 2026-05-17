@@ -138,6 +138,8 @@ class PolicyEnvelope(CraikModel):
     allowed_operator_groups: list[str] | None = None
     allowed_operator_subjects: list[str] | None = None
     required_operator_issuer: str | None = None
+    allowed_credential_kinds: list[str] | None = None
+    allowed_credential_profiles: list[str] | None = None
 
 
 class CapabilityTarget(CraikModel):

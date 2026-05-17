@@ -6,7 +6,13 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from craik.contracts.models import ModelProvider
+from craik.contracts.models import (
+    CompiledPrompt,
+    ModelProvider,
+    PolicyEnvelope,
+    RunnerMetadata,
+    RunnerStepRequest,
+)
 from craik.runtime.auth import (
     AuthProfile,
     AuthProfileStore,
@@ -18,6 +24,7 @@ from craik.runtime.auth import (
 from craik.runtime.auth.operator import OperatorSession, OperatorSessionStore
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.providers.model_providers import default_model_provider_registry
+from craik.runtime.providers.provider_runner import ProviderBackedStepRunner
 from craik.runtime.providers.provider_runtime import (
     ANTHROPIC_OFFICIAL_DOCS,
     OPENAI_OFFICIAL_DOCS,
@@ -41,6 +48,7 @@ from craik.runtime.providers.provider_transport import (
     ProviderTransport,
 )
 from craik.runtime.secrets import SecretResolver
+from craik.runtime.store import LocalStore
 
 
 def test_provider_runtime_keeps_extracted_import_surface() -> None:
@@ -815,6 +823,130 @@ def test_provider_request_enforces_operator_policy_before_transport(
         adapter.execute(request)
 
     assert transport.calls == 0
+
+
+def test_provider_request_enforces_credential_policy_before_transport(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    AuthProfileStore(paths.home).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    transport = _CountingTransport()
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+            auth_profile_id="openai:work",
+        ),
+        transport=transport,
+    )
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={
+            "credential_policy": {
+                "policy_id": "policy_provider_runtime",
+                "allowed_credential_kinds": ["secret-ref"],
+                "allowed_credential_profiles": [],
+            }
+        },
+    )
+
+    with pytest.raises(ProviderRuntimeError, match="credential kind denied by policy"):
+        adapter.execute(request)
+
+    assert transport.calls == 0
+
+
+def test_provider_backed_runner_records_credential_policy_denial(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    store = LocalStore.from_paths(paths)
+    store.initialize()
+    try:
+        AuthProfileStore(paths.home).put(
+            AuthProfile(
+                id="openai:work",
+                kind=CredentialKind.API_KEY,
+                provider_family="openai",
+                metadata={"env_var": "OPENAI_WORK_KEY"},
+                created_at=datetime(2026, 5, 17, tzinfo=UTC),
+            )
+        )
+        policy = PolicyEnvelope(
+            id="policy_provider_runtime",
+            task_id="task_provider_runtime",
+            actor="runner:provider_openai",
+            profile="strict",
+            allowed_credential_kinds=["secret-ref"],
+        )
+        store.put_policy_envelope(policy)
+        runner = ProviderBackedStepRunner(
+            store=store,
+            adapter=OpenAIProviderAdapter(
+                ProviderRuntimeConfig(
+                    provider_id="provider_openai",
+                    provider_family="openai",
+                    model="gpt-5.2",
+                    secret_ref_name="",
+                    docs_refs=list(OPENAI_OFFICIAL_DOCS),
+                    auth_profile_id="openai:work",
+                )
+            ),
+            compiled_prompt=CompiledPrompt(
+                id="compiled_provider_runtime",
+                task_id="task_provider_runtime",
+                case_file_id="case_provider_runtime",
+                policy_envelope_id="policy_provider_runtime",
+                runner_id="provider_openai",
+                runner_mode="fixture",
+                prompt="Run the provider-backed step.",
+            ),
+            actor="runner:provider_openai",
+        )
+
+        result = runner.run_step(
+            RunnerStepRequest(
+                id="runner_step_request_provider_runtime",
+                run_id="run_provider_runtime",
+                task_id="task_provider_runtime",
+                phase="act",
+                runner=RunnerMetadata(
+                    id="provider_openai",
+                    name="OpenAI Provider",
+                    adapter="provider",
+                    adapter_version="0.1.0",
+                    mode="fixture",
+                ),
+                policy_envelope_id="policy_provider_runtime",
+                expected_output_schemas=["craik.runner_step_result"],
+                input_prompt="Act.",
+                created_at=datetime(2026, 5, 17, tzinfo=UTC),
+            )
+        )
+        receipt = store.get_receipt(result.receipt_ids[0])
+    finally:
+        store.close()
+
+    assert result.status == "blocked"
+    assert result.summary == "credential kind denied by policy"
+    assert receipt is not None
+    assert receipt.capability == "credential.use"
+    assert receipt.result.status == "denied"
 
 
 def test_provider_receipt_names_matched_operator_policy_group(

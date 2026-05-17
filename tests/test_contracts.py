@@ -90,6 +90,8 @@ def test_policy_envelope_operator_fields_round_trip(
             "allowed_operator_groups": ["prod-deploy"],
             "allowed_operator_subjects": ["operator-123"],
             "required_operator_issuer": "https://issuer.example.test",
+            "allowed_credential_kinds": ["secret-ref"],
+            "allowed_credential_profiles": ["openai:prod-*"],
         }
     )
 
@@ -100,6 +102,8 @@ def test_policy_envelope_operator_fields_round_trip(
     assert dumped["allowed_operator_groups"] == ["prod-deploy"]
     assert dumped["allowed_operator_subjects"] == ["operator-123"]
     assert dumped["required_operator_issuer"] == "https://issuer.example.test"
+    assert dumped["allowed_credential_kinds"] == ["secret-ref"]
+    assert dumped["allowed_credential_profiles"] == ["openai:prod-*"]
 
 
 def test_runner_contract_models_keep_legacy_import_surface() -> None:

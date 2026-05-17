@@ -10,6 +10,7 @@ from craik.runtime.auth import (
     AuthProfile,
     AuthProfileStore,
     CredentialHealthStatus,
+    CredentialKind,
     CredentialPool,
 )
 from craik.runtime.auth.operator import (
@@ -29,6 +30,7 @@ from craik.runtime.providers.provider_runtime_support import _json_object_or_non
 from craik.runtime.providers.provider_transport import ProviderTransportError
 
 OPERATOR_POLICY_METADATA_KEY = "operator_policy"
+CREDENTIAL_POLICY_METADATA_KEY = "credential_policy"
 
 
 def execute_provider_request(
@@ -40,6 +42,7 @@ def execute_provider_request(
 ) -> ProviderRuntimeResult:
     """Execute one provider request with retry and streaming normalization."""
     request = _request_with_operator_context(request)
+    enforce_credential_policy_metadata(adapter.config, request.metadata)
     _enforce_credential_approval(adapter, request)
     if adapter.config.live_enabled:
         adapter.require_live_access()
@@ -211,6 +214,56 @@ def _enforce_operator_policy_metadata(metadata: dict[str, Any]) -> None:
         if matched is None:
             raise ProviderRuntimeError("operator groups denied by policy")
         metadata["operator_policy_matched_group"] = matched
+
+
+def enforce_credential_policy_metadata(
+    config: Any,
+    metadata: dict[str, Any],
+) -> tuple[str, CredentialKind]:
+    """Enforce provider request credential policy metadata before resolving headers."""
+    auth_profile_id, auth_kind = credential_identity_for_config(config)
+    policy = metadata.get(CREDENTIAL_POLICY_METADATA_KEY)
+    if not isinstance(policy, dict):
+        return auth_profile_id, auth_kind
+    allowed_kinds = policy.get("allowed_credential_kinds")
+    if isinstance(allowed_kinds, list) and auth_kind.value not in allowed_kinds:
+        raise ProviderRuntimeError("credential kind denied by policy")
+    allowed_profiles = policy.get("allowed_credential_profiles")
+    if isinstance(allowed_profiles, list) and not _profile_matches(
+        allowed_profiles,
+        auth_profile_id,
+    ):
+        raise ProviderRuntimeError("credential profile denied by policy")
+    metadata["auth_profile_id"] = auth_profile_id
+    metadata["auth_kind"] = auth_kind.value
+    return auth_profile_id, auth_kind
+
+
+def credential_identity_for_config(config: Any) -> tuple[str, CredentialKind]:
+    """Return the credential identity that would be used without resolving secret material."""
+    if config.credential_pool_id:
+        if config.last_auth_profile_id:
+            profile = AuthProfileStore.from_env().get(config.last_auth_profile_id)
+        else:
+            profile = CredentialPool.from_env().select_from_pool(config.credential_pool_id)
+            config.last_auth_profile_id = profile.id
+        return profile.id, profile.kind
+    if config.auth_profile_id:
+        profile = AuthProfileStore.from_env().get(config.auth_profile_id)
+        config.last_auth_profile_id = profile.id
+        return profile.id, profile.kind
+    if config.secret_ref_name:
+        return f"{config.provider_family}:legacy-env", CredentialKind.API_KEY
+    return f"{config.provider_family}:no-credential", CredentialKind.MARKER
+
+
+def _profile_matches(patterns: list[object], auth_profile_id: str) -> bool:
+    from fnmatch import fnmatchcase
+
+    return any(
+        isinstance(pattern, str) and fnmatchcase(auth_profile_id, pattern)
+        for pattern in patterns
+    )
 
 
 def _enforce_credential_approval(
