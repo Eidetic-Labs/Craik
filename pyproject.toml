@@ -39,6 +39,7 @@ dependencies = [
 dev = [
   "mypy==1.14.1",
   "pytest==8.3.4",
+  "pytest-cov==6.0.0",
   "ruff==0.8.4",
 ]
 
@@ -56,6 +57,15 @@ artifacts = ["src/craik/py.typed"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["craik"]
+
+[tool.coverage.report]
+fail_under = 75
+show_missing = true
+skip_covered = true
 
 [tool.ruff]
 line-length = 100

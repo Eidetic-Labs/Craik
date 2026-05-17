@@ -38,3 +38,9 @@ jobs:
       - name: Build docs
         working-directory: docs
         run: npm run build
+      - name: Upload docs build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docusaurus-build
+          path: docs/build
+          retention-days: 14

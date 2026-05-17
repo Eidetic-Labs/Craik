@@ -64,13 +64,13 @@ Tracking issue: [#297](https://github.com/Eidetic-Labs/Craik/issues/297).
 
 Tracking issue: [#300](https://github.com/Eidetic-Labs/Craik/issues/300).
 
-- [ ] Split CI into path-filtered jobs.
-- [ ] Add lint, type, unit, contract, docs, security, and package jobs.
-- [ ] Add coverage baseline and ratchet.
-- [ ] Add changed-file strictness checks.
-- [ ] Add conformance suites.
-- [ ] Add nightly reliability workflow.
-- [ ] Upload test, docs, coverage, and conformance artifacts.
+- [x] Split CI into path-filtered jobs.
+- [x] Add lint, type, unit, contract, docs, security, and package jobs.
+- [x] Add coverage baseline and ratchet.
+- [x] Add changed-file strictness checks.
+- [x] Add conformance suites.
+- [x] Add nightly reliability workflow.
+- [x] Upload test, docs, coverage, and conformance artifacts.
 
 ### 4. Persistent State Migrations
 

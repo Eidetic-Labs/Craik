@@ -6,8 +6,55 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
-  quality:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      contracts: ${{ steps.filter.outputs.contracts }}
+      docs: ${{ steps.filter.outputs.docs }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            python:
+              - 'src/**'
+              - 'tests/**'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - 'scripts/**'
+            contracts:
+              - 'src/craik/contracts/**'
+              - 'tests/fixtures/contracts/**'
+              - 'tests/test_contracts.py'
+            docs:
+              - 'docs/**'
+              - 'README.md'
+              - 'CHANGELOG.md'
+            workflows:
+              - '.github/workflows/**'
+
+  changed-file-strictness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check changed-file strictness
+        run: python scripts/check_changed_file_strictness.py
+
+  lint:
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,8 +65,112 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
       - name: Lint
         run: ruff check .
+
+  type:
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
       - name: Type check
         run: mypy
-      - name: Test
-        run: pytest
 
+  unit:
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+      - name: Run unit tests with coverage
+        run: |
+          mkdir -p reports/tests reports/coverage
+          pytest --junitxml=reports/tests/unit.xml --cov=craik --cov-report=xml:reports/coverage/coverage.xml --cov-report=term
+      - name: Upload test and coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: |
+            reports/tests/unit.xml
+            reports/coverage/coverage.xml
+          retention-days: 14
+
+  contract:
+    needs: changes
+    if: needs.changes.outputs.contracts == 'true' || needs.changes.outputs.python == 'true' || needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+      - name: Run contract tests
+        run: |
+          mkdir -p reports/tests
+          pytest tests/test_contracts.py --junitxml=reports/tests/contracts.xml
+      - name: Write conformance report
+        run: python scripts/write_conformance_report.py
+      - name: Upload conformance artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-conformance
+          path: |
+            reports/tests/contracts.xml
+            reports/conformance/contracts.json
+            reports/conformance/contracts.md
+          retention-days: 14
+
+  security:
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.docs == 'true' || needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+      - name: Run policy test baseline
+        run: craik policy test
+      - name: Check release readiness
+        run: python scripts/check_release_readiness.py
+      - name: Check public docs hygiene
+        run: python scripts/check_public_docs_hygiene.py
+
+  quality:
+    needs:
+      - changed-file-strictness
+      - lint
+      - type
+      - unit
+      - contract
+      - security
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check split quality gates
+        run: |
+          for result in \
+            "${{ needs.changed-file-strictness.result }}" \
+            "${{ needs.lint.result }}" \
+            "${{ needs.type.result }}" \
+            "${{ needs.unit.result }}" \
+            "${{ needs.contract.result }}" \
+            "${{ needs.security.result }}"; do
+            case "$result" in
+              success|skipped) ;;
+              *) echo "A required quality gate finished with result: $result"; exit 1 ;;
+            esac
+          done

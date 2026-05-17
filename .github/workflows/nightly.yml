@@ -1,0 +1,63 @@
+name: Nightly Reliability
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reliability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install Python package
+        run: python -m pip install --upgrade pip build twine && python -m pip install -e ".[dev]"
+      - name: Install docs dependencies
+        working-directory: docs
+        run: npm ci
+      - name: Lint
+        run: ruff check .
+      - name: Type check
+        run: mypy
+      - name: Unit tests with coverage
+        run: |
+          mkdir -p reports/tests reports/coverage
+          pytest --junitxml=reports/tests/nightly-unit.xml --cov=craik --cov-report=xml:reports/coverage/coverage.xml --cov-report=term
+      - name: Contract conformance
+        run: |
+          pytest tests/test_contracts.py --junitxml=reports/tests/nightly-contracts.xml
+          python scripts/write_conformance_report.py
+      - name: Security baseline
+        run: |
+          craik policy test
+          python scripts/check_public_docs_hygiene.py
+          python scripts/check_release_readiness.py
+      - name: Docs build
+        working-directory: docs
+        run: npm run build
+      - name: Package build
+        run: |
+          python scripts/check_version_consistency.py
+          python -m build
+          python -m twine check dist/*
+      - name: Upload reliability artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-reliability-artifacts
+          path: |
+            reports/tests/*.xml
+            reports/coverage/coverage.xml
+            reports/conformance/contracts.json
+            reports/conformance/contracts.md
+            docs/build
+            dist/*
+          retention-days: 14

@@ -46,6 +46,7 @@ const sidebars = {
       items: [
         'reference/cli',
         'reference/config',
+        'reference/ci-cd',
         'reference/schemas',
         'reference/project-profile',
         'reference/run-state',
