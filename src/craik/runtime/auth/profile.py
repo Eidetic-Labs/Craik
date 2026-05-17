@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from enum import StrEnum
 from typing import Any, Literal, Protocol
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from craik.contracts.models import CapabilityReceipt, CraikModel
 from craik.runtime.providers.provider_transport import ProviderFamily
@@ -46,6 +47,7 @@ class AuthProfile(CraikModel):
     authorized_operators: list[str] | None = None
     authorized_operator_groups: list[str] | None = None
     authorization_provenance: list[CapabilityReceipt] = Field(default_factory=list)
+    redaction_patterns: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_profile_id(self) -> AuthProfile:
@@ -60,6 +62,17 @@ class AuthProfile(CraikModel):
         if self.id.strip() != self.id or any(char.isspace() for char in self.id):
             raise ValueError("auth profile id must not contain whitespace")
         return self
+
+    @field_validator("redaction_patterns")
+    @classmethod
+    def validate_redaction_patterns(cls, patterns: list[str]) -> list[str]:
+        """Require profile-scoped redaction patterns to be valid regexes."""
+        for pattern in patterns:
+            try:
+                re.compile(pattern)
+            except re.error as exc:
+                raise ValueError("auth profile redaction pattern is invalid") from exc
+        return patterns
 
 
 class CredentialSource(Protocol):

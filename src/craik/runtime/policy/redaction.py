@@ -58,6 +58,12 @@ def redact(value: Any, config: RedactionConfig | None = None) -> RedactionResult
     )
 
 
+def redaction_config_for_patterns(patterns: list[str]) -> RedactionConfig:
+    """Extend default redaction with caller-provided regex patterns."""
+    compiled = tuple(re.compile(pattern) for pattern in patterns)
+    return RedactionConfig(patterns=(*DEFAULT_SECRET_PATTERNS, *compiled))
+
+
 def contains_unredacted_secret(value: Any, config: RedactionConfig | None = None) -> bool:
     """Return whether a value appears to contain unredacted secret material."""
     return redact(value, config).redacted

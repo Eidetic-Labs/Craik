@@ -18,7 +18,7 @@ from craik.runtime.auth.sources import (
     source_for_auth_profile,
 )
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
-from craik.runtime.policy.redaction import redact
+from craik.runtime.policy.redaction import redact, redaction_config_for_patterns
 from craik.runtime.providers.http_transport import HTTPTransport
 from craik.runtime.providers.provider_transport import (
     FixtureTransport,
@@ -122,12 +122,13 @@ def provider_runtime_receipt(
             "secret_ref_name": adapter.config.secret_ref_name,
         },
     )
-    return receipt.model_copy(
+    receipt = receipt.model_copy(
         update={
             **_receipt_auth_fields(adapter),
             **_receipt_operator_fields(request),
         }
     )
+    return _redact_receipt_for_auth_profile(receipt, _receipt_auth_profile(adapter))
 
 
 def _receipt_auth_fields(adapter: ProviderRuntimeAdapter) -> dict[str, str]:
@@ -181,6 +182,21 @@ def _receipt_auth_profile(adapter: ProviderRuntimeAdapter) -> AuthProfile | None
         return AuthProfileStore.from_env().get(profile_id)
     except AuthProfileNotFoundError:
         return None
+
+
+def _redact_receipt_for_auth_profile(
+    receipt: CapabilityReceipt,
+    profile: AuthProfile | None,
+) -> CapabilityReceipt:
+    if profile is None or not profile.redaction_patterns:
+        return receipt
+    redacted = redact(
+        receipt.model_dump(mode="python", by_alias=True),
+        redaction_config_for_patterns(profile.redaction_patterns),
+    ).value
+    if isinstance(redacted, dict):
+        return CapabilityReceipt.model_validate(redacted)
+    return receipt
 
 
 def _auth_identity_basis(metadata: dict[str, Any]) -> str:

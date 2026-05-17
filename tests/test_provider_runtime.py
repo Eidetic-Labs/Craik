@@ -710,6 +710,124 @@ def test_provider_runtime_receipt_records_auth_profile_identity_hash(
     assert "OPENAI_WORK_KEY" not in first.auth_identity_hash
 
 
+def test_provider_runtime_receipt_applies_auth_profile_redaction_patterns(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    monkeypatch.setenv("OPENAI_WORK_KEY", "sk-raw-secret")
+    AuthProfileStore(tmp_path).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            redaction_patterns=[r"work-account@example\.test", "org-secret-123"],
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            auth_profile_id="openai:work",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
+    )
+    _provider_headers(adapter.config)
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={
+            "operator_subject": "operator-123",
+            "operator_issuer": "https://issuer.example.test",
+            "operator_email": "work-account@example.test",
+        },
+    )
+    result = adapter.normalize_response(
+        {
+            "id": "resp_123",
+            "model": "org-secret-123-model",
+            "output_text": "Done",
+        }
+    )
+
+    receipt = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime",
+        actor="agent:codex",
+    )
+    dumped = receipt.model_dump_json()
+
+    assert "work-account@example.test" not in dumped
+    assert "org-secret-123" not in dumped
+    assert receipt.operator_email == "[REDACTED]"
+    assert receipt.result.metadata["model"] == "[REDACTED]-model"
+    assert "sk-raw-secret" not in dumped
+
+
+def test_provider_runtime_receipt_does_not_apply_other_profile_redaction_patterns(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    monkeypatch.setenv("OPENAI_OTHER_KEY", "sk-raw-secret")
+    AuthProfileStore(tmp_path).put(
+        AuthProfile(
+            id="openai:other",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_OTHER_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            auth_profile_id="openai:other",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
+    )
+    _provider_headers(adapter.config)
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="hi")],
+        metadata={
+            "operator_subject": "operator-123",
+            "operator_issuer": "https://issuer.example.test",
+            "operator_email": "work-account@example.test",
+        },
+    )
+    result = adapter.normalize_response(
+        {
+            "id": "resp_123",
+            "model": "org-secret-123-model",
+            "output_text": "Done",
+        }
+    )
+
+    receipt = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime",
+        actor="agent:codex",
+    )
+
+    assert receipt.operator_email == "work-account@example.test"
+    assert receipt.result.metadata["model"] == "org-secret-123-model"
+    assert "sk-raw-secret" not in receipt.model_dump_json()
+
+
 def test_provider_request_requires_operator_identity_before_transport(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
