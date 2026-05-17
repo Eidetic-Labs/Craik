@@ -869,6 +869,99 @@ def test_provider_request_enforces_credential_policy_before_transport(
     assert transport.calls == 0
 
 
+def test_provider_request_denies_unauthorized_operator_for_profile(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    OperatorSessionStore(paths.home).put(
+        OperatorSession(
+            subject="operator-123",
+            email="operator@example.test",
+            display_name="Operator",
+            groups=["platform"],
+            issuer="https://issuer.example.test",
+            id_token_jti="token-1",
+            expires_at=datetime(2026, 5, 18, tzinfo=UTC),
+        )
+    )
+    AuthProfileStore(paths.home).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+            authorized_operator_groups=["prod-deploy"],
+        )
+    )
+    transport = _CountingTransport()
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+            auth_profile_id="openai:work",
+        ),
+        transport=transport,
+    )
+
+    with pytest.raises(ProviderRuntimeError, match="not authorized"):
+        adapter.execute(
+            ProviderRuntimeRequest(messages=[ProviderMessage(role="user", content="hi")])
+        )
+
+    assert transport.calls == 0
+
+
+def test_provider_request_allows_authorized_operator_for_profile(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
+    monkeypatch.setenv("CRAIK_HOME", str(paths.home))
+    OperatorSessionStore(paths.home).put(
+        OperatorSession(
+            subject="operator-123",
+            email="operator@example.test",
+            display_name="Operator",
+            groups=["platform"],
+            issuer="https://issuer.example.test",
+            id_token_jti="token-1",
+            expires_at=datetime(2026, 5, 18, tzinfo=UTC),
+        )
+    )
+    AuthProfileStore(paths.home).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+            authorized_operators=["operator-123"],
+        )
+    )
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+            auth_profile_id="openai:work",
+        )
+    )
+
+    result = adapter.execute(
+        ProviderRuntimeRequest(messages=[ProviderMessage(role="user", content="hi")])
+    )
+
+    assert result.text
+
+
 def test_provider_backed_runner_records_credential_policy_denial(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
