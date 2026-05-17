@@ -134,13 +134,13 @@ Tracking issue: [#305](https://github.com/Eidetic-Labs/Craik/issues/305).
 
 Tracking issue: [#306](https://github.com/Eidetic-Labs/Craik/issues/306).
 
-- [ ] Add public/internal boundary classifier.
-- [ ] Add provenance-aware documentation workflow.
-- [ ] Add generated doc evidence links.
-- [ ] Add stale documentation detection.
-- [ ] Add work product classification.
-- [ ] Add decision record suggestions.
-- [ ] Add CI checks preventing public docs from exposing secrets, private paths,
+- [x] Add public/internal boundary classifier.
+- [x] Add provenance-aware documentation workflow.
+- [x] Add generated doc evidence links.
+- [x] Add stale documentation detection.
+- [x] Add work product classification.
+- [x] Add decision record suggestions.
+- [x] Add CI checks preventing public docs from exposing secrets, private paths,
   or private task names.
 
 ### 10. MVP Demo And Acceptance Workflow
