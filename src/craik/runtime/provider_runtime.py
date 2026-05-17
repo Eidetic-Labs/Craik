@@ -9,9 +9,9 @@ from pydantic import Field, model_validator
 
 from craik.contracts.models import CapabilityReceipt, CraikModel, ModelProvider
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
+from craik.runtime.provider_transport import ProviderFamily
 from craik.runtime.redaction import redact
 
-ProviderFamily = Literal["openai", "anthropic"]
 ProviderMessageRole = Literal["system", "user", "assistant", "tool"]
 
 OPENAI_OFFICIAL_DOCS = (
