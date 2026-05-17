@@ -45,6 +45,15 @@ def test_runner_contract_models_keep_legacy_import_surface() -> None:
     assert models.RunnerMetadata is RunnerMetadata
 
 
+def test_contract_models_keep_split_package_import_surface() -> None:
+    from craik.contracts import models
+    from craik.contracts.models import core, handoffs, memory
+
+    assert models.TaskRequest is core.TaskRequest
+    assert models.MemoryProposal is memory.MemoryProposal
+    assert models.TaskRun is handoffs.TaskRun
+
+
 @pytest.mark.parametrize("name", sorted(CONTRACT_REGISTRY))
 def test_wrong_schema_name_is_rejected(
     fixtures: dict[str, dict[str, Any]],
