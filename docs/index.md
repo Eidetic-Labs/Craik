@@ -109,6 +109,7 @@ project.
 - [Skill Rollbacks](reference/skill-rollbacks.md)
 - [Voice Input And Output Posture](reference/voice-posture.md)
 - [Speech-To-Text Adapter Contract](reference/speech-to-text-adapters.md)
+- [Text-To-Speech Adapter Contract](reference/text-to-speech-adapters.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
