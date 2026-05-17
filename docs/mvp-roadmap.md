@@ -111,12 +111,12 @@ Tracking issue: [#302](https://github.com/Eidetic-Labs/Craik/issues/302).
 
 Tracking issue: [#301](https://github.com/Eidetic-Labs/Craik/issues/301).
 
-- [ ] Add shell execution wrapper with grants and receipts.
-- [ ] Add file write wrapper with immutable path protection.
-- [ ] Add policy-gated Stigmem write wrapper.
-- [ ] Add guarded GitHub writes if required by the MVP proof workflow.
-- [ ] Add denial receipts for blocked side effects.
-- [ ] Add redaction regression tests for all side-effect receipts.
+- [x] Add shell execution wrapper with grants and receipts.
+- [x] Add file write wrapper with immutable path protection.
+- [x] Add policy-gated Stigmem write wrapper.
+- [x] Add guarded GitHub writes if required by the MVP proof workflow.
+- [x] Add denial receipts for blocked side effects.
+- [x] Add redaction regression tests for all side-effect receipts.
 
 ### 8. Stigmem And Memory Hardening
 
