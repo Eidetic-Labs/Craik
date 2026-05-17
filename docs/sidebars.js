@@ -56,6 +56,7 @@ const sidebars = {
         'reference/prompt-compiler',
         'reference/public-boundary-provenance',
         'reference/side-effect-wrappers',
+        'reference/failure-modes',
         'reference/memory-backends',
         'reference/local-store',
       ],

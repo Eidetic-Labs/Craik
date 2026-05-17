@@ -158,12 +158,12 @@ Tracking issue: [#308](https://github.com/Eidetic-Labs/Craik/issues/308).
 
 Tracking issue: [#307](https://github.com/Eidetic-Labs/Craik/issues/307).
 
-- [ ] Document limits and failure modes.
-- [ ] Add adversarial prompt-injection tests.
-- [ ] Add secret leakage tests.
-- [ ] Add bad tool-call and policy-bypass tests.
-- [ ] Add timeout, retry, and budget tests.
-- [ ] Add contract conformance tests for persisted payloads.
+- [x] Document limits and failure modes.
+- [x] Add adversarial prompt-injection tests.
+- [x] Add secret leakage tests.
+- [x] Add bad tool-call and policy-bypass tests.
+- [x] Add timeout, retry, and budget tests.
+- [x] Add contract conformance tests for persisted payloads.
 
 ### 12. Post-MVP Deferrals
 

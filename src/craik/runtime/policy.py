@@ -14,6 +14,7 @@ from craik.contracts.models import (
     PolicyProfile,
     ReceiptResult,
 )
+from craik.runtime.redaction import redact
 
 STRICT_ALLOWED_CAPABILITIES = ("repo.read", "memory.read", "receipt.write")
 STRICT_DENIED_CAPABILITIES = (
@@ -254,19 +255,20 @@ def denial_receipt(
     actor: str,
 ) -> CapabilityReceipt:
     """Create a receipt for a denied capability decision."""
+    metadata = redact(decision.receipt_metadata).value
     return CapabilityReceipt(
         id=f"receipt_denied_{policy.task_id}_{_receipt_slug(decision.capability)}",
         task_id=policy.task_id,
         actor=actor,
         capability=decision.capability,
-        target=decision.target,
+        target=str(redact(decision.target).value),
         policy_profile=policy.profile,
         fail_open=policy.fail_open,
         reason=decision.reason,
         result=ReceiptResult(
             status="denied",
             summary=decision.reason,
-            metadata=decision.receipt_metadata,
+            metadata=metadata if isinstance(metadata, dict) else {},
         ),
         redacted=True,
         created_at=datetime.now(UTC),
