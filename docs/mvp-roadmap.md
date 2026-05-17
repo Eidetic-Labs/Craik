@@ -76,11 +76,11 @@ Tracking issue: [#300](https://github.com/Eidetic-Labs/Craik/issues/300).
 
 Tracking issue: [#303](https://github.com/Eidetic-Labs/Craik/issues/303).
 
-- [ ] Add local store schema versioning.
-- [ ] Add forward migrations.
-- [ ] Add fixture databases for previous schema versions.
-- [ ] Add migration compatibility tests.
-- [ ] Add migration failure and recovery docs.
+- [x] Add local store schema versioning.
+- [x] Add forward migrations.
+- [x] Add fixture databases for previous schema versions.
+- [x] Add migration compatibility tests.
+- [x] Add migration failure and recovery docs.
 
 ### 5. Provider Runtime: OpenAI And Anthropic
 
