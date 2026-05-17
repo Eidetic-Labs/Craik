@@ -711,6 +711,19 @@ def test_memory_impact_preview_view_empty_preview_sections() -> None:
     assert lines.count("- none") == 6
 
 
+def test_memory_impact_preview_view_keeps_legacy_import_surface() -> None:
+    from craik.runtime import operator_memory_views, operator_views
+
+    assert (
+        operator_views.format_memory_impact_preview_view
+        is operator_memory_views.format_memory_impact_preview_view
+    )
+    assert (
+        operator_views.MemoryImpactPreviewSnapshot
+        is operator_memory_views.MemoryImpactPreviewSnapshot
+    )
+
+
 def test_known_traps_view_formats_active_expired_and_contradicted_states() -> None:
     active = _known_trap("trap_active", "active")
     expired = _known_trap(
