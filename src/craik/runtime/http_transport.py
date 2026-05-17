@@ -104,4 +104,7 @@ def _retry_after(headers: dict[str, str]) -> int | None:
 def _join_url(base_url: str, path: str) -> str:
     if not path:
         return base_url
-    return f"{base_url}/{path.lstrip('/')}"
+    normalized_path = path.lstrip("/")
+    if base_url.endswith("/v1") and normalized_path.startswith("v1/"):
+        normalized_path = normalized_path.removeprefix("v1/")
+    return f"{base_url}/{normalized_path}"

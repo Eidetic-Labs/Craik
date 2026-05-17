@@ -111,6 +111,10 @@ def test_default_registry_includes_certified_mvp_provider_metadata() -> None:
 
     openai = registry.require("provider_openai")
     anthropic = registry.require("provider_anthropic")
+    anthropic_messages = registry.require("provider_anthropic_messages")
+    openai_responses = registry.require("provider_openai_responses")
+    openai_chat = registry.require("provider_openai_chat")
+    local_openai_compatible = registry.require("provider_local_openai_compatible")
 
     assert openai.provider == "openai"
     assert openai.runtime_path == "craik.runtime.provider_runtime.OpenAIProviderAdapter"
@@ -121,3 +125,22 @@ def test_default_registry_includes_certified_mvp_provider_metadata() -> None:
     assert anthropic.runtime_path == "craik.runtime.provider_runtime.AnthropicProviderAdapter"
     assert anthropic.metadata["default_model"] == "claude-sonnet-4-20250514"
     assert "CRAIK_ANTHROPIC_API_KEY" in anthropic.secret_ref_names
+    assert anthropic_messages.provider == "anthropic"
+    assert anthropic_messages.metadata["base_url"] == "https://api.anthropic.com"
+    assert anthropic_messages.metadata["default_model"] == "claude-sonnet-4-20250514"
+    assert anthropic_messages.metadata["opus_model"] == "claude-opus-4-1-20250805"
+    assert anthropic_messages.secret_ref_names == ["ANTHROPIC_API_KEY"]
+    assert openai_responses.provider == "openai"
+    assert openai_responses.runtime_path == "craik.runtime.provider_runtime.OpenAIProviderAdapter"
+    assert openai_responses.metadata["base_url"] == "https://api.openai.com"
+    assert openai_responses.secret_ref_names == ["OPENAI_API_KEY"]
+    assert openai_chat.provider == "chat_completions"
+    assert openai_chat.runtime_path == (
+        "craik.runtime.provider_runtime.ChatCompletionsProviderAdapter"
+    )
+    assert openai_chat.metadata["base_url"] == "https://api.openai.com"
+    assert openai_chat.secret_ref_names == ["OPENAI_API_KEY"]
+    assert local_openai_compatible.provider == "chat_completions"
+    assert local_openai_compatible.trust_boundary == "local"
+    assert local_openai_compatible.metadata["base_url"] == "http://localhost:11434/v1"
+    assert local_openai_compatible.secret_ref_names == []

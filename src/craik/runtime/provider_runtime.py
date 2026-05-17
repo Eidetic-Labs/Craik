@@ -71,9 +71,9 @@ class ProviderRuntimeConfig(CraikModel):
     @model_validator(mode="after")
     def validate_runtime_config(self) -> ProviderRuntimeConfig:
         """Keep live access explicit and credentials reference-only."""
-        if not self.secret_ref_name:
-            raise ValueError("provider runtime requires a secret reference name")
-        if any(token in self.secret_ref_name.lower() for token in ("sk-", "token=", "key=")):
+        if self.secret_ref_name and any(
+            token in self.secret_ref_name.lower() for token in ("sk-", "token=", "key=")
+        ):
             raise ValueError(
                 "provider runtime secret_ref_name must not contain raw secret material"
             )
@@ -89,6 +89,8 @@ class ProviderRuntimeConfig(CraikModel):
 
     def resolve_secret(self, resolver: SecretResolver) -> str:
         """Resolve the configured secret reference at request time."""
+        if not self.secret_ref_name:
+            return ""
         return resolver.resolve(SecretRef(env_var=self.secret_ref_name))
 
 

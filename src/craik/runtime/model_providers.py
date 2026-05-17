@@ -144,6 +144,124 @@ def default_model_provider_registry() -> ModelProviderRegistry:
                     "created_at": datetime.now(UTC),
                 }
             ),
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_anthropic_messages",
+                    "name": "Anthropic Messages Provider",
+                    "provider": "anthropic",
+                    "modes": ["chat", "tool", "runner"],
+                    "capabilities": _mvp_provider_capabilities(),
+                    "trust_boundary": "third-party",
+                    "config_refs": [
+                        "ANTHROPIC_MODEL",
+                        "ANTHROPIC_BASE_URL",
+                        "ANTHROPIC_VERSION",
+                    ],
+                    "secret_ref_names": ["ANTHROPIC_API_KEY"],
+                    "budget_ref": "budget_anthropic_monthly",
+                    "quota_ref": "quota_anthropic_daily",
+                    "runtime_path": "craik.runtime.provider_runtime.AnthropicProviderAdapter",
+                    "metadata": {
+                        "base_url": "https://api.anthropic.com",
+                        "default_model": "claude-sonnet-4-20250514",
+                        "opus_model": "claude-opus-4-1-20250805",
+                        "docs_verified": "2026-05-17",
+                    },
+                    "docs": [
+                        "docs/reference/model-providers.md",
+                        "docs/reference/provider-certification.md",
+                        *ANTHROPIC_OFFICIAL_DOCS,
+                    ],
+                    "created_at": datetime.now(UTC),
+                }
+            ),
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_openai_responses",
+                    "name": "OpenAI Responses Provider",
+                    "provider": "openai",
+                    "modes": ["chat", "tool", "runner"],
+                    "capabilities": _mvp_provider_capabilities(),
+                    "trust_boundary": "third-party",
+                    "config_refs": [
+                        "OPENAI_MODEL",
+                        "OPENAI_BASE_URL",
+                    ],
+                    "secret_ref_names": ["OPENAI_API_KEY"],
+                    "budget_ref": "budget_openai_monthly",
+                    "quota_ref": "quota_openai_daily",
+                    "runtime_path": "craik.runtime.provider_runtime.OpenAIProviderAdapter",
+                    "metadata": {
+                        "base_url": "https://api.openai.com",
+                        "default_model": "gpt-5.2",
+                        "docs_verified": "2026-05-17",
+                    },
+                    "docs": [
+                        "docs/reference/model-providers.md",
+                        "docs/reference/provider-certification.md",
+                        *OPENAI_OFFICIAL_DOCS,
+                    ],
+                    "created_at": datetime.now(UTC),
+                }
+            ),
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_openai_chat",
+                    "name": "OpenAI Chat Completions Provider",
+                    "provider": "chat_completions",
+                    "modes": ["chat", "tool", "runner"],
+                    "capabilities": _mvp_provider_capabilities(),
+                    "trust_boundary": "third-party",
+                    "config_refs": [
+                        "OPENAI_MODEL",
+                        "OPENAI_BASE_URL",
+                    ],
+                    "secret_ref_names": ["OPENAI_API_KEY"],
+                    "budget_ref": "budget_openai_monthly",
+                    "quota_ref": "quota_openai_daily",
+                    "runtime_path": "craik.runtime.provider_runtime.ChatCompletionsProviderAdapter",
+                    "metadata": {
+                        "base_url": "https://api.openai.com",
+                        "default_model": "gpt-5.2",
+                        "docs_verified": "2026-05-17",
+                    },
+                    "docs": [
+                        "docs/reference/model-providers.md",
+                        "docs/reference/provider-certification.md",
+                        *OPENAI_OFFICIAL_DOCS,
+                    ],
+                    "created_at": datetime.now(UTC),
+                }
+            ),
+            ModelProvider.model_validate(
+                {
+                    "id": "provider_local_openai_compatible",
+                    "name": "Local OpenAI-Compatible Provider",
+                    "provider": "chat_completions",
+                    "modes": ["chat", "tool", "runner"],
+                    "capabilities": _mvp_provider_capabilities(),
+                    "trust_boundary": "local",
+                    "config_refs": [
+                        "LOCAL_OPENAI_COMPATIBLE_MODEL",
+                        "LOCAL_OPENAI_COMPATIBLE_BASE_URL",
+                    ],
+                    "secret_ref_names": [],
+                    "budget_ref": "budget_local_monthly",
+                    "quota_ref": "quota_local_daily",
+                    "runtime_path": "craik.runtime.provider_runtime.ChatCompletionsProviderAdapter",
+                    "metadata": {
+                        "base_url": "http://localhost:11434/v1",
+                        "default_model": "llama3.2",
+                        "docs_verified": "2026-05-17",
+                    },
+                    "docs": [
+                        "docs/reference/model-providers.md",
+                        "docs/reference/provider-certification.md",
+                        *OPENAI_OFFICIAL_DOCS,
+                    ],
+                    "created_at": datetime.now(UTC),
+                }
+            ),
         ]
     )
 

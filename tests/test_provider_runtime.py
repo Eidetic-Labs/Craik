@@ -352,6 +352,14 @@ def test_adapter_for_default_mvp_providers_uses_verified_docs_and_secret_referen
 
     openai = adapter_for_provider(registry.require("provider_openai"))
     anthropic = adapter_for_provider(registry.require("provider_anthropic"))
+    openai_responses = adapter_for_provider(registry.require("provider_openai_responses"))
+    anthropic_messages = adapter_for_provider(
+        registry.require("provider_anthropic_messages")
+    )
+    openai_chat = adapter_for_provider(registry.require("provider_openai_chat"))
+    local_openai_compatible = adapter_for_provider(
+        registry.require("provider_local_openai_compatible")
+    )
 
     assert isinstance(openai, OpenAIProviderAdapter)
     assert openai.config.secret_ref_name == "CRAIK_OPENAI_API_KEY"
@@ -359,6 +367,18 @@ def test_adapter_for_default_mvp_providers_uses_verified_docs_and_secret_referen
     assert isinstance(anthropic, AnthropicProviderAdapter)
     assert anthropic.config.secret_ref_name == "CRAIK_ANTHROPIC_API_KEY"
     assert anthropic.config.docs_refs == list(ANTHROPIC_OFFICIAL_DOCS)
+    assert isinstance(openai_responses, OpenAIProviderAdapter)
+    assert openai_responses.config.secret_ref_name == "OPENAI_API_KEY"
+    assert openai_responses.config.base_url == "https://api.openai.com"
+    assert isinstance(anthropic_messages, AnthropicProviderAdapter)
+    assert anthropic_messages.config.secret_ref_name == "ANTHROPIC_API_KEY"
+    assert anthropic_messages.config.base_url == "https://api.anthropic.com"
+    assert isinstance(openai_chat, ChatCompletionsProviderAdapter)
+    assert openai_chat.config.secret_ref_name == "OPENAI_API_KEY"
+    assert openai_chat.config.base_url == "https://api.openai.com"
+    assert isinstance(local_openai_compatible, ChatCompletionsProviderAdapter)
+    assert local_openai_compatible.config.secret_ref_name == ""
+    assert local_openai_compatible.config.base_url == "http://localhost:11434/v1"
 
 
 def test_adapter_for_provider_dispatches_chat_completions_family() -> None:
@@ -415,6 +435,18 @@ def test_provider_runtime_rejects_raw_secret_config_and_missing_docs() -> None:
             secret_ref_name="CRAIK_OPENAI_API_KEY",
             docs_refs=["docs/reference/model-providers.md"],
         )
+
+
+def test_provider_runtime_config_allows_no_secret_for_local_providers() -> None:
+    config = ProviderRuntimeConfig(
+        provider_id="provider_local_openai_compatible",
+        provider_family="chat_completions",
+        model="llama3.2",
+        secret_ref_name="",
+        docs_refs=list(OPENAI_OFFICIAL_DOCS),
+    )
+
+    assert config.resolve_secret(SecretResolver()) == ""
 
 
 def test_provider_runtime_config_resolves_secret_reference(
