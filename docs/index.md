@@ -124,6 +124,7 @@ project.
 - [Migration Maps](reference/migration-maps.md)
 - [Secret Migration Policy](reference/secret-migration-policy.md)
 - [Adjacent Runtime Bridge](reference/adjacent-runtime-bridge.md)
+- [Multi-Agent Workflow Bridge](reference/multi-agent-workflow-bridge.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
