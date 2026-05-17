@@ -86,14 +86,14 @@ Tracking issue: [#303](https://github.com/Eidetic-Labs/Craik/issues/303).
 
 Tracking issue: [#304](https://github.com/Eidetic-Labs/Craik/issues/304).
 
-- [ ] Add provider abstraction for chat, streaming, tool calls, structured output,
+- [x] Add provider abstraction for chat, streaming, tool calls, structured output,
   retries, errors, and usage metadata.
-- [ ] Implement OpenAI provider adapter.
-- [ ] Implement Anthropic provider adapter.
-- [ ] Store API access as secret references, not raw keys.
-- [ ] Add provider receipts and redaction behavior.
-- [ ] Add certification fixtures and tests for both providers.
-- [ ] Verify official provider docs before implementation work that depends on
+- [x] Implement OpenAI provider adapter.
+- [x] Implement Anthropic provider adapter.
+- [x] Store API access as secret references, not raw keys.
+- [x] Add provider receipts and redaction behavior.
+- [x] Add certification fixtures and tests for both providers.
+- [x] Verify official provider docs before implementation work that depends on
   live API behavior.
 
 ### 6. One Complete MVP Runner Path
