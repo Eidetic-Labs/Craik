@@ -58,6 +58,28 @@ def test_capability_receipt_auth_fields_round_trip(
     assert dumped["auth_identity_hash"] == "a" * 64
 
 
+def test_capability_receipt_operator_fields_round_trip(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.capability_receipt"])
+    payload.update(
+        {
+            "operator_subject": "operator-123",
+            "operator_issuer": "https://issuer.example.test",
+            "operator_email": "operator@example.test",
+            "operator_groups": ["platform"],
+        }
+    )
+
+    parsed = CONTRACT_REGISTRY["craik.capability_receipt"].model_validate(payload)
+    dumped = parsed.model_dump(mode="json", by_alias=True)
+
+    assert dumped["operator_subject"] == "operator-123"
+    assert dumped["operator_issuer"] == "https://issuer.example.test"
+    assert dumped["operator_email"] == "operator@example.test"
+    assert dumped["operator_groups"] == ["platform"]
+
+
 def test_runner_contract_models_keep_legacy_import_surface() -> None:
     from craik.contracts import models
     from craik.contracts.runner_models import RunnerMetadata
