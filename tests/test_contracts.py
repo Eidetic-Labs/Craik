@@ -106,6 +106,24 @@ def test_policy_envelope_operator_fields_round_trip(
     assert dumped["allowed_credential_profiles"] == ["openai:prod-*"]
 
 
+def test_task_request_auth_context_fields_round_trip(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.task_request"])
+    payload.update(
+        {
+            "auth_profile_id": "anthropic:local-cli",
+            "expected_duration_minutes": 90,
+        }
+    )
+
+    parsed = CONTRACT_REGISTRY["craik.task_request"].model_validate(payload)
+    dumped = parsed.model_dump(mode="json", by_alias=True)
+
+    assert dumped["auth_profile_id"] == "anthropic:local-cli"
+    assert dumped["expected_duration_minutes"] == 90
+
+
 def test_runner_contract_models_keep_legacy_import_surface() -> None:
     from craik.contracts import models
     from craik.contracts.runner_models import RunnerMetadata

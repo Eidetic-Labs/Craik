@@ -18,6 +18,8 @@ def create_task(
     requested_by: str = "user:local",
     priority: Priority = "normal",
     mode: TaskMode = "implement",
+    auth_profile_id: str | None = None,
+    expected_duration_minutes: int | None = None,
     constraints: list[str] | None = None,
     expected_outputs: list[str] | None = None,
 ) -> TaskRequest:
@@ -30,6 +32,8 @@ def create_task(
         requested_by=requested_by,
         priority=priority,
         mode=mode,
+        auth_profile_id=auth_profile_id,
+        expected_duration_minutes=expected_duration_minutes,
         constraints=constraints or [],
         expected_outputs=expected_outputs or ["case_file", "handoff"],
         created_at=datetime.now(UTC),

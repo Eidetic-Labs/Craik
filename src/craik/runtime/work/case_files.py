@@ -16,6 +16,7 @@ from craik.contracts.models import (
     ProjectProfile,
     TaskRequest,
 )
+from craik.runtime.auth.store import AuthProfileStore
 from craik.runtime.github import GitHubReadAdapter
 from craik.runtime.policy.intent_locks import IntentLockManager
 from craik.runtime.policy.policy import generate_policy_envelope
@@ -28,6 +29,7 @@ from craik.runtime.store import LocalStore
 from craik.runtime.work.case_support import (
     case_assumptions,
     context_budget,
+    credential_context,
     open_contradictions,
     verification_plan,
 )
@@ -155,11 +157,17 @@ class CaseFileAssembler:
             github_state,
             facts,
         )
+        credential_evidence, credential_risks = credential_context(
+            AuthProfileStore(self.store.database_path.parent.parent),
+            task,
+        )
+        evidence.extend(credential_evidence)
         stale_risks = [
             *case_stale_risks(repo_state, discovered.docs, assumptions),
             *instruction_stale_risk_warnings(self.store, project.id),
             *known_trap_summaries(self.store, project.id),
             *unknown_summaries(self.store, task.id),
+            *credential_risks,
         ]
         policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
         active_instructions = active_instruction_context(self.store, project.id)
