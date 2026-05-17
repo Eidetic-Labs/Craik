@@ -16,14 +16,15 @@ several surfaces are not yet end-to-end production workflows.
   tests.
 - Stigmem compatibility detection and policy-gated direct fact write helpers.
 - Deterministic fixture loop and runner preview contracts.
+- Deterministic OpenAI and Anthropic provider-backed MVP runner paths.
+- The Stigmem documentation reconciliation demo as the release acceptance path.
 
 ## Contract Or Helper Surfaces
 
-- OpenAI and Anthropic provider execution are not yet implemented. The MVP must
-  add provider adapters, certification fixtures, usage metadata, retries,
-  streaming/tool-call boundaries, and receipts.
-- Runner adapters are currently preview and fixture-oriented. They do not yet
-  provide a complete provider-backed MVP workflow.
+- OpenAI and Anthropic provider execution is deterministic by default. Live
+  provider calls remain explicitly configured and are not hidden CI behavior.
+- Runner adapters outside the MVP OpenAI and Anthropic provider paths are
+  preview, fixture, or prompt-handoff oriented.
 - Execution backends evaluate boundaries and policy requirements, but they do
   not execute shell commands, start containers, open remote shells, or drive
   browsers.
@@ -33,21 +34,16 @@ several surfaces are not yet end-to-end production workflows.
   dashboard is post-MVP unless explicitly pulled into the proof workflow.
 - Companion, mobile, visual, and multimodal surfaces are posture decisions and
   adapter contracts, not shipped product applications.
+- Marketplace and broad community ecosystem docs describe future contribution
+  mechanics, not MVP operational support.
 
 ## Known MVP Gaps
 
-- Docusaurus documentation site with Learn / Build / Operate / Secure
-  information architecture.
 - Generated CLI/reference docs.
-- Release, package publication, and security release workflows.
+- Package publication dry runs and protected release readiness.
 - Persistent local-store migrations and compatibility fixtures.
-- CI/CD depth comparable to Stigmem: path-filtered jobs, coverage ratchets,
-  docs builds, conformance tests, nightly reliability, and artifact uploads.
-- Public/internal boundary classifier and provenance-aware documentation
-  workflow.
-- Memory hygiene workflow, work product classification, and decision record
-  suggestions.
-- One complete provider-backed workflow using OpenAI and Anthropic.
+- Nightly reliability and artifact depth beyond the current PR gates.
+- Full post-MVP surfaces tracked in [Post-MVP Scope](reference/post-mvp-scope.md).
 
 ## Write Authority
 

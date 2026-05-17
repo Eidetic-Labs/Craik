@@ -4,6 +4,11 @@ Community skills package reusable instructions, examples, and optional assets
 for a bounded workflow. They should be easy to inspect before use and safe to
 run under Craik policy.
 
+Broad community distribution and marketplace workflows are post-MVP scope. This
+guide describes safe package shape and review expectations; it does not imply a
+supported public marketplace or automatic trust. See
+[Post-MVP Scope](../reference/post-mvp-scope.md).
+
 ## Authoring
 
 A community skill should include:
