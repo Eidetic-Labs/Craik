@@ -21,8 +21,11 @@ several surfaces are not yet end-to-end production workflows.
 
 ## Contract Or Helper Surfaces
 
-- OpenAI and Anthropic provider execution is deterministic by default. Live
-  provider calls remain explicitly configured and are not hidden CI behavior.
+- Provider execution is fixture-backed by default. Live HTTP requests require
+  setting `live_enabled=true` on the `ProviderRuntimeConfig` and supplying an
+  environment-variable-backed secret reference, such as `ANTHROPIC_API_KEY` or
+  `OPENAI_API_KEY`. CI does not exercise the live path; tests run against
+  either `FixtureTransport` or recorded cassettes.
 - Runner adapters outside the MVP OpenAI and Anthropic provider paths are
   preview, fixture, or prompt-handoff oriented.
 - Execution backends evaluate boundaries and policy requirements, but they do
@@ -41,6 +44,10 @@ several surfaces are not yet end-to-end production workflows.
 
 - Live model invocation behind explicit operator configuration.
 - Bounded real tool execution behind least-privilege grants.
+- Tool execution is policy-gated but does not yet run inside a sandbox. Granted
+  tool calls execute in the host process; sandbox backends (`docker_sandbox`,
+  `local_process`, `remote_shell`) define contracts but do not yet isolate
+  execution.
 - Remote Stigmem write promotion after proposal review.
 - God-file cleanup and runtime sub-packaging before the MVP freeze.
 - ADR-backed design decisions for runner scope, release posture, and package
