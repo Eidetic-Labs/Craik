@@ -123,6 +123,7 @@ project.
 - [Import Dry-Run Reports](reference/import-dry-run.md)
 - [Migration Maps](reference/migration-maps.md)
 - [Secret Migration Policy](reference/secret-migration-policy.md)
+- [Adjacent Runtime Bridge](reference/adjacent-runtime-bridge.md)
 - [Plugin Descriptors](reference/plugin-descriptors.md)
 - [Plugin Probation](reference/plugin-probation.md)
 - [Plugin Receipts](reference/plugin-receipts.md)
