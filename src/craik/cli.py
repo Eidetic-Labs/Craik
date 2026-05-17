@@ -43,6 +43,8 @@ connect_app = typer.Typer(help="Connect to external services.")
 app.add_typer(connect_app, name="connect")
 demo_app = typer.Typer(help="Run built-in Craik demos.")
 app.add_typer(demo_app, name="demo")
+auth_app = typer.Typer(help="Manage provider credential profiles.")
+app.add_typer(auth_app, name="auth")
 contradictions_app = typer.Typer(help="Manage local contradiction reports.")
 app.add_typer(contradictions_app, name="contradictions")
 graph_app = typer.Typer(help="Export Craik work graphs.")
@@ -211,6 +213,7 @@ def _paths_payload(paths: CraikPaths) -> dict[str, str]:
     }
 
 
+from craik import cli_auth as _cli_auth  # noqa: E402,F401
 from craik import cli_operations as _cli_operations  # noqa: E402,F401
 from craik import cli_project as _cli_project  # noqa: E402,F401
 

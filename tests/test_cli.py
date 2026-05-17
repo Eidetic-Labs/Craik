@@ -2,6 +2,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from craik.cli import app, package_version
@@ -576,6 +577,43 @@ def test_connect_and_onboard_commands_stay_mounted_after_module_extraction() -> 
     assert "stigmem" in connect_result.stdout
     assert onboard_result.exit_code == 0
     assert "name to onboard" in onboard_result.stdout
+
+
+def test_auth_commands_add_list_test_status_and_remove(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    home = tmp_path / "home"
+    env = {"CRAIK_HOME": str(home)}
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "anthropic-secret")
+
+    added = runner.invoke(
+        app,
+        [
+            "auth",
+            "add",
+            "anthropic:work",
+            "--kind",
+            "api-key",
+            "--env-var",
+            "ANTHROPIC_API_KEY",
+        ],
+        env=env,
+    )
+    listed = runner.invoke(app, ["auth", "list"], env=env)
+    tested = runner.invoke(app, ["auth", "test", "anthropic:work"], env=env)
+    status = runner.invoke(app, ["auth", "status"], env=env)
+    removed = runner.invoke(app, ["auth", "remove", "anthropic:work"], env=env)
+    listed_after_remove = runner.invoke(app, ["auth", "list"], env=env)
+
+    assert added.exit_code == 0
+    assert json.loads(added.stdout)["id"] == "anthropic:work"
+    assert "anthropic-secret" not in listed.stdout
+    assert [profile["id"] for profile in json.loads(listed.stdout)] == ["anthropic:work"]
+    assert json.loads(tested.stdout)["status"]["status"] == "ok"
+    assert json.loads(status.stdout)[0]["last_status"] == "ok"
+    assert json.loads(removed.stdout) == {"removed": "anthropic:work"}
+    assert json.loads(listed_after_remove.stdout) == []
 
 
 def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
