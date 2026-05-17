@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: max-file-lines
+        name: Enforce maximum Python file length
+        entry: python scripts/check_max_file_lines.py
+        language: system
+        files: ^src/.*\.py$
+        pass_filenames: true
