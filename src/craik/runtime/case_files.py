@@ -7,12 +7,14 @@ import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from craik.contracts.models import (
     Assumption,
     CaseFile,
+    ContradictionReport,
     EvidenceReference,
+    FactValue,
     ProjectProfile,
     TaskRequest,
 )
@@ -76,6 +78,13 @@ DEFAULT_DISCOVERY_EXCLUDE = (
 )
 
 
+class MemorySearch(Protocol):
+    """Memory surface needed for case-file context loading."""
+
+    def search(self, query: str) -> list[FactValue]:
+        """Return facts relevant to a query."""
+
+
 @dataclass(frozen=True)
 class DiscoveryOverrides:
     """One-off user overrides for repository context discovery."""
@@ -101,6 +110,7 @@ class CaseFileAssembler:
 
     store: LocalStore
     github_adapter: GitHubReadAdapter | None = None
+    memory: MemorySearch | None = None
 
     def build(
         self,
@@ -127,12 +137,16 @@ class CaseFileAssembler:
         repo_state = _repo_state(project, repo_root)
         github_state = _github_state(self.github_adapter, project, repo_state)
         evidence = _evidence(task, project, discovered.docs, discovered.adrs, repo_state)
+        facts = _memory_facts(self.memory, task)
+        recent_handoffs = _recent_handoffs(self.store, task.id)
+        contradictions = _open_contradictions(self.store, task.id, project.id)
         assumptions = _assumptions(
             task,
             project,
             discovered.docs,
             discovered.omitted,
             github_state,
+            facts,
         )
         stale_risks = [
             *_stale_risks(repo_state, discovered.docs, assumptions),
@@ -149,16 +163,16 @@ class CaseFileAssembler:
             objective=task.objective,
             policy_envelope_id=policy.id,
             intent_lock_id=intent_lock.id,
-            facts=[],
+            facts=facts,
             evidence=evidence,
             assumptions=assumptions,
             docs=discovered.docs,
             adrs=discovered.adrs,
             repo_state=repo_state,
             github_state=github_state,
-            recent_handoffs=[],
+            recent_handoffs=recent_handoffs,
             stale_risks=stale_risks,
-            contradictions=[],
+            contradictions=contradictions,
             verification_plan=_verification_plan(task),
             context_budget=_context_budget(
                 max_tokens=max_tokens,
@@ -170,6 +184,9 @@ class CaseFileAssembler:
                 evidence=evidence,
                 assumptions=assumptions,
                 active_instruction_constraints=active_instructions,
+                memory_fact_count=len(facts),
+                recent_handoffs=recent_handoffs,
+                contradiction_ids=[item.id for item in contradictions],
             ),
         )
         self.store.put_case_file(case_file)
@@ -399,26 +416,64 @@ def _file_evidence(task_id: str, path: str, *, immutable: bool) -> EvidenceRefer
     )
 
 
+def _memory_facts(memory: MemorySearch | None, task: TaskRequest) -> list[FactValue]:
+    if memory is None:
+        return []
+    query = " ".join([task.title, task.objective, *task.constraints, *task.expected_outputs])
+    return sorted(memory.search(query), key=lambda fact: (fact.entity, fact.relation, fact.source))
+
+
+def _recent_handoffs(store: LocalStore, task_id: str, limit: int = 5) -> list[str]:
+    handoffs = [
+        handoff
+        for handoff in store.list_handoffs()
+        if handoff.task_id == task_id or handoff.status in {"completed", "incomplete"}
+    ]
+    return [
+        f"{handoff.id}: {handoff.status}: {handoff.summary}"
+        for handoff in sorted(handoffs, key=lambda item: item.created_at, reverse=True)[:limit]
+    ]
+
+
+def _open_contradictions(
+    store: LocalStore,
+    task_id: str,
+    project_id: str,
+) -> list[ContradictionReport]:
+    return sorted(
+        [
+            report
+            for report in store.list_contradictions()
+            if report.status == "open"
+            and (report.task_id == task_id or getattr(report, "project_id", None) == project_id)
+        ],
+        key=lambda report: report.id,
+    )
+
+
 def _assumptions(
     task: TaskRequest,
     project: ProjectProfile,
     docs: list[str],
     omitted_docs: list[str],
     github_state: dict[str, Any],
+    facts: list[FactValue],
 ) -> list[Assumption]:
-    assumptions = [
-        Assumption(
-            id=f"assumption_{task.id}_memory_not_loaded",
-            task_id=task.id,
-            statement="No memory facts were loaded into this case file.",
-            rationale=(
-                f"The configured memory backend is {project.memory.backend}, but memory loading is "
-                "not implemented in the local case assembler yet."
-            ),
-            confidence=1.0,
-            status="open",
-        ),
-    ]
+    assumptions = []
+    if not facts:
+        assumptions.append(
+            Assumption(
+                id=f"assumption_{task.id}_memory_not_loaded",
+                task_id=task.id,
+                statement="No memory facts were loaded into this case file.",
+                rationale=(
+                    f"The configured memory backend is {project.memory.backend}, but no "
+                    "queryable facts were available for this task."
+                ),
+                confidence=1.0,
+                status="open",
+            )
+        )
     if github_state.get("status") != "loaded":
         assumptions.append(
             Assumption(
@@ -502,6 +557,9 @@ def _context_budget(
     evidence: list[EvidenceReference],
     assumptions: list[Assumption],
     active_instruction_constraints: list[dict[str, object]],
+    memory_fact_count: int,
+    recent_handoffs: list[str],
+    contradiction_ids: list[str],
 ) -> dict[str, Any]:
     return {
         "max_tokens": max_tokens,
@@ -514,6 +572,9 @@ def _context_budget(
         "evidence_count": len(evidence),
         "assumption_count": len(assumptions),
         "active_instruction_constraints": active_instruction_constraints,
+        "memory_fact_count": memory_fact_count,
+        "recent_handoffs": recent_handoffs,
+        "contradiction_ids": contradiction_ids,
     }
 
 

@@ -122,13 +122,13 @@ Tracking issue: [#301](https://github.com/Eidetic-Labs/Craik/issues/301).
 
 Tracking issue: [#305](https://github.com/Eidetic-Labs/Craik/issues/305).
 
-- [ ] Load Stigmem facts into case files.
-- [ ] Load recent handoffs into case files.
-- [ ] Load local contradiction reports into case files.
-- [ ] Add direct granted Stigmem writes.
-- [ ] Keep proposals as the default unprivileged path.
-- [ ] Add memory hygiene workflow.
-- [ ] Preserve provenance and source attestation metadata.
+- [x] Load Stigmem facts into case files.
+- [x] Load recent handoffs into case files.
+- [x] Load local contradiction reports into case files.
+- [x] Add direct granted Stigmem writes.
+- [x] Keep proposals as the default unprivileged path.
+- [x] Add memory hygiene workflow.
+- [x] Preserve provenance and source attestation metadata.
 
 ### 9. Public/Internal Boundary And Provenance Docs
 
