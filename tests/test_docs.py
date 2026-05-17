@@ -2,9 +2,16 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+IGNORED_DOC_PARTS = {".docusaurus", "build", "node_modules"}
+IGNORED_DOC_PREFIXES = {(Path("docs") / "blog"), (Path("docs") / "docs")}
 DOC_PATHS = [
     Path("README.md"),
-    *sorted(Path("docs").rglob("*.md")),
+    *sorted(
+        path
+        for path in Path("docs").rglob("*.md")
+        if not IGNORED_DOC_PARTS.intersection(path.parts)
+        and not any(path.is_relative_to(prefix) for prefix in IGNORED_DOC_PREFIXES)
+    ),
 ]
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 

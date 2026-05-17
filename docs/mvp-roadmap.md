@@ -42,12 +42,12 @@ Tracking issue: [#298](https://github.com/Eidetic-Labs/Craik/issues/298).
 
 Tracking issue: [#299](https://github.com/Eidetic-Labs/Craik/issues/299).
 
-- [ ] Add a Docusaurus site.
-- [ ] Mirror Stigmem's `Learn`, `Build`, `Operate`, and `Secure` IA.
-- [ ] Add local search, Mermaid support, code blocks, redirects, and broken-link
+- [x] Add a Docusaurus site.
+- [x] Mirror Stigmem's `Learn`, `Build`, `Operate`, and `Secure` IA.
+- [x] Add local search, Mermaid support, code blocks, redirects, and broken-link
   enforcement.
-- [ ] Add generated CLI/reference docs.
-- [ ] Add docs build CI and publish-ready Pages workflow.
+- [x] Add generated CLI/reference docs.
+- [x] Add docs build CI and publish-ready Pages workflow.
 
 ### 2. Release And Package Foundation
 

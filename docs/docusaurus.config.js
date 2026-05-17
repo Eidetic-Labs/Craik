@@ -16,7 +16,7 @@ const config = {
   markdown: {
     mermaid: true,
     hooks: {
-      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownLinks: 'throw',
     },
   },
   presets: [
@@ -59,6 +59,25 @@ const config = {
         hashed: true,
         indexDocs: true,
         indexPages: true,
+      },
+    ],
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            from: '/docs/getting-started',
+            to: '/docs/guides/quickstart',
+          },
+          {
+            from: '/docs/security',
+            to: '/docs/concepts/governance',
+          },
+          {
+            from: '/docs/cli',
+            to: '/docs/reference/cli',
+          },
+        ],
       },
     ],
   ],
