@@ -64,6 +64,7 @@ from craik.contracts.models import (
 from craik.contracts.registry import CONTRACT_REGISTRY
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.store import (
+    CONTRACT_KINDS,
     CURRENT_MIGRATION,
     DATABASE_NAME,
     LocalStore,
@@ -71,6 +72,7 @@ from craik.runtime.store import (
     LocalStoreMigrationError,
     UnredactedSecretError,
 )
+from craik.runtime.store_kinds import CONTRACT_KINDS as STORE_KIND_MAPPING
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "contracts" / "v0_1" / "contracts.json"
 V1_STORE_SCHEMA_FIXTURE = Path(__file__).parent / "fixtures" / "local_store" / "v1" / "schema.sql"
@@ -106,6 +108,11 @@ def test_initialize_creates_database_and_migration(tmp_path: Path) -> None:
     assert local_store.migration_version() == CURRENT_MIGRATION
     assert [item["version"] for item in local_store.applied_migrations()] == [1, 2]
     local_store.close()
+
+
+def test_store_kind_mapping_keeps_legacy_import_surface() -> None:
+    assert CONTRACT_KINDS is STORE_KIND_MAPPING
+    assert CONTRACT_KINDS["craik.task_request"] == "tasks"
 
 
 def test_initialize_records_local_store_metadata(tmp_path: Path) -> None:
