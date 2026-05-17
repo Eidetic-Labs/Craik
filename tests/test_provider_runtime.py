@@ -1,11 +1,13 @@
 import pytest
 from pydantic import ValidationError
 
+from craik.contracts.models import ModelProvider
 from craik.runtime.model_providers import default_model_provider_registry
 from craik.runtime.provider_runtime import (
     ANTHROPIC_OFFICIAL_DOCS,
     OPENAI_OFFICIAL_DOCS,
     AnthropicProviderAdapter,
+    ChatCompletionsProviderAdapter,
     OpenAIProviderAdapter,
     ProviderLiveAccessNotConfiguredError,
     ProviderMessage,
@@ -40,6 +42,21 @@ def _anthropic_adapter(*, live_enabled: bool = False) -> AnthropicProviderAdapte
             secret_ref_name="CRAIK_ANTHROPIC_API_KEY",
             live_enabled=live_enabled,
             docs_refs=list(ANTHROPIC_OFFICIAL_DOCS),
+        )
+    )
+
+
+def _chat_completions_adapter(
+    *, live_enabled: bool = False
+) -> ChatCompletionsProviderAdapter:
+    return ChatCompletionsProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai_chat",
+            provider_family="chat_completions",
+            model="gpt-5.2",
+            secret_ref_name="CRAIK_OPENAI_API_KEY",
+            live_enabled=live_enabled,
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
         )
     )
 
@@ -160,14 +177,145 @@ def test_anthropic_response_normalizes_text_tool_calls_usage_and_retry_decisions
     assert terminal.retryable is False
 
 
+def test_chat_completions_payload_supports_messages_tools_and_structured_output() -> None:
+    payload = _chat_completions_adapter().build_payload(_request())
+
+    assert payload["model"] == "gpt-5.2"
+    assert payload["stream"] is True
+    assert payload["max_tokens"] == 1024
+    assert payload["messages"][0] == {"role": "system", "content": "Follow the policy."}
+    assert payload["tools"][0] == {
+        "type": "function",
+        "function": {
+            "name": "lookup_case",
+            "description": "Lookup case metadata.",
+            "parameters": {
+                "type": "object",
+                "properties": {"case_id": {"type": "string"}},
+                "required": ["case_id"],
+            },
+        },
+    }
+    assert payload["tool_choice"] == "auto"
+    assert payload["response_format"]["type"] == "json_schema"
+    assert payload["response_format"]["json_schema"]["strict"] is True
+
+
+def test_chat_completions_payload_omits_tools_and_structured_output_when_absent() -> None:
+    request = ProviderRuntimeRequest(
+        messages=[ProviderMessage(role="user", content="Create a plan.")],
+    )
+
+    payload = _chat_completions_adapter().build_payload(request)
+
+    assert payload["messages"] == [{"role": "user", "content": "Create a plan."}]
+    assert "tools" not in payload
+    assert "response_format" not in payload
+
+
+def test_chat_completions_response_normalizes_content_tool_calls_usage() -> None:
+    adapter = _chat_completions_adapter()
+    content = adapter.normalize_response(
+        {
+            "id": "chatcmpl_123",
+            "model": "gpt-5.2",
+            "choices": [{"message": {"role": "assistant", "content": "Done"}}],
+            "usage": {
+                "prompt_tokens": 13,
+                "completion_tokens": 8,
+                "total_tokens": 21,
+            },
+        }
+    )
+    tool_call = adapter.normalize_response(
+        {
+            "id": "chatcmpl_456",
+            "model": "gpt-5.2",
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": '{"answer":"ok"}',
+                        "tool_calls": [
+                            {
+                                "id": "call_123",
+                                "type": "function",
+                                "function": {
+                                    "name": "lookup_case",
+                                    "arguments": '{"token":"sk-test-secret"}',
+                                },
+                            }
+                        ],
+                    }
+                }
+            ],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 3},
+        }
+    )
+    retryable = adapter.classify_error(status_code=429, headers={"Retry-After": "9"})
+    server_error = adapter.classify_error(status_code=503)
+    terminal = adapter.classify_error(status_code=400)
+
+    assert content.text == "Done"
+    assert content.usage == {"input_tokens": 13, "output_tokens": 8, "total_tokens": 21}
+    assert tool_call.structured_output == {"answer": "ok"}
+    assert tool_call.tool_calls == [
+        {
+            "id": "call_123",
+            "type": "function",
+            "name": "lookup_case",
+            "arguments": '{"token":"[REDACTED]"}',
+        }
+    ]
+    assert tool_call.usage == {"input_tokens": 5, "output_tokens": 3, "total_tokens": 8}
+    assert retryable.retryable is True
+    assert retryable.retry_after_seconds == 9
+    assert server_error.retryable is True
+    assert terminal.retryable is False
+
+
+def test_chat_completions_stream_chunk_normalizes_delta_content_and_tool_calls() -> None:
+    chunk = _chat_completions_adapter().normalize_chunk(
+        {
+            "id": "chatcmpl_chunk",
+            "model": "gpt-5.2",
+            "choices": [
+                {
+                    "delta": {
+                        "content": "Hel",
+                        "tool_calls": [
+                            {
+                                "id": "call_123",
+                                "type": "function",
+                                "function": {
+                                    "name": "lookup_case",
+                                    "arguments": '{"case_id":"case_1"}',
+                                },
+                            }
+                        ],
+                    },
+                    "finish_reason": None,
+                }
+            ],
+        }
+    )
+
+    assert chunk.text_delta == "Hel"
+    assert chunk.tool_calls[0]["name"] == "lookup_case"
+    assert chunk.response_id == "chatcmpl_chunk"
+
+
 def test_live_provider_access_requires_explicit_enablement() -> None:
     with pytest.raises(ProviderLiveAccessNotConfiguredError):
         _openai_adapter().require_live_access()
     with pytest.raises(ProviderLiveAccessNotConfiguredError):
         _anthropic_adapter().require_live_access()
+    with pytest.raises(ProviderLiveAccessNotConfiguredError):
+        _chat_completions_adapter().require_live_access()
 
     _openai_adapter(live_enabled=True).require_live_access()
     _anthropic_adapter(live_enabled=True).require_live_access()
+    _chat_completions_adapter(live_enabled=True).require_live_access()
 
 
 @pytest.mark.parametrize(
@@ -210,6 +358,43 @@ def test_adapter_for_default_mvp_providers_uses_verified_docs_and_secret_referen
     assert isinstance(anthropic, AnthropicProviderAdapter)
     assert anthropic.config.secret_ref_name == "CRAIK_ANTHROPIC_API_KEY"
     assert anthropic.config.docs_refs == list(ANTHROPIC_OFFICIAL_DOCS)
+
+
+def test_adapter_for_provider_dispatches_chat_completions_family() -> None:
+    provider = ModelProvider.model_validate(
+        {
+            "id": "provider_openai_chat",
+            "name": "OpenAI Chat Completions",
+            "provider": "chat_completions",
+            "modes": ["chat", "tool", "runner"],
+            "capabilities": [
+                {
+                    "name": "model.chat",
+                    "mode": "chat",
+                    "description": "Chat completions request execution.",
+                    "grant_required": True,
+                }
+            ],
+            "trust_boundary": "third-party",
+            "config_refs": ["OPENAI_BASE_URL"],
+            "secret_ref_names": ["OPENAI_API_KEY"],
+            "budget_ref": "budget_openai_monthly",
+            "quota_ref": "quota_openai_daily",
+            "runtime_path": "craik.runtime.provider_runtime.ChatCompletionsProviderAdapter",
+            "metadata": {
+                "default_model": "gpt-5.2",
+                "docs_verified": "2026-05-17",
+            },
+            "docs": ["docs/reference/model-providers.md", *OPENAI_OFFICIAL_DOCS],
+            "created_at": "2026-05-17T08:00:00Z",
+        }
+    )
+
+    adapter = adapter_for_provider(provider)
+
+    assert isinstance(adapter, ChatCompletionsProviderAdapter)
+    assert adapter.config.provider_family == "chat_completions"
+    assert adapter.config.secret_ref_name == "OPENAI_API_KEY"
 
 
 def test_provider_runtime_rejects_raw_secret_config_and_missing_docs() -> None:
