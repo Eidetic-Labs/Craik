@@ -1,5 +1,12 @@
 """Authentication profile contracts and credential source protocols."""
 
+from craik.runtime.auth.pool import (
+    CREDENTIAL_POOL_SCHEMA_VERSION,
+    CredentialPool,
+    CredentialPoolConfig,
+    CredentialPoolEntry,
+    CredentialPoolError,
+)
 from craik.runtime.auth.profile import (
     AuthProfile,
     CredentialHealthStatus,
@@ -16,12 +23,17 @@ from craik.runtime.auth.store import (
 
 __all__ = [
     "AUTH_PROFILES_SCHEMA_VERSION",
+    "CREDENTIAL_POOL_SCHEMA_VERSION",
     "AuthProfile",
     "AuthProfileNotFoundError",
     "AuthProfileStore",
     "AuthProfileStoreError",
     "CredentialHealthStatus",
     "CredentialKind",
+    "CredentialPool",
+    "CredentialPoolConfig",
+    "CredentialPoolEntry",
+    "CredentialPoolError",
     "CredentialSource",
     "CredentialStatus",
 ]
