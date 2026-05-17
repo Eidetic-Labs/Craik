@@ -5,6 +5,8 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
 
+import pytest
+
 from craik.runtime.http_transport import HTTPTransport
 from craik.runtime.provider_runtime import (
     OPENAI_OFFICIAL_DOCS,
@@ -62,6 +64,34 @@ def test_http_transport_yields_sse_json_chunks() -> None:
         chunks = list(transport.send({"_path": "/v1/messages", "stream": True}, stream=True))
 
     assert chunks == [{"delta": "Hel"}, {"delta": "lo"}]
+
+
+def test_http_transport_stream_stops_when_cancelled_between_chunks() -> None:
+    cancel_event = threading.Event()
+
+    def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
+        return _sse_response(
+            [
+                'data: {"delta":"Hel"}\n\n',
+                'data: {"delta":"lo"}\n\n',
+                'data: [DONE]\n\n',
+            ]
+        )
+
+    with _stub_server(handle) as server:
+        transport = HTTPTransport(
+            family="chat_completions",
+            base_url=server.url,
+            headers_factory=dict,
+            timeout_seconds=5,
+            cancel_event=cancel_event,
+        )
+
+        iterator = transport.send({"_path": "/v1/chat/completions"}, stream=True)
+        assert next(iterator) == {"delta": "Hel"}
+        cancel_event.set()
+        with pytest.raises(ProviderTransportError, match="cancelled"):
+            next(iterator)
 
 
 def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
@@ -191,6 +221,56 @@ def test_live_enabled_adapter_executes_round_trip_through_http_transport() -> No
     assert result.text == "live stub ok"
     assert result.response_id == "chatcmpl_live_stub"
     assert result.usage == {"input_tokens": 4, "output_tokens": 3, "total_tokens": 7}
+
+
+def test_live_enabled_adapter_retries_retryable_http_errors() -> None:
+    seen = {"requests": 0}
+
+    def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
+        seen["requests"] += 1
+        if seen["requests"] < 3:
+            return _json_response(
+                {"error": "rate limited"},
+                status=429,
+                headers={"Retry-After": "0"},
+            )
+        return _json_response(
+            {
+                "id": "chatcmpl_retry_stub",
+                "model": payload["model"],
+                "choices": [{"message": {"role": "assistant", "content": "retry ok"}}],
+                "usage": {"prompt_tokens": 1, "completion_tokens": 2, "total_tokens": 3},
+            }
+        )
+
+    with _stub_server(handle) as server:
+        config = ProviderRuntimeConfig(
+            provider_id="provider_openai_chat_retry_stub",
+            provider_family="chat_completions",
+            model="gpt-test",
+            secret_ref_name="TEST_API_KEY",
+            base_url=server.url,
+            live_enabled=True,
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
+        adapter = ChatCompletionsProviderAdapter(
+            config,
+            transport=HTTPTransport(
+                family="chat_completions",
+                base_url=server.url,
+                headers_factory=dict,
+                timeout_seconds=5,
+            ),
+        )
+
+        result = adapter.execute(
+            ProviderRuntimeRequest(
+                messages=[ProviderMessage(role="user", content="Say ok.")],
+            )
+        )
+
+    assert seen["requests"] == 3
+    assert result.text == "retry ok"
 
 
 class _StubResponse:

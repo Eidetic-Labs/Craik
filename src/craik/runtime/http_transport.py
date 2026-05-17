@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from collections.abc import Callable, Iterator
 from typing import Any
 from urllib import error, request
@@ -21,19 +22,27 @@ class HTTPTransport:
         base_url: str,
         headers_factory: Callable[[], dict[str, str]],
         timeout_seconds: float,
+        cancel_event: threading.Event | None = None,
     ) -> None:
         self._family = family
         self._base_url = base_url.rstrip("/")
         self._headers_factory = headers_factory
         self._timeout_seconds = timeout_seconds
+        self._cancel_event = cancel_event
 
     @property
     def family(self) -> ProviderFamily:
         """Provider API family this transport speaks."""
         return self._family
 
+    @property
+    def cancel_event(self) -> threading.Event | None:
+        """Optional cancellation event checked before requests and between chunks."""
+        return self._cancel_event
+
     def send(self, payload: dict[str, Any], *, stream: bool) -> Iterator[dict[str, Any]]:
         """Send a JSON payload and yield parsed JSON or SSE response chunks."""
+        _raise_if_cancelled(self._cancel_event)
         path = str(payload.get("_path", ""))
         body_payload = {key: value for key, value in payload.items() if not key.startswith("_")}
         body = json.dumps(body_payload).encode("utf-8")
@@ -51,7 +60,7 @@ class HTTPTransport:
         try:
             with request.urlopen(http_request, timeout=self._timeout_seconds) as response:
                 if stream:
-                    yield from _iter_sse(response)
+                    yield from _iter_sse(response, cancel_event=self._cancel_event)
                     return
                 parsed = json.loads(response.read().decode("utf-8"))
                 if isinstance(parsed, dict):
@@ -60,10 +69,19 @@ class HTTPTransport:
                 raise ProviderTransportError("provider response JSON was not an object")
         except error.HTTPError as exc:
             raise _transport_http_error(exc) from exc
+        except TimeoutError as exc:
+            raise _transport_network_error("provider transport timed out") from exc
+        except error.URLError as exc:
+            raise _transport_network_error("provider transport URL request failed") from exc
 
 
-def _iter_sse(response: Any) -> Iterator[dict[str, Any]]:
+def _iter_sse(
+    response: Any,
+    *,
+    cancel_event: threading.Event | None = None,
+) -> Iterator[dict[str, Any]]:
     while True:
+        _raise_if_cancelled(cancel_event)
         raw_line = response.readline()
         if not raw_line:
             return
@@ -91,7 +109,17 @@ def _transport_http_error(exc: error.HTTPError) -> ProviderTransportError:
         body=redacted_body,
         headers=headers,
         retry_after_seconds=retry_after_seconds,
+        retryable=exc.code in {408, 409, 429, 500, 502, 503, 504, 529},
     )
+
+
+def _transport_network_error(message: str) -> ProviderTransportError:
+    return ProviderTransportError(message, retryable=True)
+
+
+def _raise_if_cancelled(cancel_event: threading.Event | None) -> None:
+    if cancel_event is not None and cancel_event.is_set():
+        raise ProviderTransportError("provider transport cancelled", retryable=False)
 
 
 def _retry_after(headers: dict[str, str]) -> int | None:
