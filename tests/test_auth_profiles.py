@@ -26,6 +26,7 @@ def test_auth_profile_round_trips_through_json() -> None:
         metadata={"env_var": "ANTHROPIC_API_KEY"},
         created_at=datetime(2026, 5, 17, tzinfo=UTC),
         last_status="ok",
+        redaction_patterns=[r"work-account@example\.test"],
     )
 
     restored = AuthProfile.model_validate_json(profile.model_dump_json())
@@ -33,6 +34,7 @@ def test_auth_profile_round_trips_through_json() -> None:
     assert restored == profile
     assert restored.kind is CredentialKind.API_KEY
     assert restored.metadata["env_var"] == "ANTHROPIC_API_KEY"
+    assert restored.redaction_patterns == [r"work-account@example\.test"]
 
 
 def test_auth_profile_rejects_id_without_profile_name() -> None:
@@ -51,6 +53,17 @@ def test_auth_profile_rejects_mismatched_provider_family() -> None:
             id="openai:work",
             kind=CredentialKind.OAUTH_TOKEN,
             provider_family="anthropic",
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+
+
+def test_auth_profile_rejects_invalid_redaction_pattern() -> None:
+    with pytest.raises(ValidationError, match="redaction pattern is invalid"):
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            redaction_patterns=["["],
             created_at=datetime(2026, 5, 17, tzinfo=UTC),
         )
 
