@@ -8,6 +8,8 @@ from craik.contracts.models import (
     CapabilityTarget,
     IntentLock,
     RunnerMetadata,
+    RunnerStepRequest,
+    RunnerStepResult,
 )
 from craik.runtime.loop import (
     FixtureStepRunner,
@@ -159,6 +161,78 @@ def test_loop_enforces_intent_stop_condition_before_step(store: LocalStore) -> N
     assert result.run.status == "blocked"
     assert result.step_results == []
     assert result.run.stop_reason == "intent stop condition triggered: scope changed"
+
+
+def test_loop_executes_tool_call_and_replays_tool_result(store: LocalStore) -> None:
+    runner = ToolCallStepRunner()
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    result = executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture"),
+        runner_metadata=_runner(),
+        grants=[_shell_grant()],
+        steps=[LoopStep(phase="act", input_prompt="Run the requested tool.")],
+        max_iterations=3,
+    )
+
+    assert result.run.status == "completed"
+    assert result.run.iteration == 2
+    assert len(runner.requests) == 2
+    assert len(result.step_results) == 2
+    assert len(result.output_captures) == 2
+    assert result.receipts[0].capability == "shell.execute"
+    assert result.receipts[0].result.metadata["command_ref"] == "fixture-action"
+    assert store.get_receipt(result.receipts[0].id) == result.receipts[0]
+    assert runner.requests[1].context["message_history"][0]["role"] == "tool"
+    assert runner.requests[1].context["message_history"][0]["tool_call_id"] == "call_shell"
+    assert result.step_results[-1].observed_output["text"] == "tool result consumed"
+
+
+class ToolCallStepRunner:
+    def __init__(self) -> None:
+        self.requests: list[RunnerStepRequest] = []
+
+    def run_step(self, request: RunnerStepRequest) -> RunnerStepResult:
+        self.requests.append(request)
+        if len(self.requests) == 1:
+            return RunnerStepResult(
+                id=f"runner_step_result_{request.run_id}_tool_call",
+                request_id=request.id,
+                run_id=request.run_id,
+                task_id=request.task_id,
+                phase=request.phase,
+                runner=request.runner,
+                status="completed",
+                summary="Requested a shell tool.",
+                observed_output={
+                    "tool_calls": [
+                        {
+                            "id": "call_shell",
+                            "name": "shell.execute",
+                            "arguments": '{"command_ref":"fixture-action"}',
+                        }
+                    ]
+                },
+                created_at=datetime.now(UTC),
+            )
+        return RunnerStepResult(
+            id=f"runner_step_result_{request.run_id}_tool_result",
+            request_id=request.id,
+            run_id=request.run_id,
+            task_id=request.task_id,
+            phase=request.phase,
+            runner=request.runner,
+            status="completed",
+            summary="Consumed the tool result.",
+            observed_output={"text": "tool result consumed"},
+            created_at=datetime.now(UTC),
+        )
 
 
 def _runner() -> RunnerMetadata:

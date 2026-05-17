@@ -113,20 +113,22 @@ class ProviderBackedStepRunner:
         *,
         status: RunnerResultStatus,
     ) -> ProviderRuntimeRequest:
+        messages = [
+            ProviderMessage(
+                role="system",
+                content="You are executing a governed Craik MVP runner step.",
+            ),
+            ProviderMessage(
+                role="user",
+                content=(
+                    f"{self.compiled_prompt.prompt}\n\n"
+                    f"## Current Step\nPhase: {request.phase}\n{request.input_prompt}"
+                ),
+            ),
+            *_provider_messages_from_history(request.context.get("message_history", [])),
+        ]
         return ProviderRuntimeRequest(
-            messages=[
-                ProviderMessage(
-                    role="system",
-                    content="You are executing a governed Craik MVP runner step.",
-                ),
-                ProviderMessage(
-                    role="user",
-                    content=(
-                        f"{self.compiled_prompt.prompt}\n\n"
-                        f"## Current Step\nPhase: {request.phase}\n{request.input_prompt}"
-                    ),
-                ),
-            ],
+            messages=messages,
             tools=[
                 ProviderTool(
                     name="record_runner_step",
@@ -244,6 +246,21 @@ def _latest_run_for_task(store: LocalStore, task_id: str) -> TaskRun:
     if not matches:
         raise ValueError(f"no task run was recorded for task: {task_id}")
     return matches[-1]
+
+
+def _provider_messages_from_history(raw_messages: object) -> list[ProviderMessage]:
+    if not isinstance(raw_messages, list):
+        return []
+    messages: list[ProviderMessage] = []
+    for raw_message in raw_messages:
+        if not isinstance(raw_message, dict):
+            continue
+        role = raw_message.get("role")
+        content = raw_message.get("content")
+        if role != "tool" or content is None:
+            continue
+        messages.append(ProviderMessage(role="tool", content=str(content)))
+    return messages
 
 
 def _runner_step_schema() -> dict[str, Any]:
