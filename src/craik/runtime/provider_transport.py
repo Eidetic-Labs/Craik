@@ -35,12 +35,14 @@ class ProviderTransportError(RuntimeError):
         body: str | None = None,
         headers: dict[str, str] | None = None,
         retry_after_seconds: int | None = None,
+        retryable: bool = False,
     ) -> None:
         super().__init__(message)
         self.status_code = status_code
         self.body = body
         self.headers = headers or {}
         self.retry_after_seconds = retry_after_seconds
+        self.retryable = retryable
 
 
 @dataclass(frozen=True)

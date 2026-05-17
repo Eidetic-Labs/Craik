@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any, Literal, Protocol, cast
@@ -12,7 +13,12 @@ from pydantic import Field, model_validator
 from craik.contracts.models import CapabilityReceipt, CraikModel, ModelProvider
 from craik.runtime.environment_receipts import EnvironmentReceiptContext, environment_receipt
 from craik.runtime.http_transport import HTTPTransport
-from craik.runtime.provider_transport import FixtureTransport, ProviderFamily, ProviderTransport
+from craik.runtime.provider_transport import (
+    FixtureTransport,
+    ProviderFamily,
+    ProviderTransport,
+    ProviderTransportError,
+)
 from craik.runtime.redaction import redact
 from craik.runtime.secrets import SecretRef, SecretResolver
 
@@ -65,6 +71,7 @@ class ProviderRuntimeConfig(CraikModel):
     secret_ref_name: str
     base_url: str | None = None
     timeout_seconds: float = Field(default=30.0, gt=0)
+    max_retries: int = Field(default=3, ge=0)
     live_enabled: bool = False
     docs_verified_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     docs_refs: list[str] = Field(min_length=1)
@@ -540,6 +547,7 @@ def adapter_for_provider(
         secret_ref_name=secret_ref_name,
         base_url=_provider_base_url(provider),
         timeout_seconds=float(provider.metadata.get("timeout_seconds", 30.0)),
+        max_retries=int(provider.metadata.get("max_retries", 3)),
         live_enabled=live_configured,
         docs_refs=list(
             ANTHROPIC_OFFICIAL_DOCS if family == "anthropic" else OPENAI_OFFICIAL_DOCS
@@ -563,6 +571,34 @@ def _execute_provider_request(
     if adapter.config.live_enabled:
         adapter.require_live_access()
     payload = adapter.build_payload(request)
+    attempt = 0
+    while True:
+        try:
+            return _send_provider_request(
+                adapter,
+                request,
+                payload,
+                chunk_normalizer=chunk_normalizer,
+                stream_callback=stream_callback,
+            )
+        except ProviderTransportError as error:
+            if (
+                not _retryable_transport_error(adapter, error)
+                or attempt >= adapter.config.max_retries
+            ):
+                raise
+            attempt += 1
+            _sleep_before_retry(adapter, error)
+
+
+def _send_provider_request(
+    adapter: ProviderRuntimeAdapter,
+    request: ProviderRuntimeRequest,
+    payload: dict[str, Any],
+    *,
+    chunk_normalizer: Any | None = None,
+    stream_callback: Callable[[str], None] | None = None,
+) -> ProviderRuntimeResult:
     if not request.stream:
         chunks = list(adapter.transport.send(payload, stream=False))
         if not chunks:
@@ -602,6 +638,37 @@ def _execute_provider_request(
         usage=usage,
         response_id=response_id,
     )
+
+
+def _retryable_transport_error(
+    adapter: ProviderRuntimeAdapter,
+    error: ProviderTransportError,
+) -> bool:
+    decision = adapter.classify_error(
+        status_code=error.status_code,
+        headers=error.headers,
+    )
+    return bool(error.retryable or decision.retryable)
+
+
+def _sleep_before_retry(
+    adapter: ProviderRuntimeAdapter,
+    error: ProviderTransportError,
+) -> None:
+    cancel_event = getattr(adapter.transport, "cancel_event", None)
+    if cancel_event is not None and cancel_event.is_set():
+        raise ProviderTransportError("provider transport cancelled", retryable=False)
+    retry_after = error.retry_after_seconds
+    if retry_after is None:
+        retry_after = _retry_after(error.headers)
+    if retry_after is None:
+        retry_after = 0
+    delay = max(0, retry_after)
+    if cancel_event is not None:
+        if cancel_event.wait(delay):
+            raise ProviderTransportError("provider transport cancelled", retryable=False)
+        return
+    time.sleep(delay)
 
 
 def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
