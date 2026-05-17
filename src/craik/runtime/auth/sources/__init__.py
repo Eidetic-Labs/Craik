@@ -11,6 +11,7 @@ from craik.runtime.auth.sources.local_cli_oauth import (
     LocalCLICredentialError,
     LocalCLICredentialSource,
 )
+from craik.runtime.auth.sources.oidc_exchange import OIDCTokenExchangeSecretManager
 from craik.runtime.auth.sources.secret_ref import (
     EnvVarSecretManager,
     FileSecretManager,
@@ -29,6 +30,7 @@ __all__ = [
     "FileSecretManager",
     "LocalCLICredentialError",
     "LocalCLICredentialSource",
+    "OIDCTokenExchangeSecretManager",
     "SecretManager",
     "SecretRefCredentialError",
     "SecretRefCredentialSource",
