@@ -37,7 +37,6 @@ from craik.runtime.provider_runtime import (
     adapter_for_provider,
     provider_runtime_receipt,
 )
-from craik.runtime.provider_transport import FixtureTransport
 from craik.runtime.runners import get_runner_capability_matrix
 from craik.runtime.store import LocalStore
 
@@ -68,23 +67,8 @@ class ProviderBackedStepRunner:
     def run_step(self, request: RunnerStepRequest) -> RunnerStepResult:
         """Normalize one runner step through the configured provider adapter."""
         status = self.statuses.pop(0) if self.statuses else "completed"
-        provider_request = self._provider_request(request)
-        transport = FixtureTransport(
-            family=self.adapter.config.provider_family,
-            model=self.adapter.config.model,
-            response_id=f"provider_response_{request.run_id}_{request.phase}",
-            phase=request.phase,
-            status=status,
-        )
-        response = next(
-            transport.send(
-                self.adapter.build_payload(provider_request),
-                stream=provider_request.stream,
-            )
-        )
-        provider_result = self.adapter.normalize_response(
-            response
-        )
+        provider_request = self._provider_request(request, status=status)
+        provider_result = self.adapter.execute(provider_request)
         receipt = provider_runtime_receipt(
             adapter=self.adapter,
             request=provider_request,
@@ -123,7 +107,12 @@ class ProviderBackedStepRunner:
             created_at=datetime.now(UTC),
         )
 
-    def _provider_request(self, request: RunnerStepRequest) -> ProviderRuntimeRequest:
+    def _provider_request(
+        self,
+        request: RunnerStepRequest,
+        *,
+        status: RunnerResultStatus,
+    ) -> ProviderRuntimeRequest:
         return ProviderRuntimeRequest(
             messages=[
                 ProviderMessage(
@@ -151,6 +140,8 @@ class ProviderBackedStepRunner:
                 "user_id": request.task_id,
                 "run_id": request.run_id,
                 "phase": request.phase,
+                "status": status,
+                "response_id": f"provider_response_{request.run_id}_{request.phase}",
             },
         )
 
@@ -178,7 +169,10 @@ class ProviderBackedRunExecutor:
         if case_file is None:
             case_file = CaseFileAssembler(self.store).build(task_id)
         provider = default_model_provider_registry().require(provider_id)
-        adapter = adapter_for_provider(provider, live_enabled=False)
+        adapter = adapter_for_provider(
+            provider,
+            live_enabled=bool(provider.metadata.get("live_enabled", False)),
+        )
         compiled = PromptCompiler(self.store).compile(
             task_id,
             runner_id=provider.id,
