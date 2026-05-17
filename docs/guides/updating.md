@@ -25,5 +25,10 @@ The output includes:
 4. Run `craik doctor` again.
 5. Run project validation before starting the gateway.
 
+For published `0.x.y` patch releases, prefer the newest patch in the current
+minor line unless release notes say a migration is required. Capability-bearing
+`0.x.0` upgrades should be treated as minor compatibility events until Craik
+reaches a later `1.0.0` stability signal.
+
 Future migration commands may add explicit local-state migrations, but update
 guidance remains non-mutating by default.
