@@ -367,6 +367,10 @@ def test_demo_stigmem_docs_command_runs_without_live_stigmem(tmp_path: Path) -> 
     assert payload["schema"] == "craik.demo.stigmem_docs_reconciliation"
     assert payload["status"] == "runnable"
     assert payload["stigmem_backend_status"]["status"] == "not_configured"
+    assert [item["provider_id"] for item in payload["provider_executions"]] == [
+        "provider_openai",
+        "provider_anthropic",
+    ]
     assert payload["next_commands"]
 
 

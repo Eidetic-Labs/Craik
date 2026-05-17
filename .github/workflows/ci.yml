@@ -149,6 +149,20 @@ jobs:
       - name: Check public docs hygiene
         run: python scripts/check_public_docs_hygiene.py
 
+  quickstart-smoke:
+    needs: changes
+    if: needs.changes.outputs.python == 'true' || needs.changes.outputs.docs == 'true' || needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+      - name: Run quickstart smoke
+        run: python scripts/quickstart_smoke.py
+
   quality:
     needs:
       - changed-file-strictness
@@ -157,6 +171,7 @@ jobs:
       - unit
       - contract
       - security
+      - quickstart-smoke
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -168,7 +183,8 @@ jobs:
             "${{ needs.type.result }}" \
             "${{ needs.unit.result }}" \
             "${{ needs.contract.result }}" \
-            "${{ needs.security.result }}"; do
+            "${{ needs.security.result }}" \
+            "${{ needs.quickstart-smoke.result }}"; do
             case "$result" in
               success|skipped) ;;
               *) echo "A required quality gate finished with result: $result"; exit 1 ;;

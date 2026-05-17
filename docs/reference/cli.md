@@ -142,6 +142,7 @@ Options:
 - `--stigmem-url`: Stigmem node URL.
 - `--stigmem-api-key`: Bearer API key. Prefer CRAIK_STIGMEM_API_KEY.
 - `--github, --no-github`: Load read-only GitHub context.; default `true`
+- `--provider-id`: Provider id to exercise through the deterministic demo runner. Repeat to override the default OpenAI and Anthropic run.
 - `--max-tokens`: Approximate case-file context budget.; default `24000`
 
 ## `craik doctor`

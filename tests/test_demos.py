@@ -35,16 +35,36 @@ def test_stigmem_docs_demo_produces_runnable_artifacts(
     assert result["case_file_id"] == "case_stigmem_documentation_reconciliation"
     assert result["receipt_ids"] == ["receipt_demo_stigmem_documentation_reconciliation"]
     assert result["handoff_id"] == "handoff_stigmem_documentation_reconciliation"
+    assert result["memory_write"] == {
+        "status": "proposal_created",
+        "proposal_id": (
+            "memprop_stigmem_documentation_reconciliation_repo_stigmem_"
+            "craik_docs_reconciliation_demo"
+        ),
+        "direct_write": "not_requested",
+    }
     assert result["memory_proposal_ids"] == [
         "memprop_stigmem_documentation_reconciliation_repo_stigmem_craik_docs_reconciliation_demo"
     ]
+    assert [item["provider_id"] for item in result["provider_executions"]] == [
+        "provider_openai",
+        "provider_anthropic",
+    ]
+    assert {item["run_status"] for item in result["provider_executions"]} == {"completed"}
+    assert {tuple(item["provider_families"]) for item in result["provider_executions"]} == {
+        ("openai",),
+        ("anthropic",),
+    }
     assert result["work_graph_id"] == "graph_task_stigmem_documentation_reconciliation"
     assert store.get_task(DEMO_TASK_ID) is not None
     assert store.get_case_file("case_stigmem_documentation_reconciliation") is not None
     assert store.get_handoff("handoff_stigmem_documentation_reconciliation") is not None
     assert store.list_contradictions()[0].task_id == DEMO_TASK_ID
-    assert store.list_receipts()[0].result.metadata["policy_envelope_id"] == (
-        "policy_task_stigmem_documentation_reconciliation"
+    assert len(store.list_run_outputs()) == 8
+    assert any(
+        receipt.result.metadata.get("policy_envelope_id")
+        == "policy_task_stigmem_documentation_reconciliation"
+        for receipt in store.list_receipts()
     )
 
 
@@ -63,6 +83,23 @@ def test_stigmem_docs_demo_surfaces_boundaries_and_evidence(
         for item in result["findings"]["public_internal_boundary"]
     )
     assert result["proposed_doc_updates"][0]["path"] == "README.md"
+
+
+def test_stigmem_docs_demo_can_limit_provider_execution(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+
+    result = StigmemDocsDemo(store).run(
+        repo_path=repo,
+        github=False,
+        provider_ids=("provider_openai",),
+    )
+
+    assert [item["provider_id"] for item in result["provider_executions"]] == [
+        "provider_openai"
+    ]
 
 
 def _repo(tmp_path: Path) -> Path:

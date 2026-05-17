@@ -7,7 +7,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from craik.contracts.models import CapabilityReceipt, ReceiptResult
+from craik.contracts.models import (
+    CapabilityGrant,
+    CapabilityReceipt,
+    CapabilityTarget,
+    ReceiptResult,
+)
 from craik.runtime.case_files import CaseFileAssembler
 from craik.runtime.contradictions import ContradictionManager
 from craik.runtime.github import GitHubReadAdapter
@@ -25,6 +30,7 @@ from craik.runtime.memory import (
     MemoryError as CraikMemoryError,
 )
 from craik.runtime.project_registry import ProjectRegistry
+from craik.runtime.provider_runner import ProviderBackedRunExecutor
 from craik.runtime.receipts import ReceiptStore
 from craik.runtime.redaction import redact
 from craik.runtime.store import LocalStore
@@ -32,6 +38,7 @@ from craik.runtime.tasks import create_task
 
 DEMO_TASK_TITLE = "Stigmem documentation reconciliation"
 DEMO_TASK_ID = "task_stigmem_documentation_reconciliation"
+DEMO_PROVIDER_IDS = ("provider_openai", "provider_anthropic")
 
 
 @dataclass(frozen=True)
@@ -49,8 +56,10 @@ class StigmemDocsDemo:
         stigmem_url: str | None = None,
         stigmem_api_key: str | None = None,
         github: bool = True,
+        provider_ids: tuple[str, ...] | None = None,
         max_tokens: int = 24000,
     ) -> dict[str, Any]:
+        selected_provider_ids = provider_ids or DEMO_PROVIDER_IDS
         registry = ProjectRegistry(self.store)
         project = registry.add_project(
             repo_path,
@@ -177,10 +186,21 @@ class StigmemDocsDemo:
                 "Demo avoids editing repository files and does not write Stigmem facts by default."
             ],
         )
+        provider_executions = [
+            _provider_execution_payload(execution)
+            for execution in (
+                ProviderBackedRunExecutor(self.store).execute(
+                    task_id=task.id,
+                    provider_id=provider_id,
+                    grants=[_demo_shell_grant(task.id)],
+                )
+                for provider_id in selected_provider_ids
+            )
+        ]
         graph = WorkGraphExporter(self.store).export(task_id=task.id)
         return {
             "schema": "craik.demo.stigmem_docs_reconciliation",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "status": "runnable",
             "project": project.model_dump(mode="json", by_alias=True),
             "task": task.model_dump(mode="json", by_alias=True),
@@ -192,7 +212,13 @@ class StigmemDocsDemo:
             "receipt_ids": [receipt.id],
             "handoff_id": handoff.id,
             "memory_proposal_ids": [proposal.id],
+            "memory_write": {
+                "status": "proposal_created",
+                "proposal_id": proposal.id,
+                "direct_write": "not_requested",
+            },
             "contradiction_ids": [contradiction.id],
+            "provider_executions": provider_executions,
             "work_graph_id": graph.id,
             "next_commands": [
                 f"craik case show {task.id}",
@@ -289,3 +315,31 @@ def _demo_receipt(
         redacted=True,
         created_at=datetime.now(UTC),
     )
+
+
+def _demo_shell_grant(task_id: str) -> CapabilityGrant:
+    return CapabilityGrant(
+        id=f"grant_{task_id.removeprefix('task_')}_demo_shell",
+        task_id=task_id,
+        capability="shell.execute",
+        target=CapabilityTarget(paths=["fixture-action"]),
+        operations=["execute"],
+        reason="Allow deterministic provider-backed demo fixture action.",
+        approved_by="user:demo",
+    )
+
+
+def _provider_execution_payload(execution: Any) -> dict[str, Any]:
+    return {
+        "provider_id": execution.compiled_prompt.runner_id,
+        "run_id": execution.run.id,
+        "run_status": execution.run.status,
+        "handoff_id": execution.handoff.id,
+        "handoff_status": execution.handoff.status,
+        "receipt_ids": execution.run.receipt_ids,
+        "provider_result_ids": [result.response_id for result in execution.provider_results],
+        "provider_families": sorted(
+            {result.provider_family for result in execution.provider_results}
+        ),
+        "interrupted_error": execution.interrupted_error,
+    }
