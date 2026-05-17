@@ -635,6 +635,70 @@ def test_provider_runtime_receipt_keeps_safe_metadata_and_drops_payload_and_secr
     assert receipt.result.metadata["tool_call_count"] == 0
     assert "payload" not in receipt.result.metadata
     assert "secret_ref_name" not in receipt.result.metadata
+    assert receipt.auth_profile_id == "openai:legacy-env"
+    assert receipt.auth_kind == "api-key"
+    assert receipt.auth_identity_hash
+
+
+def test_provider_runtime_receipt_records_auth_profile_identity_hash(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    monkeypatch.setenv("OPENAI_WORK_KEY", "sk-raw-secret")
+    AuthProfileStore(tmp_path).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_WORK_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            auth_profile_id="openai:work",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
+    )
+    _provider_headers(adapter.config)
+    request = ProviderRuntimeRequest(messages=[ProviderMessage(role="user", content="hi")])
+    result = adapter.normalize_response(
+        {
+            "id": "resp_123",
+            "model": "gpt-5.2",
+            "output_text": "Done",
+        }
+    )
+
+    first = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime",
+        actor="agent:codex",
+    )
+    second = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime_2",
+        actor="agent:codex",
+    )
+
+    assert first.auth_profile_id == "openai:work"
+    assert first.auth_kind == "api-key"
+    assert first.auth_identity_hash == second.auth_identity_hash
+    assert "sk-raw-secret" not in first.model_dump_json()
+    assert "OPENAI_WORK_KEY" not in first.auth_identity_hash
 
 
 def test_provider_request_requires_operator_identity_before_transport(

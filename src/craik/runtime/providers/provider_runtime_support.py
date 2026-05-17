@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from typing import TYPE_CHECKING, Any
 
 from craik.contracts.models import CapabilityReceipt, ModelProvider
 from craik.runtime.auth import (
     AuthProfile,
+    AuthProfileNotFoundError,
     AuthProfileStore,
     CredentialPool,
 )
@@ -91,7 +93,7 @@ def provider_runtime_receipt(
     actor: str,
 ) -> CapabilityReceipt:
     """Build a redacted receipt for one provider runtime action."""
-    return environment_receipt(
+    receipt = environment_receipt(
         receipt_id=receipt_id,
         action="provider_action",
         context=EnvironmentReceiptContext(
@@ -117,6 +119,86 @@ def provider_runtime_receipt(
             "secret_ref_name": adapter.config.secret_ref_name,
         },
     )
+    return receipt.model_copy(update=_receipt_auth_fields(adapter))
+
+
+def _receipt_auth_fields(adapter: ProviderRuntimeAdapter) -> dict[str, str]:
+    profile = _receipt_auth_profile(adapter)
+    if profile is not None:
+        return {
+            "auth_profile_id": profile.id,
+            "auth_kind": profile.kind.value,
+            "auth_identity_hash": _auth_identity_hash(
+                adapter.config.provider_family,
+                profile.id,
+                profile.kind.value,
+                _auth_identity_basis(profile.metadata),
+            ),
+        }
+    profile_id = adapter.config.last_auth_profile_id or adapter.config.auth_profile_id
+    if profile_id:
+        return {
+            "auth_profile_id": profile_id,
+            "auth_kind": "unknown",
+            "auth_identity_hash": _auth_identity_hash(
+                adapter.config.provider_family,
+                profile_id,
+                "unknown",
+                "",
+            ),
+        }
+    legacy_id = (
+        f"{adapter.config.provider_family}:legacy-env"
+        if adapter.config.secret_ref_name
+        else f"{adapter.config.provider_family}:no-credential"
+    )
+    auth_kind = "api-key" if adapter.config.secret_ref_name else "marker"
+    return {
+        "auth_profile_id": legacy_id,
+        "auth_kind": auth_kind,
+        "auth_identity_hash": _auth_identity_hash(
+            adapter.config.provider_family,
+            legacy_id,
+            auth_kind,
+            adapter.config.secret_ref_name,
+        ),
+    }
+
+
+def _receipt_auth_profile(adapter: ProviderRuntimeAdapter) -> AuthProfile | None:
+    profile_id = adapter.config.last_auth_profile_id or adapter.config.auth_profile_id
+    if not profile_id:
+        return None
+    try:
+        return AuthProfileStore.from_env().get(profile_id)
+    except AuthProfileNotFoundError:
+        return None
+
+
+def _auth_identity_basis(metadata: dict[str, Any]) -> str:
+    for key in ("identity", "account", "email", "env_var", "ref", "source"):
+        value = metadata.get(key)
+        if isinstance(value, str) and value:
+            return f"{key}:{value}"
+    return ""
+
+
+def _auth_identity_hash(
+    family: str,
+    profile_id: str,
+    kind: str,
+    basis: str,
+) -> str:
+    payload = json.dumps(
+        {
+            "family": family,
+            "profile_id": profile_id,
+            "kind": kind,
+            "basis": basis,
+        },
+        sort_keys=True,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def _receipt_operator_metadata(request: ProviderRuntimeRequest) -> dict[str, Any]:

@@ -38,6 +38,26 @@ def test_contract_fixtures_pin_schema_version(fixtures: dict[str, dict[str, Any]
         assert payload["version"] == SCHEMA_VERSION
 
 
+def test_capability_receipt_auth_fields_round_trip(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.capability_receipt"])
+    payload.update(
+        {
+            "auth_profile_id": "openai:work",
+            "auth_kind": "api-key",
+            "auth_identity_hash": "a" * 64,
+        }
+    )
+
+    parsed = CONTRACT_REGISTRY["craik.capability_receipt"].model_validate(payload)
+    dumped = parsed.model_dump(mode="json", by_alias=True)
+
+    assert dumped["auth_profile_id"] == "openai:work"
+    assert dumped["auth_kind"] == "api-key"
+    assert dumped["auth_identity_hash"] == "a" * 64
+
+
 def test_runner_contract_models_keep_legacy_import_surface() -> None:
     from craik.contracts import models
     from craik.contracts.runner_models import RunnerMetadata
