@@ -1,7 +1,18 @@
+from datetime import UTC, datetime
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
 from craik.contracts.models import ModelProvider
+from craik.runtime.auth import (
+    AuthProfile,
+    AuthProfileStore,
+    CredentialKind,
+    CredentialPool,
+    CredentialPoolConfig,
+    CredentialPoolEntry,
+)
 from craik.runtime.providers.model_providers import default_model_provider_registry
 from craik.runtime.providers.provider_runtime import (
     ANTHROPIC_OFFICIAL_DOCS,
@@ -17,6 +28,7 @@ from craik.runtime.providers.provider_runtime import (
     adapter_for_provider,
     provider_runtime_receipt,
 )
+from craik.runtime.providers.provider_runtime_support import _provider_headers
 from craik.runtime.providers.provider_transport import (
     FixtureTransport,
     ProviderFamily,
@@ -480,6 +492,19 @@ def test_provider_runtime_rejects_raw_secret_config_and_missing_docs() -> None:
             secret_ref_name="sk-raw-secret",
             docs_refs=list(OPENAI_OFFICIAL_DOCS),
         )
+
+
+def test_provider_runtime_rejects_profile_and_pool_together() -> None:
+    with pytest.raises(ValidationError, match="mutually exclusive"):
+        ProviderRuntimeConfig(
+            provider_id="provider_openai",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="OPENAI_API_KEY",
+            auth_profile_id="openai:work",
+            credential_pool_id="openai:default",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
     with pytest.raises(ValidationError, match="missing official refs"):
         ProviderRuntimeConfig(
             provider_id="provider_openai",
@@ -508,6 +533,69 @@ def test_provider_runtime_config_resolves_secret_reference(
     monkeypatch.setenv("CRAIK_OPENAI_API_KEY", "resolved-secret")
 
     assert _openai_adapter().config.resolve_secret(SecretResolver()) == "resolved-secret"
+
+
+def test_provider_headers_resolve_auth_profile(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "profile-secret")
+    AuthProfileStore(tmp_path).put(
+        AuthProfile(
+            id="openai:work",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_API_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    config = ProviderRuntimeConfig(
+        provider_id="provider_openai",
+        provider_family="openai",
+        model="gpt-5.2",
+        secret_ref_name="",
+        auth_profile_id="openai:work",
+        docs_refs=list(OPENAI_OFFICIAL_DOCS),
+    )
+
+    assert _provider_headers(config) == {"Authorization": "Bearer profile-secret"}
+    assert config.last_auth_profile_id == "openai:work"
+
+
+def test_provider_headers_resolve_credential_pool(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "pool-secret")
+    AuthProfileStore(tmp_path).put(
+        AuthProfile(
+            id="openai:pool",
+            kind=CredentialKind.API_KEY,
+            provider_family="openai",
+            metadata={"env_var": "OPENAI_API_KEY"},
+            created_at=datetime(2026, 5, 17, tzinfo=UTC),
+        )
+    )
+    CredentialPool(tmp_path).put(
+        CredentialPoolConfig(
+            id="openai:default",
+            provider_family="openai",
+            profiles=[CredentialPoolEntry(profile_id="openai:pool")],
+        )
+    )
+    config = ProviderRuntimeConfig(
+        provider_id="provider_openai",
+        provider_family="openai",
+        model="gpt-5.2",
+        secret_ref_name="",
+        credential_pool_id="openai:default",
+        docs_refs=list(OPENAI_OFFICIAL_DOCS),
+    )
+
+    assert _provider_headers(config) == {"Authorization": "Bearer pool-secret"}
+    assert config.last_auth_profile_id == "openai:pool"
 
 
 def test_provider_runtime_receipt_keeps_safe_metadata_and_drops_payload_and_secret_ref() -> None:

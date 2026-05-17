@@ -6,6 +6,8 @@ import time
 from collections.abc import Callable
 from typing import Any
 
+from craik.runtime.auth import CredentialPool
+from craik.runtime.auth.pool import PoolOutcome
 from craik.runtime.providers.provider_models import (
     ProviderRuntimeAdapter,
     ProviderRuntimeError,
@@ -30,14 +32,17 @@ def execute_provider_request(
     attempt = 0
     while True:
         try:
-            return _send_provider_request(
+            result = _send_provider_request(
                 adapter,
                 request,
                 payload,
                 chunk_normalizer=chunk_normalizer,
                 stream_callback=stream_callback,
             )
+            _report_pool_outcome(adapter, "success")
+            return result
         except ProviderTransportError as error:
+            _report_pool_outcome(adapter, _pool_outcome_for_error(error))
             if (
                 not _retryable_transport_error(adapter, error)
                 or attempt >= adapter.config.max_retries
@@ -45,6 +50,21 @@ def execute_provider_request(
                 raise
             attempt += 1
             _sleep_before_retry(adapter, error)
+
+
+def _report_pool_outcome(adapter: ProviderRuntimeAdapter, outcome: PoolOutcome) -> None:
+    if not adapter.config.credential_pool_id or not adapter.config.last_auth_profile_id:
+        return
+
+    CredentialPool.from_env().report(adapter.config.last_auth_profile_id, outcome)
+
+
+def _pool_outcome_for_error(error: ProviderTransportError) -> PoolOutcome:
+    if error.status_code == 429:
+        return "rate_limited"
+    if error.status_code in {401, 403}:
+        return "rejected"
+    return "failed"
 
 
 def _send_provider_request(

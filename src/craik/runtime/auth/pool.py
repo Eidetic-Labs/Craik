@@ -95,10 +95,27 @@ class CredentialPool:
         with self._locked():
             pools = self._read_unlocked()
             pool = _pool_for(pools, family=family, purpose=purpose)
-            entry, updated = _select_entry(pool)
-            pools[updated.id] = updated
-            self._write_unlocked(pools)
-            return self.profile_store.get(entry.profile_id)
+            return self._select_from_pool_unlocked(pools, pool)
+
+    def select_from_pool(self, pool_id: str) -> AuthProfile:
+        """Select the next healthy profile from a specific pool."""
+        with self._locked():
+            pools = self._read_unlocked()
+            try:
+                pool = pools[pool_id]
+            except KeyError as exc:
+                raise CredentialPoolError(f"credential pool not found: {pool_id}") from exc
+            return self._select_from_pool_unlocked(pools, pool)
+
+    def _select_from_pool_unlocked(
+        self,
+        pools: dict[str, CredentialPoolConfig],
+        pool: CredentialPoolConfig,
+    ) -> AuthProfile:
+        entry, updated = _select_entry(pool)
+        pools[updated.id] = updated
+        self._write_unlocked(pools)
+        return self.profile_store.get(entry.profile_id)
 
     def report(self, profile_id: str, outcome: PoolOutcome) -> None:
         """Record a credential selection outcome and update health."""
