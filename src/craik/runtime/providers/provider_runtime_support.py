@@ -119,7 +119,12 @@ def provider_runtime_receipt(
             "secret_ref_name": adapter.config.secret_ref_name,
         },
     )
-    return receipt.model_copy(update=_receipt_auth_fields(adapter))
+    return receipt.model_copy(
+        update={
+            **_receipt_auth_fields(adapter),
+            **_receipt_operator_fields(request),
+        }
+    )
 
 
 def _receipt_auth_fields(adapter: ProviderRuntimeAdapter) -> dict[str, str]:
@@ -210,6 +215,19 @@ def _receipt_operator_metadata(request: ProviderRuntimeRequest) -> dict[str, Any
         "operator_issuer": metadata.get("operator_issuer"),
         "operator_email": metadata.get("operator_email"),
         "operator_groups": metadata.get("operator_groups", []),
+    }
+
+
+def _receipt_operator_fields(request: ProviderRuntimeRequest) -> dict[str, Any]:
+    metadata = _receipt_operator_metadata(request)
+    if not metadata:
+        return {}
+    groups = metadata.get("operator_groups", [])
+    return {
+        "operator_subject": metadata.get("operator_subject"),
+        "operator_issuer": metadata.get("operator_issuer"),
+        "operator_email": metadata.get("operator_email"),
+        "operator_groups": groups if isinstance(groups, list) else [],
     }
 
 

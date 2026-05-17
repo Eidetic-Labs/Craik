@@ -192,6 +192,10 @@ class CapabilityReceipt(CraikModel):
     auth_profile_id: str | None = None
     auth_kind: str | None = None
     auth_identity_hash: str | None = None
+    operator_subject: str | None = None
+    operator_issuer: str | None = None
+    operator_email: str | None = None
+    operator_groups: list[str] = Field(default_factory=list)
     created_at: datetime
 
 

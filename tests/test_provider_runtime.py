@@ -762,6 +762,10 @@ def test_provider_request_binds_active_operator_identity(
 
     assert request.metadata["operator_subject"] == "operator-123"
     assert request.metadata["operator_issuer"] == "https://issuer.example.test"
+    assert receipt.operator_subject == "operator-123"
+    assert receipt.operator_issuer == "https://issuer.example.test"
+    assert receipt.operator_email == "operator@example.test"
+    assert receipt.operator_groups == ["platform"]
     assert receipt.result.metadata["operator_subject"] == "operator-123"
     assert receipt.result.metadata["operator_groups"] == ["platform"]
 
