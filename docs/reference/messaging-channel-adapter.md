@@ -13,12 +13,12 @@ service. It defines the normalized behavior future messaging adapters must keep:
 ## Setup
 
 No provider setup is required. Runtime callers use
-`craik.runtime.messaging_channel` to build the default
+`craik.runtime.channels.messaging` to build the default
 `craik.channel_adapter_contract`, normalize a message, and produce a
 `craik.capability_receipt`.
 
 ```python
-from craik.runtime.messaging_channel import (
+from craik.runtime.channels.messaging import (
     default_messaging_channel_contract,
     inbound_message_receipt,
     normalize_inbound_message,

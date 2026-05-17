@@ -5,11 +5,11 @@ from pydantic import ValidationError
 
 from craik.contracts.models import ChannelAllowlist, ChannelAllowlistRule
 from craik.contracts.registry import schema_model
-from craik.runtime.channel_allowlist import (
+from craik.runtime.channels.allowlist import (
     allowlist_denial_receipt,
     evaluate_channel_allowlist,
 )
-from craik.runtime.messaging_channel import normalize_inbound_message
+from craik.runtime.channels.messaging import normalize_inbound_message
 
 NOW = datetime(2026, 5, 16, 18, 55, tzinfo=UTC)
 

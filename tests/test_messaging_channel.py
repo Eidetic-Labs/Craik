@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from craik.runtime.messaging_channel import (
+from craik.runtime.channels.messaging import (
     MESSAGE_RECEIVE_CAPABILITY,
     MESSAGE_RESPOND_CAPABILITY,
     default_messaging_channel_contract,

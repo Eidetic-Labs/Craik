@@ -13,8 +13,8 @@ from craik.contracts.models import (
     PolicyProfile,
     ReceiptResult,
 )
-from craik.runtime.channel_allowlist import ChannelAllowlistDecision
-from craik.runtime.channel_identity import allows_privileged_ingress
+from craik.runtime.channels.allowlist import ChannelAllowlistDecision
+from craik.runtime.channels.identity import allows_privileged_ingress
 
 DEFAULT_CHANNEL_ALLOWED_CAPABILITIES = [
     "channel.message.receive",
