@@ -1,7 +1,7 @@
 # Installation
 
-Craik is not published to PyPI yet. During pre-0.1.0 development, install it from
-a local checkout:
+Craik is not published to PyPI yet. During `0.x.0` MVP development, install it
+from a local checkout:
 
 ```sh
 python3.12 -m pip install -e ".[dev]"

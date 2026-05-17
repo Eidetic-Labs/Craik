@@ -33,10 +33,10 @@ updates or proposals with evidence.
 
 Tracking issue: [#298](https://github.com/Eidetic-Labs/Craik/issues/298).
 
-- [ ] Replace stale `pre-0.1.0` language in public docs.
-- [ ] State that the first release is `0.x.0`.
-- [ ] Add a surface status matrix.
-- [ ] Convert the post-v0.13 readiness list into MVP and post-MVP buckets.
+- [x] Replace stale `pre-0.1.0` language in public docs.
+- [x] State that the first release is `0.x.0`.
+- [x] Add a surface status matrix.
+- [x] Convert the post-v0.13 readiness list into MVP and post-MVP buckets.
 
 ### 1. Docusaurus Docs Platform
 
@@ -53,12 +53,12 @@ Tracking issue: [#299](https://github.com/Eidetic-Labs/Craik/issues/299).
 
 Tracking issue: [#297](https://github.com/Eidetic-Labs/Craik/issues/297).
 
-- [ ] Define `0.x.0` release cadence and tag policy.
-- [ ] Add version consistency checks.
-- [ ] Add package build verification.
-- [ ] Add PyPI publish workflow with protected environment.
-- [ ] Add changelog and release note workflow.
-- [ ] Add security release process.
+- [x] Define `0.x.0` release cadence and tag policy.
+- [x] Add version consistency checks.
+- [x] Add package build verification.
+- [x] Add PyPI publish workflow with protected environment.
+- [x] Add changelog and release note workflow.
+- [x] Add security release process.
 
 ### 3. CI/CD Parity With Stigmem
 
