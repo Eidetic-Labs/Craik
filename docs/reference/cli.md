@@ -42,6 +42,11 @@ Options:
 - `--credentials-path`: Local CLI credentials file path.
 - `--refresh-endpoint`: OAuth refresh endpoint for local CLI tokens.
 - `--client-id`: OAuth client id for refresh requests.
+- `--ref`: Secret reference for secret-ref profiles.
+- `--manager`: Secret manager for secret-ref profiles.
+- `--secrets-root`: Root directory for file secret references.
+- `--base-url`: Provider base URL for this profile.
+- `--allow-local-base-url`: Allow loopback HTTP provider URLs.; default `false`
 
 ## `craik auth approve`
 
