@@ -84,6 +84,7 @@ def write_policy_file(
     immutable_override: dict[str, str] | None = None,
 ) -> SideEffectResult:
     """Authorize and write one repository-relative file."""
+    path = _safe_repo_path(repo_root, relative_path)
     decision = check_file_write_grant(
         policy=policy,
         grants=grants,
@@ -94,7 +95,6 @@ def write_policy_file(
     denied = _persist_denial(store=store, policy=policy, decision=decision, actor=actor)
     if denied is not None:
         return SideEffectResult(kind="file_write", allowed=False, receipt=denied)
-    path = _safe_repo_path(repo_root, relative_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(str(redact(content).value))
     receipt = _passed_receipt(
