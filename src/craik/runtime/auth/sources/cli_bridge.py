@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import json
 import subprocess
+import threading
+import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, BinaryIO, Literal
 
 from craik.runtime.auth.profile import CredentialStatus
 from craik.runtime.providers.provider_transport import ProviderFamily
 
 TokenExtractor = Literal["stdout_json", "stdout_line", "credentials_file"]
+MAX_CLI_BRIDGE_OUTPUT_BYTES = 1024 * 1024
+CLI_BRIDGE_READ_CHUNK_BYTES = 16 * 1024
 
 
 class CLIBridgeCredentialError(RuntimeError):
@@ -73,20 +77,60 @@ class CLIBridgeCredentialSource:
         if not self.command:
             raise CLIBridgeCredentialError("CLI bridge command is empty")
         try:
-            result = subprocess.run(
+            process = subprocess.Popen(
                 list(self.command),
-                capture_output=True,
-                check=False,
-                text=True,
-                timeout=self.timeout_seconds,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=False,
             )
-        except subprocess.TimeoutExpired as exc:
-            raise CLIBridgeCredentialError("CLI bridge command timed out") from exc
         except OSError as exc:
             raise CLIBridgeCredentialError("CLI bridge command could not be executed") from exc
-        if result.returncode != 0:
+        if process.stdout is None:
+            process.kill()
+            raise CLIBridgeCredentialError("CLI bridge command could not be executed")
+
+        stdout = bytearray()
+        overflow = threading.Event()
+        reader = threading.Thread(
+            target=_read_bounded_stdout,
+            args=(process.stdout, stdout, overflow),
+            daemon=True,
+        )
+        reader.start()
+        deadline = time.monotonic() + self.timeout_seconds
+        while process.poll() is None:
+            if overflow.is_set():
+                process.kill()
+                process.wait()
+                reader.join(timeout=1)
+                raise CLIBridgeCredentialError("CLI bridge command produced too much output")
+            if time.monotonic() >= deadline:
+                process.kill()
+                process.wait()
+                reader.join(timeout=1)
+                raise CLIBridgeCredentialError("CLI bridge command timed out")
+            time.sleep(0.01)
+        reader.join(timeout=1)
+        if overflow.is_set():
+            raise CLIBridgeCredentialError("CLI bridge command produced too much output")
+        if process.returncode != 0:
             raise CLIBridgeCredentialError("CLI bridge command failed")
-        return result.stdout
+        return bytes(stdout).decode("utf-8", errors="replace")
+
+
+def _read_bounded_stdout(
+    pipe: BinaryIO,
+    stdout: bytearray,
+    overflow: threading.Event,
+) -> None:
+    while True:
+        chunk = pipe.read(CLI_BRIDGE_READ_CHUNK_BYTES)
+        if not chunk:
+            return
+        if len(stdout) + len(chunk) > MAX_CLI_BRIDGE_OUTPUT_BYTES:
+            overflow.set()
+            return
+        stdout.extend(chunk)
 
 
 def _json_file(path: Path) -> dict[str, Any]:
