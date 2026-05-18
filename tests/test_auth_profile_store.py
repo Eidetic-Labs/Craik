@@ -112,14 +112,14 @@ def test_auth_profile_store_writes_owner_only_file_on_posix(tmp_path: Path) -> N
 
 def test_auth_profile_store_concurrent_writes_do_not_corrupt_file(tmp_path: Path) -> None:
     barrier = threading.Barrier(2)
-    errors: list[BaseException] = []
+    errors: list[Exception] = []
 
     def write_profile(profile_id: str) -> None:
         try:
             store = AuthProfileStore(tmp_path)
             barrier.wait(timeout=5)
             store.put(_profile(profile_id))
-        except BaseException as exc:  # pragma: no cover - assertion reports thread errors
+        except Exception as exc:  # pragma: no cover - assertion reports thread errors
             errors.append(exc)
 
     threads = [
