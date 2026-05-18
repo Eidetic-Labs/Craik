@@ -31,6 +31,7 @@ def test_github_actions_workload_identity_requests_audience_token() -> None:
                 "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "request-token",
             },
             timeout_seconds=1,
+            allow_loopback_http=True,
         )
 
         token = provider.get_token("craik-broker")
@@ -60,6 +61,7 @@ def test_github_actions_workload_identity_fails_outside_actions() -> None:
 def test_generic_file_token_identity_refreshes_before_expiry(tmp_path: Path) -> None:
     token_path = tmp_path / "token"
     token_path.write_text("token-1\n", encoding="utf-8")
+    token_path.chmod(0o600)
     provider = GenericFileTokenIdentity(
         path=token_path,
         ttl_seconds=1,
@@ -68,12 +70,14 @@ def test_generic_file_token_identity_refreshes_before_expiry(tmp_path: Path) -> 
 
     assert provider.get_token("audience") == "token-1"
     token_path.write_text("token-2\n", encoding="utf-8")
+    token_path.chmod(0o600)
     assert provider.get_token("audience") == "token-2"
 
 
 def test_kubernetes_projected_token_identity_reads_configured_path(tmp_path: Path) -> None:
     token_path = tmp_path / "kubernetes-token"
     token_path.write_text("kubernetes-token\n", encoding="utf-8")
+    token_path.chmod(0o600)
 
     token = KubernetesProjectedTokenIdentity(path=token_path).get_token("cluster-audience")
 

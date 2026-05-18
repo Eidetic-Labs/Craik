@@ -127,7 +127,7 @@ def _stub_idp(*, jwks: dict[str, Any] | None = None) -> Iterator[_StubIdP]:
 def test_device_code_flow_returns_operator_session() -> None:
     with _stub_idp() as idp:
         authenticator = OIDCAuthenticator(
-            OIDCConfig(issuer=idp.issuer, client_id="craik-cli"),
+            OIDCConfig(issuer=idp.issuer, client_id="craik-cli", oidc_allow_loopback_http=True),
             timeout_seconds=1,
         )
 
@@ -152,7 +152,7 @@ def test_device_code_flow_returns_operator_session() -> None:
 def test_loopback_pkce_flow_exchanges_authorization_code() -> None:
     with _stub_idp() as idp:
         authenticator = OIDCAuthenticator(
-            OIDCConfig(issuer=idp.issuer, client_id="craik-cli"),
+            OIDCConfig(issuer=idp.issuer, client_id="craik-cli", oidc_allow_loopback_http=True),
             timeout_seconds=1,
         )
 
@@ -180,7 +180,13 @@ def test_loopback_pkce_flow_exchanges_authorization_code() -> None:
 
 def test_tampered_id_token_is_rejected() -> None:
     with _stub_idp() as idp:
-        authenticator = OIDCAuthenticator(OIDCConfig(issuer=idp.issuer, client_id="craik-cli"))
+        authenticator = OIDCAuthenticator(
+            OIDCConfig(
+                issuer=idp.issuer,
+                client_id="craik-cli",
+                oidc_allow_loopback_http=True,
+            )
+        )
         token = idp.token()
         header, _claims, signature = token.split(".")
         tampered_claims = {
@@ -198,7 +204,13 @@ def test_tampered_id_token_is_rejected() -> None:
 
 def test_alg_none_id_token_is_rejected() -> None:
     with _stub_idp() as idp:
-        authenticator = OIDCAuthenticator(OIDCConfig(issuer=idp.issuer, client_id="craik-cli"))
+        authenticator = OIDCAuthenticator(
+            OIDCConfig(
+                issuer=idp.issuer,
+                client_id="craik-cli",
+                oidc_allow_loopback_http=True,
+            )
+        )
         claims = {
             "iss": idp.issuer,
             "aud": "craik-cli",
@@ -216,7 +228,13 @@ def test_alg_none_id_token_is_rejected() -> None:
 
 def test_unknown_kid_is_rejected() -> None:
     with _stub_idp() as idp:
-        authenticator = OIDCAuthenticator(OIDCConfig(issuer=idp.issuer, client_id="craik-cli"))
+        authenticator = OIDCAuthenticator(
+            OIDCConfig(
+                issuer=idp.issuer,
+                client_id="craik-cli",
+                oidc_allow_loopback_http=True,
+            )
+        )
         token = _signed_jwt(
             {"alg": "HS256", "kid": "unknown", "typ": "JWT"},
             {
@@ -236,7 +254,13 @@ def test_unknown_kid_is_rejected() -> None:
 def test_hs_token_with_asymmetric_jwks_key_is_rejected() -> None:
     rsa_jwks = {"keys": [{"kty": "RSA", "kid": "test-key", "n": "sXch", "e": "AQAB"}]}
     with _stub_idp(jwks=rsa_jwks) as idp:
-        authenticator = OIDCAuthenticator(OIDCConfig(issuer=idp.issuer, client_id="craik-cli"))
+        authenticator = OIDCAuthenticator(
+            OIDCConfig(
+                issuer=idp.issuer,
+                client_id="craik-cli",
+                oidc_allow_loopback_http=True,
+            )
+        )
         token = idp.token()
 
         with pytest.raises(OIDCAuthenticationError, match="incompatible"):
