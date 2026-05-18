@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .base import *
 from .core import *
 from .instructions import *
@@ -382,3 +384,6 @@ class ExitDisciplineCheck(CraikModel):
             raise ValueError("blocked exit discipline checks require blocking_reasons")
         return self
 
+
+if not TYPE_CHECKING:
+    __all__ = [name for name in globals() if not name.startswith("_")]
