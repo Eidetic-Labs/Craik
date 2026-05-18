@@ -160,8 +160,11 @@ class OIDCAuthenticator:
         code: str,
         redirect_uri: str,
         code_verifier: str,
+        expected_state: str,
+        received_state: str | None,
     ) -> OperatorSession:
         """Exchange a loopback authorization code for an operator session."""
+        _validate_authorization_state(expected_state, received_state)
         endpoint = self._discovery_endpoint("token_endpoint")
         response = self._post_form(
             endpoint,
@@ -365,6 +368,13 @@ def _verify_signature(
         _verify_rs256(jwk, signing_input, signature)
         return
     raise OIDCAuthenticationError("OIDC ID token uses an unsupported algorithm")
+
+
+def _validate_authorization_state(expected_state: str, received_state: str | None) -> None:
+    if not expected_state or not received_state:
+        raise OIDCAuthenticationError("OIDC authorization state did not match")
+    if not hmac.compare_digest(expected_state, received_state):
+        raise OIDCAuthenticationError("OIDC authorization state did not match")
 
 
 def _verify_rs256(jwk: dict[str, Any], signing_input: bytes, signature: bytes) -> None:

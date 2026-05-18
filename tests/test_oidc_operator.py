@@ -165,6 +165,8 @@ def test_loopback_pkce_flow_exchanges_authorization_code() -> None:
             code="code-1",
             redirect_uri="http://127.0.0.1:8765/callback",
             code_verifier=verifier,
+            expected_state=state,
+            received_state="state-1",
         )
 
     parsed = parse.urlparse(authorization_url)
