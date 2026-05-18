@@ -8,6 +8,7 @@ from typing import Any, Literal
 from pydantic import Field
 
 from craik.contracts.models import CapabilityReceipt, CraikModel, PolicyProfile, ReceiptResult
+from craik.runtime.policy.redaction import redact
 
 EnvironmentReceiptAction = Literal[
     "environment_decision",
@@ -72,7 +73,7 @@ def environment_receipt(
 
 def _target(action: EnvironmentReceiptAction, context: EnvironmentReceiptContext) -> str:
     if context.command_ref:
-        return f"{action}:{context.command_ref}"
+        return f"{action}:{redact(context.command_ref).value}"
     if context.backend_id:
         return f"{action}:{context.backend_id}"
     if context.provider_id:
@@ -86,8 +87,8 @@ def _context_metadata(context: EnvironmentReceiptContext) -> dict[str, Any]:
         "provider_id": context.provider_id,
         "backend_id": context.backend_id,
         "route_id": context.route_id,
-        "target_id": context.target_id,
-        "command_ref": context.command_ref,
+        "target_id": redact(context.target_id).value if context.target_id else None,
+        "command_ref": redact(context.command_ref).value if context.command_ref else None,
         "receipt_ids": context.receipt_ids,
     }
 
@@ -100,7 +101,7 @@ def _redacted_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
             continue
         if any(token in normalized for token in _SECRET_KEY_TOKENS):
             continue
-        redacted[key] = value
+        redacted[key] = redact(value).value
     return redacted
 
 

@@ -14,6 +14,7 @@ from craik.contracts.models import (
     ProjectProfile,
     RepoProfile,
 )
+from craik.runtime.policy.redaction import redact
 from craik.runtime.store import LocalStore
 
 DEFAULT_DOC_PATH_CANDIDATES = ("README.md", "docs/")
@@ -105,7 +106,7 @@ def detect_git_remote(repo_root: Path) -> str | None:
     """Return origin remote URL when configured."""
     result = _git(repo_root, "config", "--get", "remote.origin.url")
     remote = result.stdout.strip()
-    return remote or None
+    return str(redact(remote).value) if remote else None
 
 
 def detect_default_branch(repo_root: Path) -> str:

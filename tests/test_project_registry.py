@@ -8,6 +8,7 @@ from craik.runtime.projects.project_registry import (
     NotGitRepositoryError,
     ProjectRegistry,
     detect_default_branch,
+    detect_git_remote,
     detect_git_root,
     project_id,
 )
@@ -35,6 +36,19 @@ def test_detect_git_root_from_nested_path(git_repo: Path) -> None:
 
 def test_detect_default_branch(git_repo: Path) -> None:
     assert detect_default_branch(git_repo) == "main"
+
+
+def test_detect_git_remote_redacts_embedded_credentials(git_repo: Path) -> None:
+    _run(
+        "git",
+        "remote",
+        "add",
+        "origin",
+        "https://redactionfixture123@github.com/Eidetic-Labs/Craik.git",
+        cwd=git_repo,
+    )
+
+    assert detect_git_remote(git_repo) == "https://[REDACTED]@github.com/Eidetic-Labs/Craik.git"
 
 
 def test_invalid_repo_path_is_rejected(tmp_path: Path) -> None:
@@ -112,4 +126,3 @@ def _run(*args: str, cwd: Path) -> None:
             "GIT_COMMITTER_NAME": "Craik Test",
         },
     )
-
