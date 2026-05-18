@@ -222,15 +222,46 @@ def test_github_write_wrapper_requires_grant_and_redacts_result(store: LocalStor
     assert store.get_receipt(allowed.receipt.id) == allowed.receipt
 
 
+def test_writable_memory_get_proposal_returns_stored_proposal() -> None:
+    memory = _WritableMemory()
+    assert memory.get_proposal("missing") is None
+
+    proposal = MemoryProposal(
+        id="proposal_1",
+        task_id="task_side_effect",
+        operation="add",
+        fact=FactValue(
+            entity="repo:Eidetic-Labs/Craik",
+            relation="craik:test",
+            value="remember this",
+            source="test",
+            confidence=1.0,
+            scope="local",
+            trust_class="observed",
+        ),
+        status="pending",
+    )
+
+    memory.propose(proposal)
+
+    assert memory.get_proposal("proposal_1") == proposal
+    assert memory.list_proposals() == [proposal]
+    assert memory.list_proposals(task_id="task_side_effect", status="pending") == [proposal]
+    assert memory.list_proposals(task_id="other") == []
+    assert memory.list_proposals(status="approved") == []
+
+
 class _WritableMemory:
     def __init__(self) -> None:
         self.facts: list[FactValue] = []
+        self.proposals: dict[str, MemoryProposal] = {}
 
     def propose(self, proposal: MemoryProposal) -> MemoryProposal:
+        self.proposals[proposal.id] = proposal
         return proposal
 
     def get_proposal(self, proposal_id: str) -> MemoryProposal | None:
-        return None
+        return self.proposals.get(proposal_id)
 
     def list_proposals(
         self,
@@ -238,7 +269,12 @@ class _WritableMemory:
         task_id: str | None = None,
         status: str | None = None,
     ) -> list[MemoryProposal]:
-        return []
+        proposals = list(self.proposals.values())
+        if task_id is not None:
+            proposals = [proposal for proposal in proposals if proposal.task_id == task_id]
+        if status is not None:
+            proposals = [proposal for proposal in proposals if proposal.status == status]
+        return proposals
 
     def approve(self, proposal_id: str, *, decided_by: str, reason: str) -> MemoryProposal:
         raise NotImplementedError
