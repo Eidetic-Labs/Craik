@@ -8,6 +8,7 @@ import hmac
 import json
 import secrets
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -16,6 +17,7 @@ from urllib import error, parse, request
 from pydantic import Field, model_validator
 
 from craik.contracts.models import CraikModel
+from craik.runtime.auth.operator.cache_control import cache_control_ttl_seconds
 from craik.runtime.auth.operator.session import OperatorSession
 from craik.runtime.auth.url_safety import require_https_url
 
@@ -272,12 +274,15 @@ class OIDCAuthenticator:
         now = time.monotonic()
         if self._jwks is not None and now < self._jwks_expires_at:
             return self._jwks
-        payload = self._get_json(self._discovery_endpoint("jwks_uri"))
+        payload, headers = self._get_json_with_headers(self._discovery_endpoint("jwks_uri"))
         keys = payload.get("keys")
         if not isinstance(keys, list):
             raise OIDCAuthenticationError("OIDC JWKS did not contain keys")
         self._jwks = payload
-        self._jwks_expires_at = now + self.discovery_ttl_seconds
+        self._jwks_expires_at = now + cache_control_ttl_seconds(
+            headers,
+            self.discovery_ttl_seconds,
+        )
         return payload
 
     def _validate_claims(self, claims: dict[str, Any]) -> None:
@@ -316,10 +321,14 @@ class OIDCAuthenticator:
         )
 
     def _get_json(self, url: str) -> dict[str, Any]:
+        payload, _headers = self._get_json_with_headers(url)
+        return payload
+
+    def _get_json_with_headers(self, url: str) -> tuple[dict[str, Any], Mapping[str, str]]:
         http_request = request.Request(url, method="GET")
         try:
             with request.urlopen(http_request, timeout=self.timeout_seconds) as response:
-                return _json_response(response.read())
+                return _json_response(response.read()), response.headers
         except (TimeoutError, error.URLError) as exc:
             raise OIDCAuthenticationError("OIDC endpoint request failed") from exc
 
