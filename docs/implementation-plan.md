@@ -588,7 +588,7 @@ Acceptance criteria:
 
 Target scenario:
 
-1. Register `Eidetic-Labs/stigmem` as the first demo project.
+1. Register `eidetic-labs/stigmem` as the first demo project.
 2. Connect to local Stigmem.
 3. Create a docs reconciliation task.
 4. Build a case file from repo docs, ADRs, facts, and GitHub state.
@@ -620,7 +620,7 @@ These should be decided before coding starts, but they should not block the plan
 ## Decided Project Defaults
 
 - License: MIT.
-- Public repository: `Eidetic-Labs/Craik`.
+- Public repository: `eidetic-labs/craik`.
 - Product framing: durable agent runtime.
 - Reference memory substrate: Stigmem.
 - Minimum Stigmem compatibility: health, well-known metadata, authenticated fact read/write/query, fact provenance, scopes, confidence, and source fields.

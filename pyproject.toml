@@ -48,8 +48,8 @@ dev = [
 craik = "craik.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Eidetic-Labs/Craik"
-Issues = "https://github.com/Eidetic-Labs/Craik/issues"
+Homepage = "https://github.com/eidetic-labs/craik"
+Issues = "https://github.com/eidetic-labs/craik/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/craik"]

@@ -139,7 +139,7 @@ class PolicyTestHarness:
         )
         proposal = create_proposal(
             task_id="task_policy_test",
-            entity="repo:Eidetic-Labs/Craik",
+            entity="repo:eidetic-labs/craik",
             relation="craik:policy_test",
             value="Memory updates are proposed before durable write.",
             source="policy-test",
@@ -152,7 +152,7 @@ class PolicyTestHarness:
         try:
             LocalMemoryStore(self.store).write_fact(
                 FactValue(
-                    entity="repo:Eidetic-Labs/Craik",
+                    entity="repo:eidetic-labs/craik",
                     relation="craik:policy_test",
                     value="Direct local write should be denied.",
                     source="policy-test",

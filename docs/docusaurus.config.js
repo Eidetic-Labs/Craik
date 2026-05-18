@@ -92,7 +92,7 @@ const config = {
         { type: 'docSidebar', sidebarId: 'operateSidebar', label: 'Operate', position: 'left' },
         { type: 'docSidebar', sidebarId: 'secureSidebar', label: 'Secure', position: 'left' },
         {
-          href: 'https://github.com/Eidetic-Labs/Craik',
+          href: 'https://github.com/eidetic-labs/craik',
           label: 'GitHub',
           position: 'right',
         },

@@ -34,7 +34,7 @@ def test_capture_step_result_persists_redacted_output_and_proposal(
         step,
         proposal_specs=[
             RunOutputProposalSpec(
-                entity="repo:Eidetic-Labs/Craik",
+                entity="repo:eidetic-labs/craik",
                 relation="craik:run_output",
                 value="Local state is available.",
                 handoff_id="handoff_docs_reconcile",
@@ -64,7 +64,7 @@ def test_blocked_step_persists_output_but_skips_proposals(store: LocalStore) -> 
         step,
         proposal_specs=[
             RunOutputProposalSpec(
-                entity="repo:Eidetic-Labs/Craik",
+                entity="repo:eidetic-labs/craik",
                 relation="craik:run_output",
             )
         ],

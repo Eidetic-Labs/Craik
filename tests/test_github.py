@@ -33,16 +33,16 @@ def store(tmp_path: Path):
 
 
 def test_parse_github_remote_supports_common_remote_shapes() -> None:
-    assert parse_github_remote("https://github.com/Eidetic-Labs/Craik.git").full_name == (
-        "Eidetic-Labs/Craik"
+    assert parse_github_remote("https://github.com/eidetic-labs/craik.git").full_name == (
+        "eidetic-labs/craik"
     )
-    assert parse_github_remote("git@github.com:Eidetic-Labs/Craik.git").full_name == (
-        "Eidetic-Labs/Craik"
+    assert parse_github_remote("git@github.com:eidetic-labs/craik.git").full_name == (
+        "eidetic-labs/craik"
     )
-    assert parse_github_remote("ssh://git@github.com/Eidetic-Labs/Craik.git").full_name == (
-        "Eidetic-Labs/Craik"
+    assert parse_github_remote("ssh://git@github.com/eidetic-labs/craik.git").full_name == (
+        "eidetic-labs/craik"
     )
-    assert parse_github_remote("https://example.com/Eidetic-Labs/Craik.git") is None
+    assert parse_github_remote("https://example.com/eidetic-labs/craik.git") is None
 
 
 def test_github_read_adapter_loads_repo_issues_pr_files_and_status() -> None:
@@ -52,13 +52,13 @@ def test_github_read_adapter_loads_repo_issues_pr_files_and_status() -> None:
         )
 
         state = adapter.case_file_state(
-            remote="https://github.com/Eidetic-Labs/Craik.git",
+            remote="https://github.com/eidetic-labs/craik.git",
             ref="abc123",
         )
 
     assert state["status"] == "loaded"
     assert state["authenticated"] is True
-    assert state["metadata"]["full_name"] == "Eidetic-Labs/Craik"
+    assert state["metadata"]["full_name"] == "eidetic-labs/craik"
     assert state["issues"][0]["number"] == 16
     assert state["pull_requests"][0]["changed_files"] == ["src/craik/runtime/github.py"]
     assert state["check_status"] == {"state": "success", "total_count": 2}
@@ -69,7 +69,7 @@ def test_github_adapter_handles_missing_auth() -> None:
         client = GitHubClient(GitHubConfig(api_url=api.url))
 
         with pytest.raises(GitHubAuthError, match="authentication failed"):
-            client.repository(parse_github_remote("https://github.com/Eidetic-Labs/Craik.git"))
+            client.repository(parse_github_remote("https://github.com/eidetic-labs/craik.git"))
 
 
 def test_github_adapter_maps_rate_limit_errors() -> None:
@@ -77,7 +77,7 @@ def test_github_adapter_maps_rate_limit_errors() -> None:
         client = GitHubClient(GitHubConfig(api_url=api.url, token="craik-test-not-a-real-token"))
 
         with pytest.raises(GitHubRateLimitError, match="rate limit exceeded"):
-            client.repository(parse_github_remote("https://github.com/Eidetic-Labs/Craik.git"))
+            client.repository(parse_github_remote("https://github.com/eidetic-labs/craik.git"))
 
 
 def test_case_file_includes_loaded_github_state(
@@ -85,7 +85,7 @@ def test_case_file_includes_loaded_github_state(
     store: LocalStore,
 ) -> None:
     repo = _repo(tmp_path)
-    _run_git(repo, "remote", "add", "origin", "https://github.com/Eidetic-Labs/Craik.git")
+    _run_git(repo, "remote", "add", "origin", "https://github.com/eidetic-labs/craik.git")
     project = ProjectRegistry(store).add_project(repo, name="Example")
     task = create_task(
         store,
@@ -102,7 +102,7 @@ def test_case_file_includes_loaded_github_state(
         case_file = CaseFileAssembler(store, github_adapter=adapter).build(task.id)
 
     assert case_file.github_state["status"] == "loaded"
-    assert case_file.github_state["repo"] == "Eidetic-Labs/Craik"
+    assert case_file.github_state["repo"] == "eidetic-labs/craik"
     statements = {assumption.statement for assumption in case_file.assumptions}
     assert "No GitHub issue or pull request state was loaded into this case file." not in statements
 
@@ -162,24 +162,24 @@ class _github_api:
                     self._json({"message": "bad credentials"}, status=401)
                     return
                 path = self.path.split("?", 1)[0]
-                if path == "/repos/Eidetic-Labs/Craik":
+                if path == "/repos/eidetic-labs/craik":
                     self._json(
                         {
-                            "full_name": "Eidetic-Labs/Craik",
+                            "full_name": "eidetic-labs/craik",
                             "default_branch": "main",
                             "private": True,
                             "open_issues_count": 3,
                         }
                     )
                     return
-                if path == "/repos/Eidetic-Labs/Craik/issues":
+                if path == "/repos/eidetic-labs/craik/issues":
                     self._json(
                         [
                             {
                                 "number": 16,
                                 "title": "Implement GitHub read adapter",
                                 "state": "open",
-                                "html_url": "https://github.com/Eidetic-Labs/Craik/issues/16",
+                                "html_url": "https://github.com/eidetic-labs/craik/issues/16",
                                 "updated_at": "2026-05-15T22:11:50Z",
                             },
                             {
@@ -191,24 +191,24 @@ class _github_api:
                         ]
                     )
                     return
-                if path == "/repos/Eidetic-Labs/Craik/pulls":
+                if path == "/repos/eidetic-labs/craik/pulls":
                     self._json(
                         [
                             {
                                 "number": 37,
                                 "title": "feat: add memory diff previews",
                                 "state": "open",
-                                "html_url": "https://github.com/Eidetic-Labs/Craik/pull/37",
+                                "html_url": "https://github.com/eidetic-labs/craik/pull/37",
                                 "head": {"ref": "issue-15-memory-diff-preview"},
                                 "base": {"ref": "main"},
                             }
                         ]
                     )
                     return
-                if path == "/repos/Eidetic-Labs/Craik/pulls/37/files":
+                if path == "/repos/eidetic-labs/craik/pulls/37/files":
                     self._json([{"filename": "src/craik/runtime/github.py"}])
                     return
-                if path.startswith("/repos/Eidetic-Labs/Craik/commits/") and path.endswith(
+                if path.startswith("/repos/eidetic-labs/craik/commits/") and path.endswith(
                     "/status"
                 ):
                     self._json({"state": "success", "total_count": 2})

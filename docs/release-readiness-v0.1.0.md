@@ -12,11 +12,11 @@ process when the maintainer is ready.
 ## Code Health
 
 - ✅ CI on `main` is green. The latest `ci.yml` run on `main` completed with
-  `success`: [run 26010629626](https://github.com/Eidetic-Labs/Craik/actions/runs/26010629626).
+  `success`: [run 26010629626](https://github.com/eidetic-labs/craik/actions/runs/26010629626).
 - ✅ CodeQL is green. The latest `codeql.yml` run on `main` completed with
-  `success`: [run 26010629612](https://github.com/Eidetic-Labs/Craik/actions/runs/26010629612).
+  `success`: [run 26010629612](https://github.com/eidetic-labs/craik/actions/runs/26010629612).
 - ✅ Code scanning has zero open alerts:
-  `gh api repos/Eidetic-Labs/Craik/code-scanning/alerts`.
+  `gh api repos/eidetic-labs/craik/code-scanning/alerts`.
 - ✅ Version is consistent:
   `uv run python scripts/check_release_version.py`.
 - ✅ File-size budget is enforced:

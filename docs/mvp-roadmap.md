@@ -32,7 +32,7 @@ produce a handoff, and leave memory updates or proposals with evidence.
 
 ### 0. Roadmap Reset And Status Truth
 
-Tracking issue: [#298](https://github.com/Eidetic-Labs/Craik/issues/298).
+Tracking issue: [#298](https://github.com/eidetic-labs/craik/issues/298).
 
 - [x] Replace stale `pre-0.1.0` language in public docs.
 - [x] State that the first release is `0.x.0`.
@@ -41,7 +41,7 @@ Tracking issue: [#298](https://github.com/Eidetic-Labs/Craik/issues/298).
 
 ### 1. Docusaurus Docs Platform
 
-Tracking issue: [#299](https://github.com/Eidetic-Labs/Craik/issues/299).
+Tracking issue: [#299](https://github.com/eidetic-labs/craik/issues/299).
 
 - [x] Add a Docusaurus site.
 - [x] Mirror Stigmem's `Learn`, `Build`, `Operate`, and `Secure` IA.
@@ -52,7 +52,7 @@ Tracking issue: [#299](https://github.com/Eidetic-Labs/Craik/issues/299).
 
 ### 2. Release And Package Foundation
 
-Tracking issue: [#297](https://github.com/Eidetic-Labs/Craik/issues/297).
+Tracking issue: [#297](https://github.com/eidetic-labs/craik/issues/297).
 
 - [x] Define `0.x.0` release cadence and tag policy.
 - [x] Add version consistency checks.
@@ -63,7 +63,7 @@ Tracking issue: [#297](https://github.com/Eidetic-Labs/Craik/issues/297).
 
 ### 3. CI/CD Parity With Stigmem
 
-Tracking issue: [#300](https://github.com/Eidetic-Labs/Craik/issues/300).
+Tracking issue: [#300](https://github.com/eidetic-labs/craik/issues/300).
 
 - [x] Split CI into path-filtered jobs.
 - [x] Add lint, type, unit, contract, docs, security, and package jobs.
@@ -75,7 +75,7 @@ Tracking issue: [#300](https://github.com/Eidetic-Labs/Craik/issues/300).
 
 ### 4. Persistent State Migrations
 
-Tracking issue: [#303](https://github.com/Eidetic-Labs/Craik/issues/303).
+Tracking issue: [#303](https://github.com/eidetic-labs/craik/issues/303).
 
 - [x] Add local store schema versioning.
 - [x] Add forward migrations.
@@ -85,7 +85,7 @@ Tracking issue: [#303](https://github.com/Eidetic-Labs/Craik/issues/303).
 
 ### 5. Provider Runtime: OpenAI And Anthropic
 
-Tracking issue: [#304](https://github.com/Eidetic-Labs/Craik/issues/304).
+Tracking issue: [#304](https://github.com/eidetic-labs/craik/issues/304).
 
 - [x] Add provider abstraction for chat, streaming, tool calls, structured output,
   retries, errors, and usage metadata.
@@ -100,7 +100,7 @@ Tracking issue: [#304](https://github.com/Eidetic-Labs/Craik/issues/304).
 
 ### 5A. Authentication, Credentials, And Operator Identity
 
-Tracking issue: [#464](https://github.com/Eidetic-Labs/Craik/issues/464).
+Tracking issue: [#464](https://github.com/eidetic-labs/craik/issues/464).
 
 - [x] Add OIDC operator login with device-code flow and persisted sessions.
 - [x] Add `craik login`, `craik logout`, and `craik whoami`.
@@ -119,7 +119,7 @@ Tracking issue: [#464](https://github.com/Eidetic-Labs/Craik/issues/464).
 
 ### 6. One Complete MVP Runner Path
 
-Tracking issue: [#302](https://github.com/Eidetic-Labs/Craik/issues/302).
+Tracking issue: [#302](https://github.com/eidetic-labs/craik/issues/302).
 
 - [x] Connect case file assembly to prompt compilation.
 - [x] Execute one provider-backed run loop.
@@ -130,7 +130,7 @@ Tracking issue: [#302](https://github.com/Eidetic-Labs/Craik/issues/302).
 
 ### 7. Policy-Enforced Side Effects
 
-Tracking issue: [#301](https://github.com/Eidetic-Labs/Craik/issues/301).
+Tracking issue: [#301](https://github.com/eidetic-labs/craik/issues/301).
 
 - [x] Add shell execution wrapper with grants and receipts.
 - [x] Add file write wrapper with immutable path protection.
@@ -141,7 +141,7 @@ Tracking issue: [#301](https://github.com/Eidetic-Labs/Craik/issues/301).
 
 ### 8. Stigmem And Memory Hardening
 
-Tracking issue: [#305](https://github.com/Eidetic-Labs/Craik/issues/305).
+Tracking issue: [#305](https://github.com/eidetic-labs/craik/issues/305).
 
 - [x] Load Stigmem facts into case files.
 - [x] Load recent handoffs into case files.
@@ -153,7 +153,7 @@ Tracking issue: [#305](https://github.com/Eidetic-Labs/Craik/issues/305).
 
 ### 9. Public/Internal Boundary And Provenance Docs
 
-Tracking issue: [#306](https://github.com/Eidetic-Labs/Craik/issues/306).
+Tracking issue: [#306](https://github.com/eidetic-labs/craik/issues/306).
 
 - [x] Add public/internal boundary classifier.
 - [x] Add provenance-aware documentation workflow.
@@ -166,7 +166,7 @@ Tracking issue: [#306](https://github.com/Eidetic-Labs/Craik/issues/306).
 
 ### 10. MVP Demo And Acceptance Workflow
 
-Tracking issue: [#308](https://github.com/Eidetic-Labs/Craik/issues/308).
+Tracking issue: [#308](https://github.com/eidetic-labs/craik/issues/308).
 
 - [x] Build the Stigmem docs reconciliation demo as the release acceptance path.
 - [x] Include OIDC operator authentication and provider credential profile setup
@@ -179,7 +179,7 @@ Tracking issue: [#308](https://github.com/Eidetic-Labs/Craik/issues/308).
 
 ### 11. Hardening And Failure Modes
 
-Tracking issue: [#307](https://github.com/Eidetic-Labs/Craik/issues/307).
+Tracking issue: [#307](https://github.com/eidetic-labs/craik/issues/307).
 
 - [x] Document limits and failure modes.
 - [x] Add adversarial prompt-injection tests.
@@ -190,7 +190,7 @@ Tracking issue: [#307](https://github.com/Eidetic-Labs/Craik/issues/307).
 
 ### 12. Post-MVP Deferrals
 
-Tracking issue: [#309](https://github.com/Eidetic-Labs/Craik/issues/309).
+Tracking issue: [#309](https://github.com/eidetic-labs/craik/issues/309).
 
 - [x] Mark full gateway daemon as post-MVP unless required by the proof workflow.
 - [x] Mark full TUI/dashboard as post-MVP.

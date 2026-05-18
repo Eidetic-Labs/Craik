@@ -240,7 +240,7 @@ def test_shell_github_and_memory_hooks_require_matching_grants() -> None:
         policy=envelope,
         grants=[],
         operation="create_pr",
-        target="Eidetic-Labs/Craik",
+        target="eidetic-labs/craik",
     ).allowed is False
     assert check_memory_grant(
         policy=envelope,
@@ -258,7 +258,7 @@ def test_shell_github_and_memory_hooks_require_matching_grants() -> None:
         policy=envelope,
         grants=[_grant("github.write", operations=["create_pr"])],
         operation="create_pr",
-        target="Eidetic-Labs/Craik",
+        target="eidetic-labs/craik",
     ).allowed is True
     assert check_memory_grant(
         policy=envelope,

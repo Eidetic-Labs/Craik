@@ -39,7 +39,7 @@ def test_authorization_code_exchange_rejects_mismatched_state_before_token_reque
     assert authenticator.exchanged is False
 
 
-def test_authorization_code_exchange_rejects_missing_state_before_token_request() -> None:
+def test_authorization_code_exchange_rejects_missing_state() -> None:
     authenticator = _StateValidationAuthenticator()
 
     with pytest.raises(OIDCAuthenticationError, match="state did not match"):

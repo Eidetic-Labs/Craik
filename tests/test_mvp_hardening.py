@@ -91,7 +91,7 @@ def test_secret_shaped_payloads_are_rejected_or_redacted(store: LocalStore) -> N
         grants=[],
         actor="agent:codex",
         operation="create_pr",
-        target="Eidetic-Labs/Craik?token=craik-test-not-a-real-token-hardening",
+        target="eidetic-labs/craik?token=craik-test-not-a-real-token-hardening",
     )
 
     assert result.receipt.result.status == "denied"
@@ -122,7 +122,7 @@ def test_bad_tool_call_and_policy_bypass_attempts_are_blocked(
                 phase="act",
                 input_prompt="Attempt an unapproved GitHub write.",
                 side_effect_capability="github.write",
-                side_effect_target="Eidetic-Labs/Craik",
+                side_effect_target="eidetic-labs/craik",
             )
         ],
     )

@@ -40,7 +40,7 @@
       "name": "stigmem",
       "repo": {
         "local_path": "/workspace/stigmem",
-        "remote": "git@github.com:Eidetic-Labs/stigmem.git",
+        "remote": "git@github.com:eidetic-labs/stigmem.git",
         "default_branch": "main",
         "branch": "main",
         "head": "abc1234",
@@ -199,7 +199,7 @@
     "task_id": "task_docs_reconcile",
     "capability": "repo.write.docs",
     "target": {
-      "repo": "Eidetic-Labs/stigmem",
+      "repo": "eidetic-labs/stigmem",
       "paths": ["docs/**", "README.md"],
       "exclude": ["docs/adr/**"],
       "metadata": {
@@ -358,7 +358,7 @@
     "intent_lock_id": "intent_docs_reconcile",
     "facts": [
       {
-        "entity": "repo:Eidetic-Labs/stigmem",
+        "entity": "repo:eidetic-labs/stigmem",
         "relation": "craik:current_state",
         "value": "Docs reconciliation is the first demo target.",
         "source": "docs/roadmap.md",
@@ -675,7 +675,7 @@
       {
         "id": "fact_docs_reconcile_demo",
         "cid": "sha256:example",
-        "entity": "repo:Eidetic-Labs/Craik",
+        "entity": "repo:eidetic-labs/craik",
         "relation": "craik:current_state",
         "value": "Docs reconciliation is the first demo target.",
         "source": "docs/roadmap.md",
@@ -694,7 +694,7 @@
       {
         "id": null,
         "cid": null,
-        "entity": "repo:Eidetic-Labs/Craik",
+        "entity": "repo:eidetic-labs/craik",
         "relation": "craik:contract_surface",
         "value": "Craik defines v0.1.0 runtime contracts as Pydantic schemas.",
         "source": "src/craik/contracts/models.py",
@@ -733,7 +733,7 @@
     "id": "probe_github_issue_113",
     "task_id": "task_docs_reconcile",
     "project_id": "project_stigmem",
-    "target": "Eidetic-Labs/Craik#113",
+    "target": "eidetic-labs/craik#113",
     "kind": "github_state",
     "status": "fresh",
     "trust_class": "observed",
@@ -875,7 +875,7 @@
     "task_id": "task_docs_reconcile",
     "operation": "add",
     "fact": {
-      "entity": "repo:Eidetic-Labs/Craik",
+      "entity": "repo:eidetic-labs/craik",
       "relation": "craik:contract_surface",
       "value": "Craik defines v0.1.0 runtime contracts as Pydantic schemas.",
       "source": "src/craik/contracts/models.py",
@@ -914,7 +914,7 @@
     "repo": {
       "type": "git",
       "local_path": "/workspace/stigmem",
-      "remote": "git@github.com:Eidetic-Labs/stigmem.git",
+      "remote": "git@github.com:eidetic-labs/stigmem.git",
       "default_branch": "main"
     },
     "docs": {
@@ -1526,7 +1526,7 @@
     "policy_envelope_id": "policy_docs_reconcile",
     "capability": "repo.write.docs",
     "target": {
-      "repo": "Eidetic-Labs/Craik",
+      "repo": "eidetic-labs/craik",
       "paths": ["docs/**"],
       "exclude": ["docs/adr/**"],
       "metadata": {

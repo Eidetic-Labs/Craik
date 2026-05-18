@@ -147,7 +147,7 @@ def test_memory_write_wrapper_requires_policy_grant_and_records_receipt(
     policy = generate_policy_envelope(task_id="task_side_effect", actor="agent:codex")
     memory = _WritableMemory()
     fact = FactValue(
-        entity="repo:Eidetic-Labs/Craik",
+        entity="repo:eidetic-labs/craik",
         relation="craik:test",
         value="side effect completed",
         source="agent:codex",
@@ -187,7 +187,7 @@ def test_memory_write_wrapper_passes_policy_to_policy_aware_memory(
     grant = _grant("memory.write", operations=["write"])
     memory = _PolicyAwareMemory()
     fact = FactValue(
-        entity="repo:Eidetic-Labs/Craik",
+        entity="repo:eidetic-labs/craik",
         relation="craik:test",
         value="side effect completed",
         source="agent:codex",
@@ -218,7 +218,7 @@ def test_github_write_wrapper_requires_grant_and_redacts_result(store: LocalStor
         grants=[],
         actor="agent:codex",
         operation="create_pr",
-        target="Eidetic-Labs/Craik",
+        target="eidetic-labs/craik",
     )
     allowed = run_github_write(
         store=store,
@@ -226,7 +226,7 @@ def test_github_write_wrapper_requires_grant_and_redacts_result(store: LocalStor
         grants=[_grant("github.write", operations=["create_pr"])],
         actor="agent:codex",
         operation="create_pr",
-        target="Eidetic-Labs/Craik",
+        target="eidetic-labs/craik",
         writer=lambda operation, target: {
             "operation": operation,
             "target": target,
@@ -249,7 +249,7 @@ def test_writable_memory_get_proposal_returns_stored_proposal() -> None:
         task_id="task_side_effect",
         operation="add",
         fact=FactValue(
-            entity="repo:Eidetic-Labs/Craik",
+            entity="repo:eidetic-labs/craik",
             relation="craik:test",
             value="remember this",
             source="test",

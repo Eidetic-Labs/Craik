@@ -14,7 +14,7 @@ def _grant(**overrides: object) -> PluginCapabilityGrant:
         "policy_envelope_id": "policy_docs_reconcile",
         "capability": "repo.write.docs",
         "target": {
-            "repo": "Eidetic-Labs/Craik",
+            "repo": "eidetic-labs/craik",
             "paths": ["docs/**"],
             "exclude": ["docs/adr/**"],
             "metadata": {"scope": "plugin"},

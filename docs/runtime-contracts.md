@@ -53,7 +53,7 @@ Defines a project Craik can reason about.
   "repo": {
     "type": "git",
     "local_path": "/path/to/repo",
-    "remote": "git@github.com:Eidetic-Labs/stigmem.git",
+    "remote": "git@github.com:eidetic-labs/stigmem.git",
     "default_branch": "main"
   },
   "docs": {
@@ -102,7 +102,7 @@ Represents a concrete permission for an action family.
   "task_id": "task_...",
   "capability": "repo.write.docs",
   "target": {
-    "repo": "Eidetic-Labs/stigmem",
+    "repo": "eidetic-labs/stigmem",
     "paths": ["docs/**", "README.md"],
     "exclude": ["docs/adr/**"]
   },

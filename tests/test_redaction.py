@@ -31,9 +31,9 @@ def test_redacts_auth_url_without_destroying_shape() -> None:
 
 
 def test_redacts_token_only_git_remote_without_destroying_shape() -> None:
-    result = redact("https://redactionfixture123@github.com/Eidetic-Labs/Craik.git")
+    result = redact("https://redactionfixture123@github.com/eidetic-labs/craik.git")
 
-    assert result.value == "https://[REDACTED]@github.com/Eidetic-Labs/Craik.git"
+    assert result.value == "https://[REDACTED]@github.com/eidetic-labs/craik.git"
 
 
 def test_redacts_secret_key_in_structured_payload() -> None:
