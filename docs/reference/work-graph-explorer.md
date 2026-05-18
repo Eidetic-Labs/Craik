@@ -3,7 +3,7 @@
 The work graph explorer is a read-only operator view over
 `craik.work_graph_export` and `craik.work_graph_event` records.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - graph id and task scope;
 - node count and edge count;

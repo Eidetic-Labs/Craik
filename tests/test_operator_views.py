@@ -977,7 +977,7 @@ def _negative_knowledge(
             "id": knowledge_id,
             "project_id": "project_traps",
             "task_id": "task_traps",
-            "statement": "No browser dashboard exists in v0.8.0.",
+            "statement": "No browser dashboard exists in v0.7.0.",
             "scope": "repository",
             "trust_class": "observed",
             "evidence_ids": ["evidence_tree"],

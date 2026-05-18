@@ -219,7 +219,7 @@ def _gemini_matrix() -> RunnerCapabilityMatrix:
                 "is proven."
             ),
             default_grant_posture="deny-by-default",
-            notes=["Use for review or synthesis by default; avoid direct side effects in v0.2.0."],
+            notes=["Use for review or synthesis by default; avoid direct side effects in v0.1.0."],
         ),
         capabilities=[
             _capability("file.read", "prompt-handoff", grant_required=False),

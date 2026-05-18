@@ -3,7 +3,7 @@
 The known traps view is a read-only operator display for known traps and
 negative knowledge.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - trap statement, kind, project, task, and status;
 - avoidance guidance;

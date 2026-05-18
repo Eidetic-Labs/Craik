@@ -1,6 +1,6 @@
 # Agent Roles
 
-`craik.agent_role` defines the role boundary for v0.4.0 multi-agent
+`craik.agent_role` defines the role boundary for v0.3.0 multi-agent
 coordination. Roles describe responsibility and authority; they do not grant new
 runtime permissions by themselves.
 

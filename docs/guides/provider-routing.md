@@ -48,7 +48,7 @@ MCP routes must remain:
 
 ## Sandbox Backends
 
-The v0.10.0 sandbox surfaces are:
+The v0.9.0 sandbox surfaces are:
 
 - [Local Process Backend](../reference/local-process-backend.md);
 - [Remote Shell Backend](../reference/remote-shell-backend.md);

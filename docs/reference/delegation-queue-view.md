@@ -3,7 +3,7 @@
 The delegation queue is a read-only operator view over
 `craik.human_delegation_point` records.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - delegation count;
 - delegation id, status, and kind;

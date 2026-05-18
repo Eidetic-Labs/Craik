@@ -3,7 +3,7 @@
 The evidence and assumption view is a read-only operator view over
 `craik.evidence_reference` and `craik.assumption` records.
 
-The v0.8.0 TUI surface formats evidence with:
+The v0.7.0 TUI surface formats evidence with:
 
 - evidence id and kind;
 - source and locator;

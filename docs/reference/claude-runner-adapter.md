@@ -1,7 +1,7 @@
 # Claude Runner Adapter Preview
 
 The Claude adapter preview implements Craik's shared `RunnerAdapter` protocol
-for Claude-compatible workflows. In v0.2.0 it focuses on prompt handoff and
+for Claude-compatible workflows. In v0.1.0 it focuses on prompt handoff and
 deterministic fixture output rather than direct external execution.
 
 ## Local Setup

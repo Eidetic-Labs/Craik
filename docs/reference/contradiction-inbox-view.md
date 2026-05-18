@@ -3,7 +3,7 @@
 The contradiction inbox is a read-only operator view over
 `craik.contradiction_report` records.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - inbox count;
 - contradiction id and status;

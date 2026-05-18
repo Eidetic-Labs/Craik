@@ -1,7 +1,7 @@
 # Codex Runner Adapter Preview
 
 The Codex adapter preview implements Craik's shared `RunnerAdapter` protocol for
-Codex-compatible workflows. In v0.2.0 it is intentionally conservative: it can
+Codex-compatible workflows. In v0.1.0 it is intentionally conservative: it can
 turn a compiled prompt into a normalized runner request and return deterministic
 fixture results when live execution is unavailable.
 
