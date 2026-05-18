@@ -26,6 +26,50 @@ _No unreleased changes._
 - Governed loop support for dispatchable provider tool calls and replayable
   streaming output chunks.
 
+### Added — Pluggable credential sources
+
+- Typed credential abstraction with `auth-profiles.json` and
+  `<provider_family>:<name>` profile IDs.
+- Credential sources: env-var API key, local-CLI OAuth fallback (e.g. Claude
+  Code credentials), vendor-CLI subprocess bridge, external secret manager
+  references, markers, and Stigmem-backed credential references.
+- Credential pool with rotation, failover, and per-profile health tracking.
+- Credential CLI: `craik auth list / add / remove / test / status / approve /
+  grant`.
+- Credential health surfaced in `craik doctor`.
+
+### Added — OIDC operator identity
+
+- OIDC operator authentication with device-code and loopback+PKCE flows.
+- IdP discovery, JWKS-validated ID tokens (rejects `alg=none`, unknown `kid`,
+  asymmetric/symmetric algorithm confusion), and refresh-token handling.
+- Operator session store at `<CRAIK_HOME>/operator-session.json` with
+  `craik login`, `craik logout`, `craik whoami`.
+- Workload identity providers: GitHub Actions, Kubernetes projected service
+  account token, generic file token, env-var token.
+- RFC 8693 token-exchange secret manager for federated credential brokering.
+- Operator identity bound to every provider call and persisted on every
+  receipt.
+
+### Added — Governance-native credential features
+
+- Credential-scoped receipt fields: `auth_profile_id`, `auth_kind`,
+  `auth_identity_hash`.
+- Operator-scoped receipt fields: `operator_subject`, `operator_issuer`,
+  `operator_email`, `operator_groups`.
+- Policy envelopes can constrain operators (`required_operator`,
+  `allowed_operator_groups`, `allowed_operator_subjects`,
+  `required_operator_issuer`) and credentials (`allowed_credential_kinds`,
+  `allowed_credential_profiles`).
+- Approval-gated first live use of any credential profile, recorded as a
+  receipt.
+- Operator-credential authorization binding with a receipted grant chain.
+- Credential expiry surfaced as evidence/risk in case files for long-running
+  work.
+- Per-credential redaction patterns extending the global redaction utility.
+- Per-agent credential and operator isolation in handoff records (foundation
+  for v0.3.0 multi-agent runtime).
+
 ## 0.0.0 - 2026-05-16
 
 ### Added
