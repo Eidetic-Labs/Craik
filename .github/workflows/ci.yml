@@ -168,6 +168,12 @@ jobs:
           pip-audit --requirement reports/security/requirements-audit.txt --require-hashes --disable-pip --progress-spinner off
       - name: Run Bandit static analysis
         run: bandit -r src/craik --baseline .bandit-baseline.json
+      - name: Run Gitleaks secret scan
+        run: |
+          docker run --rm \
+            -v "${PWD}:/repo" \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            detect --source=/repo --config=/repo/.gitleaks.toml --no-git --redact --verbose
       - name: Run policy test baseline
         run: craik policy test
       - name: Check release readiness

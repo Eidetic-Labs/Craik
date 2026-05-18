@@ -1,0 +1,20 @@
+title = "Craik Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignore generated documentation dependency trees."
+paths = [
+  '''^docs/node_modules/''',
+  '''^docs/\.docusaurus/''',
+  '''^docs/build/''',
+]
+
+[[allowlists]]
+description = "Ignore intentional non-real credential fixtures."
+regexTarget = "line"
+regexes = [
+  '''craik-test-not-a-real-[A-Za-z0-9_-]+''',
+  '''token=craik-test-not-a-real-[A-Za-z0-9_-]+''',
+]
