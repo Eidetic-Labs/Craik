@@ -9,6 +9,7 @@ from craik.contracts.models import (
     DocsProfile,
     FactValue,
     MemoryProposal,
+    PolicyEnvelope,
 )
 from craik.runtime.paths import ensure_craik_home
 from craik.runtime.policy.policy import generate_policy_envelope
@@ -161,6 +162,35 @@ def test_memory_write_wrapper_requires_policy_grant_and_records_receipt(
     assert allowed.receipt.result.metadata["entity"] == fact.entity
 
 
+def test_memory_write_wrapper_passes_policy_to_policy_aware_memory(
+    store: LocalStore,
+) -> None:
+    policy = generate_policy_envelope(task_id="task_side_effect", actor="agent:codex")
+    grant = _grant("memory.write", operations=["write"])
+    memory = _PolicyAwareMemory()
+    fact = FactValue(
+        entity="repo:Eidetic-Labs/Craik",
+        relation="craik:test",
+        value="side effect completed",
+        source="agent:codex",
+        confidence=1.0,
+        scope="local",
+        trust_class="observed",
+    )
+
+    result = write_memory_fact(
+        store=store,
+        memory=memory,
+        policy=policy,
+        grants=[grant],
+        actor="agent:codex",
+        fact=fact,
+    )
+
+    assert result.allowed is True
+    assert memory.calls == [(fact, policy, [grant])]
+
+
 def test_github_write_wrapper_requires_grant_and_redacts_result(store: LocalStore) -> None:
     policy = generate_policy_envelope(task_id="task_side_effect", actor="agent:codex")
 
@@ -221,6 +251,21 @@ class _WritableMemory:
 
     def write_fact(self, fact: FactValue) -> FactValue:
         self.facts.append(fact)
+        return fact
+
+
+class _PolicyAwareMemory:
+    def __init__(self) -> None:
+        self.calls: list[tuple[FactValue, PolicyEnvelope, list[CapabilityGrant]]] = []
+
+    def write_fact(
+        self,
+        fact: FactValue,
+        *,
+        policy: PolicyEnvelope,
+        grants: list[CapabilityGrant],
+    ) -> FactValue:
+        self.calls.append((fact, policy, grants))
         return fact
 
 
