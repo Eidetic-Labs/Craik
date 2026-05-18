@@ -19,6 +19,7 @@ from craik.contracts.models import (
 )
 from craik.runtime.policy.policy import generate_policy_envelope
 from craik.runtime.policy.redaction import redact
+from craik.runtime.projects.git_commands import run_git
 from craik.runtime.projects.instruction_sources import (
     active_instruction_context,
     instruction_stale_risk_warnings,
@@ -294,9 +295,4 @@ def _handoff_summary(handoff: Handoff) -> dict[str, Any]:
 
 
 def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ("git", "-C", str(cwd), *args),
-        check=False,
-        text=True,
-        capture_output=True,
-    )
+    return run_git(cwd, *args)
