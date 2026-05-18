@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from inspect import signature
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from craik.contracts.models import (
     CapabilityGrant,
@@ -127,10 +128,7 @@ def write_memory_fact(
     denied = _persist_denial(store=store, policy=policy, decision=decision, actor=actor)
     if denied is not None:
         return SideEffectResult(kind="memory_write", allowed=False, receipt=denied)
-    try:
-        written = memory.write_fact(fact, policy=policy, grants=grants)
-    except TypeError:
-        written = memory.write_fact(fact)
+    written = _write_fact(memory=memory, fact=fact, policy=policy, grants=grants)
     receipt = _passed_receipt(
         policy=policy,
         actor=actor,
@@ -146,6 +144,20 @@ def write_memory_fact(
     )
     store.put_receipt(receipt)
     return SideEffectResult(kind="memory_write", allowed=True, receipt=receipt)
+
+
+def _write_fact(
+    *,
+    memory: Any,
+    fact: FactValue,
+    policy: PolicyEnvelope,
+    grants: list[CapabilityGrant],
+) -> FactValue:
+    write_fact = memory.write_fact
+    parameters = signature(write_fact).parameters
+    if "policy" in parameters and "grants" in parameters:
+        return cast(FactValue, write_fact(fact, **{"policy": policy, "grants": grants}))
+    return cast(FactValue, write_fact(fact))
 
 
 def run_github_write(
