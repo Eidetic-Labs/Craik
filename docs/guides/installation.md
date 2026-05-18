@@ -1,7 +1,7 @@
 # Installation
 
-Craik is not published to PyPI yet. During `0.x.0` MVP development, install it
-from a local checkout:
+Craik is not published to PyPI yet. <!-- TODO: update when PyPI publish lands -->
+During `0.x.0` MVP development, install it from a local checkout:
 
 ```sh
 python3.12 -m pip install -e ".[dev]"
@@ -22,3 +22,22 @@ uv run --python 3.12 --extra dev craik --version
 ```
 
 Runtime state is stored under `~/.craik` unless `CRAIK_HOME` is set.
+
+## First-Time Configuration
+
+Initialize local state before running project workflows:
+
+```sh
+craik home init
+```
+
+Fixture-backed provider execution works without credentials. For live provider
+calls, authenticate the operator and add a credential profile:
+
+```sh
+craik login
+craik auth add anthropic:work --kind=api-key --env-var=ANTHROPIC_API_KEY
+```
+
+See [Authentication and Credentials](authentication.md) for OIDC login,
+credential profiles, approval flow, and workload-identity setup.

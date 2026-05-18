@@ -1,7 +1,8 @@
 # Quickstart
 
-Craik v0.1.0 is a CLI-first durable runtime for local project state, case files,
-policy checks, receipts, handoffs, memory proposals, and the first Stigmem demo.
+Craik v0.1.0 is a CLI-first durable runtime for local project state, operator
+authentication, credential profiles, case files, policy checks, receipts,
+handoffs, memory proposals, and the first Stigmem demo.
 
 ## Install
 
@@ -24,6 +25,29 @@ uv run --python 3.12 --extra dev
 export CRAIK_HOME=/tmp/craik-quickstart
 craik home init
 ```
+
+## Authenticate
+
+The fixture-backed provider path needs no credentials. For a live provider
+call, authenticate the operator and add a credential profile:
+
+```sh
+craik login
+craik auth add anthropic:work \
+  --kind=api-key \
+  --env-var=ANTHROPIC_API_KEY
+craik auth status
+```
+
+For Claude subscribers with Claude Code installed:
+
+```sh
+craik auth add anthropic:claude-code \
+  --kind=oauth-token \
+  --source=local-cli
+```
+
+See [Authentication and Credentials](authentication.md) for the full reference.
 
 ## Register A Project
 
