@@ -4,7 +4,7 @@ The instruction distillation view is a read-only operator display for declared
 instruction sources, observed source snapshots, provenance, distilled proposals,
 and promotion reviews.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - declared instruction sources and their trust boundaries;
 - source snapshot hash status;

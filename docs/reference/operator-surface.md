@@ -19,7 +19,7 @@ A full TUI remains a later option because the formatter-first path:
 
 ## Boundary
 
-The v0.8.0 operator surface is read-only by default. It may display state from
+The v0.7.0 operator surface is read-only by default. It may display state from
 the local store, docs, fixtures, and validated contracts. It must not mutate
 memory, approve grants, resolve contradictions, delete records, or execute
 plugins without an explicit future command and policy boundary.

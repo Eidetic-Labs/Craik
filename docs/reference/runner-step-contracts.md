@@ -1,6 +1,6 @@
 # Runner Step Contracts
 
-Runner steps are the contract boundary for the v0.3.0 single-agent execution
+Runner steps are the contract boundary for the v0.1.0 single-agent execution
 loop. They describe one bounded `plan`, `act`, `observe`, `evaluate`,
 `continue`, or `stop` phase without invoking a runner by themselves.
 

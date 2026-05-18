@@ -1,6 +1,6 @@
 # Single-Agent Execution Loop
 
-Craik's v0.3.0 loop lets one runner work through a governed task without
+Craik's v0.1.0 loop lets one runner work through a governed task without
 depending on an untracked chat transcript. The runner still performs reasoning,
 but Craik owns the durable boundary: run state, policy checks, receipts, step
 outputs, memory proposals, and recovery state.

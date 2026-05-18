@@ -3,7 +3,7 @@
 The budget and quota view is a read-only operator display for configured limits,
 observed usage, missing data, exceeded limits, and notes.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - configured limits;
 - usage summaries;

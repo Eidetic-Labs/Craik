@@ -124,7 +124,7 @@ craik runners matrix
 craik runners matrix --runner codex
 ```
 
-The v0.2.0 preview profiles are conservative:
+The v0.1.0 runner profiles are conservative:
 
 - `codex`: live local runner, medium trust, side effects require explicit grants
   and receipts.

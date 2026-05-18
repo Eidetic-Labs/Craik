@@ -1,7 +1,7 @@
 # Gemini Runner Adapter Preview
 
 The Gemini adapter preview implements Craik's shared `RunnerAdapter` protocol
-for Gemini-compatible workflows. In v0.2.0 it is read/review-oriented and uses
+for Gemini-compatible workflows. In v0.1.0 it is read/review-oriented and uses
 prompt handoff plus deterministic fixture output rather than direct external
 execution.
 

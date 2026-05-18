@@ -3,7 +3,7 @@
 The memory impact preview view is a read-only operator display for proposed
 memory writes before promotion or direct write attempts.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - pending memory proposals and their status;
 - facts that would be added or updated;

@@ -50,7 +50,7 @@ Craik also exposes policy hooks for:
 - `github.write`,
 - `memory.write`.
 
-The v0.1.0 hook layer checks whether a matching grant exists. Later runtime layers will call these checks before performing side effects.
+The v0.1.0 hook layer checks whether a matching grant exists. Runtime provider
+and tool-call paths call these checks before performing side effects.
 
 Denied decisions can produce capability receipts with status `denied`.
-

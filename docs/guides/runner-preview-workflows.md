@@ -1,15 +1,15 @@
 # Runner Preview Workflows
 
-Craik's v0.2.0 runner adapter preview connects four pieces:
+Craik's v0.1.0 runner adapter and provider-adapter surface connects four pieces:
 
 - context discovery and case files,
 - policy-aware prompt compilation,
 - runner adapter fixture or prompt-handoff execution,
 - receipt and handoff metadata capture.
 
-The preview is designed to validate boundaries before live side effects are
-trusted. Fixture mode and prompt handoff are expected paths. Live execution is
-only represented by metadata today.
+The preview is designed to validate runner boundaries before live side effects
+are trusted. Fixture mode, prompt handoff, and governed provider execution are
+the expected paths.
 
 ## Workflow
 

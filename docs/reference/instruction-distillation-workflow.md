@@ -32,7 +32,7 @@ automatic authority.
 
 ## Fixtures
 
-The contract fixture file includes examples for the core v0.5.0 records:
+The contract fixture file includes examples for the core v0.4.0 records:
 
 - `craik.instruction_source`
 - `craik.instruction_source_registry`

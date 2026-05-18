@@ -5,7 +5,7 @@ Design rationale: [ADR 0005 Receipts And Handoffs As Public Contracts](../adr/00
 The receipt viewer is a read-only operator view over capability and plugin
 receipt records.
 
-The v0.8.0 TUI surface formats capability receipts with:
+The v0.7.0 TUI surface formats capability receipts with:
 
 - receipt id, task, actor, capability, target, and policy profile;
 - status, reason, redacted summary, and redaction state.

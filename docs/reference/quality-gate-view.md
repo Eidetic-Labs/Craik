@@ -4,7 +4,7 @@ The quality gate view is a read-only operator display for handoff quality
 scores, evidence coverage scores, runtime critic findings, and red-team
 findings.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - handoff score bands and blocking reasons;
 - evidence coverage score bands, missing evidence, and weak claims;

@@ -3,7 +3,7 @@
 The run delta view is a read-only operator display for continuity-relevant
 changes since the previous usable handoff or resume point.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - previous and current handoff links;
 - case file, receipt, contradiction, and active instruction constraint links;

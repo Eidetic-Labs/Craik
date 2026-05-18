@@ -4,7 +4,7 @@ Design rationale: [ADR 0005 Receipts And Handoffs As Public Contracts](../adr/00
 
 The handoff viewer is a read-only operator view over `craik.handoff` records.
 
-The v0.8.0 TUI surface formats:
+The v0.7.0 TUI surface formats:
 
 - handoff id, task id, project id, status, agent, and summary;
 - completed actions;

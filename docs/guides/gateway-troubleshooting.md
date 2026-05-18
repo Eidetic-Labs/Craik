@@ -1,6 +1,6 @@
 # Gateway Troubleshooting
 
-This guide covers v0.9.0 gateway surfaces: setup, diagnostics, channels,
+This guide covers v0.8.0 gateway surfaces: setup, diagnostics, channels,
 webhooks, schedules, policies, and receipts.
 
 ## Baseline Checks
