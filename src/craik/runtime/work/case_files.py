@@ -37,6 +37,7 @@ from craik.runtime.work.case_support import (
 from craik.runtime.work.case_support import (
     stale_risks as case_stale_risks,
 )
+from craik.runtime.work.case_support.receipts import case_file_denial_receipt
 from craik.runtime.work.known_traps import known_trap_summaries
 from craik.runtime.work.scratchpad import unknown_summaries
 
@@ -51,6 +52,10 @@ class TaskNotFoundError(CaseFileError):
 
 class ProjectNotFoundError(CaseFileError):
     """Raised when a task references an unknown project."""
+
+
+class CaseFilePathTraversalError(CaseFileError):
+    """Raised when configured discovery paths escape the repository root."""
 
 
 DEFAULT_DISCOVERY_EXCLUDE = (
@@ -138,12 +143,19 @@ class CaseFileAssembler:
             raise ProjectNotFoundError(f"unknown project for task {task_id}: {task.project_id}")
 
         repo_root = Path(project.repo.local_path)
-        discovered = _discover_docs(
-            project,
-            repo_root,
-            max_tokens=max_tokens,
-            overrides=discovery_overrides or DiscoveryOverrides(),
-        )
+        policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
+        try:
+            discovered = _discover_docs(
+                project,
+                repo_root,
+                max_tokens=max_tokens,
+                overrides=discovery_overrides or DiscoveryOverrides(),
+            )
+        except CaseFilePathTraversalError as exc:
+            self.store.put_receipt(
+                case_file_denial_receipt(task=task, policy_id=policy.id, reason=str(exc))
+            )
+            raise
         repo_state = _repo_state(project, repo_root)
         github_state = _github_state(self.github_adapter, project, repo_state)
         evidence = _evidence(task, project, discovered.docs, discovered.adrs, repo_state)
@@ -170,7 +182,6 @@ class CaseFileAssembler:
             *unknown_summaries(self.store, task.id),
             *credential_risks,
         ]
-        policy = generate_policy_envelope(task_id=task.id, actor="agent:case-file")
         active_instructions = active_instruction_context(self.store, project.id)
         intent_lock = IntentLockManager(self.store).ensure_for_task(task)
         case_file = CaseFile(
@@ -464,7 +475,12 @@ def _normalize_path(path: str) -> str:
 
 
 def _relative(repo_root: Path, path: Path) -> str:
-    return path.resolve().relative_to(repo_root.resolve()).as_posix()
+    try:
+        return path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError as exc:
+        raise CaseFilePathTraversalError(
+            "case-file discovery path escapes repository root"
+        ) from exc
 
 
 def _slug(value: str) -> str:
