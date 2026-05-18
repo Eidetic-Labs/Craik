@@ -57,7 +57,7 @@ def test_doctor_reports_pass_with_setup_and_memory_config(tmp_path) -> None:
 
 def test_doctor_reports_auth_profile_health(tmp_path, monkeypatch) -> None:
     paths = ensure_craik_home({"CRAIK_HOME": str(tmp_path / "home")})
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "craik-test-not-a-real-key")
     AuthProfileStore(paths.home).put(
         AuthProfile(
             id="anthropic:work",
@@ -72,7 +72,7 @@ def test_doctor_reports_auth_profile_health(tmp_path, monkeypatch) -> None:
         paths,
         env={
             "CRAIK_STIGMEM_URL": "http://127.0.0.1:18765",
-            "ANTHROPIC_API_KEY": "sk-test",
+            "ANTHROPIC_API_KEY": "craik-test-not-a-real-key",
         },
     )
 

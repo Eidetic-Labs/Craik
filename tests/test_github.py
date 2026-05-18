@@ -48,7 +48,7 @@ def test_parse_github_remote_supports_common_remote_shapes() -> None:
 def test_github_read_adapter_loads_repo_issues_pr_files_and_status() -> None:
     with _github_api() as api:
         adapter = GitHubReadAdapter(
-            GitHubClient(GitHubConfig(api_url=api.url, token="test-token"))
+            GitHubClient(GitHubConfig(api_url=api.url, token="craik-test-not-a-real-token"))
         )
 
         state = adapter.case_file_state(
@@ -74,7 +74,7 @@ def test_github_adapter_handles_missing_auth() -> None:
 
 def test_github_adapter_maps_rate_limit_errors() -> None:
     with _github_api(rate_limited=True) as api:
-        client = GitHubClient(GitHubConfig(api_url=api.url, token="test-token"))
+        client = GitHubClient(GitHubConfig(api_url=api.url, token="craik-test-not-a-real-token"))
 
         with pytest.raises(GitHubRateLimitError, match="rate limit exceeded"):
             client.repository(parse_github_remote("https://github.com/Eidetic-Labs/Craik.git"))
@@ -97,7 +97,7 @@ def test_case_file_includes_loaded_github_state(
 
     with _github_api() as api:
         adapter = GitHubReadAdapter(
-            GitHubClient(GitHubConfig(api_url=api.url, token="test-token"))
+            GitHubClient(GitHubConfig(api_url=api.url, token="craik-test-not-a-real-token"))
         )
         case_file = CaseFileAssembler(store, github_adapter=adapter).build(task.id)
 
@@ -122,7 +122,7 @@ def test_case_file_records_github_fallback_assumption(
 
     with _github_api() as api:
         adapter = GitHubReadAdapter(
-            GitHubClient(GitHubConfig(api_url=api.url, token="test-token"))
+            GitHubClient(GitHubConfig(api_url=api.url, token="craik-test-not-a-real-token"))
         )
         case_file = CaseFileAssembler(store, github_adapter=adapter).build(task.id)
 
@@ -157,7 +157,8 @@ class _github_api:
                 if rate_limited:
                     self._json({"message": "rate limit"}, status=403, rate_limited=True)
                     return
-                if require_auth and self.headers.get("Authorization") != "Bearer test-token":
+                expected_auth = "Bearer craik-test-not-a-real-token"
+                if require_auth and self.headers.get("Authorization") != expected_auth:
                     self._json({"message": "bad credentials"}, status=401)
                     return
                 path = self.path.split("?", 1)[0]

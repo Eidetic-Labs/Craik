@@ -30,7 +30,7 @@ def test_http_transport_yields_non_streaming_json_response() -> None:
         transport = HTTPTransport(
             family="openai",
             base_url=server.url,
-            headers_factory=lambda: {"Authorization": "Bearer test-token"},
+            headers_factory=lambda: {"Authorization": "Bearer craik-test-not-a-real-token"},
             timeout_seconds=5,
         )
 
@@ -38,7 +38,7 @@ def test_http_transport_yields_non_streaming_json_response() -> None:
 
     assert chunks == [{"id": "resp_1", "output_text": "ok"}]
     assert seen["payload"] == {"model": "gpt-test"}
-    assert seen["authorization"] == "Bearer test-token"
+    assert seen["authorization"] == "Bearer craik-test-not-a-real-token"
 
 
 def test_provider_transport_protocol_defaults_raise_not_implemented() -> None:
@@ -112,7 +112,7 @@ def test_http_transport_stream_stops_when_cancelled_between_chunks() -> None:
 def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
     def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
         return _json_response(
-            {"error": "token sk-test-secret failed"},
+            {"error": "token=craik-test-not-a-real-key-01 failed"},
             status=429,
             headers={"Retry-After": "3"},
         )
@@ -134,10 +134,10 @@ def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
 
     assert error.status_code == 429
     assert error.retry_after_seconds == 3
-    assert "sk-test-secret" not in str(error)
+    assert "craik-test-not-a-real-key-01" not in str(error)
     assert "secret-auth-token" not in str(error)
     assert error.body is not None
-    assert "sk-test-secret" not in error.body
+    assert "craik-test-not-a-real-key-01" not in error.body
     assert error.headers["content-type"] == "application/json"
     assert error.headers["retry-after"] == "3"
     assert "server" not in error.headers
@@ -146,12 +146,12 @@ def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
 def test_http_transport_error_drops_sensitive_headers_and_redacts_safe_values() -> None:
     def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
         return _json_response(
-            {"error": "token=sk-leaked-from-body-value"},
+            {"error": "token=craik-test-not-a-real-key-body"},
             status=401,
             headers={
                 "WWW-Authenticate": 'Bearer realm="api", error="invalid_token"',
-                "X-API-Key": "sk-leaked-real-key-value",
-                "X-Request-Id": "token=sk-leaked-from-request-id",
+                "X-API-Key": "craik-test-not-a-real-key-header",
+                "X-Request-Id": "token=craik-test-not-a-real-key-request",
                 "Retry-After": "30",
             },
         )
@@ -174,8 +174,8 @@ def test_http_transport_error_drops_sensitive_headers_and_redacts_safe_values() 
     assert error.headers["retry-after"] == "30"
     assert error.headers["x-request-id"] == "token=[REDACTED]"
     assert error.body is not None
-    assert "sk-leaked-from-body-value" not in error.body
-    assert "sk-leaked-real-key-value" not in str(error)
+    assert "craik-test-not-a-real-key-body" not in error.body
+    assert "craik-test-not-a-real-key-header" not in str(error)
 
 
 def test_http_transport_builds_headers_for_each_request() -> None:

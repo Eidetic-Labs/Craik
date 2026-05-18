@@ -230,7 +230,7 @@ def test_github_write_wrapper_requires_grant_and_redacts_result(store: LocalStor
         writer=lambda operation, target: {
             "operation": operation,
             "target": target,
-            "token": "ghp-secret-token",
+            "token": "craik-test-not-a-real-token-gh",
         },
     )
 

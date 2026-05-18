@@ -114,7 +114,7 @@ def test_source_for_auth_profile_maps_supported_kinds() -> None:
             id="chat_completions:bridge",
             kind=CredentialKind.CLI_BRIDGE,
             provider_family="chat_completions",
-            metadata={"command": ["echo", '{"token":"sk-test"}']},
+            metadata={"command": ["echo", '{"token":"craik-test-not-a-real-key"}']},
             created_at=created_at,
         )
     )
@@ -138,7 +138,7 @@ def test_source_for_auth_profile_maps_supported_kinds() -> None:
 
 
 def test_stigmem_credential_source_resolves_fact_value() -> None:
-    server, thread = _stigmem_credential_server("sk-stigmem-secret")
+    server, thread = _stigmem_credential_server("craik-test-not-a-real-stigmem-key")
     try:
         source = StigmemCredentialSource.from_config(
             node_url=_server_url(server),
@@ -147,7 +147,7 @@ def test_stigmem_credential_source_resolves_fact_value() -> None:
         )
 
         assert source.headers_for("openai") == {
-            "Authorization": "Bearer sk-stigmem-secret"
+            "Authorization": "Bearer craik-test-not-a-real-stigmem-key"
         }
         assert source.status().status == "ok"
     finally:

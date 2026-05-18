@@ -13,16 +13,16 @@ def test_cli_bridge_stdout_json_extracts_token_without_leaking_in_status() -> No
         command=(
             sys.executable,
             "-c",
-            "import json; print(json.dumps({'token': 'sk-test'}))",
+            "import json; print(json.dumps({'token': 'craik-test-not-a-real-key'}))",
         ),
         token_extractor="stdout_json",
     )
 
     headers = source.headers_for("chat_completions")
 
-    assert headers == {"Authorization": "Bearer sk-test"}
+    assert headers == {"Authorization": "Bearer craik-test-not-a-real-key"}
     assert source.status().status == "ok"
-    assert "sk-test" not in str(source.status())
+    assert "craik-test-not-a-real-key" not in str(source.status())
 
 
 def test_cli_bridge_stdout_line_extracts_first_nonempty_line() -> None:
@@ -52,7 +52,7 @@ def test_cli_bridge_credentials_file_extracts_nested_token(tmp_path: Path) -> No
 
 def test_cli_bridge_error_messages_do_not_include_stdout_token_material() -> None:
     source = CLIBridgeCredentialSource(
-        command=(sys.executable, "-c", "print('sk-test'); raise SystemExit(1)"),
+        command=(sys.executable, "-c", "print('craik-test-not-a-real-key'); raise SystemExit(1)"),
         token_extractor="stdout_line",
     )
 
@@ -60,7 +60,7 @@ def test_cli_bridge_error_messages_do_not_include_stdout_token_material() -> Non
 
     assert status.status == "rejected"
     assert status.detail == "CLI bridge command failed"
-    assert "sk-test" not in str(status)
+    assert "craik-test-not-a-real-key" not in str(status)
 
 
 def test_cli_bridge_rejects_unbounded_stdout() -> None:

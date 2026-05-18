@@ -185,7 +185,7 @@ def _request() -> ProviderRuntimeRequest:
             "additionalProperties": False,
         },
         stream=True,
-        metadata={"user_id": "case-user", "api_key": "sk-test-secret"},
+        metadata={"user_id": "case-user", "api_key": "craik-test-not-a-real-key-01"},
     )
 
 
@@ -216,7 +216,7 @@ def test_openai_response_normalizes_text_tool_calls_usage_and_retry_decisions() 
                     "id": "fc_123",
                     "call_id": "call_123",
                     "name": "lookup_case",
-                    "arguments": '{"token":"sk-test-secret"}',
+                    "arguments": '{"token":"Bearer craiktestnotarealkey01"}',
                 },
             ],
             "usage": {"input_tokens": 10, "output_tokens": 5, "total_tokens": 15},
@@ -226,7 +226,7 @@ def test_openai_response_normalizes_text_tool_calls_usage_and_retry_decisions() 
     terminal = adapter.classify_error(status_code=400)
 
     assert result.text == "Done"
-    assert result.tool_calls[0]["arguments"] == '{"token":"[REDACTED]"}'
+    assert result.tool_calls[0]["arguments"] == '{"token":"Bearer [REDACTED]"}'
     assert result.usage == {"input_tokens": 10, "output_tokens": 5, "total_tokens": 15}
     assert retryable.retryable is True
     assert retryable.retry_after_seconds == 7
@@ -259,7 +259,7 @@ def test_anthropic_response_normalizes_text_tool_calls_usage_and_retry_decisions
                     "type": "tool_use",
                     "id": "toolu_123",
                     "name": "craik_structured_output",
-                    "input": {"answer": "ok", "token": "sk-test-secret"},
+                    "input": {"answer": "ok", "token": "craik-test-not-a-real-key-01"},
                 },
             ],
             "usage": {"input_tokens": 11, "output_tokens": 6},
@@ -269,7 +269,7 @@ def test_anthropic_response_normalizes_text_tool_calls_usage_and_retry_decisions
     terminal = adapter.classify_error(status_code=400)
 
     assert result.text == "Done"
-    assert result.structured_output == {"answer": "ok", "token": "sk-test-secret"}
+    assert result.structured_output == {"answer": "ok", "token": "craik-test-not-a-real-key-01"}
     assert result.tool_calls[0]["input"] == {"answer": "ok", "token": "[REDACTED]"}
     assert result.usage == {"input_tokens": 11, "output_tokens": 6, "total_tokens": 17}
     assert retryable.retryable is True
@@ -342,7 +342,7 @@ def test_chat_completions_response_normalizes_content_tool_calls_usage() -> None
                                 "type": "function",
                                 "function": {
                                     "name": "lookup_case",
-                                    "arguments": '{"token":"sk-test-secret"}',
+                                    "arguments": '{"token":"Bearer craiktestnotarealkey01"}',
                                 },
                             }
                         ],
@@ -364,7 +364,7 @@ def test_chat_completions_response_normalizes_content_tool_calls_usage() -> None
             "id": "call_123",
             "type": "function",
             "name": "lookup_case",
-            "arguments": '{"token":"[REDACTED]"}',
+            "arguments": '{"token":"Bearer [REDACTED]"}',
         }
     ]
     assert tool_call.usage == {"input_tokens": 5, "output_tokens": 3, "total_tokens": 8}
@@ -551,7 +551,7 @@ def test_provider_runtime_rejects_raw_secret_config_and_missing_docs() -> None:
             provider_id="provider_openai",
             provider_family="openai",
             model="gpt-5.2",
-            secret_ref_name="sk-raw-secret",
+            secret_ref_name="token=craik-test-not-a-real-key-raw",
             docs_refs=list(OPENAI_OFFICIAL_DOCS),
         )
 
@@ -737,7 +737,7 @@ def test_provider_runtime_receipt_records_auth_profile_identity_hash(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
-    monkeypatch.setenv("OPENAI_WORK_KEY", "sk-raw-secret")
+    monkeypatch.setenv("OPENAI_WORK_KEY", "token=craik-test-not-a-real-key-raw")
     AuthProfileStore(tmp_path).put(
         AuthProfile(
             id="openai:work",
@@ -789,7 +789,7 @@ def test_provider_runtime_receipt_records_auth_profile_identity_hash(
     assert first.auth_profile_id == "openai:work"
     assert first.auth_kind == "api-key"
     assert first.auth_identity_hash == second.auth_identity_hash
-    assert "sk-raw-secret" not in first.model_dump_json()
+    assert "token=craik-test-not-a-real-key-raw" not in first.model_dump_json()
     assert "OPENAI_WORK_KEY" not in first.auth_identity_hash
 
 
@@ -798,7 +798,7 @@ def test_provider_runtime_receipt_applies_auth_profile_redaction_patterns(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
-    monkeypatch.setenv("OPENAI_WORK_KEY", "sk-raw-secret")
+    monkeypatch.setenv("OPENAI_WORK_KEY", "token=craik-test-not-a-real-key-raw")
     AuthProfileStore(tmp_path).put(
         AuthProfile(
             id="openai:work",
@@ -851,7 +851,7 @@ def test_provider_runtime_receipt_applies_auth_profile_redaction_patterns(
     assert "org-secret-123" not in dumped
     assert receipt.operator_email == "[REDACTED]"
     assert receipt.result.metadata["model"] == "[REDACTED]-model"
-    assert "sk-raw-secret" not in dumped
+    assert "token=craik-test-not-a-real-key-raw" not in dumped
 
 
 def test_provider_runtime_receipt_does_not_apply_other_profile_redaction_patterns(
@@ -859,7 +859,7 @@ def test_provider_runtime_receipt_does_not_apply_other_profile_redaction_pattern
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("CRAIK_HOME", str(tmp_path))
-    monkeypatch.setenv("OPENAI_OTHER_KEY", "sk-raw-secret")
+    monkeypatch.setenv("OPENAI_OTHER_KEY", "token=craik-test-not-a-real-key-raw")
     AuthProfileStore(tmp_path).put(
         AuthProfile(
             id="openai:other",
@@ -908,7 +908,7 @@ def test_provider_runtime_receipt_does_not_apply_other_profile_redaction_pattern
 
     assert receipt.operator_email == "work-account@example.test"
     assert receipt.result.metadata["model"] == "org-secret-123-model"
-    assert "sk-raw-secret" not in receipt.model_dump_json()
+    assert "token=craik-test-not-a-real-key-raw" not in receipt.model_dump_json()
 
 
 def test_provider_request_requires_operator_identity_before_transport(
