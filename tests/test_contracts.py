@@ -186,28 +186,52 @@ def test_contract_models_keep_split_package_import_surface() -> None:
 
 
 @pytest.mark.parametrize(
-    ("module_name", "export_name"),
+    ("module_name", "export_name", "export_kind"),
     [
-        ("craik.contracts.models.core", "TaskRequest"),
-        ("craik.contracts.models.handoffs", "Handoff"),
-        ("craik.contracts.models.instructions", "InstructionSource"),
-        ("craik.contracts.models.memory", "MemoryProposal"),
-        ("craik.contracts.models.review", "WorkerFinding"),
-        ("craik.contracts.models.runtime", "RunOutput"),
-        ("craik.contracts.models.skills", "SkillPackage"),
-        ("craik.runtime.memory.memory", "create_proposal"),
-        ("craik.runtime.policy.policy", "generate_policy_envelope"),
-        ("craik.runtime.runners.runners", "default_runner_capability_matrices"),
+        ("craik.contracts.models.core", "TaskRequest", "symbol"),
+        ("craik.contracts.models.handoffs", "Handoff", "symbol"),
+        ("craik.contracts.models.instructions", "InstructionSource", "symbol"),
+        ("craik.contracts.models.memory", "MemoryProposal", "symbol"),
+        ("craik.contracts.models.review", "WorkerFinding", "symbol"),
+        ("craik.contracts.models.runtime", "RunOutput", "symbol"),
+        ("craik.contracts.models.skills", "SkillPackage", "symbol"),
+        ("craik.runtime.memory.memory", "create_proposal", "function"),
+        ("craik.runtime.policy.policy", "generate_policy_envelope", "function"),
+        ("craik.runtime.runners.runners", "default_runner_capability_matrices", "function"),
     ],
 )
 def test_compatibility_reexport_modules_define_public_exports(
     module_name: str,
     export_name: str,
+    export_kind: str,
 ) -> None:
     module = importlib.import_module(module_name)
 
     assert export_name in module.__all__
-    assert getattr(module, export_name)
+    exported = getattr(module, export_name)
+    assert exported
+
+    if export_kind == "function":
+        assert callable(exported)
+        if export_name == "create_proposal":
+            proposal = exported(
+                task_id="task_exports",
+                entity="repo:Eidetic-Labs/Craik",
+                relation="craik:test",
+                value="exported proposal works",
+                source="test",
+                confidence=1.0,
+                scope="local",
+                trust_class="observed",
+                evidence=[],
+            )
+            assert proposal.task_id == "task_exports"
+        if export_name == "generate_policy_envelope":
+            policy = exported(task_id="task_exports", actor="agent:test")
+            assert policy.task_id == "task_exports"
+        if export_name == "default_runner_capability_matrices":
+            matrices = exported()
+            assert "codex" in matrices
 
 
 @pytest.mark.parametrize("name", sorted(CONTRACT_REGISTRY))

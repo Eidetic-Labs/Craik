@@ -20,6 +20,8 @@ from craik.runtime.auth.workload import (
     WorkloadIdentityProvider,
 )
 
+_THREAD_JOIN_TIMEOUT_SECONDS = 2
+
 
 def test_github_actions_workload_identity_requests_audience_token() -> None:
     with _stub_oidc_endpoint() as endpoint:
@@ -116,14 +118,15 @@ class _StubOIDCEndpoint:
 
     def stop(self) -> None:
         self.server.shutdown()
-        self.thread.join(timeout=2)
+        self.thread.join(timeout=_THREAD_JOIN_TIMEOUT_SECONDS)
 
     def _handler(self) -> type[BaseHTTPRequestHandler]:
         parent = self
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, format: str, *args: object) -> None:
-                return
+                # Intentionally suppress HTTP request logging in tests.
+                pass
 
             def do_GET(self) -> None:
                 parsed = parse.urlparse(self.path)

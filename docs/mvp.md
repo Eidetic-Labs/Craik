@@ -57,9 +57,12 @@ Commands:
 - `craik auth grant`
 - `craik project add`
 - `craik task create`
+- `craik case build`
 - `craik run execute`
 - `craik handoff show`
+- `craik handoff create`
 - `craik memory propose`
+- `craik memory diff`
 - `craik receipts list`
 
 The command list should start small. Implementation should prioritize:
