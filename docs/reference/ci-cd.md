@@ -71,6 +71,11 @@ The `security` job runs Bandit against `src/craik` with an explicit baseline
 for accepted findings. New findings fail the job and should either be fixed or
 added to the baseline only with a reviewable rationale.
 
+The same job runs Gitleaks against the checked-out tree with the repo-local
+`.gitleaks.toml` configuration. The configuration extends the default rules and
+only allowlists generated documentation dependency trees plus intentionally
+fake test credential fixtures.
+
 ## Changed-File Strictness
 
 `scripts/check_changed_file_strictness.py` enforces minimum review discipline:
