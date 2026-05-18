@@ -37,7 +37,7 @@ Tracking issue: [#298](https://github.com/Eidetic-Labs/Craik/issues/298).
 - [x] Replace stale `pre-0.1.0` language in public docs.
 - [x] State that the first release is `0.x.0`.
 - [x] Add a surface status matrix.
-- [x] Convert the post-v0.13 readiness list into MVP and post-MVP buckets.
+- [x] Convert the release-readiness list into MVP and post-MVP buckets.
 
 ### 1. Docusaurus Docs Platform
 
