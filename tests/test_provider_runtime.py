@@ -34,6 +34,7 @@ from craik.runtime.providers.provider_runtime import (
     OpenAIProviderAdapter,
     ProviderLiveAccessNotConfiguredError,
     ProviderMessage,
+    ProviderRuntimeAdapter,
     ProviderRuntimeConfig,
     ProviderRuntimeError,
     ProviderRuntimeRequest,
@@ -98,6 +99,25 @@ def test_provider_runtime_keeps_extracted_import_surface() -> None:
     assert runtime_error is extracted_runtime_error
     assert runtime_approval_error is extracted_approval_error
     assert runtime_receipt is extracted_receipt
+
+
+def test_provider_runtime_adapter_protocol_defaults_raise_not_implemented() -> None:
+    class IncompleteProviderRuntimeAdapter(ProviderRuntimeAdapter):
+        pass
+
+    adapter = IncompleteProviderRuntimeAdapter()
+    request = ProviderRuntimeRequest(messages=[ProviderMessage(role="user", content="hi")])
+
+    with pytest.raises(NotImplementedError):
+        adapter.execute(request)
+    with pytest.raises(NotImplementedError):
+        adapter.build_payload(request)
+    with pytest.raises(NotImplementedError):
+        adapter.normalize_response({})
+    with pytest.raises(NotImplementedError):
+        adapter.classify_error(status_code=None)
+    with pytest.raises(NotImplementedError):
+        adapter.require_live_access()
 
 
 def _openai_adapter(*, live_enabled: bool = False) -> OpenAIProviderAdapter:

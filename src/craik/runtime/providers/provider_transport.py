@@ -17,11 +17,11 @@ class ProviderTransport(Protocol):
     @property
     def family(self) -> ProviderFamily:
         """Provider API family this transport speaks."""
-        ...
+        raise NotImplementedError
 
     def send(self, payload: dict[str, Any], *, stream: bool) -> Iterator[dict[str, Any]]:
         """Send one provider payload and yield one or more response chunks."""
-        ...
+        raise NotImplementedError
 
 
 class ProviderTransportError(RuntimeError):

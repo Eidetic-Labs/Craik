@@ -26,7 +26,7 @@ class SecretManager(Protocol):
 
     def resolve(self, ref: str) -> str:
         """Return credential material for a reference."""
-        ...
+        raise NotImplementedError
 
 
 @dataclass(frozen=True)
