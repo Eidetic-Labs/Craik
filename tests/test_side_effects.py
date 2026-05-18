@@ -69,6 +69,24 @@ def test_shell_wrapper_runs_command_reference_with_receipt(store: LocalStore) ->
     assert store.get_receipt(result.receipt.id) == result.receipt
 
 
+def test_shell_wrapper_redacts_command_reference_in_receipt(store: LocalStore) -> None:
+    policy = generate_policy_envelope(task_id="task_side_effect", actor="agent:codex")
+
+    result = run_shell_command_ref(
+        store=store,
+        policy=policy,
+        grants=[_grant("shell.execute", operations=["execute"])],
+        actor="agent:codex",
+        command_ref="tool run --token redactionfixture123",
+        executor=lambda command_ref: {"command_ref": command_ref, "stdout": "ok"},
+    )
+
+    assert result.allowed is True
+    assert "redactionfixture123" not in result.receipt.target
+    assert result.receipt.result.metadata["command_ref"] == "tool run --token [REDACTED]"
+    assert result.receipt.result.metadata["output"]["command_ref"] == "tool run --token [REDACTED]"
+
+
 def test_file_write_wrapper_enforces_immutable_paths_and_writes_allowed_file(
     store: LocalStore,
     tmp_path: Path,

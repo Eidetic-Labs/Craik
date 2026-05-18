@@ -215,13 +215,14 @@ def _passed_receipt(
     reason: str,
     metadata: dict[str, Any],
 ) -> CapabilityReceipt:
+    redacted_target = str(redact(target).value)
     return environment_receipt(
-        receipt_id=f"receipt_{policy.task_id}_{_slug(capability)}_{_slug(target)}",
+        receipt_id=f"receipt_{policy.task_id}_{_slug(capability)}_{_slug(redacted_target)}",
         action="sandbox_action",
         context=EnvironmentReceiptContext(
             task_id=policy.task_id,
             policy_envelope_id=policy.id,
-            target_id=target,
+            target_id=redacted_target,
         ),
         actor=actor,
         capability=capability,

@@ -23,8 +23,10 @@ REDACTED_VALUE_KEYS = frozenset(value.lower() for value in REDACTED_VALUES)
 DEFAULT_SECRET_PATTERNS: tuple[re.Pattern[str], ...] = (
     re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]{8,}"),
     re.compile(r"(?i)\b(api[_-]?key|token|password|secret)=([^\s&]+)"),
+    re.compile(r"(?i)(--(?:api[_-]?key|token|password|secret)(?:=|\s+))([^\s]+)"),
     re.compile(r"(?i)\b(ghp|github_pat|sk|xox[baprs])-[A-Za-z0-9_-]{8,}"),
     re.compile(r"(?i)(https?://)([^/\s:@]+):([^@\s/]+)@"),
+    re.compile(r"(?i)(https?://)([A-Za-z0-9._~+/=-]{8,})@"),
 )
 
 
@@ -145,7 +147,11 @@ def _redact_string(
 def _replacement_for_match(config: RedactionConfig) -> Callable[[re.Match[str]], str]:
     def replace(match: re.Match[str]) -> str:
         if match.re.pattern.startswith("(?i)(https?://)"):
-            return f"{match.group(1)}{config.replacement}:{config.replacement}@"
+            if len(match.groups()) >= 3:
+                return f"{match.group(1)}{config.replacement}:{config.replacement}@"
+            return f"{match.group(1)}{config.replacement}@"
+        if match.re.pattern.startswith("(?i)(--"):
+            return f"{match.group(1)}{config.replacement}"
         if len(match.groups()) >= 2 and match.group(1).lower() in {
             "api_key",
             "apikey",
