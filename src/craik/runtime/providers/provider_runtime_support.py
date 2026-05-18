@@ -25,6 +25,10 @@ from craik.runtime.providers.provider_transport import (
     ProviderFamily,
     ProviderTransport,
 )
+from craik.runtime.providers.provider_url_safety import (
+    ProviderURLSafetyError,
+    assert_safe_provider_url,
+)
 
 if TYPE_CHECKING:
     from craik.runtime.providers.provider_runtime import (
@@ -43,6 +47,15 @@ def _transport_for_config(config: ProviderRuntimeConfig) -> ProviderTransport:
         from craik.runtime.providers.provider_runtime import ProviderRuntimeError
 
         raise ProviderRuntimeError(f"provider {config.provider_id} requires base_url")
+    try:
+        assert_safe_provider_url(
+            config.base_url,
+            allow_local=config.allow_local_base_url,
+        )
+    except ProviderURLSafetyError as exc:
+        from craik.runtime.providers.provider_runtime import ProviderRuntimeError
+
+        raise ProviderRuntimeError(str(exc)) from exc
     return HTTPTransport(
         family=config.provider_family,
         base_url=config.base_url,
@@ -79,10 +92,24 @@ def _headers_for_auth_profile(
 def _provider_base_url(provider: ModelProvider) -> str:
     configured = provider.metadata.get("base_url")
     if isinstance(configured, str) and configured:
-        return configured
-    if provider.provider == "anthropic":
-        return "https://api.anthropic.com"
-    return "https://api.openai.com"
+        url = configured
+    elif provider.provider == "anthropic":
+        url = "https://api.anthropic.com"
+    else:
+        url = "https://api.openai.com"
+    try:
+        assert_safe_provider_url(url, allow_local=_provider_allows_local_url(provider))
+    except ProviderURLSafetyError as exc:
+        from craik.runtime.providers.provider_runtime import ProviderRuntimeError
+
+        raise ProviderRuntimeError(str(exc)) from exc
+    return url
+
+
+def _provider_allows_local_url(provider: ModelProvider) -> bool:
+    return provider.id.startswith("provider_local_") or provider.metadata.get(
+        "allow_local_base_url"
+    ) is True
 
 
 def provider_runtime_receipt(

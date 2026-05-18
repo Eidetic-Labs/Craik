@@ -7,6 +7,10 @@ from typing import Any
 
 from craik.contracts.models import ModelProvider
 from craik.runtime.providers.provider_runtime import ANTHROPIC_OFFICIAL_DOCS, OPENAI_OFFICIAL_DOCS
+from craik.runtime.providers.provider_url_safety import (
+    ProviderURLSafetyError,
+    assert_safe_provider_url,
+)
 
 ANTHROPIC_PROVIDER_ADAPTER = "craik.runtime.providers.provider_runtime.AnthropicProviderAdapter"
 OPENAI_PROVIDER_ADAPTER = "craik.runtime.providers.provider_runtime.OpenAIProviderAdapter"
@@ -39,6 +43,7 @@ class ModelProviderRegistry:
         """Register one provider by stable id."""
         if provider.id in self._providers:
             raise DuplicateModelProviderError(f"provider already registered: {provider.id}")
+        _validate_provider_base_url(provider)
         self._providers[provider.id] = provider
         return provider
 
@@ -257,6 +262,7 @@ def default_model_provider_registry() -> ModelProviderRegistry:
                     "runtime_path": CHAT_COMPLETIONS_PROVIDER_ADAPTER,
                     "metadata": {
                         "base_url": "http://localhost:11434/v1",
+                        "allow_local_base_url": True,
                         "default_model": "llama3.2",
                         "docs_verified": "2026-05-17",
                     },
@@ -270,6 +276,19 @@ def default_model_provider_registry() -> ModelProviderRegistry:
             ),
         ]
     )
+
+
+def _validate_provider_base_url(provider: ModelProvider) -> None:
+    configured = provider.metadata.get("base_url")
+    if not isinstance(configured, str) or not configured:
+        return
+    allow_local = provider.id.startswith("provider_local_") or provider.metadata.get(
+        "allow_local_base_url"
+    ) is True
+    try:
+        assert_safe_provider_url(configured, allow_local=allow_local)
+    except ProviderURLSafetyError as exc:
+        raise ModelProviderRegistryError(str(exc)) from exc
 
 
 def _mvp_provider_capabilities() -> list[dict[str, object]]:

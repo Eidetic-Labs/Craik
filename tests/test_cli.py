@@ -756,6 +756,51 @@ def test_auth_secret_ref_file_profile_rejects_absolute_ref(tmp_path: Path) -> No
     assert "relative to the secrets root" in added.output
 
 
+def test_auth_profile_rejects_unsafe_provider_base_url(tmp_path: Path) -> None:
+    added = runner.invoke(
+        app,
+        [
+            "auth",
+            "add",
+            "openai:work",
+            "--kind",
+            "api-key",
+            "--env-var",
+            "OPENAI_API_KEY",
+            "--base-url",
+            "http://169.254.169.254/latest/meta-data/",
+        ],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert added.exit_code != 0
+    assert "HTTPS" in added.output
+
+
+def test_auth_profile_allows_explicit_local_provider_base_url(tmp_path: Path) -> None:
+    added = runner.invoke(
+        app,
+        [
+            "auth",
+            "add",
+            "chat_completions:local",
+            "--kind",
+            "api-key",
+            "--env-var",
+            "LOCAL_API_KEY",
+            "--base-url",
+            "http://localhost:11434/v1",
+            "--allow-local-base-url",
+        ],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert added.exit_code == 0
+    payload = json.loads(added.stdout)
+    assert payload["metadata"]["base_url"] == "http://localhost:11434/v1"
+    assert payload["metadata"]["allow_local_base_url"] is True
+
+
 def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
     home = tmp_path / "home"
 

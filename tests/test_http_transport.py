@@ -246,6 +246,7 @@ def test_live_enabled_adapter_executes_round_trip_through_http_transport() -> No
             model="gpt-test",
             secret_ref_name="TEST_API_KEY",
             base_url=server.url,
+            allow_local_base_url=True,
             live_enabled=True,
             docs_refs=list(OPENAI_OFFICIAL_DOCS),
         )
@@ -303,6 +304,7 @@ def test_live_enabled_adapter_retries_retryable_http_errors() -> None:
             model="gpt-test",
             secret_ref_name="TEST_API_KEY",
             base_url=server.url,
+            allow_local_base_url=True,
             live_enabled=True,
             docs_refs=list(OPENAI_OFFICIAL_DOCS),
         )
