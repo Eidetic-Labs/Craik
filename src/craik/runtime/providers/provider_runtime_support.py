@@ -222,6 +222,7 @@ def _redact_receipt_for_auth_profile(
         redaction_config_for_patterns(profile.redaction_patterns),
     ).value
     if isinstance(redacted, dict):
+        redacted["self_hash"] = ""
         return CapabilityReceipt.model_validate(redacted)
     return receipt
 

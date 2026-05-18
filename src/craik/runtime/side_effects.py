@@ -67,7 +67,7 @@ def run_shell_command_ref(
         reason=decision.reason,
         metadata={"command_ref": command_ref, "output": redact(output).value},
     )
-    store.put_receipt(receipt)
+    receipt = store.put_receipt(receipt)
     return SideEffectResult(kind="shell", allowed=True, receipt=receipt, output=output)
 
 
@@ -109,7 +109,7 @@ def write_policy_file(
             "immutable_path": decision.immutable_path,
         },
     )
-    store.put_receipt(receipt)
+    receipt = store.put_receipt(receipt)
     return SideEffectResult(kind="file_write", allowed=True, receipt=receipt)
 
 
@@ -142,7 +142,7 @@ def write_memory_fact(
             "confidence": written.confidence,
         },
     )
-    store.put_receipt(receipt)
+    receipt = store.put_receipt(receipt)
     return SideEffectResult(kind="memory_write", allowed=True, receipt=receipt)
 
 
@@ -189,7 +189,7 @@ def run_github_write(
         reason=decision.reason,
         metadata={"operation": operation, "github_result": redact(output).value},
     )
-    store.put_receipt(receipt)
+    receipt = store.put_receipt(receipt)
     return SideEffectResult(kind="github_write", allowed=True, receipt=receipt, output=output)
 
 
@@ -203,8 +203,7 @@ def _persist_denial(
     if decision.allowed:
         return None
     receipt = denial_receipt(policy=policy, decision=decision, actor=actor)
-    store.put_receipt(receipt)
-    return receipt
+    return store.put_receipt(receipt)
 
 
 def _passed_receipt(

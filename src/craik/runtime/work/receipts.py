@@ -37,8 +37,7 @@ class ReceiptStore:
 
     def record_receipt(self, receipt: CapabilityReceipt) -> CapabilityReceipt:
         """Persist a validated receipt and return the stored model."""
-        self._store.put_receipt(receipt)
-        return receipt
+        return self._store.put_receipt(receipt)
 
     def get_receipt(self, receipt_id: str) -> CapabilityReceipt | None:
         """Load one receipt by id."""

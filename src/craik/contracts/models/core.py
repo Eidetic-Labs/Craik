@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import TYPE_CHECKING
 
 from .base import *
@@ -206,7 +208,28 @@ class CapabilityReceipt(CraikModel):
     operator_issuer: str | None = None
     operator_email: str | None = None
     operator_groups: list[str] = Field(default_factory=list)
+    previous_receipt_hash: str | None = None
+    self_hash: str = ""
     created_at: datetime
+
+    @model_validator(mode="after")
+    def validate_receipt_hash(self) -> CapabilityReceipt:
+        """Compute or verify the canonical receipt hash."""
+        expected = _capability_receipt_hash(self)
+        if self.self_hash and self.self_hash != expected:
+            raise ValueError("capability receipt hash did not match payload")
+        self.self_hash = expected
+        return self
+
+
+def _capability_receipt_hash(receipt: CapabilityReceipt) -> str:
+    payload = receipt.model_dump(
+        mode="json",
+        by_alias=True,
+        exclude={"self_hash"},
+    )
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 class AgentRole(CraikModel):
