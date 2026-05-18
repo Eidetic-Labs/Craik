@@ -228,6 +228,33 @@ def test_alg_none_id_token_is_rejected() -> None:
             authenticator.validate_id_token(token)
 
 
+def test_id_token_algorithm_must_be_allowed_by_config() -> None:
+    with _stub_idp() as idp:
+        authenticator = OIDCAuthenticator(
+            OIDCConfig(
+                issuer=idp.issuer,
+                client_id="craik-cli",
+                oidc_allow_loopback_http=True,
+                allowed_id_token_algorithms=["RS256"],
+            )
+        )
+
+        with pytest.raises(OIDCAuthenticationError, match="algorithm is not allowed"):
+            authenticator.validate_id_token(idp.token())
+
+
+@pytest.mark.parametrize("algorithms", [[], ["none"], ["ES256"]])
+def test_id_token_algorithm_allowlist_is_constrained(algorithms: list[str]) -> None:
+    with _stub_idp() as idp:
+        with pytest.raises(OIDCAuthenticationError, match="algorithm allowlist"):
+            OIDCConfig(
+                issuer=idp.issuer,
+                client_id="craik-cli",
+                oidc_allow_loopback_http=True,
+                allowed_id_token_algorithms=algorithms,
+            )
+
+
 def test_unknown_kid_is_rejected() -> None:
     with _stub_idp() as idp:
         authenticator = OIDCAuthenticator(

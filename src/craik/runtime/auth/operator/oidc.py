@@ -23,6 +23,7 @@ from craik.runtime.auth.url_safety import require_https_url
 
 DEFAULT_DISCOVERY_TTL_SECONDS = 3600
 DEFAULT_CLOCK_SKEW_SECONDS = 60
+SUPPORTED_ID_TOKEN_ALGORITHMS = frozenset({"HS256", "RS256"})
 RSA_SHA256_DIGEST_INFO = bytes.fromhex("3031300d060960864801650304020105000420")
 
 
@@ -40,6 +41,7 @@ class OIDCConfig(CraikModel):
     audience: str | None = None
     groups_claim: str = "groups"
     oidc_allow_loopback_http: bool = False
+    allowed_id_token_algorithms: list[str] = Field(default_factory=lambda: ["RS256", "HS256"])
 
     @model_validator(mode="after")
     def validate_oidc_endpoints(self) -> OIDCConfig:
@@ -49,6 +51,11 @@ class OIDCConfig(CraikModel):
             allow_loopback_http=self.oidc_allow_loopback_http,
             error_type=OIDCAuthenticationError,
         )
+        algorithms = set(self.allowed_id_token_algorithms)
+        if not algorithms:
+            raise OIDCAuthenticationError("OIDC ID token algorithm allowlist cannot be empty")
+        if "none" in algorithms or not algorithms.issubset(SUPPORTED_ID_TOKEN_ALGORITHMS):
+            raise OIDCAuthenticationError("OIDC ID token algorithm allowlist is unsupported")
         return self
 
 
@@ -248,6 +255,8 @@ class OIDCAuthenticator:
         alg = _required_string(header, "alg")
         if alg == "none":
             raise OIDCAuthenticationError("OIDC ID token uses an unsupported algorithm")
+        if alg not in self.config.allowed_id_token_algorithms:
+            raise OIDCAuthenticationError("OIDC ID token algorithm is not allowed")
         kid = _required_string(header, "kid")
         key = self._jwk_for_kid(kid)
         _verify_signature(alg, key, signing_input, signature)
