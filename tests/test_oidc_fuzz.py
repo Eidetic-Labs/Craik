@@ -88,7 +88,12 @@ def test_validate_id_token_handles_json_jwt_and_jwks_shapes(
             _b64url(signature),
         ]
     )
-    jwks_payload = jwks if isinstance(jwks, dict) else {"keys": jwks}
+    if isinstance(jwks, dict):
+        jwks_payload = jwks
+    elif isinstance(jwks, list):
+        jwks_payload = {"keys": jwks}
+    else:
+        jwks_payload = {"keys": [jwks]}
 
     _assert_only_oidc_error_escapes(token, jwks_payload)
 
@@ -117,6 +122,10 @@ def _assert_only_oidc_error_escapes(token: str, jwks: dict[str, Any]) -> None:
         authenticator.validate_id_token(token)
     except OIDCAuthenticationError:
         return
+
+    # Success is acceptable for generated well-formed inputs; make the allowed
+    # success shape explicit so this helper does not silently pass every path.
+    assert len(token.split(".")) == 3
 
 
 def _json_part(value: dict[str, Any]) -> str:

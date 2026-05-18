@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 import pytest
@@ -54,6 +54,21 @@ def test_authorization_code_exchange_rejects_missing_state_before_token_request(
     assert authenticator.exchanged is False
 
 
+def test_authorization_code_exchange_rejects_empty_expected_state_with_received_state() -> None:
+    authenticator = _StateValidationAuthenticator()
+
+    with pytest.raises(OIDCAuthenticationError, match="state did not match"):
+        authenticator.exchange_authorization_code(
+            code="code-1",
+            redirect_uri="http://127.0.0.1:8765/callback",
+            code_verifier="verifier-1",
+            expected_state="",
+            received_state="state-2",
+        )
+
+    assert authenticator.exchanged is False
+
+
 class _StateValidationAuthenticator(OIDCAuthenticator):
     def __init__(self) -> None:
         super().__init__(
@@ -86,6 +101,6 @@ class _StateValidationAuthenticator(OIDCAuthenticator):
             groups=["platform"],
             issuer="https://idp.example.test",
             id_token_jti="token-1",
-            expires_at=datetime.now(UTC) + timedelta(hours=1),
+            expires_at=datetime(2030, 1, 1, tzinfo=UTC),
             refresh_token_ref=None,
         )

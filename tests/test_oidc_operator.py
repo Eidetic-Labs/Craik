@@ -25,7 +25,7 @@ KEY = {"kty": "oct", "kid": "test-key", "k": ""}
 KEY["k"] = base64.urlsafe_b64encode(SECRET).rstrip(b"=").decode("ascii")
 
 
-class _StubIdP:
+class _StubIDP:
     def __init__(self, *, jwks: dict[str, Any] | None = None) -> None:
         self.jwks = jwks or {"keys": [KEY]}
         self.server = HTTPServer(("127.0.0.1", 0), self._handler())
@@ -61,7 +61,7 @@ class _StubIdP:
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, format: str, *args: object) -> None:
-                return
+                pass
 
             def do_GET(self) -> None:
                 if self.path == "/.well-known/openid-configuration":
@@ -115,8 +115,8 @@ class _StubIdP:
 
 
 @contextmanager
-def _stub_idp(*, jwks: dict[str, Any] | None = None) -> Iterator[_StubIdP]:
-    idp = _StubIdP(jwks=jwks)
+def _stub_idp(*, jwks: dict[str, Any] | None = None) -> Iterator[_StubIDP]:
+    idp = _StubIDP(jwks=jwks)
     idp.start()
     try:
         yield idp
@@ -190,7 +190,8 @@ def test_tampered_id_token_is_rejected() -> None:
             )
         )
         token = idp.token()
-        header, _claims, signature = token.split(".")
+        header, claims, signature = token.split(".")
+        assert claims
         tampered_claims = {
             "iss": idp.issuer,
             "aud": "craik-cli",
