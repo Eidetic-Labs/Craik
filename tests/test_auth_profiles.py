@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from craik.runtime.auth import AuthProfile, CredentialKind, CredentialStatus
+from craik.runtime.auth import AuthProfile, CredentialKind, CredentialSource, CredentialStatus
 from craik.runtime.auth.sources import (
     CLIBridgeCredentialSource,
     EnvVarApiKeySource,
@@ -74,6 +74,18 @@ def test_credential_status_defaults_to_unknown() -> None:
     assert status.status == "unknown"
     assert status.detail is None
     assert status.expires_at is None
+
+
+def test_credential_source_protocol_defaults_raise_not_implemented() -> None:
+    class IncompleteCredentialSource(CredentialSource):
+        pass
+
+    source = IncompleteCredentialSource()
+
+    with pytest.raises(NotImplementedError):
+        source.headers_for("openai")
+    with pytest.raises(NotImplementedError):
+        source.status()
 
 
 def test_source_for_auth_profile_maps_supported_kinds() -> None:

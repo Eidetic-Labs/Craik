@@ -22,7 +22,7 @@ class WorkloadIdentityProvider(Protocol):
 
     def get_token(self, audience: str) -> str:
         """Return a current workload OIDC token for the requested audience."""
-        ...
+        raise NotImplementedError
 
 
 @dataclass

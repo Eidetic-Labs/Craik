@@ -80,8 +80,8 @@ class CredentialSource(Protocol):
 
     def headers_for(self, family: ProviderFamily) -> dict[str, str]:
         """Return provider-specific authorization headers."""
-        ...
+        raise NotImplementedError
 
     def status(self) -> CredentialStatus:
         """Return a cheap health verdict without exposing credential material."""
-        ...
+        raise NotImplementedError

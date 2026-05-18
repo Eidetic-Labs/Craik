@@ -5,6 +5,7 @@ import pytest
 from craik.runtime.auth.sources import (
     EnvVarSecretManager,
     FileSecretManager,
+    SecretManager,
     SecretRefCredentialSource,
 )
 
@@ -25,6 +26,16 @@ def test_secret_ref_source_resolves_file_secret(tmp_path: Path) -> None:
     }
     assert source.status().status == "ok"
     assert "file-secret" not in str(source.status())
+
+
+def test_secret_manager_protocol_default_raises_not_implemented() -> None:
+    class IncompleteSecretManager(SecretManager):
+        pass
+
+    manager = IncompleteSecretManager()
+
+    with pytest.raises(NotImplementedError):
+        manager.resolve("secret-ref")
 
 
 def test_secret_ref_source_resolves_env_secret(monkeypatch: pytest.MonkeyPatch) -> None:

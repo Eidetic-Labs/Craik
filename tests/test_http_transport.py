@@ -15,7 +15,7 @@ from craik.runtime.providers.provider_runtime import (
     ProviderRuntimeConfig,
     ProviderRuntimeRequest,
 )
-from craik.runtime.providers.provider_transport import ProviderTransportError
+from craik.runtime.providers.provider_transport import ProviderTransport, ProviderTransportError
 
 
 def test_http_transport_yields_non_streaming_json_response() -> None:
@@ -39,6 +39,21 @@ def test_http_transport_yields_non_streaming_json_response() -> None:
     assert chunks == [{"id": "resp_1", "output_text": "ok"}]
     assert seen["payload"] == {"model": "gpt-test"}
     assert seen["authorization"] == "Bearer test-token"
+
+
+def test_provider_transport_protocol_defaults_raise_not_implemented() -> None:
+    class IncompleteTransport(ProviderTransport):
+        pass
+
+    transport = IncompleteTransport()
+
+    def read_family() -> object:
+        return transport.family
+
+    with pytest.raises(NotImplementedError):
+        read_family()
+    with pytest.raises(NotImplementedError):
+        list(transport.send({}, stream=False))
 
 
 def test_http_transport_yields_sse_json_chunks() -> None:

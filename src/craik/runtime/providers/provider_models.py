@@ -106,13 +106,15 @@ class ProviderRuntimeAdapter(Protocol):
         stream_callback: Callable[[str], None] | None = None,
     ) -> ProviderRuntimeResult:
         """Execute one provider request through the configured transport."""
-        ...
+        raise NotImplementedError
 
     def build_payload(self, request: ProviderRuntimeRequest) -> dict[str, Any]:
         """Build a provider-specific request payload."""
+        raise NotImplementedError
 
     def normalize_response(self, response: dict[str, Any]) -> ProviderRuntimeResult:
         """Normalize a provider response payload."""
+        raise NotImplementedError
 
     def classify_error(
         self,
@@ -122,6 +124,8 @@ class ProviderRuntimeAdapter(Protocol):
         headers: dict[str, str] | None = None,
     ) -> ProviderRuntimeErrorDecision:
         """Classify whether an error is retryable."""
+        raise NotImplementedError
 
     def require_live_access(self) -> None:
         """Raise unless live API access was explicitly enabled."""
+        raise NotImplementedError

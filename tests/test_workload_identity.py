@@ -17,6 +17,7 @@ from craik.runtime.auth.workload import (
     GitHubActionsWorkloadIdentity,
     KubernetesProjectedTokenIdentity,
     WorkloadIdentityError,
+    WorkloadIdentityProvider,
 )
 
 
@@ -35,6 +36,16 @@ def test_github_actions_workload_identity_requests_audience_token() -> None:
     assert token == "github-oidc-token"
     assert endpoint.seen_authorization == ["Bearer request-token"]
     assert endpoint.seen_audiences == ["craik-broker"]
+
+
+def test_workload_identity_provider_protocol_default_raises_not_implemented() -> None:
+    class IncompleteWorkloadIdentityProvider(WorkloadIdentityProvider):
+        pass
+
+    provider = IncompleteWorkloadIdentityProvider()
+
+    with pytest.raises(NotImplementedError):
+        provider.get_token("audience")
 
 
 def test_github_actions_workload_identity_fails_outside_actions() -> None:
