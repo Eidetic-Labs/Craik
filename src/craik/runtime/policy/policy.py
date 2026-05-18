@@ -360,6 +360,10 @@ def _target_matches(grant: CapabilityGrant, target: str) -> bool:
     if not paths:
         return True
     normalized = _normalize_path(target)
+    if not _safe_target_value(normalized):
+        return False
+    if any(not _safe_target_pattern(pattern) for pattern in paths + excludes):
+        return False
     if any(_path_matches(pattern, normalized) for pattern in excludes):
         return False
     return any(_path_matches(pattern, normalized) for pattern in paths)
@@ -378,6 +382,25 @@ def _path_matches(pattern: str, path: str) -> bool:
 
 def _normalize_path(path: str) -> str:
     return path.replace("\\", "/").strip("/")
+
+
+def _safe_target_value(path: str) -> bool:
+    parts = PurePosixPath(path).parts
+    return bool(path) and ".." not in parts
+
+
+def _safe_target_pattern(pattern: str) -> bool:
+    normalized = _normalize_path(pattern)
+    if not _safe_target_value(normalized):
+        return False
+    if pattern.startswith(("/", "\\")):
+        return False
+    if normalized in {"*", "**", "*/**"}:
+        return False
+    parts = PurePosixPath(normalized).parts
+    if any(part == "**" for part in parts[:-1]):
+        return False
+    return True
 
 
 def _valid_immutable_override(override: dict[str, str] | None) -> bool:

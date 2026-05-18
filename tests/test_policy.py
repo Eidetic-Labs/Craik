@@ -179,6 +179,59 @@ def test_grant_exclude_blocks_path() -> None:
     assert decision.allowed is False
 
 
+@pytest.mark.parametrize(
+    "pattern",
+    ["*", "**", "../outside.md", "/docs/**", "docs/../secrets.md", "docs/**/secrets.md"],
+)
+def test_file_write_grants_reject_unsafe_target_patterns(pattern: str) -> None:
+    envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
+    grant = _grant("repo.write.docs", paths=[pattern], operations=["write"])
+
+    decision = check_file_write_grant(
+        policy=envelope,
+        grants=[grant],
+        path="docs/index.md",
+        docs=DocsProfile(paths=["docs/"], immutable_paths=[]),
+    )
+
+    assert decision.allowed is False
+    assert decision.reason == "file write requires matching capability grant"
+
+
+def test_file_write_grants_reject_repo_escape_targets() -> None:
+    envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
+    grant = _grant("repo.write.docs", paths=["../outside.md"], operations=["write"])
+
+    decision = check_file_write_grant(
+        policy=envelope,
+        grants=[grant],
+        path="../outside.md",
+        docs=DocsProfile(paths=["docs/"], immutable_paths=[]),
+    )
+
+    assert decision.allowed is False
+    assert decision.reason == "file write requires matching capability grant"
+
+
+def test_file_write_grants_reject_unsafe_exclude_patterns() -> None:
+    envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
+    grant = _grant(
+        "repo.write.docs",
+        paths=["docs/**"],
+        exclude=["../outside.md"],
+        operations=["write"],
+    )
+
+    decision = check_file_write_grant(
+        policy=envelope,
+        grants=[grant],
+        path="docs/index.md",
+        docs=DocsProfile(paths=["docs/"], immutable_paths=[]),
+    )
+
+    assert decision.allowed is False
+
+
 def test_shell_github_and_memory_hooks_require_matching_grants() -> None:
     envelope = generate_policy_envelope(task_id="task_policy", actor="agent:codex")
 
