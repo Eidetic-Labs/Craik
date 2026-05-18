@@ -12,6 +12,18 @@ for API keys, channel tokens, webhook secrets, or bearer credentials. Store thos
 secrets in the operator's secret manager or environment variables for the
 specific adapter that needs them.
 
+For live provider calls, run OIDC operator login and add a credential profile
+after setup:
+
+```sh
+craik login
+craik auth add anthropic:work --kind=api-key --env-var=ANTHROPIC_API_KEY
+```
+
+See [Authentication and Credentials](authentication.md) for the full credential
+surface, including local-CLI OAuth, secret references, Stigmem-backed
+credentials, workload identity, and approval-gated first use.
+
 ## Gateway Options
 
 Enable the persisted gateway configuration:

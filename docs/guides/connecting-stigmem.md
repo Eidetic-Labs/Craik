@@ -49,3 +49,16 @@ craik memory propose task_review_docs \
 | `CRAIK_STIGMEM_TIMEOUT` | Request timeout in seconds. Defaults to `5.0`. |
 
 Store API keys in the environment or local secret tooling. Do not commit them to project files.
+
+## Stigmem-Backed Credentials
+
+Craik can also resolve provider credentials from Stigmem facts through
+`stigmem-ref` auth profiles. The profile points at a Stigmem node, entity,
+scope, and relation such as `craik:credential:value`; the credential material is
+resolved at request time and is not printed in receipts or logs.
+
+This is useful when a team wants shared provider credentials with Stigmem
+provenance and revocation semantics. The auth profile metadata is file-backed in
+`<CRAIK_HOME>/auth-profiles.json`; see
+[Authentication and Credentials](authentication.md) for the profile shape and
+audit behavior.

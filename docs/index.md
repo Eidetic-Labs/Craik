@@ -6,8 +6,9 @@ project.
 Craik v0.1.0 is a governed runtime substrate, not a broad autonomous agent
 release. It supports typed case files, policy envelopes, receipts, prompt
 compilation, fixture and live-shaped provider transports, provider-backed loop
-execution, handoffs, work graphs, and memory proposals. Live model calls are
-explicitly enabled and credentialed through secret references; unbounded tool
+execution, typed credential profiles, OIDC operator identity, handoffs, work
+graphs, and memory proposals. Live model calls are explicitly enabled and
+credentialed through auth profiles or credential pools; unbounded tool
 execution, unattended edits, and production multi-agent orchestration remain
 outside the current MVP surface.
 
@@ -38,6 +39,7 @@ outside the current MVP surface.
 - [Configuring Craik Home](guides/configuring-craik-home.md)
 - [Setup Wizard](guides/setup.md)
 - [Doctor Diagnostics](guides/doctor.md)
+- [Authentication and Credentials](guides/authentication.md)
 - [Updating Craik](guides/updating.md)
 - [Gateway Troubleshooting](guides/gateway-troubleshooting.md)
 - [Provider Routing And Sandboxes](guides/provider-routing.md)
