@@ -88,13 +88,13 @@ def test_credential_pool_concurrent_selects_advance_cursor_once(tmp_path: Path) 
     )
     barrier = threading.Barrier(2)
     selections: list[str] = []
-    errors: list[BaseException] = []
+    errors: list[Exception] = []
 
     def select_profile() -> None:
         try:
             barrier.wait(timeout=5)
             selections.append(CredentialPool(tmp_path).select("openai").id)
-        except BaseException as exc:  # pragma: no cover - assertion reports thread errors
+        except Exception as exc:  # pragma: no cover - assertion reports thread errors
             errors.append(exc)
 
     threads = [threading.Thread(target=select_profile) for _ in range(2)]
