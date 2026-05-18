@@ -15,6 +15,7 @@ from craik.contracts.models import (
     RepoProfile,
 )
 from craik.runtime.policy.redaction import redact
+from craik.runtime.projects.git_commands import run_git
 from craik.runtime.store import LocalStore
 
 DEFAULT_DOC_PATH_CANDIDATES = ("README.md", "docs/")
@@ -139,9 +140,4 @@ def project_id(name: str) -> str:
 
 
 def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ("git", "-C", str(cwd), *args),
-        check=False,
-        text=True,
-        capture_output=True,
-    )
+    return run_git(cwd, *args)
