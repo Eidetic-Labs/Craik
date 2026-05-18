@@ -56,11 +56,11 @@ def test_training_trajectory_export_redacts_secrets_private_payloads_and_paths()
                     "api_token": "redaction-fixture-value",
                 },
                 diagnostics=["wrote /var/folders/96/private.txt"],
-                artifacts=["/Users/bjones/Desktop/Craik/private.log"],
+                artifacts=["/Users/bjones/Desktop/craik/private.log"],
             )
         ],
         receipts=[_receipt(metadata={"trace": "private", "status": "passed"})],
-        evidence=[_evidence(locator="/Users/bjones/Desktop/Craik/tests/test_secret.py")],
+        evidence=[_evidence(locator="/Users/bjones/Desktop/craik/tests/test_secret.py")],
         outcome="completed at /tmp/private-output with Bearer redactionfixture123",
         created_at=NOW,
     )
