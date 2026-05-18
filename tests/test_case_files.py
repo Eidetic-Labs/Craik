@@ -13,6 +13,7 @@ from craik.runtime.projects.project_registry import ProjectRegistry
 from craik.runtime.store import LocalStore
 from craik.runtime.work.case_files import (
     CaseFileAssembler,
+    CaseFilePathTraversalError,
     DiscoveryOverrides,
     ProjectNotFoundError,
     TaskNotFoundError,
@@ -109,6 +110,36 @@ def test_case_file_tracks_missing_context_as_assumptions(
     assert "No mutable documentation files were discovered for this project." in statements
     assert case_file.github_state == {"status": "not_loaded"}
     assert "Case file contains open assumptions" in case_file.stale_risks[-1]
+
+
+def test_case_file_path_traversal_denial_records_receipt(
+    tmp_path: Path,
+    store: LocalStore,
+) -> None:
+    repo = _repo(tmp_path)
+    outside = tmp_path / "outside.md"
+    outside.write_text("# Outside\n")
+    try:
+        (repo / "docs" / "leak.md").symlink_to(outside)
+    except OSError as exc:  # pragma: no cover - platform permission guard
+        pytest.skip(f"symlinks unavailable: {exc}")
+    project = ProjectRegistry(store).add_project(repo, name="Traversal")
+    task = create_task(
+        store,
+        title="Build escaped case",
+        objective="Reject escaped docs.",
+        project_id=project.id,
+    )
+
+    with pytest.raises(CaseFilePathTraversalError, match="escapes repository root"):
+        CaseFileAssembler(store).build(task.id)
+
+    receipts = store.list_receipts()
+    assert len(receipts) == 1
+    assert receipts[0].task_id == task.id
+    assert receipts[0].capability == "case_file.read"
+    assert receipts[0].result.status == "denied"
+    assert receipts[0].target == "case_file.discovery"
 
 
 def test_case_context_budget_counts_extracted_context_inputs() -> None:
