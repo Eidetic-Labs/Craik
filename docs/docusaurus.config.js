@@ -7,7 +7,7 @@ const config = {
   tagline: 'Durable agent runtime for governed software work',
   favicon: 'img/favicon.ico',
   url: 'https://eidetic-labs.github.io',
-  baseUrl: '/Craik/',
+  baseUrl: '/craik/',
   onBrokenLinks: 'throw',
   i18n: {
     defaultLocale: 'en',
