@@ -16,7 +16,7 @@ outside the current MVP surface.
 
 - [Installation](guides/installation.md)
 - [Quickstart](guides/quickstart.md)
-- [Stigmem Documentation Demo](guides/stigmem-docs-demo.md)
+- [Stigmem Documentation Demo](guides/quickstart.md)
 - [CLI Reference](reference/cli.md)
 - [Limitations](limitations.md)
 - [Robust MVP Roadmap](mvp-roadmap.md)
@@ -166,7 +166,7 @@ outside the current MVP surface.
 - [Local State](reference/local-state.md)
 - [Local Store](reference/local-store.md)
 - [Redaction](reference/redaction.md)
-- [Secrets](security/secrets.md)
+- Secrets
 
 ## Public Boundary
 

@@ -1,6 +1,6 @@
 # Limitations
 
-Craik is preparing for a robust `0.x.0` MVP release. The repository has broad
+Craik is preparing for a robust `0.1.0` MVP release. The repository has broad
 contract, helper, CLI, and documentation coverage through the v0.12 roadmap, but
 several surfaces are not yet end-to-end production workflows.
 
@@ -79,7 +79,7 @@ Local memory proposals remain the default unprivileged path.
 
 ## Release Posture
 
-The first release target is `0.x.0`. The release must be honest about limits and
+The first release target is `0.1.0`. The release must be honest about limits and
 strong enough for a credible MVP, but it is not a `1.0.0` stability guarantee.
 Package version `0.1.0` marks the first governed agent-runtime substrate with
 live opt-in providers, typed credentials, and operator identity. Roadmap
