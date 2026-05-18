@@ -10,3 +10,4 @@ exists, what tradeoffs were accepted, and how a decision can be retracted.
 - [0004 Policy Envelope Shape](0004-policy-envelope-shape.md)
 - [0005 Receipts And Handoffs As Public Contracts](0005-receipts-and-handoffs-as-public-contracts.md)
 - [0006 Package And Runtime Layout](0006-package-and-runtime-layout.md)
+- [0007 Credential And Identity Architecture](0007-credential-and-identity-architecture.md)
