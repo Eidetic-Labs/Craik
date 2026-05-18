@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 import pytest
@@ -69,7 +70,11 @@ def test_oidc_accepts_https_jwks_from_https_discovery(monkeypatch: pytest.Monkey
             return {"keys": []}
         raise AssertionError(f"unexpected URL: {url}")
 
+    def fake_get_json_with_headers(url: str) -> tuple[dict[str, Any], Mapping[str, str]]:
+        return fake_get_json(url), {}
+
     monkeypatch.setattr(authenticator, "_get_json", fake_get_json)
+    monkeypatch.setattr(authenticator, "_get_json_with_headers", fake_get_json_with_headers)
 
     assert authenticator.jwks() == {"keys": []}
     assert seen_urls == [
