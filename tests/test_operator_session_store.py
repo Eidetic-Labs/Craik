@@ -86,6 +86,7 @@ def test_operator_session_store_logout_revokes_and_removes_session(tmp_path: Pat
 
 def test_operator_login_whoami_logout_cli_against_stub_idp(tmp_path: Path) -> None:
     home = tmp_path / "home"
+    env = {"CRAIK_HOME": str(home), "CRAIK_OIDC_ALLOW_LOOPBACK_HTTP": "1"}
     with _stub_idp() as idp:
         login = runner.invoke(
             app,
@@ -98,13 +99,13 @@ def test_operator_login_whoami_logout_cli_against_stub_idp(tmp_path: Path) -> No
                 "--max-wait-seconds",
                 "1",
             ],
-            env={"CRAIK_HOME": str(home)},
+            env=env,
         )
-        whoami = runner.invoke(app, ["whoami"], env={"CRAIK_HOME": str(home)})
+        whoami = runner.invoke(app, ["whoami"], env=env)
         logout = runner.invoke(
             app,
             ["logout", "--issuer", idp.issuer, "--client-id", "craik-cli"],
-            env={"CRAIK_HOME": str(home)},
+            env=env,
         )
 
     assert login.exit_code == 0, login.stdout

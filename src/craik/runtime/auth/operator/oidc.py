@@ -13,10 +13,11 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from urllib import error, parse, request
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from craik.contracts.models import CraikModel
 from craik.runtime.auth.operator.session import OperatorSession
+from craik.runtime.auth.url_safety import require_https_url
 
 DEFAULT_DISCOVERY_TTL_SECONDS = 3600
 DEFAULT_CLOCK_SKEW_SECONDS = 60
@@ -36,6 +37,17 @@ class OIDCConfig(CraikModel):
     scopes: list[str] = Field(default_factory=lambda: ["openid", "profile", "email"])
     audience: str | None = None
     groups_claim: str = "groups"
+    oidc_allow_loopback_http: bool = False
+
+    @model_validator(mode="after")
+    def validate_oidc_endpoints(self) -> OIDCConfig:
+        """Reject non-HTTPS issuers unless loopback HTTP was explicitly allowed."""
+        require_https_url(
+            self.issuer,
+            allow_loopback_http=self.oidc_allow_loopback_http,
+            error_type=OIDCAuthenticationError,
+        )
+        return self
 
 
 @dataclass
@@ -51,9 +63,17 @@ class OIDCAuthenticator:
     _jwks: dict[str, Any] | None = field(default=None, init=False)
     _jwks_expires_at: float = field(default=0.0, init=False)
 
+    def __post_init__(self) -> None:
+        """Validate endpoint posture before any network request is made."""
+        require_https_url(
+            self.config.issuer,
+            allow_loopback_http=self.config.oidc_allow_loopback_http,
+            error_type=OIDCAuthenticationError,
+        )
+
     def device_authorization(self) -> dict[str, Any]:
         """Start RFC 8628 device-code authorization."""
-        endpoint = _string_endpoint(self.discovery(), "device_authorization_endpoint")
+        endpoint = self._discovery_endpoint("device_authorization_endpoint")
         payload = {
             "client_id": self.config.client_id,
             "scope": " ".join(self.config.scopes),
@@ -86,7 +106,7 @@ class OIDCAuthenticator:
         max_wait_seconds: int = 600,
     ) -> dict[str, Any]:
         """Poll the token endpoint until it returns a token response payload."""
-        endpoint = _string_endpoint(self.discovery(), "token_endpoint")
+        endpoint = self._discovery_endpoint("token_endpoint")
         deadline = time.monotonic() + max_wait_seconds
         interval = max(1, interval_seconds)
         while time.monotonic() <= deadline:
@@ -120,7 +140,7 @@ class OIDCAuthenticator:
         verifier = code_verifier or _pkce_verifier()
         challenge = _b64url(hashlib.sha256(verifier.encode("ascii")).digest())
         session_state = state or secrets.token_urlsafe(24)
-        endpoint = _string_endpoint(self.discovery(), "authorization_endpoint")
+        endpoint = self._discovery_endpoint("authorization_endpoint")
         query = parse.urlencode(
             {
                 "response_type": "code",
@@ -142,7 +162,7 @@ class OIDCAuthenticator:
         code_verifier: str,
     ) -> OperatorSession:
         """Exchange a loopback authorization code for an operator session."""
-        endpoint = _string_endpoint(self.discovery(), "token_endpoint")
+        endpoint = self._discovery_endpoint("token_endpoint")
         response = self._post_form(
             endpoint,
             {
@@ -185,7 +205,7 @@ class OIDCAuthenticator:
 
     def refresh_session(self, refresh_token: str) -> tuple[OperatorSession, str | None]:
         """Refresh an operator session with a stored refresh token."""
-        endpoint = _string_endpoint(self.discovery(), "token_endpoint")
+        endpoint = self._discovery_endpoint("token_endpoint")
         response = self._post_form(
             endpoint,
             {
@@ -202,6 +222,7 @@ class OIDCAuthenticator:
         endpoint = self.discovery().get("revocation_endpoint")
         if not isinstance(endpoint, str) or not endpoint:
             return False
+        endpoint = self._require_endpoint_url(endpoint)
         try:
             self._post_form(
                 endpoint,
@@ -234,6 +255,7 @@ class OIDCAuthenticator:
         if self._discovery is not None and now < self._discovery_expires_at:
             return self._discovery
         url = self.config.issuer.rstrip("/") + "/.well-known/openid-configuration"
+        url = self._require_endpoint_url(url)
         payload = self._get_json(url)
         issuer = payload.get("issuer")
         if issuer != self.config.issuer.rstrip("/"):
@@ -247,7 +269,7 @@ class OIDCAuthenticator:
         now = time.monotonic()
         if self._jwks is not None and now < self._jwks_expires_at:
             return self._jwks
-        payload = self._get_json(_string_endpoint(self.discovery(), "jwks_uri"))
+        payload = self._get_json(self._discovery_endpoint("jwks_uri"))
         keys = payload.get("keys")
         if not isinstance(keys, list):
             raise OIDCAuthenticationError("OIDC JWKS did not contain keys")
@@ -279,6 +301,16 @@ class OIDCAuthenticator:
             if isinstance(key, dict) and key.get("kid") == kid:
                 return key
         raise OIDCAuthenticationError("OIDC ID token key id was not found in JWKS")
+
+    def _discovery_endpoint(self, key: str) -> str:
+        return self._require_endpoint_url(_string_endpoint(self.discovery(), key))
+
+    def _require_endpoint_url(self, url: str) -> str:
+        return require_https_url(
+            url,
+            allow_loopback_http=self.config.oidc_allow_loopback_http,
+            error_type=OIDCAuthenticationError,
+        )
 
     def _get_json(self, url: str) -> dict[str, Any]:
         http_request = request.Request(url, method="GET")

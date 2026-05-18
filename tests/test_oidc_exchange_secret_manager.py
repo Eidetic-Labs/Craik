@@ -23,6 +23,7 @@ def test_oidc_token_exchange_secret_manager_returns_and_caches_credential() -> N
             exchange_endpoint=exchange.url,
             audience="craik-broker",
             target_token_type="urn:ietf:params:oauth:token-type:access_token",
+            allow_loopback_http=True,
         )
 
         first = manager.resolve("provider/openai/work")
@@ -51,6 +52,7 @@ def test_oidc_token_exchange_secret_manager_refreshes_on_expiry() -> None:
             audience="craik-broker",
             target_token_type="urn:ietf:params:oauth:token-type:access_token",
             safety_margin_seconds=2,
+            allow_loopback_http=True,
         )
 
         first = manager.resolve("provider/openai/work")
@@ -67,6 +69,7 @@ def test_oidc_token_exchange_secret_manager_fails_when_workload_token_unavailabl
         exchange_endpoint="http://127.0.0.1:9/exchange",
         audience="craik-broker",
         target_token_type="urn:ietf:params:oauth:token-type:access_token",
+        allow_loopback_http=True,
     )
 
     with pytest.raises(SecretRefCredentialError) as error:

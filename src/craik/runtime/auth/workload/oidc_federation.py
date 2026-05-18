@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+import stat
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 from urllib import error, parse, request
+
+from craik.runtime.auth.url_safety import require_https_url
 
 DEFAULT_KUBERNETES_TOKEN_PATH = Path("/var/run/secrets/tokens/craik")
 
@@ -31,6 +34,7 @@ class GitHubActionsWorkloadIdentity:
 
     env: dict[str, str] | None = None
     timeout_seconds: float = 5.0
+    allow_loopback_http: bool = False
 
     def get_token(self, audience: str) -> str:
         """Request a GitHub Actions OIDC token for an audience."""
@@ -39,7 +43,14 @@ class GitHubActionsWorkloadIdentity:
         request_token = values.get("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
         if not base_url or not request_token:
             raise WorkloadIdentityError("GitHub Actions OIDC environment is not available")
-        url = _url_with_audience(base_url, audience)
+        url = _url_with_audience(
+            require_https_url(
+                base_url,
+                allow_loopback_http=self.allow_loopback_http,
+                error_type=WorkloadIdentityError,
+            ),
+            audience,
+        )
         http_request = request.Request(
             url,
             headers={
@@ -117,10 +128,19 @@ class EnvVarTokenIdentity:
 
 
 def _read_token_file(path: Path, label: str) -> str:
+    expanded = path.expanduser()
     try:
-        token = path.expanduser().read_text(encoding="utf-8").strip()
+        metadata = expanded.lstat()
     except FileNotFoundError as exc:
         raise WorkloadIdentityError(f"{label} is not available") from exc
+    if stat.S_ISLNK(metadata.st_mode):
+        raise WorkloadIdentityError(f"{label} could not be read")
+    if not stat.S_ISREG(metadata.st_mode):
+        raise WorkloadIdentityError(f"{label} could not be read")
+    if os.name == "posix" and (metadata.st_mode & 0o077):
+        raise WorkloadIdentityError(f"{label} could not be read")
+    try:
+        token = expanded.read_text(encoding="utf-8").strip()
     except OSError as exc:
         raise WorkloadIdentityError(f"{label} could not be read") from exc
     if not token:

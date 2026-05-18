@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from urllib import error, parse, request
 
 from craik.runtime.auth.sources.secret_ref import SecretRefCredentialError
+from craik.runtime.auth.url_safety import require_https_url
 from craik.runtime.auth.workload import WorkloadIdentityError, WorkloadIdentityProvider
 
 TOKEN_EXCHANGE_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:token-exchange"
@@ -24,8 +25,16 @@ class OIDCTokenExchangeSecretManager:
     target_token_type: str
     timeout_seconds: float = 5.0
     safety_margin_seconds: int = 30
+    allow_loopback_http: bool = False
     _cached_credential: str | None = field(default=None, init=False)
     _expires_at: float = field(default=0.0, init=False)
+
+    def __post_init__(self) -> None:
+        require_https_url(
+            self.exchange_endpoint,
+            allow_loopback_http=self.allow_loopback_http,
+            error_type=SecretRefCredentialError,
+        )
 
     def resolve(self, ref: str) -> str:
         """Return an exchanged credential for a secret reference."""
@@ -52,7 +61,11 @@ class OIDCTokenExchangeSecretManager:
         }
         body = parse.urlencode(payload).encode("utf-8")
         http_request = request.Request(
-            self.exchange_endpoint,
+            require_https_url(
+                self.exchange_endpoint,
+                allow_loopback_http=self.allow_loopback_http,
+                error_type=SecretRefCredentialError,
+            ),
             data=body,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             method="POST",

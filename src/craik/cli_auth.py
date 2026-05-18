@@ -232,6 +232,7 @@ def login(
             issuer=resolved_issuer.rstrip("/"),
             client_id=resolved_client_id,
             audience=audience,
+            oidc_allow_loopback_http=_oidc_allow_loopback_http_from_env(),
         )
     )
     authorization = authenticator.device_authorization()
@@ -280,6 +281,7 @@ def logout(
             OIDCConfig(
                 issuer=resolved_issuer.rstrip("/"),
                 client_id=client_id or os.environ.get("CRAIK_OIDC_CLIENT_ID", "craik-cli"),
+                oidc_allow_loopback_http=_oidc_allow_loopback_http_from_env(),
             )
         )
     revoked = OperatorSessionStore.from_env().delete(authenticator=authenticator)
@@ -353,3 +355,7 @@ def _operator_session_payload(session: Any) -> dict[str, Any]:
         "expires_at": session.expires_at.isoformat(),
         "refresh_token_ref": session.refresh_token_ref,
     }
+
+
+def _oidc_allow_loopback_http_from_env() -> bool:
+    return os.environ.get("CRAIK_OIDC_ALLOW_LOOPBACK_HTTP") == "1"
