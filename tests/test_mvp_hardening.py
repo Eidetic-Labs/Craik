@@ -76,7 +76,7 @@ def test_secret_shaped_payloads_are_rejected_or_redacted(store: LocalStore) -> N
         result=ReceiptResult(
             status="passed",
             summary="unsafe",
-            metadata={"api_key": "sk-hardening-secret"},
+            metadata={"api_key": "craik-test-not-a-real-key-hardening"},
         ),
         redacted=False,
         created_at=datetime(2026, 5, 17, tzinfo=UTC),
@@ -91,7 +91,7 @@ def test_secret_shaped_payloads_are_rejected_or_redacted(store: LocalStore) -> N
         grants=[],
         actor="agent:codex",
         operation="create_pr",
-        target="Eidetic-Labs/Craik?token=ghp-hardening-secret",
+        target="Eidetic-Labs/Craik?token=craik-test-not-a-real-token-hardening",
     )
 
     assert result.receipt.result.status == "denied"

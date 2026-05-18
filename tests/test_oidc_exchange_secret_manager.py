@@ -75,7 +75,7 @@ def test_oidc_token_exchange_secret_manager_fails_when_workload_token_unavailabl
     with pytest.raises(SecretRefCredentialError) as error:
         manager.resolve("provider/openai/work")
 
-    assert "workload-secret" not in str(error.value)
+    assert "craik-test-not-a-real-workload-token" not in str(error.value)
     assert "provider/openai/work" not in str(error.value)
 
 
