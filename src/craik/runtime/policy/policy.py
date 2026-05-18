@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import PurePosixPath
+from typing import TYPE_CHECKING
 
 from craik.contracts.models import (
     CapabilityGrant,
@@ -459,3 +460,7 @@ def _envelope(
         receipt_required=True,
         redaction_required=True,
     )
+
+
+if not TYPE_CHECKING:
+    __all__ = [name for name in globals() if not name.startswith("_")]

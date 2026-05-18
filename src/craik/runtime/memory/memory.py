@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 from urllib import error, parse, request
 
 from craik.contracts.models import (
@@ -381,3 +381,7 @@ proposal_id = _memory_proposals.proposal_id
 evidence_reference = _memory_proposals.evidence_reference
 MemoryError = _memory_errors.MemoryError
 EvidenceRequiredError = _memory_errors.EvidenceRequiredError
+
+
+if not TYPE_CHECKING:
+    __all__ = [name for name in globals() if not name.startswith("_")]

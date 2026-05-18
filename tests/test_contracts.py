@@ -1,3 +1,4 @@
+import importlib
 import json
 from pathlib import Path
 from typing import Any
@@ -182,6 +183,31 @@ def test_contract_models_keep_split_package_import_surface() -> None:
     assert models.TaskRequest is core.TaskRequest
     assert models.MemoryProposal is memory.MemoryProposal
     assert models.TaskRun is handoffs.TaskRun
+
+
+@pytest.mark.parametrize(
+    ("module_name", "export_name"),
+    [
+        ("craik.contracts.models.core", "TaskRequest"),
+        ("craik.contracts.models.handoffs", "Handoff"),
+        ("craik.contracts.models.instructions", "InstructionSource"),
+        ("craik.contracts.models.memory", "MemoryProposal"),
+        ("craik.contracts.models.review", "WorkerFinding"),
+        ("craik.contracts.models.runtime", "RunOutput"),
+        ("craik.contracts.models.skills", "SkillPackage"),
+        ("craik.runtime.memory.memory", "create_proposal"),
+        ("craik.runtime.policy.policy", "generate_policy_envelope"),
+        ("craik.runtime.runners.runners", "default_runner_capability_matrices"),
+    ],
+)
+def test_compatibility_reexport_modules_define_public_exports(
+    module_name: str,
+    export_name: str,
+) -> None:
+    module = importlib.import_module(module_name)
+
+    assert export_name in module.__all__
+    assert getattr(module, export_name)
 
 
 @pytest.mark.parametrize("name", sorted(CONTRACT_REGISTRY))

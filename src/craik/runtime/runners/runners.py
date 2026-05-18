@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from craik.contracts.models import (
     RunnerAdapterRequest,
@@ -335,3 +335,7 @@ def _capability(
         grant_required=grant_required,
         notes=notes,
     )
+
+
+if not TYPE_CHECKING:
+    __all__ = [name for name in globals() if not name.startswith("_")]
