@@ -649,6 +649,41 @@ def test_provider_runtime_receipt_keeps_safe_metadata_and_drops_payload_and_secr
     assert receipt.auth_identity_hash
 
 
+def test_provider_runtime_receipt_records_no_credential_marker_identity() -> None:
+    adapter = OpenAIProviderAdapter(
+        ProviderRuntimeConfig(
+            provider_id="provider_openai_local",
+            provider_family="openai",
+            model="gpt-5.2",
+            secret_ref_name="",
+            docs_refs=list(OPENAI_OFFICIAL_DOCS),
+        )
+    )
+    request = _request()
+    result = adapter.normalize_response(
+        {
+            "id": "resp_marker",
+            "model": "gpt-5.2",
+            "output_text": "Done",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+        }
+    )
+
+    receipt = provider_runtime_receipt(
+        adapter=adapter,
+        request=request,
+        result=result,
+        task_id="task_provider_runtime",
+        policy_envelope_id="policy_provider_runtime",
+        receipt_id="receipt_provider_runtime_marker",
+        actor="agent:codex",
+    )
+
+    assert receipt.auth_profile_id == "openai:no-credential"
+    assert receipt.auth_kind == "marker"
+    assert receipt.auth_identity_hash
+
+
 def test_provider_runtime_receipt_records_auth_profile_identity_hash(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
