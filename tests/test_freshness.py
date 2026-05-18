@@ -37,7 +37,7 @@ def _probe(**overrides: object) -> KnowledgeFreshnessProbe:
         "id": "probe_gh_issue",
         "task_id": "task_freshness",
         "project_id": "project_freshness",
-        "target": "Eidetic-Labs/Craik#113",
+        "target": "eidetic-labs/craik#113",
         "kind": "github_state",
         "status": "fresh",
         "trust_class": "observed",

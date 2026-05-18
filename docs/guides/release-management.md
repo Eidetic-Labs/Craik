@@ -75,7 +75,7 @@ Configure the `pypi` Protected Environment before the first public release:
 - require at least one maintainer approval;
 - restrict the workflow to protected branches and release tags;
 - keep PyPI trusted publisher configuration aligned with
-  `Eidetic-Labs/Craik`;
+  `eidetic-labs/craik`;
 - do not store long-lived PyPI credentials in repository secrets.
 
 ## Rollback

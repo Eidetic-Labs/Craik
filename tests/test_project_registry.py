@@ -44,11 +44,11 @@ def test_detect_git_remote_redacts_embedded_credentials(git_repo: Path) -> None:
         "remote",
         "add",
         "origin",
-        "https://redactionfixture123@github.com/Eidetic-Labs/Craik.git",
+        "https://redactionfixture123@github.com/eidetic-labs/craik.git",
         cwd=git_repo,
     )
 
-    assert detect_git_remote(git_repo) == "https://[REDACTED]@github.com/Eidetic-Labs/Craik.git"
+    assert detect_git_remote(git_repo) == "https://[REDACTED]@github.com/eidetic-labs/craik.git"
 
 
 def test_invalid_repo_path_is_rejected(tmp_path: Path) -> None:

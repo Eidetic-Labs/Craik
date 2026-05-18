@@ -233,7 +233,7 @@ def test_compatibility_reexport_modules_define_public_exports(
         if export_name == "create_proposal":
             proposal = exported(
                 task_id="task_exports",
-                entity="repo:Eidetic-Labs/Craik",
+                entity="repo:eidetic-labs/craik",
                 relation="craik:test",
                 value="exported proposal works",
                 source="test",

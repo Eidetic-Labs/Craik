@@ -197,7 +197,7 @@ TypeScript remains appropriate for future UI, gateway adapters, and channel inte
 
 Craik uses the same name across the public repository, Python package, import module, and CLI command:
 
-- GitHub repository: `Eidetic-Labs/Craik`
+- GitHub repository: `eidetic-labs/craik`
 - PyPI distribution: `craik`
 - Python module: `craik`
 - CLI command: `craik`
