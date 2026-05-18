@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
+from importlib import import_module
 from typing import Annotated, cast
 
 import typer
 
-from craik import cli_handoffs as _cli_handoffs  # noqa: F401
 from craik.cli import contradictions_app, graph_app, memory_app, policy_app
 from craik.contracts.models import (
     ContradictionStatus,
@@ -34,6 +34,8 @@ from craik.runtime.policy.policy import (
 from craik.runtime.policy.policy_tests import PolicyTestHarness
 from craik.runtime.store import LocalStore
 from craik.runtime.work.graph import WorkGraphExporter, WorkGraphTaskNotFoundError
+
+import_module("craik.cli_handoffs")
 
 
 @contradictions_app.command("open")
