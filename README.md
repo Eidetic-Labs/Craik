@@ -25,9 +25,29 @@ OpenAI-compatible Chat Completions adapters, persist receipts/handoffs/work
 graphs, and propose memory updates for review.
 
 The live provider path is explicit. Runtime callers opt into live access, supply
-provider metadata, and resolve credentials through secret references. The local
-OpenAI-compatible provider path can target a localhost `/v1` server such as
-Ollama for optional live validation without paid API keys.
+provider metadata, and resolve credentials through typed credential profiles or
+credential pools. The local OpenAI-compatible provider path can target a
+localhost `/v1` server such as Ollama for optional live validation without paid
+API keys.
+
+Craik authenticates to provider APIs through typed credential profiles. Profile
+kinds include env-var API keys, local-CLI OAuth fallback (e.g. reading
+`~/.claude/.credentials.json`), vendor CLI subprocess bridges, external secret
+manager references, and Stigmem-backed credential references. A credential pool
+supports rotation and failover across multiple profiles.
+
+Craik authenticates the operator via OIDC against any compliant IdP. Device-code
+and loopback+PKCE flows are both supported; `craik login` initiates the flow,
+`craik whoami` reports the active operator, `craik logout` revokes the session.
+Every provider call is bound to both an operator identity and a credential
+identity; every receipt names both. Workload-identity providers (GitHub Actions,
+Kubernetes projected tokens, generic file/env-var) plus RFC 8693 token exchange
+enable credential-less deployment in CI and cloud.
+
+Policy envelopes can constrain which operators and which credentials a task may
+use. First-time use of a credential profile is approval-gated and produces a
+receipted authorization chain. Credential expiry surfaces as evidence in case
+files so long-running runs are warned about tokens that will expire mid-work.
 
 ## What Does Not Work Yet
 
@@ -149,14 +169,15 @@ runner preview contracts, governed loop fixtures, multi-agent review contracts,
 instruction distillation, quality/recovery helpers, skills/plugins foundations,
 operator view formatters, gateway/channel contracts, sandbox/provider routing
 contracts, learning-loop helpers, multimodal decisions, migration/i18n
-contracts, and broad docs/tests through the v0.13 roadmap.
+contracts, and broad docs/tests through the v0.12 roadmap.
 
 The remaining MVP work is to harden these contract and helper surfaces into one
 complete release-quality workflow: remote Stigmem write promotion,
 God-file/runtime package cleanup, ADR-backed design decisions, and docs/test
-depth comparable to Stigmem. Package version `0.1.0` marks the first live
-provider transport path; roadmap sections remain implementation gates, not
-`1.0.0` readiness claims. See [Robust MVP Roadmap](docs/mvp-roadmap.md).
+depth comparable to Stigmem. Package version `0.1.0` marks the first governed
+provider, credential, and operator-identity substrate; roadmap sections remain
+implementation gates, not `1.0.0` readiness claims. See
+[Robust MVP Roadmap](docs/mvp-roadmap.md).
 
 ## Implementation Stack
 
