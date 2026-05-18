@@ -9,14 +9,15 @@ and package publication.
 ## MVP Definition
 
 The MVP is complete when Craik can run one real software-delivery workflow end
-to end with OpenAI and Anthropic provider support, policy-enforced side effects,
-durable receipts, a useful handoff, accurate documentation, and package-release
-quality gates.
+to end with OIDC-authenticated operators, typed credential profiles, OpenAI and
+Anthropic provider support, policy-enforced side effects, durable receipts that
+name both operator and credential identity, a useful handoff, accurate
+documentation, and package-release quality gates.
 
 The accepted proof workflow remains Stigmem documentation and state
 reconciliation. It must run from a clean install, assemble a case file, use a
-certified provider path, record receipts, produce a handoff, and leave memory
-updates or proposals with evidence.
+certified provider path authorized by a credential profile, record receipts,
+produce a handoff, and leave memory updates or proposals with evidence.
 
 ## Status Classes
 
@@ -90,11 +91,31 @@ Tracking issue: [#304](https://github.com/Eidetic-Labs/Craik/issues/304).
   retries, errors, and usage metadata.
 - [x] Implement OpenAI provider adapter.
 - [x] Implement Anthropic provider adapter.
-- [x] Store API access as secret references, not raw keys.
+- [x] Store API access through typed credential profiles, credential pools, and
+  secret references, not raw keys.
 - [x] Add provider receipts and redaction behavior.
 - [x] Add certification fixtures and tests for both providers.
 - [x] Verify official provider docs before implementation work that depends on
   live API behavior.
+
+### 5A. Authentication, Credentials, And Operator Identity
+
+Tracking issue: [#464](https://github.com/Eidetic-Labs/Craik/issues/464).
+
+- [x] Add OIDC operator login with device-code flow and persisted sessions.
+- [x] Add `craik login`, `craik logout`, and `craik whoami`.
+- [x] Add typed auth profiles with `<provider_family>:<name>` IDs.
+- [x] Add credential sources for env-var API keys, local-CLI OAuth fallback,
+  vendor CLI bridge, secret references, Stigmem-backed references, and marker
+  identity.
+- [x] Add credential pool rotation, failover, and health tracking.
+- [x] Add workload identity providers and RFC 8693 token exchange.
+- [x] Add `craik auth list / add / remove / test / status / approve / grant`.
+- [x] Add credential health to `craik doctor`.
+- [x] Add credential-scoped and operator-scoped receipt fields.
+- [x] Add policy-bound operator and credential constraints.
+- [x] Add approval-gated first live credential use.
+- [x] Add credential expiry as case-file evidence and per-credential redaction.
 
 ### 6. One Complete MVP Runner Path
 
@@ -148,6 +169,8 @@ Tracking issue: [#306](https://github.com/Eidetic-Labs/Craik/issues/306).
 Tracking issue: [#308](https://github.com/Eidetic-Labs/Craik/issues/308).
 
 - [x] Build the Stigmem docs reconciliation demo as the release acceptance path.
+- [x] Include OIDC operator authentication and provider credential profile setup
+  in the accepted workflow.
 - [x] Support OpenAI and Anthropic provider execution for the demo.
 - [x] Produce case file, receipts, handoff, memory proposal/write, and graph
   export.
@@ -203,7 +226,10 @@ first `1.0.0` release:
 ## MVP Acceptance Criteria
 
 - [ ] A clean install can run the accepted demo.
+- [ ] The accepted demo includes operator authentication and provider credential
+  profile setup.
 - [ ] OpenAI and Anthropic provider paths both pass certification tests.
+- [ ] Provider receipts name both operator identity and credential identity.
 - [ ] Side effects are policy-gated and receipt-backed.
 - [ ] Redaction is applied before persistence and docs publication.
 - [ ] Local store migrations are tested against fixture states.
