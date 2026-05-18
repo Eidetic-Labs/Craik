@@ -27,15 +27,46 @@ class WorkStoreMixin(LocalStoreCore):
     def list_task_runs(self) -> list[TaskRun]:
         return _cast_list(TaskRun, self.list_contracts("craik.task_run"))
 
-    def put_receipt(self, receipt: CapabilityReceipt) -> None:
+    def put_receipt(self, receipt: CapabilityReceipt) -> CapabilityReceipt:
+        existing = self.get_receipt(receipt.id)
+        replaced_hashes = _receipt_hash_history(existing)
+        if existing is not None:
+            replaced_hashes.append(existing.self_hash)
+        previous_hash = (
+            receipt.previous_receipt_hash
+            if receipt.previous_receipt_hash is not None
+            else existing.previous_receipt_hash
+            if existing is not None
+            else self._latest_receipt_hash(exclude_id=receipt.id)
+        )
+        if receipt.previous_receipt_hash is None or replaced_hashes:
+            receipt = _receipt_with_integrity_metadata(
+                receipt,
+                previous_hash=previous_hash,
+                replaced_hashes=replaced_hashes,
+            )
         self.put_contract(receipt)
+        stored = self.get_receipt(receipt.id)
+        if stored is None:
+            raise LocalStoreCorruptError("stored capability receipt could not be reloaded")
+        return stored
 
     def get_receipt(self, receipt_id: str) -> CapabilityReceipt | None:
         contract = self.get_contract("craik.capability_receipt", receipt_id)
         return _cast_optional(CapabilityReceipt, contract)
 
     def list_receipts(self) -> list[CapabilityReceipt]:
-        return _cast_list(CapabilityReceipt, self.list_contracts("craik.capability_receipt"))
+        receipts = _cast_list(CapabilityReceipt, self.list_contracts("craik.capability_receipt"))
+        _verify_receipt_chain(receipts)
+        return receipts
+
+    def _latest_receipt_hash(self, *, exclude_id: str) -> str | None:
+        receipts = [
+            receipt for receipt in self.list_receipts() if receipt.id != exclude_id
+        ]
+        if not receipts:
+            return None
+        return sorted(receipts, key=lambda receipt: (receipt.created_at, receipt.id))[-1].self_hash
 
     def put_policy_envelope(self, policy: PolicyEnvelope) -> None:
         self.put_contract(policy)
@@ -181,3 +212,42 @@ class WorkStoreMixin(LocalStoreCore):
             HandoffQualityScore,
             self.list_contracts("craik.handoff_quality_score"),
         )
+
+
+def _verify_receipt_chain(receipts: list[CapabilityReceipt]) -> None:
+    receipt_hashes = {
+        known_hash
+        for receipt in receipts
+        for known_hash in [receipt.self_hash, *_receipt_hash_history(receipt)]
+    }
+    for receipt in receipts:
+        if (
+            receipt.previous_receipt_hash is not None
+            and receipt.previous_receipt_hash not in receipt_hashes
+        ):
+            raise LocalStoreCorruptError("stored capability receipt chain is broken")
+
+
+def _receipt_with_integrity_metadata(
+    receipt: CapabilityReceipt,
+    *,
+    previous_hash: str | None,
+    replaced_hashes: list[str],
+) -> CapabilityReceipt:
+    payload = receipt.model_dump(mode="json", by_alias=True)
+    metadata = dict(payload["result"].get("metadata", {}))
+    if replaced_hashes:
+        metadata["receipt_hash_history"] = sorted(set(replaced_hashes))
+    payload["result"]["metadata"] = metadata
+    payload["previous_receipt_hash"] = previous_hash
+    payload["self_hash"] = ""
+    return CapabilityReceipt.model_validate(payload)
+
+
+def _receipt_hash_history(receipt: CapabilityReceipt | None) -> list[str]:
+    if receipt is None:
+        return []
+    value = receipt.result.metadata.get("receipt_hash_history")
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str) and item]
