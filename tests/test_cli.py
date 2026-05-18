@@ -43,6 +43,25 @@ def test_receipts_app_is_mounted_from_extracted_module() -> None:
     assert "Inspect persisted capability receipts." in result.output
 
 
+@pytest.mark.parametrize(
+    ("command", "expected"),
+    [
+        (["auth", "--help"], "add"),
+        (["connect", "--help"], "stigmem"),
+        (["demo", "--help"], "stigmem-docs"),
+        (["handoff", "--help"], "create"),
+    ],
+)
+def test_cli_extension_modules_register_commands(
+    command: list[str],
+    expected: str,
+) -> None:
+    result = runner.invoke(app, command)
+
+    assert result.exit_code == 0
+    assert expected in result.output
+
+
 def test_version_command_prints_version() -> None:
     result = runner.invoke(app, ["version"])
 

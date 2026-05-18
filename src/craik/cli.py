@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 from typing import Annotated
 
@@ -213,9 +214,17 @@ def _paths_payload(paths: CraikPaths) -> dict[str, str]:
     }
 
 
-from craik import cli_auth as _cli_auth  # noqa: E402,F401
-from craik import cli_operations as _cli_operations  # noqa: E402,F401
-from craik import cli_project as _cli_project  # noqa: E402,F401
+def _load_cli_extensions() -> None:
+    """Import command modules that register subcommands on shared Typer apps."""
+    for module_name in (
+        "craik.cli_auth",
+        "craik.cli_operations",
+        "craik.cli_project",
+    ):
+        import_module(module_name)
+
+
+_load_cli_extensions()
 
 
 def main() -> None:

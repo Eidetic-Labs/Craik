@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import json
 import os
+from importlib import import_module
 from pathlib import Path
 from typing import Annotated, Any, cast
 
 import typer
 
-from craik import cli_connect as _cli_connect  # noqa: F401
-from craik import cli_demos as _cli_demos  # noqa: F401
-from craik import cli_onboarding as _cli_onboarding  # noqa: F401
 from craik.cli import (
     case_app,
     home_app,
@@ -49,6 +47,13 @@ from craik.runtime.work.case_files import (
     TaskNotFoundError,
 )
 from craik.runtime.work.tasks import create_task
+
+for _module_name in (
+    "craik.cli_connect",
+    "craik.cli_demos",
+    "craik.cli_onboarding",
+):
+    import_module(_module_name)
 
 
 @runners_app.command("matrix")

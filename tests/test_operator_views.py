@@ -53,7 +53,16 @@ NOW = datetime(2026, 5, 16, 17, 55, tzinfo=UTC)
 
 def test_operator_views_reexports_artifact_formatters() -> None:
     from craik.runtime.companions import operator_artifact_views, operator_views
+    from craik.runtime.memory import operator_memory_views
 
+    assert (
+        operator_views.format_contradiction_inbox
+        is operator_artifact_views.format_contradiction_inbox
+    )
+    assert (
+        operator_views.format_evidence_assumption_view
+        is operator_artifact_views.format_evidence_assumption_view
+    )
     assert (
         operator_views.format_receipt_viewer
         is operator_artifact_views.format_receipt_viewer
@@ -65,6 +74,14 @@ def test_operator_views_reexports_artifact_formatters() -> None:
     assert (
         operator_views.format_work_graph_explorer
         is operator_artifact_views.format_work_graph_explorer
+    )
+    assert (
+        operator_views.MemoryImpactPreviewSnapshot
+        is operator_memory_views.MemoryImpactPreviewSnapshot
+    )
+    assert (
+        operator_views.format_memory_impact_preview_view
+        is operator_memory_views.format_memory_impact_preview_view
     )
 
 

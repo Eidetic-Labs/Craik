@@ -24,27 +24,16 @@ from craik.contracts.models import (
     RunDeltaItem,
     RuntimeCriticFinding,
 )
-from craik.runtime.companions.operator_artifact_views import (
-    format_contradiction_inbox as format_contradiction_inbox,
-)
-from craik.runtime.companions.operator_artifact_views import (
-    format_evidence_assumption_view as format_evidence_assumption_view,
-)
-from craik.runtime.companions.operator_artifact_views import (
-    format_handoff_viewer as format_handoff_viewer,
-)
-from craik.runtime.companions.operator_artifact_views import (
-    format_receipt_viewer as format_receipt_viewer,
-)
-from craik.runtime.companions.operator_artifact_views import (
-    format_work_graph_explorer as format_work_graph_explorer,
-)
-from craik.runtime.memory.operator_memory_views import (
-    MemoryImpactPreviewSnapshot as MemoryImpactPreviewSnapshot,
-)
-from craik.runtime.memory.operator_memory_views import (
-    format_memory_impact_preview_view as format_memory_impact_preview_view,
-)
+from craik.runtime.companions import operator_artifact_views as _operator_artifact_views
+from craik.runtime.memory import operator_memory_views as _operator_memory_views
+
+format_contradiction_inbox = _operator_artifact_views.format_contradiction_inbox
+format_evidence_assumption_view = _operator_artifact_views.format_evidence_assumption_view
+format_handoff_viewer = _operator_artifact_views.format_handoff_viewer
+format_receipt_viewer = _operator_artifact_views.format_receipt_viewer
+format_work_graph_explorer = _operator_artifact_views.format_work_graph_explorer
+MemoryImpactPreviewSnapshot = _operator_memory_views.MemoryImpactPreviewSnapshot
+format_memory_impact_preview_view = _operator_memory_views.format_memory_impact_preview_view
 
 
 @dataclass(frozen=True)

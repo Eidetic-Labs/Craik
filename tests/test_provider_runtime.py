@@ -55,21 +55,49 @@ def test_provider_runtime_keeps_extracted_import_surface() -> None:
     from craik.runtime.providers.provider_config import (
         ProviderRuntimeConfig as extracted_config,
     )
+    from craik.runtime.providers.provider_models import (
+        CredentialApprovalRequiredError as extracted_approval_error,
+    )
     from craik.runtime.providers.provider_models import ProviderMessage as extracted_message
+    from craik.runtime.providers.provider_models import (
+        ProviderMessageRole as extracted_message_role,
+    )
+    from craik.runtime.providers.provider_models import (
+        ProviderRuntimeError as extracted_runtime_error,
+    )
     from craik.runtime.providers.provider_models import (
         ProviderRuntimeRequest as extracted_request,
     )
+    from craik.runtime.providers.provider_runtime import (
+        CredentialApprovalRequiredError as runtime_approval_error,
+    )
     from craik.runtime.providers.provider_runtime import ProviderMessage as runtime_message
+    from craik.runtime.providers.provider_runtime import (
+        ProviderMessageRole as runtime_message_role,
+    )
     from craik.runtime.providers.provider_runtime import (
         ProviderRuntimeConfig as runtime_config,
     )
     from craik.runtime.providers.provider_runtime import (
+        ProviderRuntimeError as runtime_error,
+    )
+    from craik.runtime.providers.provider_runtime import (
         ProviderRuntimeRequest as runtime_request,
+    )
+    from craik.runtime.providers.provider_runtime import (
+        provider_runtime_receipt as runtime_receipt,
+    )
+    from craik.runtime.providers.provider_runtime_support import (
+        provider_runtime_receipt as extracted_receipt,
     )
 
     assert runtime_config is extracted_config
     assert runtime_message is extracted_message
+    assert runtime_message_role is extracted_message_role
     assert runtime_request is extracted_request
+    assert runtime_error is extracted_runtime_error
+    assert runtime_approval_error is extracted_approval_error
+    assert runtime_receipt is extracted_receipt
 
 
 def _openai_adapter(*, live_enabled: bool = False) -> OpenAIProviderAdapter:
