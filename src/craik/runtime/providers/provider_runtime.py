@@ -425,6 +425,8 @@ def adapter_for_provider(
         model=model,
         secret_ref_name=secret_ref_name,
         base_url=_provider_base_url(provider),
+        allow_local_base_url=bool(provider.metadata.get("allow_local_base_url", False))
+        or provider.id.startswith("provider_local_"),
         timeout_seconds=float(provider.metadata.get("timeout_seconds", 30.0)),
         max_retries=int(provider.metadata.get("max_retries", 3)),
         live_enabled=live_configured,

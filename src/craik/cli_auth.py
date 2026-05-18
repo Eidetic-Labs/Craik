@@ -28,6 +28,10 @@ from craik.runtime.auth.operator import (
 )
 from craik.runtime.auth.sources import source_for_auth_profile
 from craik.runtime.providers.provider_transport import ProviderFamily
+from craik.runtime.providers.provider_url_safety import (
+    ProviderURLSafetyError,
+    assert_safe_provider_url,
+)
 
 
 @auth_app.command("list")
@@ -77,6 +81,14 @@ def auth_add(
         str | None,
         typer.Option("--secrets-root", help="Root directory for file secret references."),
     ] = None,
+    base_url: Annotated[
+        str | None,
+        typer.Option("--base-url", help="Provider base URL for this profile."),
+    ] = None,
+    allow_local_base_url: Annotated[
+        bool,
+        typer.Option("--allow-local-base-url", help="Allow loopback HTTP provider URLs."),
+    ] = False,
 ) -> None:
     """Add or replace an auth profile."""
     try:
@@ -103,6 +115,14 @@ def auth_add(
         metadata["manager"] = manager
     if secrets_root is not None:
         metadata["secrets_root"] = secrets_root
+    if base_url is not None:
+        try:
+            assert_safe_provider_url(base_url, allow_local=allow_local_base_url)
+        except ProviderURLSafetyError as exc:
+            raise typer.BadParameter(str(exc)) from None
+        metadata["base_url"] = base_url
+        if allow_local_base_url:
+            metadata["allow_local_base_url"] = True
     if credential_kind is CredentialKind.API_KEY and not env_var:
         raise typer.BadParameter("--env-var is required for api-key profiles")
     if credential_kind is CredentialKind.OAUTH_TOKEN and source != "local-cli":

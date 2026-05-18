@@ -8,6 +8,10 @@ from pydantic import Field, model_validator
 
 from craik.contracts.models import CraikModel
 from craik.runtime.providers.provider_transport import ProviderFamily
+from craik.runtime.providers.provider_url_safety import (
+    ProviderURLSafetyError,
+    assert_safe_provider_url,
+)
 from craik.runtime.secrets import SecretRef, SecretResolver
 
 OPENAI_OFFICIAL_DOCS = (
@@ -33,6 +37,7 @@ class ProviderRuntimeConfig(CraikModel):
     model: str
     secret_ref_name: str
     base_url: str | None = None
+    allow_local_base_url: bool = False
     timeout_seconds: float = Field(default=30.0, gt=0)
     max_retries: int = Field(default=3, ge=0)
     live_enabled: bool = False
@@ -55,6 +60,14 @@ class ProviderRuntimeConfig(CraikModel):
             raise ValueError(
                 "provider runtime auth_profile_id and credential_pool_id are mutually exclusive"
             )
+        if self.base_url:
+            try:
+                assert_safe_provider_url(
+                    self.base_url,
+                    allow_local=self.allow_local_base_url,
+                )
+            except ProviderURLSafetyError as exc:
+                raise ValueError(str(exc)) from exc
         expected_refs = (
             ANTHROPIC_OFFICIAL_DOCS
             if self.provider_family == "anthropic"
