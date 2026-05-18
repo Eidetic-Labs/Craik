@@ -11,7 +11,7 @@ Craik CI is split by surface so failures point at the area that regressed.
 | `unit` | Full pytest suite with coverage XML and JUnit artifacts. |
 | `contract` | Runtime contract fixture conformance and report generation. |
 | `integration` | Recorded provider integration tests that do not require live credentials. |
-| `security` | Dependency audit, policy baseline, release readiness, and public documentation hygiene. |
+| `security` | Dependency audit, static analysis, policy baseline, release readiness, and public documentation hygiene. |
 | `CodeQL` | GitHub code scanning for Python on pull requests and pushes to `main`. |
 | `docs` | Generated CLI docs, docs hygiene, and Docusaurus build. |
 | `package` | Source distribution and wheel build, metadata validation, smoke install. |
@@ -64,6 +64,12 @@ The `security` job exports `uv.lock` to a hash-pinned requirements file and
 runs `pip-audit` against that locked dependency set. The audit runs in
 pip-free mode so CI checks the committed lock state without resolving a new
 dependency graph.
+
+## Static Analysis
+
+The `security` job runs Bandit against `src/craik` with an explicit baseline
+for accepted findings. New findings fail the job and should either be fixed or
+added to the baseline only with a reviewable rationale.
 
 ## Changed-File Strictness
 
