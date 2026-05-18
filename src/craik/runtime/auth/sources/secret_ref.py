@@ -8,6 +8,8 @@ environment variables and local files for development and tests.
 
 from __future__ import annotations
 
+import os
+import stat
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -19,6 +21,9 @@ from craik.runtime.secrets import SecretNotFoundError, SecretRef, SecretResolver
 
 class SecretRefCredentialError(RuntimeError):
     """Raised when a secret-reference credential cannot resolve."""
+
+
+SECRET_REFERENCE_ERROR = "secret reference could not be resolved"
 
 
 class SecretManager(Protocol):
@@ -40,22 +45,41 @@ class EnvVarSecretManager:
         try:
             return self.resolver.resolve(SecretRef(env_var=ref))
         except SecretNotFoundError as exc:
-            raise SecretRefCredentialError("secret reference could not be resolved") from exc
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR) from exc
 
 
 @dataclass(frozen=True)
 class FileSecretManager:
-    """Secret manager that reads credential material from a local file path."""
+    """Secret manager that reads credential material below a configured root."""
+
+    secrets_root: Path
 
     def resolve(self, ref: str) -> str:
-        """Resolve a secret from a file path."""
+        """Resolve a secret from a root-relative file path."""
+        path = self._validated_secret_path(ref)
         try:
-            value = Path(ref).expanduser().read_text(encoding="utf-8").strip()
-        except FileNotFoundError as exc:
-            raise SecretRefCredentialError("secret reference could not be resolved") from exc
+            value = path.read_text(encoding="utf-8").strip()
+        except OSError as exc:
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR) from exc
         if not value:
-            raise SecretRefCredentialError("secret reference could not be resolved")
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR)
         return value
+
+    def _validated_secret_path(self, ref: str) -> Path:
+        root = self.secrets_root.expanduser().resolve(strict=False)
+        candidate = (root / ref).expanduser()
+        try:
+            metadata = candidate.lstat()
+            resolved = candidate.resolve(strict=True)
+        except OSError as exc:
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR) from exc
+        if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR)
+        if not resolved.is_relative_to(root):
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR)
+        if os.name == "posix" and metadata.st_mode & 0o077:
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR)
+        return resolved
 
 
 @dataclass(frozen=True)
@@ -86,5 +110,5 @@ class SecretRefCredentialSource:
     def _resolve_secret(self) -> str:
         secret = self.manager.resolve(self.ref)
         if not secret:
-            raise SecretRefCredentialError("secret reference could not be resolved")
+            raise SecretRefCredentialError(SECRET_REFERENCE_ERROR)
         return secret

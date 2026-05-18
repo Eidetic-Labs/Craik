@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from craik.runtime.auth.profile import AuthProfile, CredentialKind, CredentialSource
@@ -58,8 +59,25 @@ def _secret_ref_source(profile: AuthProfile) -> SecretRefCredentialSource:
     manager = profile.metadata.get("manager", "env")
     if not isinstance(ref, str):
         raise AuthProfileSourceError("secret-ref auth profile requires metadata.ref")
-    secret_manager = FileSecretManager() if manager == "file" else EnvVarSecretManager()
+    secret_manager = (
+        FileSecretManager(secrets_root=_secrets_root(profile))
+        if manager == "file"
+        else EnvVarSecretManager()
+    )
     return SecretRefCredentialSource(ref=ref, manager=secret_manager)
+
+
+def _secrets_root(profile: AuthProfile) -> Path:
+    configured = profile.metadata.get("secrets_root")
+    if isinstance(configured, str) and configured:
+        return Path(configured)
+    env_root = os.environ.get("CRAIK_SECRETS_ROOT")
+    if env_root:
+        return Path(env_root)
+    craik_home = os.environ.get("CRAIK_HOME")
+    if craik_home:
+        return Path(craik_home) / "secrets"
+    return Path("~/.craik/secrets")
 
 
 def _stigmem_ref_source(profile: AuthProfile) -> StigmemCredentialSource:

@@ -667,6 +667,7 @@ def test_auth_oauth_local_cli_profile_tests_against_credentials_file(tmp_path: P
         ),
         encoding="utf-8",
     )
+    credentials.chmod(0o600)
 
     added = runner.invoke(
         app,
@@ -694,6 +695,65 @@ def test_auth_oauth_local_cli_profile_tests_against_credentials_file(tmp_path: P
     assert tested.exit_code == 0
     assert json.loads(tested.stdout)["status"]["status"] == "ok"
     assert "local-access-token" not in tested.stdout
+
+
+def test_auth_secret_ref_file_profile_uses_root_relative_secret(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    secrets_root = tmp_path / "secrets"
+    secrets_root.mkdir()
+    secret = secrets_root / "anthropic.key"
+    secret.write_text("file-secret\n", encoding="utf-8")
+    secret.chmod(0o600)
+
+    added = runner.invoke(
+        app,
+        [
+            "auth",
+            "add",
+            "anthropic:file",
+            "--kind",
+            "secret-ref",
+            "--manager",
+            "file",
+            "--ref",
+            "anthropic.key",
+            "--secrets-root",
+            str(secrets_root),
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    tested = runner.invoke(
+        app,
+        ["auth", "test", "anthropic:file"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert added.exit_code == 0
+    assert json.loads(added.stdout)["metadata"]["ref"] == "anthropic.key"
+    assert tested.exit_code == 0
+    assert json.loads(tested.stdout)["status"]["status"] == "ok"
+    assert "file-secret" not in tested.stdout
+
+
+def test_auth_secret_ref_file_profile_rejects_absolute_ref(tmp_path: Path) -> None:
+    added = runner.invoke(
+        app,
+        [
+            "auth",
+            "add",
+            "anthropic:file",
+            "--kind",
+            "secret-ref",
+            "--manager",
+            "file",
+            "--ref",
+            str(tmp_path / "secret.txt"),
+        ],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert added.exit_code != 0
+    assert "relative to the secrets root" in added.output
 
 
 def test_memory_commands_propose_approve_and_search(tmp_path: Path) -> None:
