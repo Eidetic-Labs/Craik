@@ -138,6 +138,44 @@ def test_http_transport_error_redacts_body_and_preserves_retry_after() -> None:
     assert "secret-auth-token" not in str(error)
     assert error.body is not None
     assert "sk-test-secret" not in error.body
+    assert error.headers["content-type"] == "application/json"
+    assert error.headers["retry-after"] == "3"
+    assert "server" not in error.headers
+
+
+def test_http_transport_error_drops_sensitive_headers_and_redacts_safe_values() -> None:
+    def handle(payload: dict[str, Any], headers: dict[str, str]) -> _StubResponse:
+        return _json_response(
+            {"error": "token=sk-leaked-from-body-value"},
+            status=401,
+            headers={
+                "WWW-Authenticate": 'Bearer realm="api", error="invalid_token"',
+                "X-API-Key": "sk-leaked-real-key-value",
+                "X-Request-Id": "token=sk-leaked-from-request-id",
+                "Retry-After": "30",
+            },
+        )
+
+    with _stub_server(handle) as server:
+        transport = HTTPTransport(
+            family="openai",
+            base_url=server.url,
+            headers_factory=dict,
+            timeout_seconds=5,
+        )
+
+        with pytest.raises(ProviderTransportError) as exc_info:
+            list(transport.send({"_path": "/v1/responses"}, stream=False))
+
+    error = exc_info.value
+    assert error.retry_after_seconds == 30
+    assert "www-authenticate" not in error.headers
+    assert "x-api-key" not in error.headers
+    assert error.headers["retry-after"] == "30"
+    assert error.headers["x-request-id"] == "token=[REDACTED]"
+    assert error.body is not None
+    assert "sk-leaked-from-body-value" not in error.body
+    assert "sk-leaked-real-key-value" not in str(error)
 
 
 def test_http_transport_builds_headers_for_each_request() -> None:

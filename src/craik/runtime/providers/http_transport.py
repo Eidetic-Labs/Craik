@@ -11,6 +11,15 @@ from urllib import error, request
 from craik.runtime.policy.redaction import redact
 from craik.runtime.providers.provider_transport import ProviderFamily, ProviderTransportError
 
+_SAFE_ERROR_HEADER_NAMES = frozenset(
+    {
+        "content-type",
+        "date",
+        "retry-after",
+        "x-request-id",
+    }
+)
+
 
 class HTTPTransport:
     """POST provider payloads over HTTP and yield parsed response chunks."""
@@ -101,13 +110,13 @@ def _iter_sse(
 def _transport_http_error(exc: error.HTTPError) -> ProviderTransportError:
     body = exc.read().decode("utf-8", errors="replace")
     redacted_body = str(redact(body).value)
-    headers = {str(key): str(value) for key, value in exc.headers.items()}
-    retry_after_seconds = _retry_after(headers)
+    safe_headers = _safe_error_headers({str(key): str(value) for key, value in exc.headers.items()})
+    retry_after_seconds = _retry_after(safe_headers)
     return ProviderTransportError(
         f"provider transport HTTP {exc.code}: {redacted_body}",
         status_code=exc.code,
         body=redacted_body,
-        headers=headers,
+        headers=safe_headers,
         retry_after_seconds=retry_after_seconds,
         retryable=exc.code in {408, 409, 429, 500, 502, 503, 504, 529},
     )
@@ -127,6 +136,16 @@ def _retry_after(headers: dict[str, str]) -> int | None:
         if key.lower() == "retry-after" and value.isdigit():
             return int(value)
     return None
+
+
+def _safe_error_headers(headers: dict[str, str]) -> dict[str, str]:
+    safe_headers: dict[str, str] = {}
+    for raw_key, raw_value in headers.items():
+        key = raw_key.lower()
+        if key not in _SAFE_ERROR_HEADER_NAMES:
+            continue
+        safe_headers[key] = str(redact(raw_value).value)
+    return safe_headers
 
 
 def _join_url(base_url: str, path: str) -> str:
