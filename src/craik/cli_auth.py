@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Annotated, Any, cast
 
 import typer
@@ -64,6 +65,18 @@ def auth_add(
         str | None,
         typer.Option("--client-id", help="OAuth client id for refresh requests."),
     ] = None,
+    ref: Annotated[
+        str | None,
+        typer.Option("--ref", help="Secret reference for secret-ref profiles."),
+    ] = None,
+    manager: Annotated[
+        str | None,
+        typer.Option("--manager", help="Secret manager for secret-ref profiles."),
+    ] = None,
+    secrets_root: Annotated[
+        str | None,
+        typer.Option("--secrets-root", help="Root directory for file secret references."),
+    ] = None,
 ) -> None:
     """Add or replace an auth profile."""
     try:
@@ -84,10 +97,21 @@ def auth_add(
         metadata["refresh_endpoint"] = refresh_endpoint
     if client_id is not None:
         metadata["client_id"] = client_id
+    if ref is not None:
+        metadata["ref"] = ref
+    if manager is not None:
+        metadata["manager"] = manager
+    if secrets_root is not None:
+        metadata["secrets_root"] = secrets_root
     if credential_kind is CredentialKind.API_KEY and not env_var:
         raise typer.BadParameter("--env-var is required for api-key profiles")
     if credential_kind is CredentialKind.OAUTH_TOKEN and source != "local-cli":
         raise typer.BadParameter("--source=local-cli is required for oauth-token profiles")
+    if credential_kind is CredentialKind.SECRET_REF:
+        if not ref:
+            raise typer.BadParameter("--ref is required for secret-ref profiles")
+        if manager == "file" and Path(ref).expanduser().is_absolute():
+            raise typer.BadParameter("file secret refs must be relative to the secrets root")
 
     family = profile_id.split(":", 1)[0]
     try:

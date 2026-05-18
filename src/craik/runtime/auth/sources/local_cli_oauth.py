@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import stat
 import tempfile
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -79,7 +80,7 @@ class LocalCLICredentialSource:
         return access_token
 
     def _read_credentials(self) -> dict[str, Any]:
-        path = self.credentials_path.expanduser()
+        path = _validated_credentials_path(self.credentials_path, must_exist=True)
         try:
             parsed = json.loads(path.read_text(encoding="utf-8"))
         except FileNotFoundError as exc:
@@ -127,7 +128,7 @@ class LocalCLICredentialSource:
         return updated
 
     def _write_credentials(self, payload: dict[str, Any]) -> None:
-        path = self.credentials_path.expanduser()
+        path = _validated_credentials_path(self.credentials_path, must_exist=False)
         path.parent.mkdir(parents=True, exist_ok=True)
         fd, temp_name = tempfile.mkstemp(
             prefix=f".{path.name}.",
@@ -152,6 +153,25 @@ class LocalCLICredentialSource:
     def _needs_refresh(self, expires_at: datetime) -> bool:
         margin = timedelta(seconds=self.refresh_margin_seconds)
         return expires_at <= datetime.now(UTC) + margin
+
+
+def _validated_credentials_path(path: Path, *, must_exist: bool) -> Path:
+    expanded = path.expanduser()
+    try:
+        metadata = expanded.lstat()
+    except FileNotFoundError as exc:
+        if must_exist:
+            raise LocalCLICredentialError("local CLI credentials file not found") from exc
+        return expanded
+    except OSError as exc:
+        raise LocalCLICredentialError("local CLI credentials file could not be inspected") from exc
+    if stat.S_ISLNK(metadata.st_mode):
+        raise LocalCLICredentialError("local CLI credentials path must not be a symlink")
+    if not stat.S_ISREG(metadata.st_mode):
+        raise LocalCLICredentialError("local CLI credentials path must be a regular file")
+    if os.name == "posix" and metadata.st_mode & 0o077:
+        raise LocalCLICredentialError("local CLI credentials file must be owner-only (0600)")
+    return expanded
 
 
 def _extract_token_payload(payload: dict[str, Any]) -> dict[str, Any]:

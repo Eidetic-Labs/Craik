@@ -1,11 +1,14 @@
 import json
+import os
 import threading
 from datetime import UTC, datetime, timedelta
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any
 
-from craik.runtime.auth.sources import LocalCLICredentialSource
+import pytest
+
+from craik.runtime.auth.sources import LocalCLICredentialError, LocalCLICredentialSource
 
 
 def test_local_cli_oauth_source_returns_anthropic_bearer_header(tmp_path: Path) -> None:
@@ -22,6 +25,7 @@ def test_local_cli_oauth_source_returns_anthropic_bearer_header(tmp_path: Path) 
         ),
         encoding="utf-8",
     )
+    credentials.chmod(0o600)
 
     headers = LocalCLICredentialSource(credentials_path=credentials).headers_for("anthropic")
 
@@ -43,6 +47,7 @@ def test_local_cli_oauth_source_refreshes_expired_token(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
+    credentials.chmod(0o600)
     seen_requests: list[dict[str, Any]] = []
 
     class RefreshHandler(BaseHTTPRequestHandler):
@@ -63,7 +68,7 @@ def test_local_cli_oauth_source_refreshes_expired_token(tmp_path: Path) -> None:
             self.wfile.write(encoded)
 
         def log_message(self, format: str, *args: object) -> None:
-            return
+            pass
 
     server = HTTPServer(("127.0.0.1", 0), RefreshHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -91,4 +96,37 @@ def test_local_cli_oauth_source_refreshes_expired_token(tmp_path: Path) -> None:
     ]
     assert persisted["access_token"] == "refreshed-access-token"
     assert persisted["refresh_token"] == "refreshed-refresh-token"
+    assert credentials.stat().st_mode & 0o777 == 0o600
     assert "expired-access-token" not in str(source.status())
+
+
+def test_local_cli_oauth_source_rejects_group_readable_credentials(tmp_path: Path) -> None:
+    credentials = tmp_path / "credentials.json"
+    credentials.write_text('{"access_token": "local-access-token"}', encoding="utf-8")
+    credentials.chmod(0o644)
+    source = LocalCLICredentialSource(credentials_path=credentials)
+
+    with pytest.raises(LocalCLICredentialError, match="owner-only"):
+        source.headers_for("anthropic")
+
+
+def test_local_cli_oauth_source_rejects_symlink_credentials(tmp_path: Path) -> None:
+    target = tmp_path / "target.json"
+    target.write_text('{"access_token": "local-access-token"}', encoding="utf-8")
+    target.chmod(0o600)
+    link = tmp_path / "credentials.json"
+    link.symlink_to(target)
+    source = LocalCLICredentialSource(credentials_path=link)
+
+    with pytest.raises(LocalCLICredentialError, match="must not be a symlink"):
+        source.headers_for("anthropic")
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="mkfifo is not available")
+def test_local_cli_oauth_source_rejects_fifo_credentials(tmp_path: Path) -> None:
+    fifo = tmp_path / "credentials.pipe"
+    os.mkfifo(fifo)
+    source = LocalCLICredentialSource(credentials_path=fifo)
+
+    with pytest.raises(LocalCLICredentialError, match="regular file"):
+        source.headers_for("anthropic")
