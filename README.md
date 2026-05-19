@@ -181,9 +181,9 @@ implementation gates, not `1.0.0` readiness claims. See
 
 ## Implementation Stack
 
-Craik core is implemented in Python 3.12/3.13 with a CLI-first package shape. The initial stack is:
+Craik core is implemented in Python 3.12+ with a CLI-first package shape. The initial stack is:
 
-- Python 3.12 or 3.13
+- Python 3.12+
 - Typer for CLI
 - Pydantic for runtime contracts
 - SQLite for local persistent state

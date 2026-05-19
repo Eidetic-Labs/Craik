@@ -12,6 +12,16 @@ within the `0.x.0` stability expectations described in
 
 _No unreleased changes._
 
+## 0.1.2 - 2026-05-18
+
+### Fixed
+
+- Restored Python 3.14 compatibility for normal installs by upgrading Pydantic
+  to `2.13.4`, which depends on a `pydantic-core` release with Python 3.14
+  wheels.
+- Restored package metadata to `requires-python >=3.12` and reverted the
+  temporary Python 3.12/3.13-only install guidance from `0.1.1`.
+
 ## 0.1.1 - 2026-05-18
 
 ### Fixed
