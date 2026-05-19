@@ -60,9 +60,10 @@ python -m twine check dist/*
 
 ## PyPI Publishing
 
-Publishing is handled by the Publish workflow. The build job always creates and
-validates artifacts. The publish job only runs when the workflow is manually
-dispatched with `publish=true`.
+Publishing is handled by the Publish workflow. Manual dispatch builds and
+validates artifacts only. PyPI publication runs only from the immutable release
+tag, currently `v0.1.0`, after the workflow verifies that the tag, package
+version, and changelog all agree.
 
 Publishing requires the `pypi` Protected Environment. The environment should
 require reviewer approval and should use trusted publishing through GitHub OIDC
