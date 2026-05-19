@@ -1583,6 +1583,108 @@ html[data-theme='dark'] .craik-product-feature::before {
   }
 }
 
+/* Compact ADR-card grid — denser than .craik-product-card. For short,
+   structured Architecture Decision Records where number + title + one-line
+   decision + status pill is enough. */
+.craik-adr-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.craik-adr-grid > li {
+  margin: 0;
+}
+.craik-adr-card {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 10px;
+  color: var(--craik-fg) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 18px 20px;
+  position: relative;
+  text-decoration: none !important;
+  transition: border-color 220ms var(--craik-ease),
+    background 220ms var(--craik-ease), transform 220ms var(--craik-ease);
+}
+.craik-adr-card::before {
+  background: var(--craik-accent);
+  content: '';
+  height: 0;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transition: height 280ms var(--craik-ease);
+  width: 2px;
+}
+.craik-adr-card:hover {
+  background: var(--craik-bg-elevated);
+  border-color: var(--craik-rule-strong);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.craik-adr-card:hover::before {
+  height: 100%;
+}
+.craik-adr-card__head {
+  align-items: center;
+  display: flex;
+  font-family: var(--craik-font-mono);
+  gap: 10px;
+  justify-content: space-between;
+}
+.craik-adr-card__num {
+  color: var(--craik-accent);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+.craik-adr-card__status {
+  background: color-mix(in srgb, #1bbf6e 14%, transparent);
+  border: 1px solid color-mix(in srgb, #1bbf6e 30%, transparent);
+  border-radius: 999px;
+  color: #1bbf6e;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+.craik-adr-card__title {
+  color: var(--craik-fg);
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.28;
+  margin: 0;
+}
+.craik-adr-card__decision {
+  color: var(--craik-fg-dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+.craik-adr-card__cta {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.craik-adr-card__cta::after {
+  content: ' →';
+  transition: padding 240ms var(--craik-ease);
+}
+.craik-adr-card:hover .craik-adr-card__cta::after {
+  padding-left: 4px;
+}
+
 /* "Next steps" footer — soft cards linking to the next 2-3 docs. */
 .craik-next {
   display: grid;

@@ -1008,26 +1008,203 @@ This plan turns the Craik concept into a buildable sequence.
 
 </div>
 
-### 5 · Architecture Decision Records
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">05</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Architecture decisions</p>
+<h3 className="craik-section-banner__title">
+The reasons behind <em>the structural choices.</em>
+</h3>
+<p className="craik-section-banner__lede">
+ADRs record durable design decisions separately from mutable reference
+material. Reference docs describe current behavior; ADRs explain why
+the shape exists, what tradeoffs were accepted, and how a decision can
+be retracted.
+</p>
+</div>
+</header>
 
-The reasons behind the structural choices. Stable, dated, and referenced from
-the rest of the docs.
+<ol className="craik-adr-grid">
 
-- [ADR index](adr/index.md)
-- ADR 0001 — [MVP runner scope](adr/0001-record-mvp-runner-scope.md)
-- ADR 0002 — [Provider transport and mode families](adr/0002-provider-transport-and-mode-families.md)
-- ADR 0003 — [Secret handling](adr/0003-secret-handling.md)
-- ADR 0004 — [Policy envelope shape](adr/0004-policy-envelope-shape.md)
-- ADR 0005 — [Receipts and handoffs as public contracts](adr/0005-receipts-and-handoffs-as-public-contracts.md)
-- ADR 0006 — [Package and runtime layout](adr/0006-package-and-runtime-layout.md)
-- ADR 0007 — [Credential and identity architecture](adr/0007-credential-and-identity-architecture.md)
+<li>
+<a className="craik-adr-card" href="../adr/record-mvp-runner-scope/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0001</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">MVP runner scope</h4>
+<p className="craik-adr-card__decision">
+Sets the public framing: the MVP ships case-file assembly, policy
+envelopes, prompt compilation, receipts, handoffs, and one governed
+workflow — not unbounded tool execution.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
 
-### 6 · Stigmem integration
+<li>
+<a className="craik-adr-card" href="../adr/provider-transport-and-mode-families/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0002</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Provider transport &amp; mode families</h4>
+<p className="craik-adr-card__decision">
+OpenAI Responses, Anthropic Messages, and OAI-compatible Chat
+Completions stay as separate transport families — not collapsed into a
+single adapter — so tool, streaming, usage, and retry differences stay
+explicit.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
 
-Craik runs in degraded local mode without Stigmem, but Stigmem is the reference
-substrate for team-scale memory.
+<li>
+<a className="craik-adr-card" href="../adr/secret-handling/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0003</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Secret handling</h4>
+<p className="craik-adr-card__decision">
+Receipts, handoffs, case files, provider configs, and local store
+records are scrubbed through a central redaction guard before
+persistence. Secret material is referenced — never copied.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
 
-- [Stigmem integration](stigmem-integration.md)
+<li>
+<a className="craik-adr-card" href="../adr/policy-envelope-shape/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0004</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Policy envelope shape</h4>
+<p className="craik-adr-card__decision">
+The policy envelope binds actor, task, profile, grant requirements,
+redaction posture, and receipt obligations into one typed record that
+travels with every governed action.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="../adr/receipts-and-handoffs-as-public-contracts/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0005</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Receipts &amp; handoffs as public contracts</h4>
+<p className="craik-adr-card__decision">
+Receipts and handoffs sit at the boundary of runtime, memory, docs, and
+operator workflows. They are versioned public contracts — adapters and
+plugins integrate against them without renegotiating shape.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="../adr/package-and-runtime-layout/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0006</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Package &amp; runtime layout</h4>
+<p className="craik-adr-card__decision">
+Splits the historically flat runtime namespace into ownership-bearing
+modules (providers, memory, policy, work execution, companions,
+channels, voice, sandboxing, project workflows) so change rates and
+risk profiles can diverge cleanly.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="../adr/credential-and-identity-architecture/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0007</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Credential &amp; identity architecture</h4>
+<p className="craik-adr-card__decision">
+Provider credentials and operator identity are governance inputs.
+Every receipt names which human authorized work, which credential
+carried the call, which policy allowed it, and which grant made the
+credential usable.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="../adr/">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">Index</span>
+<span className="craik-adr-card__status">Catalog</span>
+</div>
+<h4 className="craik-adr-card__title">ADR index</h4>
+<p className="craik-adr-card__decision">
+The full catalog of accepted decisions and the conventions for
+proposing new ones, retiring old ones, and citing them from reference
+docs.
+</p>
+<span className="craik-adr-card__cta">Browse all</span>
+</a>
+</li>
+
+</ol>
+
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">06</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Stigmem integration</p>
+<h3 className="craik-section-banner__title">
+The reference memory substrate — <em>and the boundary.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Craik runs in degraded local mode without Stigmem, but Stigmem is the
+reference substrate for team-scale memory. One doc draws the exact
+boundary between what Craik owns and what Stigmem owns.
+</p>
+</div>
+</header>
+
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="stigmem-integration.md">
+<div>
+<p className="craik-product-feature__num">Substrate · 01</p>
+<h4 className="craik-product-feature__title">Stigmem integration</h4>
+<p className="craik-product-feature__summary">
+Stigmem owns facts, provenance, scopes, trust metadata, contradiction
+tracking, federation, auth, and memory plugin hooks. Craik owns
+orchestration, case files, agent roles, capability grants, receipts,
+handoffs, and project workflows. Each side stays focused; the contract
+between them is the proposal flow plus a small set of read APIs.
+</p>
+<ul className="craik-product-feature__topics">
+<li>ownership boundary</li>
+<li>fact substrate</li>
+<li>federation</li>
+<li>read APIs</li>
+</ul>
+<span className="craik-product-feature__cta">Read the integration</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Substrate</p>
+<p className="craik-product-feature__quote-text">
+Craik should use Stigmem as its reference memory and truth substrate.
+</p>
+<p className="craik-product-feature__quote-attribution">— Stigmem integration · §Boundary</p>
+</blockquote>
+</a>
+
+</div>
 
 ## Where to go next
 
