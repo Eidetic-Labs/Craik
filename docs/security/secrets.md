@@ -234,19 +234,19 @@ add catch-alls, and don't route receipts around it.
 
 <div className="craik-next">
 
-<a href="../guides/authentication.md">
+<a href="../../guides/authentication/">
 <strong>Do</strong>
 <span>Authentication &amp; credentials</span>
 <small>OIDC login, credential profiles, pools, workload identity, and approval flow.</small>
 </a>
 
-<a href="../reference/redaction.md">
+<a href="../../reference/redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>The redaction guard's patterns and how to extend it safely.</small>
 </a>
 
-<a href="../adr/secret-handling.md">
+<a href="../../adr/secret-handling/">
 <strong>ADR</strong>
 <span>Secret handling design</span>
 <small>The full rationale and tradeoffs that produced this contract.</small>

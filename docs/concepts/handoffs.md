@@ -221,19 +221,19 @@ the edges that explain how the run got from case file to handoff.
 
 <div className="craik-next">
 
-<a href="work-graph.md">
+<a href="../work-graph/">
 <strong>Read next</strong>
 <span>The work graph</span>
 <small>How tasks, case files, receipts, and handoffs compose into the queryable runtime state.</small>
 </a>
 
-<a href="../guides/writing-handoffs.md">
+<a href="../../guides/writing-handoffs/">
 <strong>Do</strong>
 <span>Write good handoffs</span>
 <small>Patterns that make a handoff actually useful for the next agent.</small>
 </a>
 
-<a href="../reference/handoff-viewer.md">
+<a href="../../reference/handoff-viewer/">
 <strong>Reference</strong>
 <span>Handoff viewer</span>
 <small>The operator surface that renders a handoff with full context.</small>

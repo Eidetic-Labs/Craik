@@ -64,7 +64,7 @@ Where Craik is today and where it is going. Honest about what's not yet built.
 - [Current MVP](mvp.md)
 - [MVP roadmap](mvp-roadmap.md)
 - [Roadmap](roadmap.md)
-- [Release readiness · v0.1.0](release-readiness-v0.1.0.md)
+- [Release readiness · v0.1.0](release-readiness.md)
 - [Limitations](limitations.md)
 - [Implementation plan](implementation-plan.md)
 

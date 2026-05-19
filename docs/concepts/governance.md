@@ -188,19 +188,19 @@ is one audit trail you can walk forwards or backwards.
 
 <div className="craik-next">
 
-<a href="../reference/policy-profiles.md">
+<a href="../../reference/policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>The full ruleset for every profile Craik ships.</small>
 </a>
 
-<a href="../guides/capability-grants.md">
+<a href="../../guides/capability-grants/">
 <strong>Do</strong>
 <span>Add capability grants</span>
 <small>Narrow, time-bound permissions that compose with strict.</small>
 </a>
 
-<a href="../reference/policy-tests.md">
+<a href="../../reference/policy-tests/">
 <strong>Reference</strong>
 <span>Policy tests</span>
 <small>How the policy gate enforces the governance contract.</small>

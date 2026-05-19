@@ -202,19 +202,19 @@ craik case show task_review_docs   # shows the latest by default
 
 <div className="craik-next">
 
-<a href="writing-handoffs.md">
+<a href="../writing-handoffs/">
 <strong>Do next</strong>
 <span>Write a handoff</span>
 <small>Close the loop — turn the case-file context into a continuity record.</small>
 </a>
 
-<a href="../concepts/case-files.md">
+<a href="../../concepts/case-files/">
 <strong>Read</strong>
 <span>Case-file concept</span>
 <small>The typed-object view of what you just built.</small>
 </a>
 
-<a href="../reference/local-state.md">
+<a href="../../reference/local-state/">
 <strong>Reference</strong>
 <span>Local state layout</span>
 <small>Where case files persist on disk.</small>

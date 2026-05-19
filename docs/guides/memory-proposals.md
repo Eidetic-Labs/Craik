@@ -202,19 +202,19 @@ specs. This stops a flailing run from contaminating the proposal queue.
 
 <div className="craik-next">
 
-<a href="memory-impact-preview.md">
+<a href="../memory-impact-preview/">
 <strong>Do</strong>
 <span>Preview impact before approving</span>
 <small>See what a promotion would do to existing facts before saying yes.</small>
 </a>
 
-<a href="memory-diffs.md">
+<a href="../memory-diffs/">
 <strong>Do</strong>
 <span>Memory diffs</span>
 <small>Inspect the full memory delta a task produced.</small>
 </a>
 
-<a href="../concepts/memory-and-stigmem.md">
+<a href="../../concepts/memory-and-stigmem/">
 <strong>Read</strong>
 <span>Memory &amp; Stigmem</span>
 <small>The memory model and the Craik / Stigmem ownership split.</small>

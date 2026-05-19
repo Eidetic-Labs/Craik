@@ -175,19 +175,19 @@ outcomes — the wrong move is to leave proposals stale and untriaged.
 
 <div className="craik-next">
 
-<a href="../guides/memory-proposals.md">
+<a href="../../guides/memory-proposals/">
 <strong>Do</strong>
 <span>Manage memory proposals</span>
 <small>The proposal lifecycle from creation to approval to retirement.</small>
 </a>
 
-<a href="../guides/contradiction-inbox.md">
+<a href="../../guides/contradiction-inbox/">
 <strong>Do</strong>
 <span>Resolve contradictions</span>
 <small>How conflicting facts surface and how the inbox tracks resolutions.</small>
 </a>
 
-<a href="../reference/memory-backends.md">
+<a href="../../reference/memory-backends/">
 <strong>Reference</strong>
 <span>Memory backends</span>
 <small>Configuration for local memory and Stigmem-backed memory.</small>

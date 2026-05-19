@@ -145,19 +145,19 @@ scope the run wrote into matches the scope the reviewer authorized.
 
 <div className="craik-next">
 
-<a href="memory-proposals.md">
+<a href="../memory-proposals/">
 <strong>Do</strong>
 <span>Manage memory proposals</span>
 <small>How proposals flow from a run to reviewer approval.</small>
 </a>
 
-<a href="memory-impact-preview.md">
+<a href="../memory-impact-preview/">
 <strong>Do</strong>
 <span>Preview impact before promotion</span>
 <small>See what a proposal would do to memory before approving it.</small>
 </a>
 
-<a href="../concepts/memory-and-stigmem.md">
+<a href="../../concepts/memory-and-stigmem/">
 <strong>Read</strong>
 <span>Memory &amp; Stigmem</span>
 <small>The memory model Craik composes against.</small>

@@ -156,19 +156,19 @@ stay queryable for audit.
 
 <div className="craik-next">
 
-<a href="quickstart.md">
+<a href="../quickstart/">
 <strong>Do</strong>
 <span>Quickstart</span>
 <small>Take a freshly registered project and walk it through a full governed task.</small>
 </a>
 
-<a href="../concepts/project-model.md">
+<a href="../../concepts/project-model/">
 <strong>Read</strong>
 <span>The project model</span>
 <small>The typed object Craik builds from a registered repository.</small>
 </a>
 
-<a href="using-case-files.md">
+<a href="../using-case-files/">
 <strong>Do</strong>
 <span>Use case files</span>
 <small>Patterns for assembling, inspecting, and refreshing the per-task case file.</small>

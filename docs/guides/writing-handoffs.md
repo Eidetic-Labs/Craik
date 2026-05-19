@@ -223,19 +223,19 @@ contaminate the next run's context.
 
 <div className="craik-next">
 
-<a href="../concepts/handoffs.md">
+<a href="../../concepts/handoffs/">
 <strong>Read</strong>
 <span>Handoff concept</span>
 <small>The typed object you just produced and how it composes with the work graph.</small>
 </a>
 
-<a href="memory-proposals.md">
+<a href="../memory-proposals/">
 <strong>Do</strong>
 <span>Memory proposals</span>
 <small>What to do with the proposals your handoff emitted.</small>
 </a>
 
-<a href="../reference/handoff-viewer.md">
+<a href="../../reference/handoff-viewer/">
 <strong>Reference</strong>
 <span>Handoff viewer</span>
 <small>The operator surface that renders handoffs with full context.</small>

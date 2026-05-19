@@ -215,19 +215,19 @@ unset CRAIK_HOME
 
 <div className="craik-next">
 
-<a href="../concepts/project-model.md">
+<a href="../../concepts/project-model/">
 <strong>Read</strong>
 <span>The project model</span>
 <small>Understand what a project profile actually contains and how agents consume it.</small>
 </a>
 
-<a href="../concepts/case-files.md">
+<a href="../../concepts/case-files/">
 <strong>Read</strong>
 <span>How case files work</span>
 <small>Evidence, assumptions, stale-risk markers, and the verification plan.</small>
 </a>
 
-<a href="authentication.md">
+<a href="../authentication/">
 <strong>Step up</strong>
 <span>Authenticate &amp; add credentials</span>
 <small>OIDC login, credential profiles, pools, and workload identity for CI.</small>

@@ -199,19 +199,19 @@ case-file builds, and handoffs are in progress — see
 
 <div className="craik-next">
 
-<a href="handoffs.md">
+<a href="../handoffs/">
 <strong>Read next</strong>
 <span>Handoffs</span>
 <small>How a run ends and how the next agent picks up.</small>
 </a>
 
-<a href="governance.md">
+<a href="../governance/">
 <strong>Read</strong>
 <span>Governance</span>
 <small>Policy envelopes, capability grants, and the gates that decide which receipts even get a chance to be written.</small>
 </a>
 
-<a href="../reference/redaction.md">
+<a href="../../reference/redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>The redaction guard, its patterns, and how to extend it.</small>
