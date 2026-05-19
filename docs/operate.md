@@ -16,25 +16,209 @@ multimodal, locale).
 
 ## Implementation paths
 
-### 1 · Day-to-day operations
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">01</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Day-to-day operations</p>
+<h3 className="craik-section-banner__title">
+The four commands <em>you reach for most often.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Read-only diagnostics, the contributor quality gates, the safe-update
+flow, and the release cadence. Start here if you're picking up an
+already-running install or preparing to cut a release.
+</p>
+</div>
+</header>
 
-The commands you reach for most often. Start here if you're picking up an
-already-running install.
+<div className="craik-product-spread">
 
-- [Development checks](guides/development.md)
-- [Doctor diagnostics](guides/doctor.md)
-- [Updating Craik](guides/updating.md)
-- [Release management](guides/release-management.md)
+<a className="craik-product-feature" href="guides/doctor.md">
+<div>
+<p className="craik-product-feature__num">Diagnostic · 01</p>
+<h4 className="craik-product-feature__title">Doctor diagnostics</h4>
+<p className="craik-product-feature__summary">
+The read-only health check. Inspects local home, SQLite store, memory
+backend, every auth profile, gateway config, gateway prerequisites,
+and policy state — without contacting Stigmem or writing receipts.
+Run it before going live or whenever something feels off.
+</p>
+<ul className="craik-product-feature__topics">
+<li>read-only</li>
+<li>auth-profile health</li>
+<li>structured statuses</li>
+<li>CI-friendly JSON</li>
+</ul>
+<span className="craik-product-feature__cta">Run doctor</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Read-only</p>
+<p className="craik-product-feature__quote-text">
+<code>craik doctor</code> inspects existing local state and environment
+variables. It does not create <code>CRAIK_HOME</code>, initialize a
+database, contact Stigmem, start a gateway, or write receipts.
+</p>
+<p className="craik-product-feature__quote-attribution">— Doctor diagnostics · §Read-only</p>
+</blockquote>
+</a>
 
-### 2 · Local state & migrations
+</div>
 
-Where Craik stores things on disk, how to upgrade those stores, and how secret
-material moves.
+<ol className="craik-adr-grid">
 
-- [Local state](reference/local-state.md)
-- [Local store](reference/local-store.md)
-- [Local store migrations](guides/local-store-migrations.md)
-- [Secret migration policy](reference/secret-migration-policy.md)
+<li>
+<a className="craik-adr-card" href="guides/development.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Quality gates</span>
+</div>
+<h4 className="craik-adr-card__title">Development checks</h4>
+<p className="craik-adr-card__decision">
+The four core gates contributors run before opening a PR: pytest,
+ruff, mypy, and <code>craik policy test</code>. Same set CI exercises
+on every push — green locally usually means green in CI.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/updating.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Safe update</span>
+</div>
+<h4 className="craik-adr-card__title">Updating Craik</h4>
+<p className="craik-adr-card__decision">
+<code>craik update</code> prints safe update guidance only — it does
+not modify the installed package, rewrite source checkouts, fetch
+remote release metadata, or migrate local state. Operator stays in
+control of the actual upgrade.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/release-management.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Release</span>
+</div>
+<h4 className="craik-adr-card__title">Release management</h4>
+<p className="craik-adr-card__decision">
+The release cadence and gates for the <code>0.x.0</code> MVP series.
+Each published release must be installable, documented, and
+recoverable — contracts can change between minor releases but never
+without docs and tests.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+</ol>
+
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">02</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Local state &amp; migrations</p>
+<h3 className="craik-section-banner__title">
+Where state lives — <em>and how to move it.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Four docs cover the on-disk layout, the SQLite local store, the
+forward-only migration discipline, and the strict secret-handling
+policy that applies whenever data crosses runtime boundaries.
+</p>
+</div>
+</header>
+
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="reference/local-store.md">
+<div>
+<p className="craik-product-feature__num">Persistence · 01</p>
+<h4 className="craik-product-feature__title">Local store</h4>
+<p className="craik-product-feature__summary">
+SQLite at <code>$CRAIK_HOME/state/craik.sqlite3</code>. Holds projects,
+tasks, intent locks, case files, run state, receipts, handoffs, memory
+proposals, contradictions, and work-graph projections. Schema is
+versioned; migrations run on <code>LocalStore.initialize()</code>.
+</p>
+<ul className="craik-product-feature__topics">
+<li>SQLite</li>
+<li>versioned schema</li>
+<li>forward-only</li>
+<li>single source of truth</li>
+</ul>
+<span className="craik-product-feature__cta">Read the store</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Persistence</p>
+<p className="craik-product-feature__quote-text">
+Craik uses SQLite for local runtime persistence.
+</p>
+<p className="craik-product-feature__quote-attribution">— Local store · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/local-state.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">On-disk layout</span>
+</div>
+<h4 className="craik-adr-card__title">Local state layout</h4>
+<p className="craik-adr-card__decision">
+The full <code>~/.craik/</code> directory map: <code>config/</code>,
+<code>secrets/</code>, <code>state/</code>, <code>cache/</code>,
+<code>logs/</code>, <code>receipts/</code>, <code>handoffs/</code>,
+<code>case-files/</code>, <code>projects/</code>. Override the root
+with <code>CRAIK_HOME</code>.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/local-store-migrations.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Migrations</span>
+</div>
+<h4 className="craik-adr-card__title">Local store migrations</h4>
+<p className="craik-adr-card__decision">
+Migrations are forward-only and run during
+<code>LocalStore.initialize()</code>. Each step is versioned; a
+schema-version table tracks what has applied so a re-initialization
+is idempotent.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/secret-migration-policy.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Policy</span>
+</div>
+<h4 className="craik-adr-card__title">Secret migration policy</h4>
+<p className="craik-adr-card__decision">
+Migration workflows must never copy secret values across runtime
+boundaries. Secret-bearing fields are handled through one of four
+policy outcomes — <code>redact</code>, <code>strip</code>,
+<code>reference</code>, or <code>reject</code> — never copied as-is.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 3 · Operator views
 
