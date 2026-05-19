@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Craik · The Agent Operating Layer</title>
+    <meta
+      name="description"
+      content="Craik is the governance substrate around coding agents — shared project state, policy-bound authority, durable receipts, and machine-readable handoffs. Built by Eidetic Labs."
+    />
+    <meta property="og:title" content="Craik — The Agent Operating Layer" />
+    <meta
+      property="og:description"
+      content="Shared project context, policy-shaped execution, durable receipts, and auditable handoffs for coding agents."
+    />
+    <meta property="og:image" content="https://craik.eidetic-labs.com/assets/og-image.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://craik.eidetic-labs.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script>
+      (() => {
+        const saved = localStorage.getItem('craik-theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = saved || (systemDark ? 'dark' : 'light');
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Craik home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="-40 -40 80 80" width="28" height="28">
+            <path
+              d="M 29.564 -12.246 A 32 32 0 1 0 29.564 12.246"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="16"
+              stroke-linecap="round"
+            />
+            <circle cx="0" cy="0" r="18" fill="#B4ACE6" />
+          </svg>
+        </span>
+        <span class="brand__wordmark">Craik</span>
+        <span class="brand__by">by Eidetic Labs</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#runtime"><span aria-hidden="true">§01</span> Runtime</a>
+        <a href="#capabilities"><span aria-hidden="true">§02</span> Capabilities</a>
+        <a href="#workflow"><span aria-hidden="true">§03</span> Workflow</a>
+        <a href="#vision"><span aria-hidden="true">§04</span> Vision</a>
+      </nav>
+
+      <div class="header-controls">
+        <button class="theme-toggle" type="button" aria-label="Toggle theme" data-theme-toggle>
+          <span class="theme-toggle__thumb" aria-hidden="true"></span>
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+            <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M12 2.6v2.4" />
+              <path d="M12 19v2.4" />
+              <path d="M2.6 12h2.4" />
+              <path d="M19 12h2.4" />
+              <path d="M5.2 5.2l1.7 1.7" />
+              <path d="M17.1 17.1l1.7 1.7" />
+              <path d="M5.2 18.8l1.7-1.7" />
+              <path d="M17.1 6.9l1.7-1.7" />
+            </g>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <a class="header-action" href="https://github.com/eidetic-labs/craik">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.73-1.53-2.55-.29-5.24-1.28-5.24-5.71 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.95 10.95 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.44-2.7 5.42-5.27 5.7.41.36.78 1.07.78 2.16v3.2c0 .31.21.68.8.56 4.57-1.52 7.86-5.83 7.86-10.91C23.5 5.65 18.35.5 12 .5z"
+            />
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ───────────── HERO ───────────── -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__grid" aria-hidden="true"></div>
+
+        <div class="hero__copy">
+          <p class="eyebrow">
+            <span class="eyebrow__dot"></span>
+            By Eidetic Labs · The agent operating layer
+          </p>
+          <h1 id="hero-title">
+            <span class="hero__line hero__line--a">Agent work</span>
+            <span class="hero__line hero__line--b">that survives</span>
+            <span class="hero__line hero__line--c">
+              the <em>run</em>.
+            </span>
+          </h1>
+          <p class="hero__lede">
+            Craik is the governance substrate around coding agents — shared project state,
+            policy-bound authority, durable receipts, and handoffs the next agent can
+            trust. Built for software work that crosses sessions, runners, and reviewers.
+          </p>
+
+          <div class="hero__actions">
+            <a class="button button--primary" href="https://docs.craik.eidetic-labs.com">
+              Read the docs
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  d="M5 12h14M13 5l7 7-7 7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+            <code class="install-snippet" aria-label="Install command">
+              <span class="install-snippet__prompt">$</span>
+              <span class="install-snippet__cmd">pip install craik</span>
+              <button
+                type="button"
+                class="install-snippet__copy"
+                data-copy="pip install craik"
+                aria-label="Copy install command"
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                  <rect
+                    x="8"
+                    y="8"
+                    width="11"
+                    height="13"
+                    rx="2"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+                  <path
+                    d="M5 16V5a2 2 0 0 1 2-2h9"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  />
+                </svg>
+              </button>
+            </code>
+          </div>
+
+          <dl class="hero__stats">
+            <div>
+              <dt>Runners</dt>
+              <dd>Codex · Claude · Gemini</dd>
+            </div>
+            <div>
+              <dt>Providers</dt>
+              <dd>OpenAI · Anthropic · OAI-compatible</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd><span class="pulse"></span>0.1.x · governed MVP</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Hero runtime mark — the signature visual -->
+        <figure class="hero__stage" aria-label="The Craik runtime model">
+          <svg
+            class="runtime-svg"
+            viewBox="0 0 640 640"
+            role="img"
+            aria-labelledby="runtime-svg-title"
+          >
+            <title id="runtime-svg-title">
+              The Craik runtime: case files, policy, runner, receipts, memory, handoff
+            </title>
+            <defs>
+              <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="var(--lavender)" stop-opacity="0.55" />
+                <stop offset="55%" stop-color="var(--lavender)" stop-opacity="0.1" />
+                <stop offset="100%" stop-color="var(--lavender)" stop-opacity="0" />
+              </radialGradient>
+              <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="var(--ink-soft)" stop-opacity="0" />
+                <stop offset="50%" stop-color="var(--lavender-deep)" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="var(--ink-soft)" stop-opacity="0" />
+              </linearGradient>
+              <pattern id="dotgrid" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="var(--ink-soft)" fill-opacity="0.18" />
+              </pattern>
+            </defs>
+
+            <rect x="0" y="0" width="640" height="640" fill="url(#dotgrid)" opacity="0.55" />
+            <circle cx="320" cy="320" r="270" fill="url(#halo)" />
+
+            <!-- Concentric orbits -->
+            <g class="runtime-svg__orbits" fill="none" stroke-width="1">
+              <circle cx="320" cy="320" r="265" class="orbit orbit--3" />
+              <circle cx="320" cy="320" r="195" class="orbit orbit--2" />
+              <circle cx="320" cy="320" r="125" class="orbit orbit--1" />
+            </g>
+
+            <!-- Edges from center to nodes -->
+            <g class="runtime-svg__edges" stroke="url(#edge)" stroke-width="1.4" fill="none">
+              <line x1="320" y1="320" x2="120" y2="180" />
+              <line x1="320" y1="320" x2="520" y2="180" />
+              <line x1="320" y1="320" x2="560" y2="380" />
+              <line x1="320" y1="320" x2="420" y2="540" />
+              <line x1="320" y1="320" x2="200" y2="520" />
+              <line x1="320" y1="320" x2="80" y2="360" />
+            </g>
+
+            <!-- Traveling pulses -->
+            <g class="runtime-svg__pulses" fill="var(--lavender-deep)">
+              <circle r="3.5">
+                <animateMotion
+                  dur="3.6s"
+                  repeatCount="indefinite"
+                  path="M320,320 L120,180"
+                  rotate="auto"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;1;0"
+                  dur="3.6s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle r="3.5">
+                <animateMotion
+                  dur="4.2s"
+                  begin="0.5s"
+                  repeatCount="indefinite"
+                  path="M320,320 L520,180"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;1;0"
+                  dur="4.2s"
+                  begin="0.5s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle r="3.5">
+                <animateMotion
+                  dur="3.2s"
+                  begin="1.1s"
+                  repeatCount="indefinite"
+                  path="M320,320 L560,380"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;1;0"
+                  dur="3.2s"
+                  begin="1.1s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle r="3.5">
+                <animateMotion
+                  dur="3.8s"
+                  begin="1.8s"
+                  repeatCount="indefinite"
+                  path="M320,320 L420,540"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;1;0"
+                  dur="3.8s"
+                  begin="1.8s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle r="3.5">
+                <animateMotion
+                  dur="4.4s"
+                  begin="0.2s"
+                  repeatCount="indefinite"
+                  path="M320,320 L200,520"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;1;0"
+                  dur="4.4s"
+                  begin="0.2s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+              <circle r="3.5">
+                <animateMotion
+                  dur="3.4s"
+                  begin="1.5s"
+                  repeatCount="indefinite"
+                  path="M320,320 L80,360"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;1;0"
+                  dur="3.4s"
+                  begin="1.5s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+            </g>
+
+            <!-- Center: the Craik C-mark -->
+            <g transform="translate(320 320)">
+              <circle r="80" class="runtime-svg__core-bg" />
+              <g transform="scale(2)">
+                <path
+                  d="M 29.564 -12.246 A 32 32 0 1 0 29.564 12.246"
+                  fill="none"
+                  stroke="var(--mark-stroke)"
+                  stroke-width="9"
+                  stroke-linecap="round"
+                />
+                <circle cx="0" cy="0" r="10" fill="var(--lavender)" class="mark-dot" />
+              </g>
+            </g>
+
+            <!-- Node labels -->
+            <g class="runtime-svg__nodes" font-family="var(--font-mono)" font-size="11">
+              <g transform="translate(120 180)" class="node">
+                <rect x="-56" y="-18" width="112" height="36" rx="6" />
+                <text y="-2" text-anchor="middle">
+                  <tspan class="node__label">CASE FILE</tspan>
+                </text>
+                <text y="11" text-anchor="middle" class="node__hint">task_042</text>
+              </g>
+              <g transform="translate(520 180)" class="node">
+                <rect x="-50" y="-18" width="100" height="36" rx="6" />
+                <text y="-2" text-anchor="middle">
+                  <tspan class="node__label">POLICY</tspan>
+                </text>
+                <text y="11" text-anchor="middle" class="node__hint">strict.write</text>
+              </g>
+              <g transform="translate(560 380)" class="node">
+                <rect x="-46" y="-18" width="92" height="36" rx="6" />
+                <text y="-2" text-anchor="middle">
+                  <tspan class="node__label">RUNNER</tspan>
+                </text>
+                <text y="11" text-anchor="middle" class="node__hint">codex</text>
+              </g>
+              <g transform="translate(420 540)" class="node">
+                <rect x="-50" y="-18" width="100" height="36" rx="6" />
+                <text y="-2" text-anchor="middle">
+                  <tspan class="node__label">RECEIPT</tspan>
+                </text>
+                <text y="11" text-anchor="middle" class="node__hint">rcpt_4f1c</text>
+              </g>
+              <g transform="translate(200 520)" class="node">
+                <rect x="-50" y="-18" width="100" height="36" rx="6" />
+                <text y="-2" text-anchor="middle">
+                  <tspan class="node__label">HANDOFF</tspan>
+                </text>
+                <text y="11" text-anchor="middle" class="node__hint">next_agent</text>
+              </g>
+              <g transform="translate(80 360)" class="node">
+                <rect x="-46" y="-18" width="92" height="36" rx="6" />
+                <text y="-2" text-anchor="middle">
+                  <tspan class="node__label">MEMORY</tspan>
+                </text>
+                <text y="11" text-anchor="middle" class="node__hint">stigmem</text>
+              </g>
+            </g>
+          </svg>
+        </figure>
+      </section>
+
+      <!-- ───────────── DIRECTIVE / PROBLEM ───────────── -->
+      <section class="directive" aria-label="The problem Craik exists to fix">
+        <div class="directive__inner">
+          <p class="directive__kicker">§ Premise</p>
+          <p class="directive__statement">
+            <span>Most agent frameworks optimize for tool calling, prompt routing, parallel execution.</span>
+            <strong>Those are necessary. They are not enough.</strong>
+            <span>
+              Agent systems become useful at organizational scale only when they can
+              <em>remember</em>, <em>justify</em>, <em>coordinate</em>, <em>dispute</em>,
+              and <em>hand off</em> work over time.
+            </span>
+          </p>
+          <ul class="directive__contrasts">
+            <li>
+              <span class="contrast__from">Sessions end.</span>
+              <span class="contrast__to">Context dies.</span>
+            </li>
+            <li>
+              <span class="contrast__from">Tools fire.</span>
+              <span class="contrast__to">Authority drifts.</span>
+            </li>
+            <li>
+              <span class="contrast__from">Memory is mocked.</span>
+              <span class="contrast__to">Truth degrades.</span>
+            </li>
+            <li>
+              <span class="contrast__from">Runs finish.</span>
+              <span class="contrast__to">Evidence is lost.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ───────────── RUNTIME LAYER ───────────── -->
+      <section class="section runtime" id="runtime" aria-labelledby="runtime-title">
+        <header class="section__head">
+          <p class="eyebrow"><span class="eyebrow__num">01</span> Runtime layer</p>
+          <h2 id="runtime-title">
+            Not another agent framework. <em>The operating layer around them.</em>
+          </h2>
+        </header>
+        <div class="runtime__body">
+          <p class="runtime__lead">
+            Craik prepares governed context before a runner acts, records what happened
+            after it acts, and keeps the work graph durable across sessions, tools, and
+            future agents. Memory, provenance, policy, and work state are runtime
+            concerns — not optional logging.
+          </p>
+
+          <article class="terminal" aria-label="Craik CLI session" data-typewriter>
+            <header class="terminal__chrome">
+              <span class="terminal__dot terminal__dot--r"></span>
+              <span class="terminal__dot terminal__dot--y"></span>
+              <span class="terminal__dot terminal__dot--g"></span>
+              <span class="terminal__path">~/repos/product · main</span>
+            </header>
+            <!-- Static fallback for no-JS / reduced-motion. The typewriter
+                 below parses these lines, blanks the body, and replays them. -->
+            <div class="terminal__body">
+              <p><span class="prompt">$</span> craik project add ./repo --name product</p>
+              <p class="comment">→ project registered · pid_8b3 · 4 ADRs · 17 facts indexed</p>
+              <p><span class="prompt">$</span> craik task create --project product "ship migration 0042"</p>
+              <p class="comment">→ task_042 created · case file scheduled</p>
+              <p><span class="prompt">$</span> craik case build task_042</p>
+              <p class="comment">→ case file built · 12 evidence refs · 3 contradictions surfaced</p>
+              <p><span class="prompt">$</span> craik prompt compile task_042 --runner codex</p>
+              <p class="comment">→ prompt sealed · policy: strict.write · grants: 2</p>
+              <p>
+                <span class="prompt">$</span> craik run task_042 <span class="caret">▌</span>
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ───────────── CAPABILITIES ───────────── -->
+      <section class="section capabilities" id="capabilities" aria-labelledby="cap-title">
+        <header class="section__head">
+          <p class="eyebrow"><span class="eyebrow__num">02</span> Capabilities</p>
+          <h2 id="cap-title">
+            What agents gain <em>when the vision is complete.</em>
+          </h2>
+          <p class="section__sub">
+            Craik treats every part of agent work as a typed, governable, queryable runtime object.
+            The capabilities below are the shape of that surface.
+          </p>
+        </header>
+
+        <ol class="cap-grid" role="list">
+          <li class="cap cap--feature">
+            <p class="cap__index">01</p>
+            <h3>Shared project models</h3>
+            <p>
+              Agents inherit a working model of your repository before they act — facts,
+              ADRs, issues, PRs, tests, prior handoffs, known traps, and contradictions
+              — instead of reconstructing state from scratch on every prompt.
+            </p>
+            <ul class="cap__tags" aria-label="Related concepts">
+              <li>case files</li>
+              <li>evidence</li>
+              <li>project profile</li>
+            </ul>
+          </li>
+
+          <li class="cap cap--feature">
+            <p class="cap__index">02</p>
+            <h3>Receipted authority</h3>
+            <p>
+              Provider calls, credentials, operator identity, side effects, memory
+              writes, and policy decisions become durable, structured records bound to
+              <em>both</em> an operator and a credential.
+            </p>
+            <ul class="cap__tags" aria-label="Related concepts">
+              <li>receipts</li>
+              <li>operator id</li>
+              <li>provenance</li>
+            </ul>
+          </li>
+
+          <li class="cap">
+            <p class="cap__index">03</p>
+            <h3>Policy envelopes</h3>
+            <p>
+              Write authority, review gates, credential rotation, and approval surfaces
+              are first-class runtime objects — not prompt suggestions.
+            </p>
+          </li>
+
+          <li class="cap cap--wide">
+            <p class="cap__index">04</p>
+            <h3>Runner-neutral coordination</h3>
+            <p>
+              Codex, Claude, Gemini, plus direct OpenAI and Anthropic provider paths and
+              OpenAI-compatible local servers (Ollama, vLLM, etc.) all consume the same
+              Craik contracts. One governance model. One handoff format.
+            </p>
+            <div class="runner-grid" aria-label="Supported runners and providers">
+              <span>codex</span>
+              <span>claude</span>
+              <span>gemini</span>
+              <span>openai</span>
+              <span>anthropic</span>
+              <span>oai-compatible</span>
+            </div>
+          </li>
+
+          <li class="cap">
+            <p class="cap__index">05</p>
+            <h3>Durable handoffs</h3>
+            <p>
+              Runs end with machine-readable state. The next agent — human or model —
+              picks up where the last one stopped, with reasons attached.
+            </p>
+          </li>
+
+          <li class="cap">
+            <p class="cap__index">06</p>
+            <h3>Memory &amp; contradictions</h3>
+            <p>
+              Stigmem-backed facts, scope-aware proposals, and a contradiction inbox so
+              truth doesn't silently overwrite truth.
+            </p>
+          </li>
+
+          <li class="cap">
+            <p class="cap__index">07</p>
+            <h3>Work graph</h3>
+            <p>
+              Tasks, PRs, issues, facts, decisions, docs, tools, agents, and artifacts
+              modeled as connected, queryable state — exportable for review and audit.
+            </p>
+          </li>
+
+          <li class="cap cap--full">
+            <p class="cap__index">08</p>
+            <h3>Identity &amp; credentials as runtime</h3>
+            <p>
+              OIDC operator identity. Credential pools with rotation and failover.
+              Workload identity for CI and cloud. RFC 8693 token exchange. Policy-bound
+              credential gates with approval-gated first use — every provider call bound
+              to <em>both</em> operator and credential identities, named on every
+              receipt.
+            </p>
+            <pre class="cap__snippet" aria-hidden="true">operator   = oidc://acme.okta.com#alice
+credential = pool:openai-prod (rotate=24h)
+policy     = strict.write { gate: review }
+binding    = receipt.actor + receipt.credential</pre>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ───────────── ARTIFACTS ───────────── -->
+      <section class="section artifacts" aria-labelledby="artifacts-title">
+        <header class="section__head section__head--center">
+          <p class="eyebrow"><span class="eyebrow__num">02·b</span> Artifacts</p>
+          <h2 id="artifacts-title">
+            What comes out of a governed run.
+          </h2>
+        </header>
+
+        <div class="artifact-row">
+          <article class="artifact artifact--receipt" aria-label="Example capability receipt">
+            <header class="artifact__head">
+              <span class="artifact__tag">receipt.json</span>
+              <span class="artifact__id">rcpt_4f1c · sealed</span>
+            </header>
+            <pre><span class="key">"actor"</span>:        <span class="val">"oidc://acme/alice"</span>,
+<span class="key">"credential"</span>:   <span class="val">"pool:openai-prod#k_77a"</span>,
+<span class="key">"action"</span>:       <span class="val">"provider.call"</span>,
+<span class="key">"provider"</span>:     <span class="val">"anthropic.messages"</span>,
+<span class="key">"model"</span>:        <span class="val">"claude-opus-4-7"</span>,
+<span class="key">"policy"</span>:       <span class="val">"strict.write"</span>,
+<span class="key">"target"</span>:       <span class="val">"task_042"</span>,
+<span class="key">"reason"</span>:       <span class="val">"migration plan compile"</span>,
+<span class="key">"result"</span>:       <span class="ok">"ok"</span>,
+<span class="key">"evidence"</span>:     <span class="val">["adr/0042","pr/1188"]</span>,
+<span class="key">"sealed_at"</span>:    <span class="val">"2026-05-19T14:08:21Z"</span></pre>
+          </article>
+
+          <article class="artifact artifact--handoff" aria-label="Example handoff">
+            <header class="artifact__head">
+              <span class="artifact__tag">handoff.md</span>
+              <span class="artifact__id">task_042 → next</span>
+            </header>
+            <div class="handoff">
+              <p class="handoff__heading">## State of task_042</p>
+              <p>
+                Migration 0042 plan compiled and reviewed. <span class="mark-y">2 of 4</span>
+                evidence checks pass; <span class="mark-r">contradiction</span> open on
+                row-count assumption.
+              </p>
+              <p class="handoff__heading">## Open</p>
+              <ul>
+                <li>resolve <span class="mark-l">stigmem/contra_91</span></li>
+                <li>re-run policy test <span class="mark-l">policy.write/0042</span></li>
+                <li>request approval: <span class="mark-l">reviewer:@dba</span></li>
+              </ul>
+              <p class="handoff__heading">## Next agent should</p>
+              <ol>
+                <li>Read receipts <code>rcpt_4f1c</code>, <code>rcpt_4f1d</code></li>
+                <li>Use credential pool <code>openai-prod</code></li>
+                <li>Stop before <code>migration.apply</code> — review gate</li>
+              </ol>
+            </div>
+          </article>
+
+          <article class="artifact artifact--graph" aria-label="Example work graph fragment">
+            <header class="artifact__head">
+              <span class="artifact__tag">work-graph.dot</span>
+              <span class="artifact__id">exported</span>
+            </header>
+            <svg viewBox="0 0 360 280" class="graph">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--ink-soft)" />
+                </marker>
+              </defs>
+              <g stroke="var(--ink-soft)" stroke-width="1" fill="none" marker-end="url(#arrow)">
+                <line x1="180" y1="40" x2="100" y2="120" />
+                <line x1="180" y1="40" x2="260" y2="120" />
+                <line x1="100" y1="160" x2="180" y2="220" />
+                <line x1="260" y1="160" x2="180" y2="220" />
+                <line x1="180" y1="40" x2="180" y2="210" stroke-dasharray="3 3" />
+              </g>
+              <g class="graph__node">
+                <rect x="130" y="20" width="100" height="34" rx="4" />
+                <text x="180" y="41" text-anchor="middle">task_042</text>
+              </g>
+              <g class="graph__node">
+                <rect x="50" y="120" width="100" height="34" rx="4" />
+                <text x="100" y="141" text-anchor="middle">case_file</text>
+              </g>
+              <g class="graph__node">
+                <rect x="210" y="120" width="100" height="34" rx="4" />
+                <text x="260" y="141" text-anchor="middle">policy</text>
+              </g>
+              <g class="graph__node graph__node--accent">
+                <rect x="130" y="210" width="100" height="34" rx="4" />
+                <text x="180" y="231" text-anchor="middle">receipt</text>
+              </g>
+            </svg>
+            <p class="graph__caption">
+              Tasks, case files, policies, and receipts are nodes — not log lines.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ───────────── WORKFLOW LOOP ───────────── -->
+      <section class="section workflow" id="workflow" aria-labelledby="workflow-title">
+        <header class="section__head section__head--split">
+          <div>
+            <p class="eyebrow"><span class="eyebrow__num">03</span> Workflow</p>
+            <h2 id="workflow-title">
+              From request to durable handoff.
+            </h2>
+          </div>
+          <p class="workflow__lead">
+            Six durable phases. Every transition leaves an artifact. Every artifact is
+            queryable. Nothing is implicit.
+          </p>
+        </header>
+
+        <ol class="workflow__steps">
+          <li>
+            <span class="workflow__num">01</span>
+            <h3>Register</h3>
+            <p>Connect a repository and establish the project profile, ADRs, and capability map.</p>
+            <p class="workflow__artifact">→ <code>project.profile</code></p>
+          </li>
+          <li>
+            <span class="workflow__num">02</span>
+            <h3>Assemble</h3>
+            <p>Build a case file with evidence, contradictions, policy, risks, and known constraints.</p>
+            <p class="workflow__artifact">→ <code>case_file.task_042</code></p>
+          </li>
+          <li>
+            <span class="workflow__num">03</span>
+            <h3>Govern</h3>
+            <p>Bind a policy envelope, capability grants, operator identity, and credential profile.</p>
+            <p class="workflow__artifact">→ <code>policy.envelope</code></p>
+          </li>
+          <li>
+            <span class="workflow__num">04</span>
+            <h3>Run</h3>
+            <p>Dispatch through a runner adapter — Codex, Claude, Gemini, or direct provider.</p>
+            <p class="workflow__artifact">→ <code>runner.session</code></p>
+          </li>
+          <li>
+            <span class="workflow__num">05</span>
+            <h3>Record</h3>
+            <p>Persist receipts, graph edges, memory proposals, contradictions, and side effects.</p>
+            <p class="workflow__artifact">→ <code>receipts/*.json</code></p>
+          </li>
+          <li>
+            <span class="workflow__num">06</span>
+            <h3>Hand off</h3>
+            <p>Emit machine-readable state for the next agent — model or human — to resume.</p>
+            <p class="workflow__artifact">→ <code>handoff.md + state</code></p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ───────────── VISION ───────────── -->
+      <section class="section vision" id="vision" aria-labelledby="vision-title">
+        <p class="eyebrow eyebrow--inverse"><span class="eyebrow__num">04</span> Vision</p>
+        <h2 id="vision-title">
+          From <span class="strike">isolated prompts</span> to
+          <span class="hilite">durable agent operations.</span>
+        </h2>
+        <p class="vision__body">
+          When the vision is complete, Craik turns multi-agent software work into an
+          auditable system of record. Every action is receipted. Every contradiction is
+          surfaced. Every handoff is machine-readable. Every credential is bound to an
+          operator identity. The default state of agent work becomes
+          <em>governed</em> — not hopeful.
+        </p>
+        <div class="vision__matrix" aria-label="Future capabilities">
+          <div>
+            <h4>Multi-agent coordination</h4>
+            <p>Review contracts, intent locks, and parallel runner orchestration without losing the work graph.</p>
+          </div>
+          <div>
+            <h4>Resumable runs</h4>
+            <p>Long-running, durable sessions that survive token expiry, model swaps, and reviewer round-trips.</p>
+          </div>
+          <div>
+            <h4>Gateway &amp; channels</h4>
+            <p>Slack, GitHub, schedules, and webhooks as governed ingress with the same receipt model.</p>
+          </div>
+          <div>
+            <h4>Capability marketplace</h4>
+            <p>Skills, tools, and plugins with probation, signed capability grants, and revocation.</p>
+          </div>
+          <div>
+            <h4>Federated memory</h4>
+            <p>Cross-project facts with trust scopes, federation policies, and contradiction federation.</p>
+          </div>
+          <div>
+            <h4>Audit &amp; compliance</h4>
+            <p>Export work graphs to SIEM, generate audit trails per task, attest provenance per receipt.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───────────── CTA ───────────── -->
+      <section class="cta" aria-labelledby="cta-title">
+        <div class="cta__inner">
+          <p class="eyebrow"><span class="eyebrow__dot"></span>Craik 0.1.x · governed MVP</p>
+          <h2 id="cta-title">
+            Start with governed context.<br />
+            Build toward durable agent operations.
+          </h2>
+          <div class="cta__actions">
+            <a class="button button--primary" href="https://docs.craik.eidetic-labs.com">
+              Read the docs
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  d="M5 12h14M13 5l7 7-7 7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+            <a class="button button--ghost" href="https://github.com/eidetic-labs/craik">
+              View on GitHub
+            </a>
+            <a class="button button--ghost" href="https://pypi.org/project/craik/">
+              PyPI · craik
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="-40 -40 80 80" width="22" height="22">
+            <path
+              d="M 29.564 -12.246 A 32 32 0 1 0 29.564 12.246"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="16"
+              stroke-linecap="round"
+            />
+            <circle cx="0" cy="0" r="18" fill="#B4ACE6" />
+          </svg>
+        </span>
+        <span>Craik · by Eidetic Labs</span>
+      </div>
+      <p class="site-footer__legal">© 2026 Eidetic Labs. MIT-licensed runtime.</p>
+      <nav class="site-footer__nav" aria-label="Footer">
+        <a href="https://docs.craik.eidetic-labs.com">Docs</a>
+        <a href="https://github.com/eidetic-labs/craik">GitHub</a>
+        <a href="https://pypi.org/project/craik/">PyPI</a>
+      </nav>
+    </footer>
+
+    <script>
+      // Theme toggle
+      (() => {
+        const root = document.documentElement;
+        const toggle = document.querySelector('[data-theme-toggle]');
+        const apply = (theme) => {
+          root.dataset.theme = theme;
+          localStorage.setItem('craik-theme', theme);
+          toggle.setAttribute(
+            'aria-label',
+            theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+          );
+        };
+        toggle.addEventListener('click', () => {
+          apply(root.dataset.theme === 'dark' ? 'light' : 'dark');
+        });
+        apply(root.dataset.theme || 'light');
+      })();
+
+      // Copy install snippet
+      (() => {
+        const btn = document.querySelector('[data-copy]');
+        if (!btn) return;
+        btn.addEventListener('click', async () => {
+          const value = btn.getAttribute('data-copy');
+          try {
+            await navigator.clipboard.writeText(value);
+            btn.classList.add('is-copied');
+            setTimeout(() => btn.classList.remove('is-copied'), 1400);
+          } catch (_) {
+            /* clipboard not available — fail silently */
+          }
+        });
+      })();
+
+      // Terminal typewriter — parses the static fallback lines, blanks the
+      // body, and types them back in once the panel scrolls into view.
+      // Respects prefers-reduced-motion by leaving the static content alone.
+      (() => {
+        const terminals = document.querySelectorAll('[data-typewriter]');
+        if (!terminals.length) return;
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || !('IntersectionObserver' in window)) return;
+
+        terminals.forEach((terminal) => {
+          const body = terminal.querySelector('.terminal__body');
+          if (!body) return;
+
+          // Extract the script from the static fallback content.
+          const script = [];
+          let current = null;
+          body.querySelectorAll('p').forEach((p) => {
+            if (p.classList.contains('comment')) {
+              if (current) current.comment = p.textContent.trim();
+              return;
+            }
+            const cmd = p.textContent
+              .replace(/^\$\s*/, '')
+              .replace(/▌\s*$/, '')
+              .trim();
+            if (!cmd) return;
+            current = { cmd, comment: null };
+            script.push(current);
+          });
+          if (!script.length) return;
+
+          // Reserve the rendered height so the panel doesn't collapse while
+          // empty — the static fallback already occupied that space.
+          const measuredHeight = body.getBoundingClientRect().height;
+          body.style.minHeight = `${Math.ceil(measuredHeight)}px`;
+          body.innerHTML = '';
+
+          const writePrompt = (textContent, withCaret) => {
+            const p = document.createElement('p');
+            const prompt = document.createElement('span');
+            prompt.className = 'prompt';
+            prompt.textContent = '$';
+            p.appendChild(prompt);
+            p.appendChild(document.createTextNode(' ' + textContent));
+            if (withCaret) {
+              const caret = document.createElement('span');
+              caret.className = 'caret';
+              caret.textContent = '▌';
+              p.appendChild(caret);
+            }
+            return p;
+          };
+
+          let lineEl = null;
+
+          const step = (line, char, showComment) => {
+            const entry = script[line];
+            if (!entry) {
+              // Done — append a fresh prompt with a blinking caret.
+              body.appendChild(writePrompt('', true));
+              return;
+            }
+
+            // Ensure the current line exists / refresh its content.
+            if (!lineEl || +lineEl.dataset.line !== line) {
+              if (lineEl) {
+                const oldCaret = lineEl.querySelector('.caret');
+                if (oldCaret) oldCaret.remove();
+              }
+              lineEl = writePrompt(entry.cmd.slice(0, char), true);
+              lineEl.dataset.line = String(line);
+              body.appendChild(lineEl);
+            } else {
+              lineEl.lastChild &&
+                lineEl.removeChild(lineEl.lastChild); /* drop caret if present */
+              if (lineEl.childNodes.length > 1) {
+                lineEl.removeChild(lineEl.childNodes[1]); /* drop text node */
+              }
+              lineEl.appendChild(document.createTextNode(' ' + entry.cmd.slice(0, char)));
+              const caret = document.createElement('span');
+              caret.className = 'caret';
+              caret.textContent = '▌';
+              lineEl.appendChild(caret);
+            }
+
+            if (char < entry.cmd.length) {
+              const next = entry.cmd[char];
+              const delay = next === ' ' ? 32 + Math.random() * 28 : 38 + Math.random() * 44;
+              setTimeout(() => step(line, char + 1, false), delay);
+              return;
+            }
+
+            if (entry.comment && !showComment) {
+              setTimeout(() => {
+                const commentEl = document.createElement('p');
+                commentEl.className = 'comment';
+                commentEl.textContent = entry.comment;
+                body.appendChild(commentEl);
+                step(line, char, true);
+              }, 380);
+              return;
+            }
+
+            if (line < script.length - 1) {
+              const oldCaret = lineEl.querySelector('.caret');
+              if (oldCaret) oldCaret.remove();
+              setTimeout(() => step(line + 1, 0, false), 720);
+              return;
+            }
+
+            // Final command finished — drop its caret and add a fresh prompt.
+            const oldCaret = lineEl.querySelector('.caret');
+            if (oldCaret) oldCaret.remove();
+            setTimeout(() => step(line + 1, 0, false), 220);
+          };
+
+          const io = new IntersectionObserver(
+            (entries) => {
+              if (entries.some((e) => e.isIntersecting)) {
+                io.disconnect();
+                step(0, 0, false);
+              }
+            },
+            { threshold: 0.25 },
+          );
+          io.observe(terminal);
+        });
+      })();
+
+      // Scroll reveal — applies .is-in once an element enters the viewport.
+      (() => {
+        if (!('IntersectionObserver' in window)) {
+          document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-in'));
+          return;
+        }
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+        );
+        document
+          .querySelectorAll(
+            '.section, .directive, .cap, .workflow__steps li, .artifact, .vision__matrix > div',
+          )
+          .forEach((el) => {
+            el.setAttribute('data-reveal', '');
+            io.observe(el);
+          });
+      })();
+    </script>
+  </body>
+</html>

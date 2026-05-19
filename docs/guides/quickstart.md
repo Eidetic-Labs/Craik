@@ -1,68 +1,77 @@
 # Quickstart
 
-Craik v0.1.0 is a CLI-first durable runtime for local project state, operator
-authentication, credential profiles, case files, policy checks, receipts,
-handoffs, memory proposals, and the first Stigmem demo.
+<p className="craik-meta"><span>10 min · hands-on</span><span>For first-time operators</span><span>Updated 2026-05-19</span></p>
 
-## Install
+<div className="craik-lead">
 
-From a local checkout:
+**What you'll do**
 
-```sh
-python3.12 -m pip install -e ".[dev]"
-craik --version
-```
+Install Craik, point it at a Git repository, build a case file, run policy
+tests, and emit a handoff — without making a single live provider call.
+Every output we discuss is real and persists on disk, so you can inspect
+it after the run.
 
-For source-tree development with `uv`, prefix commands with:
+</div>
 
-```sh
-uv run --python 3.12 --extra dev
-```
+This tutorial uses the **fixture-backed provider path**, so it needs zero
+credentials and zero network access. When you're done, the same project,
+task, case file, receipts, and handoff can be re-run against live providers
+by adding a credential profile and flipping policy.
 
-## Create Local State
+## Before you start
 
-```sh
+- You completed [Installation](installation.md) (`craik --version` works).
+- You have a Git repository handy. The Craik repo itself works fine if you
+  don't have one.
+- You're in a shell where `craik` resolves to the binary you just installed.
+
+## 1 · Pin Craik's state to a sandbox
+
+For the duration of this walkthrough, send all Craik state to a scratch
+directory so you can blow it away cleanly at the end.
+
+```bash title="Sandbox home"
 export CRAIK_HOME=/tmp/craik-quickstart
 craik home init
 ```
 
-## Authenticate
+<div className="craik-keypoint">
 
-The fixture-backed provider path needs no credentials. For a live provider
-call, authenticate the operator and add a credential profile:
+**Why a sandbox?**
 
-```sh
-craik login
-craik auth add anthropic:work \
-  --kind=api-key \
-  --env-var=ANTHROPIC_API_KEY
-craik auth status
-```
+`CRAIK_HOME` decides where projects, receipts, handoffs, and case files
+live. Pinning it to `/tmp/craik-quickstart` keeps this tutorial isolated
+from your real `~/.craik/` directory. To start over: `rm -rf /tmp/craik-quickstart`.
 
-For Claude subscribers with Claude Code installed:
+</div>
 
-```sh
-craik auth add anthropic:claude-code \
-  --kind=oauth-token \
-  --source=local-cli
-```
+## 2 · Register a project
 
-See [Authentication and Credentials](authentication.md) for the full reference.
+Point Craik at a Git repository. This creates a **project profile** —
+the runner-readable view Craik builds from your repo state, docs paths,
+and policy posture.
 
-## Register A Project
-
-Run this inside or next to a Git repository:
-
-```sh
+```bash title="Register the current directory as a project"
 craik project add . --name Example
+craik project list
 ```
 
-Craik detects conventional docs paths such as `README.md`, `docs/`, and
-immutable ADR paths such as `docs/adr/`.
+You should see `Example` in the listing, along with a project id like
+`pid_xxxx`. Craik scanned the repo and noted conventional docs paths
+(`README.md`, `docs/`) and immutable evidence paths
+(`docs/adr/` if present).
 
-## Create A Task
+:::note
+Project registration only *reads* — it doesn't write back to your
+repository. Everything lands in `$CRAIK_HOME/state/`.
+:::
 
-```sh
+## 3 · Create a task
+
+A **task** is a unit of work scoped by an objective and an intent lock. The
+intent lock declares the boundaries the agent is allowed to act within.
+
+```bash title="Create a docs-review task"
 craik task create \
   --project Example \
   --title "Review docs" \
@@ -71,47 +80,157 @@ craik task create \
   --out-of-scope "ADR edits"
 ```
 
-The command creates both a task request and an intent lock.
+Craik prints the new task id (something like `task_review_docs`) and the
+matching intent lock id. The `--out-of-scope` flag tells future agents that
+edits to ADR files are not permitted under this lock.
 
-## Build A Case File
+## 4 · Build a case file
 
-```sh
+The **case file** is the per-task pre-run brief — evidence, docs, immutable
+paths, assumptions, stale-risk warnings, and a verification plan. The case
+file is what an agent reads *before* it acts.
+
+```bash title="Assemble the case file"
 craik case build task_review_docs --no-github
 craik case show task_review_docs
 ```
 
-Case files include project state, docs, immutable paths, assumptions, stale-risk
-warnings, evidence, and a verification plan.
+`craik case show` prints the structured JSON. Skim it once — you'll see:
 
-## Run Policy Tests
+- `evidence` references back to the repo, docs, immutable paths, and any
+  GitHub state Craik was allowed to read.
+- `assumptions` for context Craik *couldn't* find (for example, when no
+  memory backend is configured).
+- `stale_risk_markers` highlighting evidence that may have moved since it
+  was indexed.
+- `verification_plan` listing the validation steps the next runner should
+  execute.
 
-```sh
+<div className="craik-keypoint">
+
+**`--no-github`**
+
+This flag keeps the case-file build offline. Drop it once you've configured
+the GitHub adapter, and Craik will fold in open issues, PRs, and review
+state as additional evidence.
+
+</div>
+
+## 5 · Run the policy gate
+
+Before anything else, validate that the default policy envelope behaves the
+way you expect:
+
+```bash title="Exercise the policy contract"
 craik policy test
 ```
 
 The policy gate verifies strict defaults, immutable path behavior, memory
-proposal defaults, fail-open receipts, automation fail-closed behavior, and
-redaction.
+proposal defaults, fail-open receipt shape, automation fail-closed
+behavior, and redaction. Every line that passes is a guarantee for the
+runner that's about to consume the case file.
 
-## Create A Handoff
+## 6 · Emit a handoff
 
-```sh
+When work ends — whether the agent finished, failed, or was interrupted —
+Craik writes a **handoff**: a structured continuity record the next actor
+can resume from.
+
+```bash title="Create a handoff for the next agent"
 craik handoff create task_review_docs \
   --summary "Reviewed docs and recorded current state." \
   --test-run "craik policy test" \
   --next-step "Review memory proposals."
 ```
 
-## Run The Stigmem Demo
+Then render it as Markdown:
 
-From a Stigmem checkout:
+```bash title="Read the handoff as Markdown"
+craik handoff show task_review_docs --markdown
+```
 
-```sh
+The handoff captures the summary, the validation you ran, declared
+next steps, and a self-audit checklist that flags whether redaction,
+receipts, assumptions, and validation were reviewed.
+
+## 7 · Try the full Stigmem demo
+
+For an end-to-end walkthrough that adds contradiction detection, memory
+proposals, receipts, work-graph export, *and* governed
+provider-backed execution against deterministic fixtures, run the bundled
+demo from a Stigmem checkout:
+
+```bash title="The bundled demo — no credentials required"
 craik demo stigmem-docs --repo-path . --no-github
 ```
 
-The demo creates local project, task, case-file, contradiction, memory proposal,
-receipt, handoff, provider execution, and work-graph artifacts without editing
-files or directly writing Stigmem facts. It also runs deterministic OpenAI and
-Anthropic provider-backed paths, so the same command is used by quickstart smoke
-CI without live model credentials.
+The demo touches the entire MVP surface: project, task, case file,
+contradiction, memory proposal, receipt, handoff, deterministic
+OpenAI/Anthropic provider runs, and a work-graph export. No file edits.
+No live model calls. This is also the command CI runs against every PR.
+
+## What you produced
+
+If you walked the full path above, your sandbox now contains:
+
+<div className="craik-grid">
+
+<div>
+<h4><code>state/</code></h4>
+<p>SQLite store with the <code>Example</code> project, <code>task_review_docs</code>, its case file, the intent lock, and the handoff.</p>
+</div>
+
+<div>
+<h4><code>case-files/</code></h4>
+<p>Exported case-file JSON — the same payload <code>craik case show</code> prints.</p>
+</div>
+
+<div>
+<h4><code>handoffs/</code></h4>
+<p>Structured handoff (JSON) and the Markdown rendering.</p>
+</div>
+
+<div>
+<h4><code>receipts/</code></h4>
+<p>Empty unless you wired live provider calls — receipts are written for every governed action.</p>
+</div>
+
+</div>
+
+Inspect them with whatever you use day-to-day:
+
+```bash
+ls -la $CRAIK_HOME
+sqlite3 $CRAIK_HOME/state/craik.sqlite ".tables"
+```
+
+## Cleanup
+
+```bash title="Tear down the sandbox"
+rm -rf /tmp/craik-quickstart
+unset CRAIK_HOME
+```
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../concepts/project-model.md">
+<strong>Read</strong>
+<span>The project model</span>
+<small>Understand what a project profile actually contains and how agents consume it.</small>
+</a>
+
+<a href="../concepts/case-files.md">
+<strong>Read</strong>
+<span>How case files work</span>
+<small>Evidence, assumptions, stale-risk markers, and the verification plan.</small>
+</a>
+
+<a href="authentication.md">
+<strong>Step up</strong>
+<span>Authenticate &amp; add credentials</span>
+<small>OIDC login, credential profiles, pools, and workload identity for CI.</small>
+</a>
+
+</div>
