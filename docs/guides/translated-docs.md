@@ -1,98 +1,204 @@
-# Translated Documentation Strategy
+# Translated documentation strategy
 
-Craik documentation starts from English source-of-truth pages and uses
-translation metadata to expose localized docs without changing runtime
-contracts. Translations are presentation surfaces; they do not redefine policy,
-evidence, receipt, redaction, schema, or identifier semantics.
+<p className="craik-meta"><span>4 min read</span><span>For maintainers</span><span>Updated 2026-05-19</span></p>
 
-## Source Of Truth
+<div className="craik-lead">
 
-The canonical documentation lives under `docs/` and is authored as the source
-locale for each page. Translated pages may live in locale-specific paths when
-they are reviewed and linked through metadata described in
-[Locale I18n Framework](../reference/locale-i18n-framework.md).
+**What you'll find here**
+
+How Craik handles localized docs. Translations are presentation
+surfaces over the English source-of-truth pages. They never redefine
+policy, evidence, receipt, redaction, schema, or identifier semantics.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Presentation, not policy.**
+
+If a translation cannot preserve the meaning of a policy rule, schema
+field, receipt status, or redaction requirement, the translated page
+remains deferred and links back to the source page.
+
+</div>
+
+## Source of truth
+
+Canonical documentation lives under `docs/` and is authored as the
+source locale for each page. Translated pages may live in
+locale-specific paths when reviewed and linked through metadata
+described in
+[Locale i18n framework](../reference/locale-i18n-framework.md).
 
 Source-of-truth pages define:
 
-- stable language-neutral document ids;
-- canonical links to contracts and guides;
-- policy, evidence, receipt, and redaction semantics;
-- public boundary requirements;
-- the fallback path used when a translation is unavailable.
+<div className="craik-grid">
 
-Translations must preserve those semantics. If a translation cannot preserve
-the meaning of a policy rule, schema field, receipt status, or redaction
-requirement, the translated page should remain deferred and link back to the
-source page.
+<div><h4>Stable language-neutral document ids</h4></div>
+<div><h4>Canonical links</h4><p>To contracts and guides.</p></div>
+<div><h4>Policy · evidence · receipt · redaction semantics</h4></div>
+<div><h4>Public boundary requirements</h4></div>
+<div><h4>Fallback path</h4><p>When a translation is unavailable.</p></div>
 
-## Translation Metadata
+</div>
 
-Each translatable page should have metadata that records:
+## Translation metadata
 
-- stable document id;
-- source path and source locale;
-- available locales and translated paths;
-- policy envelope id governing translation review;
-- evidence references for source material and review;
-- receipt references for translation checks;
-- redaction requirement;
-- confirmation that runtime identifiers remain language-neutral.
+Each translatable page records:
 
-This metadata is represented by `TranslatableDocMetadata` and resolved through
-`resolve_doc_locale`. The resolution result records the requested locale,
-resolved locale, fallback chain, path, and policy/evidence/receipt context.
+<div className="craik-fields">
 
-## Fallback Links
+<div>
+<dt>Field</dt>
+<dt><span className="craik-fields__type">Required</span></dt>
+<dd>Purpose</dd>
+</div>
 
-Translated docs should include a path back to the source page when a locale is
-incomplete, stale, community-maintained, or deferred. Runtime link resolution
-should prefer:
+<div>
+<dt>Stable document id</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>Language-neutral identity.</dd>
+</div>
 
-1. exact locale;
-2. language-only locale when configured;
-3. configured fallback locales;
-4. source locale.
+<div>
+<dt>Source path and source locale</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>Canonical reference.</dd>
+</div>
 
-Fallback links must point to public docs pages only. They must not expose local
-filesystem paths, private planning labels, credentials, or private task names.
+<div>
+<dt>Available locales and translated paths</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>Resolved at link time.</dd>
+</div>
 
-## Review Expectations
+<div>
+<dt>Policy envelope id</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>Governs translation review.</dd>
+</div>
 
-Translation review should verify:
+<div>
+<dt>Evidence references</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>For source material and review.</dd>
+</div>
 
-- public boundary language is preserved;
-- redaction markers and secret references are not translated into secret values;
-- schema names, ids, receipt ids, policy ids, memory entities, and task ids are
-  unchanged;
-- code blocks and CLI commands remain technically valid;
-- links resolve through docs tests or documented deferred status;
-- any machine-generated translation has human or policy review before being
-  marked supported.
+<div>
+<dt>Receipt references</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>For translation checks.</dd>
+</div>
 
-Review receipts should record the source page, target locale, review evidence,
-reviewer or automation id, and whether policy/evidence/receipt/redaction
-semantics were preserved.
+<div>
+<dt>Redaction requirement</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>Applied to both source and translated pages.</dd>
+</div>
 
-## Deferred And Community-Maintained Translations
+<div>
+<dt>Identifier-neutrality confirmation</dt>
+<dt><span className="craik-fields__type">always</span></dt>
+<dd>Runtime identifiers remain language-neutral.</dd>
+</div>
 
-A locale may be marked deferred when there is no reviewer, when terminology is
-not settled, or when source docs are changing too quickly. Deferred translations
-should use fallback links rather than stale translated prose.
+</div>
 
-Community-maintained translations are acceptable when they follow the same
-metadata, review, public boundary, and receipt expectations as core
-translations. Community status should be visible in the translation metadata or
-review receipt, and source docs remain authoritative when conflicts appear.
+This metadata is represented by `TranslatableDocMetadata` and resolved
+through `resolve_doc_locale`. The resolution result records the
+requested locale, resolved locale, fallback chain, path, and
+policy/evidence/receipt context.
+
+## Fallback links
+
+Translated docs include a path back to the source page when a locale
+is incomplete, stale, community-maintained, or deferred.
+
+<ol className="craik-steps">
+<li>Exact locale.</li>
+<li>Language-only locale when configured.</li>
+<li>Configured fallback locales.</li>
+<li>Source locale.</li>
+</ol>
+
+<div className="craik-keypoint">
+
+**Fallback links go to public pages only.**
+
+Never expose local filesystem paths, private planning labels,
+credentials, or private task names through fallback link resolution.
+
+</div>
+
+## Review expectations
+
+<ol className="craik-steps">
+<li>Public boundary language is preserved.</li>
+<li>Redaction markers and secret references are not translated into secret values.</li>
+<li>Schema names, ids, receipt ids, policy ids, memory entities, and task ids are unchanged.</li>
+<li>Code blocks and CLI commands remain technically valid.</li>
+<li>Links resolve through docs tests or documented deferred status.</li>
+<li>Any machine-generated translation has human or policy review before being marked supported.</li>
+</ol>
+
+Review receipts record the source page, target locale, review
+evidence, reviewer or automation id, and whether
+policy/evidence/receipt/redaction semantics were preserved.
+
+## Deferred and community-maintained translations
+
+<div className="craik-decision">
+
+<div>
+<h4>Deferred</h4>
+<p>No reviewer · terminology unsettled · source docs changing too quickly. Deferred translations use fallback links rather than stale translated prose.</p>
+</div>
+
+<div>
+<h4>Community-maintained</h4>
+<p>Acceptable when following the same metadata, review, public-boundary, and receipt expectations. Community status must be visible in the metadata or review receipt. Source docs remain authoritative when conflicts appear.</p>
+</div>
+
+</div>
 
 ## Limits
 
-Translated docs must not:
+<div className="craik-keypoint">
 
-- translate runtime identifiers or schema names;
-- weaken policy, approval, capability grant, receipt, evidence, or redaction
-  requirements;
-- introduce examples with real credentials, private paths, or private task
-  names;
-- imply unsupported locale-specific behavior exists in the runtime;
-- bypass docs link validation except through explicitly documented deferred
-  status.
+**Translations must NOT.**
+
+</div>
+
+<div className="craik-grid">
+
+<div><h4>Translate runtime identifiers</h4><p>Or schema names.</p></div>
+<div><h4>Weaken policy / approval / grant / receipt / evidence / redaction</h4></div>
+<div><h4>Introduce examples</h4><p>With real credentials, private paths, or private task names.</p></div>
+<div><h4>Imply unsupported behavior</h4><p>Locale-specific behavior that does not exist in the runtime.</p></div>
+<div><h4>Bypass docs link validation</h4><p>Except through explicitly documented deferred status.</p></div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../../reference/locale-i18n-framework/">
+<strong>Reference</strong>
+<span>Locale i18n framework</span>
+<small>The metadata and resolution contracts.</small>
+</a>
+
+<a href="../../reference/translated-docs-strategy/">
+<strong>Reference</strong>
+<span>Translated docs strategy</span>
+<small>The shipped contract for translation status.</small>
+</a>
+
+<a href="../../limitations/">
+<strong>Read</strong>
+<span>Limitations</span>
+<small>Why translation rollout follows roadmap milestones.</small>
+</a>
+
+</div>

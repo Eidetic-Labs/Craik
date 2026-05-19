@@ -1,30 +1,45 @@
-# Gateway Troubleshooting
+# Gateway troubleshooting
 
-This guide covers v0.8.0 gateway surfaces: setup, diagnostics, channels,
-webhooks, schedules, policies, and receipts.
+<p className="craik-meta"><span>5 min read</span><span>For operators</span><span>Updated 2026-05-19</span></p>
 
-## Baseline Checks
+<div className="craik-lead">
 
-Run:
+**What you'll do**
+
+Diagnose the v0.8.0 gateway surfaces — setup · diagnostics · channels ·
+webhooks · schedules · policies · receipts — using safe commands that
+don't expose secrets.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Gateway daemon is a roadmap surface.**
+
+Always-on gateway daemon is a v0.8.0 capability. Setup, diagnostics,
+and contracts ship earlier, but a production dispatch loop is not part
+of the MVP.
+
+</div>
+
+## Baseline checks
 
 ```sh
 craik doctor
 ```
 
-Expected output is JSON with checks for local home, local store, memory backend
-configuration, gateway prerequisites, and gateway policy readiness.
-
-Run:
+Expected output: JSON with checks for local home, local store, memory
+backend, gateway prerequisites, and gateway policy readiness.
 
 ```sh
 craik setup --disable-gateway
 ```
 
-Expected output includes `secrets_written = false` and a local-only gateway
-configuration. Do not put channel tokens, webhook secrets, or bearer credentials
-in Craik config payloads.
+Expected output: `secrets_written = false` and a local-only gateway
+configuration. **Do not put channel tokens, webhook secrets, or bearer
+credentials in Craik config payloads.**
 
-## Setup Problems
+## Setup problems
 
 | Symptom | Check | Resolution |
 | --- | --- | --- |
@@ -32,10 +47,7 @@ in Craik config payloads.
 | Public bind is rejected | Setup or validation reports missing policy | Add a policy envelope before using a public bind host. |
 | Secrets appear in output | Review setup output and receipts | Move secrets to the provider-specific secret store and rotate exposed credentials. |
 
-See [Setup Wizard](setup.md), [Doctor Diagnostics](doctor.md), and
-[Gateway Daemon Mode](../reference/gateway-daemon.md).
-
-## Channel Problems
+## Channel problems
 
 | Symptom | Check | Resolution |
 | --- | --- | --- |
@@ -44,24 +56,16 @@ See [Setup Wizard](setup.md), [Doctor Diagnostics](doctor.md), and
 | Sender was revoked | Pairing state is `revoked` | Create a new approved pairing if access should be restored. |
 | Event is denied by allowlist | Decision reason is `no enabled allowlist rule matched` | Add or enable a narrow rule for the sender, workspace, thread, or metadata. |
 
-See [Channel Adapter Contract](../reference/channel-adapter-contract.md),
-[Messaging Channel Adapter](../reference/messaging-channel-adapter.md),
-[Channel Identity Pairing](../reference/channel-identity-pairing.md),
-[Channel Allowlists](../reference/channel-allowlists.md), and
-[Channel Policy Envelopes](../reference/channel-policy-envelopes.md).
-
-## Webhook Problems
+## Webhook problems
 
 | Symptom | Check | Resolution |
 | --- | --- | --- |
 | Request is invalid | Ingress reason says signature is missing or invalid | Recompute the `X-Craik-Signature` value over the raw body. |
 | Body is rejected | Ingress reason says body is not a JSON object | Send a JSON object with `event_id` and `event_type`. |
-| Event is duplicate | Ingress status is `duplicate` | Treat the event as already handled; do not dispatch twice. |
-| Event type is unauthorized | Ingress status is `unauthorized` | Add the event type to the configured allowlist only if it is intended. |
+| Event is duplicate | Ingress status is `duplicate` | Treat the event as already handled; don't dispatch twice. |
+| Event type is unauthorized | Ingress status is `unauthorized` | Add the event type to the configured allowlist only if intended. |
 
-See [Webhook Ingress](../reference/webhook-ingress.md).
-
-## Schedule Problems
+## Schedule problems
 
 | Symptom | Check | Resolution |
 | --- | --- | --- |
@@ -71,32 +75,26 @@ See [Webhook Ingress](../reference/webhook-ingress.md).
 | Automation does not run | Result status is `disabled` | Enable the automation after reviewing policy and receipts. |
 | Automation is policy denied | Result status is `policy_denied` | Add `gateway.schedule.execute` only to the intended policy envelope. |
 
-See [Scheduled Task Creation](../reference/scheduled-task-creation.md) and
-[Scheduled Automations](../reference/scheduled-automations.md).
-
-## Policy And Receipt Problems
+## Policy and receipt problems
 
 | Symptom | Check | Resolution |
 | --- | --- | --- |
 | Channel action is denied | Receipt status is `denied` | Inspect requested capability and channel policy boundaries. |
 | Local operator capability is unavailable | Policy denies `shell.execute`, `repo.write`, or similar | Use a local operator workflow instead of channel ingress. |
-| Receipt lacks payload text | `redacted_fields` includes payload fields | This is expected; gateway receipts omit sensitive channel data. |
+| Receipt lacks payload text | `redacted_fields` includes payload fields | Expected — gateway receipts omit sensitive channel data. |
 | Receipt link is missing | Check policy, channel, task, and identity ids | Recreate the gateway decision with complete context before dispatch. |
 
-See [Gateway Receipts](../reference/gateway-receipts.md), [Policy Profiles](../reference/policy-profiles.md),
-and [Receipt Viewer](../reference/receipt-viewer.md).
+## Safe diagnostic commands
 
-## Safe Diagnostic Commands
+<div className="craik-grid">
 
-Use commands that inspect state without exposing secrets:
+<div><h4><code>craik doctor</code></h4></div>
+<div><h4><code>craik setup --disable-gateway</code></h4></div>
+<div><h4><code>craik update</code></h4></div>
 
-```sh
-craik doctor
-craik setup --disable-gateway
-craik update
-```
+</div>
 
-For development validation, run:
+For development validation:
 
 ```sh
 uv run --extra dev ruff check .
@@ -104,5 +102,35 @@ uv run --extra dev mypy
 uv run --extra dev pytest
 ```
 
-Do not paste webhook secrets, bearer tokens, raw message bodies, or provider
-signing secrets into issue reports, public docs, or receipts.
+<div className="craik-keypoint">
+
+**Never paste secrets into reports.**
+
+Do not paste webhook secrets, bearer tokens, raw message bodies, or
+provider signing secrets into issue reports, public docs, or receipts.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../doctor/">
+<strong>Guide</strong>
+<span>Doctor diagnostics</span>
+<small>The first command in any gateway investigation.</small>
+</a>
+
+<a href="../../reference/gateway-daemon/">
+<strong>Reference</strong>
+<span>Gateway daemon mode</span>
+<small>The v0.8.0 always-on gateway contract.</small>
+</a>
+
+<a href="../../reference/gateway-receipts/">
+<strong>Reference</strong>
+<span>Gateway receipts</span>
+<small>What every channel decision records.</small>
+</a>
+
+</div>

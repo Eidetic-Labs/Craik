@@ -1,100 +1,143 @@
-# Learning Loops
+# Learning loops
 
-Craik learning loops turn observed skill behavior into reviewable improvement
-records. They do not let an agent silently rewrite reusable guidance.
+<p className="craik-meta"><span>4 min read</span><span>For maintainers</span><span>Updated 2026-05-19</span></p>
 
-The supported flow is:
+<div className="craik-lead">
 
-1. Record [Skill Telemetry](../reference/skill-telemetry.md) for an invocation.
-2. Draft a [Skill Proposal](../reference/skill-proposals.md) from telemetry,
-   evidence, and receipts.
-3. Run [Skill Replay](../reference/skill-replay.md) against redacted fixtures.
-4. Record review, replay, promotion, rollback, export, and other decisions with
-   [Learning Receipts](../reference/learning-receipts.md).
-5. Apply [Skill Promotion Gates](../reference/skill-promotion-gates.md) before
-   promoted guidance changes.
-6. Use [Skill Rollbacks](../reference/skill-rollbacks.md) when a promoted
-   version regresses.
-7. Use [Training Trajectory Exports](../reference/trajectory-exports.md) and
-   compressed summaries for replay and review.
+**What you'll do**
 
-Learning loops can also use [Memory Review Nudges](../reference/memory-review-nudges.md)
-and [Preference Facts](../reference/preference-facts.md) when repeated behavior
-suggests a reviewable memory update or preference clarification.
+Walk through Craik's learning-loop discipline — telemetry, proposals,
+replay, receipts, promotion gates, rollbacks, and trajectory exports.
+Loops turn observed skill behavior into reviewable improvement
+records. They never let an agent silently rewrite reusable guidance.
 
-## Evidence Boundary
+</div>
 
-Every learning-loop step should preserve ids instead of raw payloads:
+<div className="craik-keypoint">
 
-- task ids;
-- policy envelope ids;
-- evidence ids;
-- receipt ids;
-- telemetry ids;
-- replay fixture ids;
-- replay result ids;
-- proposal ids;
-- promoted version ids;
-- rollback version ids;
-- unresolved risk ids.
+**No silent self-modification.**
 
-Telemetry, receipts, proposals, exports, and summaries must redact secrets,
+A skill proposal becomes promoted guidance only after explicit approval
+by a non-agent reviewer. Missing promotion gates produce a denied
+decision — and denied decisions are valuable review artifacts.
+
+</div>
+
+## Supported flow
+
+<ol className="craik-steps">
+<li>Record <a href="../../reference/skill-telemetry/">skill telemetry</a> for an invocation.</li>
+<li>Draft a <a href="../../reference/skill-proposals/">skill proposal</a> from telemetry, evidence, and receipts.</li>
+<li>Run <a href="../../reference/skill-replay/">skill replay</a> against redacted fixtures.</li>
+<li>Record review, replay, promotion, rollback, and export decisions with <a href="../../reference/learning-receipts/">learning receipts</a>.</li>
+<li>Apply <a href="../../reference/skill-promotion-gates/">skill promotion gates</a> before promoted guidance changes.</li>
+<li>Use <a href="../../reference/skill-rollbacks/">skill rollbacks</a> when a promoted version regresses.</li>
+<li>Use <a href="../../reference/trajectory-exports/">training trajectory exports</a> and compressed summaries for replay and review.</li>
+</ol>
+
+Learning loops can also use
+[memory review nudges](../reference/memory-review-nudges.md) and
+[preference facts](../reference/preference-facts.md) when repeated
+behavior suggests a reviewable memory update or preference
+clarification.
+
+## Evidence boundary
+
+Every learning-loop step preserves ids — not raw payloads.
+
+<div className="craik-grid">
+
+<div><h4>Task ids</h4></div>
+<div><h4>Policy envelope ids</h4></div>
+<div><h4>Evidence ids</h4></div>
+<div><h4>Receipt ids</h4></div>
+<div><h4>Telemetry ids</h4></div>
+<div><h4>Replay fixture ids</h4></div>
+<div><h4>Replay result ids</h4></div>
+<div><h4>Proposal ids</h4></div>
+<div><h4>Promoted version ids</h4></div>
+<div><h4>Rollback version ids</h4></div>
+<div><h4>Unresolved risk ids</h4></div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Redact before persistence.**
+
+Telemetry, receipts, proposals, exports, and summaries redact secrets,
 private prompts, private payloads, raw outputs, traces, trajectories,
 credentials, and local-only filesystem paths.
 
-## Promotion Requirements
+</div>
 
-A skill proposal can become promoted guidance only after explicit approval.
-Promotion requires:
+## Promotion requirements
 
-- an approved proposal;
-- a structured improvement plan;
-- a non-agent approver;
-- policy envelope context;
-- evidence ids;
-- eval or replay result ids;
-- receipt ids;
-- an approval receipt id.
+A proposal can become promoted guidance only after every requirement
+below is satisfied.
 
-Missing promotion gates produce a denied promotion decision. Denied decisions
-are useful review artifacts and should keep explicit denial reasons.
+<div className="craik-grid">
 
-## Rollback Requirements
+<div><h4>Approved proposal</h4></div>
+<div><h4>Structured improvement plan</h4></div>
+<div><h4>Non-agent approver</h4></div>
+<div><h4>Policy envelope context</h4></div>
+<div><h4>Evidence ids</h4></div>
+<div><h4>Eval or replay result ids</h4></div>
+<div><h4>Receipt ids</h4></div>
+<div><h4>Approval receipt id</h4></div>
 
-Rollbacks target a prior promoted version. A rollback decision should preserve:
+</div>
 
-- the promoted version id;
-- the rollback version id;
-- rollback reason and rationale;
-- policy envelope context;
-- evidence ids;
-- receipt ids;
-- replay result ids;
-- the rollback decision receipt.
+Missing promotion gates produce a denied promotion decision. Denied
+decisions are review artifacts and must keep explicit denial reasons.
 
-Rollback decisions should not invent replacement guidance. They move back to a
-known prior version and leave an audit trail.
+## Rollback requirements
 
-## Trajectory Review
+Rollbacks target a prior promoted version. A rollback decision
+preserves:
 
-Training trajectory exports are redacted replay and review artifacts. Full
-exports keep decision-level detail, while compressed summaries keep the links
-needed for review:
+<div className="craik-grid">
 
-- receipt ids;
-- evidence ids;
-- policy envelope ids;
-- replay fixture ids;
-- replay result ids;
-- unresolved risk ids.
+<div><h4>Promoted version id</h4></div>
+<div><h4>Rollback version id</h4></div>
+<div><h4>Rollback reason &amp; rationale</h4></div>
+<div><h4>Policy envelope context</h4></div>
+<div><h4>Evidence ids</h4></div>
+<div><h4>Receipt ids</h4></div>
+<div><h4>Replay result ids</h4></div>
+<div><h4>Rollback decision receipt</h4></div>
 
-Compressed summaries omit decision detail by design. Load the source export when
-reviewers need diagnostics, artifacts, observed output, or per-step timestamps.
+</div>
 
-## Safe Diagnostics
+<div className="craik-keypoint">
 
-Use repository validation commands that do not print secrets or private local
-state:
+**Rollbacks don't invent replacement guidance.**
+
+A rollback moves back to a known prior version and leaves an audit
+trail. It is not a hook for silently substituting new guidance.
+
+</div>
+
+## Trajectory review
+
+Training trajectory exports are redacted replay and review artifacts.
+
+<div className="craik-decision">
+
+<div>
+<h4>Full exports</h4>
+<p>Keep decision-level detail. Use these when reviewers need diagnostics, artifacts, observed output, or per-step timestamps.</p>
+</div>
+
+<div>
+<h4>Compressed summaries</h4>
+<p>Keep only the links needed for review: receipt ids · evidence ids · policy envelope ids · replay fixture ids · replay result ids · unresolved risk ids. Omit decision detail by design.</p>
+</div>
+
+</div>
+
+## Safe diagnostics
 
 ```sh
 uv run --extra dev ruff check .
@@ -104,14 +147,33 @@ uv run --extra dev pytest tests/test_learning_receipts.py tests/test_skill_promo
 uv run --extra dev pytest tests/test_trajectory_exports.py tests/test_docs.py
 ```
 
-Expected successful output includes:
+Expected: `All checks passed!` · `Success: no issues found` · `passed`.
 
-```text
-All checks passed!
-Success: no issues found
-passed
-```
+If a command fails, preserve the command, failing test name, and
+sanitized error summary in a receipt or review note. **Do not copy raw
+prompts, credentials, private payloads, or local-only paths into
+public docs.**
 
-If a command fails, preserve the command, failing test name, and sanitized error
-summary in a receipt or review note. Do not copy raw prompts, credentials,
-private payloads, or local-only paths into public docs.
+## What's next
+
+<div className="craik-next">
+
+<a href="../../reference/skill-promotion-gates/">
+<strong>Reference</strong>
+<span>Skill promotion gates</span>
+<small>The shipped gates a proposal must satisfy.</small>
+</a>
+
+<a href="../../reference/learning-receipts/">
+<strong>Reference</strong>
+<span>Learning receipts</span>
+<small>The receipt shape every learning decision produces.</small>
+</a>
+
+<a href="../../reference/trajectory-exports/">
+<strong>Reference</strong>
+<span>Trajectory exports</span>
+<small>The replay-and-review artifact shape.</small>
+</a>
+
+</div>
