@@ -807,22 +807,225 @@ accepts them.
 
 </ol>
 
-### 5 · Gateway & channels
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">05</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Gateway &amp; channels</p>
+<h3 className="craik-section-banner__title">
+Always-on Craik — <em>channels, schedules, webhooks.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Eleven docs cover the gateway surface: the daemon mode, channel
+ingress contracts, identity pairing, allowlists, policy envelopes for
+externally-driven runs, webhook validation, scheduled task creation,
+scheduled automations, and gateway-specific receipts.
+</p>
+<p className="craik-section-banner__lede">
+<strong>Current scope:</strong> gateway daemon mode is
+<a href="../reference/post-mvp-scope/">post-MVP</a>. The current
+surface documents contracts and deterministic lifecycle pieces; the
+first messaging adapter is a fixture-only adapter (no Slack /
+Discord / email / SMS yet).
+</p>
+</div>
+</header>
 
-Running Craik as a daemon, ingesting messages from channels, and binding
-identity at the boundary.
+<div className="craik-product-spread">
 
-- [Gateway daemon mode](reference/gateway-daemon.md)
-- [Gateway troubleshooting](guides/gateway-troubleshooting.md)
-- [Channel adapter contract](reference/channel-adapter-contract.md)
-- [Messaging channel adapter](reference/messaging-channel-adapter.md)
-- [Channel identity pairing](reference/channel-identity-pairing.md)
-- [Channel allowlists](reference/channel-allowlists.md)
-- [Channel policy envelopes](reference/channel-policy-envelopes.md)
-- [Webhook ingress](reference/webhook-ingress.md)
-- [Scheduled task creation](reference/scheduled-task-creation.md)
-- [Scheduled automations](reference/scheduled-automations.md)
-- [Gateway receipts](reference/gateway-receipts.md)
+<a className="craik-product-feature" href="reference/gateway-daemon.md">
+<div>
+<p className="craik-product-feature__num">Mode · 01</p>
+<h4 className="craik-product-feature__title">Gateway daemon mode</h4>
+<p className="craik-product-feature__summary">
+The always-on entry point — channels, webhooks, schedules, and policy
+ingress all hang off this surface. Contracts and deterministic
+lifecycle ship today; the live daemon is explicitly post-MVP until a
+later proof workflow pulls it forward.
+</p>
+<ul className="craik-product-feature__topics">
+<li>contracts ship today</li>
+<li>deterministic lifecycle</li>
+<li>policy ingress</li>
+<li>post-MVP daemon</li>
+</ul>
+<span className="craik-product-feature__cta">Read gateway mode</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Scope today</p>
+<p className="craik-product-feature__quote-text">
+Gateway daemon mode is post-MVP unless a later proof workflow
+explicitly pulls it forward. The current surface documents contracts
+and deterministic lifecycle.
+</p>
+<p className="craik-product-feature__quote-attribution">— Gateway daemon · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="guides/gateway-troubleshooting.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guide</span>
+</div>
+<h4 className="craik-adr-card__title">Gateway troubleshooting</h4>
+<p className="craik-adr-card__decision">
+Walks the v0.8 gateway surfaces — setup, diagnostics, channels,
+webhooks, schedules, policies, receipts — and the failure modes that
+deserve operator attention.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/channel-adapter-contract.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · channel</span>
+</div>
+<h4 className="craik-adr-card__title">Channel adapter contract</h4>
+<p className="craik-adr-card__decision">
+<code>craik.channel_adapter_contract</code> defines the boundary for
+external operator ingress through always-on gateway channels — the
+typed surface every adapter implements against.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/messaging-channel-adapter.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Adapter · fixture</span>
+</div>
+<h4 className="craik-adr-card__title">Messaging channel adapter</h4>
+<p className="craik-adr-card__decision">
+The first messaging channel adapter is a fixture-only adapter for
+controlled gateway ingress. Slack, Discord, email, and SMS adapters
+are explicitly out of scope until daemon mode promotes.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/channel-identity-pairing.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · identity</span>
+</div>
+<h4 className="craik-adr-card__title">Channel identity pairing</h4>
+<p className="craik-adr-card__decision">
+<code>craik.channel_identity_pairing</code> records the relationship
+between an external channel account and a Craik subject — so receipts
+can name the human, not just the channel id.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/channel-allowlists.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · ingress</span>
+</div>
+<h4 className="craik-adr-card__title">Channel allowlists</h4>
+<p className="craik-adr-card__decision">
+<code>craik.channel_allowlist</code> controls which normalized inbound
+channel events may continue past the gateway ingress boundary — the
+"who is allowed to ask" surface.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/channel-policy-envelopes.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Policy · ingress</span>
+</div>
+<h4 className="craik-adr-card__title">Channel policy envelopes</h4>
+<p className="craik-adr-card__decision">
+Channel ingress uses normal <code>craik.policy_envelope</code> records
+— but the selected envelope is intentionally narrower than local
+operator authority.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/webhook-ingress.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">08</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · ingress</span>
+</div>
+<h4 className="craik-adr-card__title">Webhook ingress</h4>
+<p className="craik-adr-card__decision">
+Validates one request boundary before any gateway dispatch.
+Signature, allowlist, payload shape, and identity binding all happen
+before the runtime sees the request.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/scheduled-task-creation.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">09</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · schedule</span>
+</div>
+<h4 className="craik-adr-card__title">Scheduled task creation</h4>
+<p className="craik-adr-card__decision">
+Cron-like gateway schedules convert one schedule tick into one
+deterministic <code>craik.task_request</code>. Same shape that
+operator-initiated tasks use.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/scheduled-automations.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">10</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · schedule</span>
+</div>
+<h4 className="craik-adr-card__title">Scheduled automations</h4>
+<p className="craik-adr-card__decision">
+Enabled gateway definitions backed by cron-like schedules. Each
+evaluation operates on one observed schedule tick at a time so missed
+ticks don't pile up into surprise bursts.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/gateway-receipts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">11</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · receipt</span>
+</div>
+<h4 className="craik-adr-card__title">Gateway receipts</h4>
+<p className="craik-adr-card__decision">
+Redacted <code>craik.capability_receipt</code> records for always-on
+service actions — same shape as task-driven receipts, but tagged
+with the channel and ingress path that produced them.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 6 · Companion apps & visual workspaces
 
