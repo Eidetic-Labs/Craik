@@ -19,11 +19,22 @@ If you'd rather jump straight to installing the CLI, head to
 
 ## What's in this section
 
-### 1 · The product
-
-Start here to understand the thesis: that agent work needs an **operating
-layer** — not another framework — and why Craik's bet is durability,
-governance, and shared state over more clever prompting.
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">01</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">The product</p>
+<h3 className="craik-section-banner__title">
+A durable agent runtime — <em>not another framework.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Start here to understand the thesis: agent work needs an
+<strong> operating layer</strong> — not more clever prompting — and the
+five docs below build that argument from the north star down through
+the typed contracts. Every other section of these docs is downstream
+of this one.
+</p>
+</div>
+</header>
 
 <div className="craik-product-spread">
 
@@ -59,6 +70,15 @@ state better than a human who has been away for two weeks.
 
 <li>
 <a className="craik-product-card" href="../product-strategy/">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="12" cy="18" r="3" />
+<circle cx="52" cy="18" r="3" />
+<circle cx="32" cy="54" r="3" />
+<line x1="12" y1="18" x2="30" y2="32" />
+<line x1="52" y1="18" x2="34" y2="32" />
+<line x1="32" y1="54" x2="32" y2="34" />
+<circle cx="32" cy="32" r="5" fill="var(--craik-lavender)" stroke="none" />
+</svg>
 <p className="craik-product-card__num">02 · Positioning</p>
 <h4 className="craik-product-card__title">Product strategy</h4>
 <p className="craik-product-card__summary">
@@ -67,6 +87,10 @@ market wedge, the agent-runner strategy (Codex / Claude / Gemini as
 first-class adapters), the MIT license rationale, and the patterns Craik
 borrows from local runtimes versus the patterns it adds on top.
 </p>
+<blockquote className="craik-product-card__quote">
+Craik should not be positioned as another agent framework.
+<span className="craik-product-card__quote-attr">Product strategy · §Agent Runner Strategy</span>
+</blockquote>
 <ul className="craik-product-card__topics">
 <li>runner strategy</li>
 <li>license</li>
@@ -82,14 +106,26 @@ borrows from local runtimes versus the patterns it adds on top.
 
 <li>
 <a className="craik-product-card" href="../differentiators/">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<line x1="8" y1="32" x2="30" y2="32" />
+<line x1="34" y1="32" x2="56" y2="14" />
+<line x1="34" y1="32" x2="56" y2="50" stroke-dasharray="3.5 3" />
+<circle cx="32" cy="32" r="3" fill="var(--craik-lavender)" stroke="none" />
+<circle cx="56" cy="14" r="2.5" />
+<circle cx="56" cy="50" r="2.5" stroke-dasharray="2 2" />
+</svg>
 <p className="craik-product-card__num">03 · What's distinct</p>
 <h4 className="craik-product-card__title">Differentiators</h4>
 <p className="craik-product-card__summary">
 The features that keep the roadmap from collapsing into basic CLI
-plumbing. Evidence-first execution ("no durable assertion without
-evidence"), the assumption ledger, belief promotion lifecycle, context
-budgeting as policy, and end-to-end run reproducibility.
+plumbing. Evidence-first execution, the assumption ledger, the
+belief-promotion lifecycle, context budgeting as policy, and end-to-end
+run reproducibility.
 </p>
+<blockquote className="craik-product-card__quote">
+No durable assertion without evidence.
+<span className="craik-product-card__quote-attr">Differentiators · §Evidence-First Execution</span>
+</blockquote>
 <ul className="craik-product-card__topics">
 <li>evidence-first</li>
 <li>assumption ledger</li>
@@ -105,6 +141,15 @@ budgeting as policy, and end-to-end run reproducibility.
 
 <li>
 <a className="craik-product-card" href="../features/">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<line x1="18" y1="14" x2="54" y2="14" />
+<line x1="18" y1="22" x2="48" y2="22" />
+<line x1="18" y1="30" x2="54" y2="30" />
+<line x1="18" y1="38" x2="42" y2="38" />
+<line x1="18" y1="46" x2="54" y2="46" />
+<line x1="18" y1="54" x2="46" y2="54" />
+<circle cx="10" cy="30" r="2.5" fill="var(--craik-lavender)" stroke="none" />
+</svg>
 <p className="craik-product-card__num">04 · What ships</p>
 <h4 className="craik-product-card__title">Features</h4>
 <p className="craik-product-card__summary">
@@ -113,6 +158,11 @@ criteria. Project registry, case-file assembler, policy envelope,
 capability grants, runner adapters, work graph, receipts, handoffs.
 Read this to know exactly what v0.1 ships.
 </p>
+<blockquote className="craik-product-card__quote">
+Read-only tasks default to repo read, memory read, and receipt write.
+Implementation tasks require explicit write grants.
+<span className="craik-product-card__quote-attr">Features · §Policy Envelope</span>
+</blockquote>
 <ul className="craik-product-card__topics">
 <li>case files</li>
 <li>policy envelope</li>
@@ -129,6 +179,15 @@ Read this to know exactly what v0.1 ships.
 
 <li>
 <a className="craik-product-card" href="../architecture/">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="10" y="8" width="44" height="3.5" rx="1" />
+<rect x="14" y="16" width="36" height="3.5" rx="1" />
+<rect x="10" y="24" width="44" height="3.5" rx="1" />
+<rect x="14" y="32" width="36" height="3.5" rx="1" />
+<rect x="10" y="40" width="44" height="3.5" rx="1" />
+<rect x="14" y="48" width="36" height="3.5" rx="1" />
+<rect x="22" y="56" width="20" height="3.5" rx="1" fill="var(--craik-lavender)" stroke="none" />
+</svg>
 <p className="craik-product-card__num">05 · How it composes</p>
 <h4 className="craik-product-card__title">Architecture</h4>
 <p className="craik-product-card__summary">
@@ -137,6 +196,12 @@ adapters, capability, memory, work graph, experience — plus the typed
 contracts that hold them together. The map for anyone extending Craik
 or integrating a new runner.
 </p>
+<blockquote className="craik-product-card__quote">
+The layers should remain separable so Craik can support different model
+providers, tool environments, and memory backends without weakening the
+product thesis.
+<span className="craik-product-card__quote-attr">Architecture · §Layers</span>
+</blockquote>
 <ul className="craik-product-card__topics">
 <li>seven layers</li>
 <li>runtime flow</li>

@@ -1145,6 +1145,161 @@ html[data-theme='dark'] .theme-doc-version-badge {
   margin: 0;
 }
 
+/* Dramatic section banner — replaces inline h3 for high-priority sections.
+   Oversized mono numeral + manifesto title + lede + accent rule. */
+.craik-section-banner {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 2em 0 1.6em;
+  padding-bottom: 1.8em;
+  position: relative;
+}
+.craik-section-banner::after {
+  background: var(--craik-accent);
+  border-radius: 999px;
+  bottom: 0;
+  content: '';
+  height: 3px;
+  left: 0;
+  position: absolute;
+  width: 64px;
+}
+.craik-section-banner__num {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-feature-settings: 'tnum';
+  font-size: clamp(3.4rem, 7.5vw, 5.6rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  padding-top: 0.06em;
+  user-select: none;
+}
+.craik-section-banner__body {
+  max-width: 64ch;
+}
+.craik-section-banner__kicker {
+  align-items: center;
+  color: var(--craik-fg-mute);
+  display: inline-flex;
+  font-family: var(--craik-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  gap: 10px;
+  letter-spacing: 0.2em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+.craik-section-banner__kicker::before {
+  background: var(--craik-fg-mute);
+  content: '';
+  display: inline-block;
+  height: 1px;
+  width: 22px;
+}
+.craik-section-banner__title {
+  color: var(--craik-fg);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin: 0 0 14px;
+}
+.craik-section-banner__title em {
+  color: var(--craik-accent);
+  font-style: normal;
+  font-weight: 300;
+}
+.craik-section-banner__lede {
+  color: var(--craik-fg-dim);
+  font-size: 1.04rem;
+  line-height: 1.65;
+  margin: 0;
+}
+.craik-section-banner__lede strong {
+  color: var(--craik-fg);
+  font-weight: 500;
+}
+@media (max-width: 720px) {
+  .craik-section-banner {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .craik-section-banner__num {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+/* Small SVG motif used in product-card top-right */
+.craik-card-motif {
+  color: var(--craik-fg-dim);
+  height: 44px;
+  opacity: 0.55;
+  pointer-events: none;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  transition: opacity 240ms var(--craik-ease), color 240ms var(--craik-ease),
+    transform 320ms var(--craik-ease);
+  width: 44px;
+}
+.craik-card-motif line,
+.craik-card-motif path,
+.craik-card-motif rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+.craik-card-motif circle:not([fill]) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+.craik-product-card:hover .craik-card-motif {
+  color: var(--craik-accent);
+  opacity: 1;
+  transform: rotate(-3deg);
+}
+
+/* Inline source quote inside a product card */
+.craik-product-card__quote {
+  border-left: 2px solid var(--craik-lavender);
+  color: var(--craik-fg);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  margin: 0;
+  padding: 4px 0 4px 14px;
+  position: relative;
+}
+.craik-product-card__quote::before {
+  color: color-mix(in srgb, var(--craik-lavender) 70%, transparent);
+  content: '“';
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 2.4em;
+  font-style: normal;
+  left: -6px;
+  line-height: 0.85;
+  position: absolute;
+  top: -0.05em;
+}
+.craik-product-card__quote-attr {
+  color: var(--craik-fg-mute);
+  display: block;
+  font-family: var(--craik-font-mono);
+  font-size: 0.66rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
 /* Editorial product spread — for the Learn landing's "The product"
    section. One featured card with a pull-quote, four secondary cards
    in a 2x2 grid below. Cards are whole-card links. */
@@ -1355,6 +1510,7 @@ html[data-theme='dark'] .craik-product-feature::before {
   font-weight: 500;
   letter-spacing: 0.16em;
   margin: 0;
+  padding-right: 56px; /* room for the SVG motif top-right */
 }
 .craik-product-card__title {
   color: var(--craik-fg);
@@ -1363,6 +1519,7 @@ html[data-theme='dark'] .craik-product-feature::before {
   letter-spacing: -0.01em;
   line-height: 1.22;
   margin: 0;
+  padding-right: 56px; /* room for the SVG motif top-right */
 }
 .craik-product-card__summary {
   color: var(--craik-fg-dim);
