@@ -22,20 +22,20 @@ their Craik install.
 Start here to understand what "governance" means inside the runtime, then
 configure the basic envelope you want every task to run inside.
 
-- [Governance concept](/docs/concepts/governance)
-- [Governance model](/docs/governance)
-- [Capability grants](/docs/guides/capability-grants)
-- [Scope control](/docs/guides/scope-control)
-- [Fail-open behavior](/docs/guides/fail-open)
+- [Governance concept](concepts/governance.md)
+- [Governance model](governance.md)
+- [Capability grants](guides/capability-grants.md)
+- [Scope control](guides/scope-control.md)
+- [Fail-open behavior](guides/fail-open.md)
 
 ### 2 · Policy
 
 The policy envelope is the per-run governance object. These docs cover its
 shape, how to test it, and how to enforce it in CI.
 
-- [Policy profiles](/docs/reference/policy-profiles)
-- [Policy tests](/docs/reference/policy-tests)
-- [Running policy tests](/docs/guides/running-policy-tests)
+- [Policy profiles](reference/policy-profiles.md)
+- [Policy tests](reference/policy-tests.md)
+- [Running policy tests](guides/running-policy-tests.md)
 
 ### 3 · Identity & credentials
 
@@ -43,44 +43,44 @@ Operator identity is OIDC. Credentials live in typed profiles, can be pooled,
 rotated, and bound to policy. Every provider call is bound to both an operator
 and a credential identity.
 
-- [Authentication & credentials](/docs/guides/authentication)
-- [ADR 0007 · Credential & identity architecture](/docs/adr/credential-and-identity-architecture)
+- [Authentication & credentials](guides/authentication.md)
+- [ADR 0007 · Credential & identity architecture](adr/0007-credential-and-identity-architecture.md)
 
 ### 4 · Secrets, redaction & release
 
 How secret material is stored, redacted, migrated, and how those properties are
 preserved across releases.
 
-- [Secrets](/docs/security/secrets)
-- [Redaction](/docs/reference/redaction)
-- [Secret migration policy](/docs/reference/secret-migration-policy)
-- [Release process](/docs/security/release-process)
+- [Secrets](security/secrets.md)
+- [Redaction](reference/redaction.md)
+- [Secret migration policy](reference/secret-migration-policy.md)
+- [Release process](security/release-process.md)
 
 ### 5 · Evidence & memory governance
 
 Memory is governed too. Evidence-backed proposals, contradiction handling, and
 preview surfaces keep truth from being silently overwritten.
 
-- [Evidence & assumptions](/docs/guides/evidence-and-assumptions)
-- [Contradiction inbox](/docs/guides/contradiction-inbox)
-- [Memory proposals](/docs/guides/memory-proposals)
-- [Memory diffs](/docs/guides/memory-diffs)
-- [Memory impact preview](/docs/guides/memory-impact-preview)
+- [Evidence & assumptions](guides/evidence-and-assumptions.md)
+- [Contradiction inbox](guides/contradiction-inbox.md)
+- [Memory proposals](guides/memory-proposals.md)
+- [Memory diffs](guides/memory-diffs.md)
+- [Memory impact preview](guides/memory-impact-preview.md)
 
 ### 6 · Sandboxing
 
 Tool execution and side effects run inside policy-bound sandboxes. Pick the
 backend that matches your trust boundary.
 
-- [Sandbox backends](/docs/reference/sandbox-backends)
-- [Local process backend](/docs/reference/local-process-backend)
-- [Remote shell backend](/docs/reference/remote-shell-backend)
-- [Docker sandbox backend](/docs/reference/docker-sandbox-backend)
-- [Browser tool boundary](/docs/reference/browser-tool-boundary)
-- [Environment receipts](/docs/reference/environment-receipts)
+- [Sandbox backends](reference/sandbox-backends.md)
+- [Local process backend](reference/local-process-backend.md)
+- [Remote shell backend](reference/remote-shell-backend.md)
+- [Docker sandbox backend](reference/docker-sandbox-backend.md)
+- [Browser tool boundary](reference/browser-tool-boundary.md)
+- [Environment receipts](reference/environment-receipts.md)
 
 ## Where to go next
 
-- **Build something new** → [Build](/docs/build)
-- **Run and inspect the system** → [Operate](/docs/operate)
-- **Understand the model** → [Learn](/docs/learn)
+- **Build something new** → [Build](build.md)
+- **Run and inspect the system** → [Operate](operate.md)
+- **Understand the model** → [Learn](learn.md)

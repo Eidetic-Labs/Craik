@@ -21,20 +21,20 @@ multimodal, locale).
 The commands you reach for most often. Start here if you're picking up an
 already-running install.
 
-- [Development checks](/docs/guides/development)
-- [Doctor diagnostics](/docs/guides/doctor)
-- [Updating Craik](/docs/guides/updating)
-- [Release management](/docs/guides/release-management)
+- [Development checks](guides/development.md)
+- [Doctor diagnostics](guides/doctor.md)
+- [Updating Craik](guides/updating.md)
+- [Release management](guides/release-management.md)
 
 ### 2 · Local state & migrations
 
 Where Craik stores things on disk, how to upgrade those stores, and how secret
 material moves.
 
-- [Local state](/docs/reference/local-state)
-- [Local store](/docs/reference/local-store)
-- [Local store migrations](/docs/guides/local-store-migrations)
-- [Secret migration policy](/docs/reference/secret-migration-policy)
+- [Local state](reference/local-state.md)
+- [Local store](reference/local-store.md)
+- [Local store migrations](guides/local-store-migrations.md)
+- [Secret migration policy](reference/secret-migration-policy.md)
 
 ### 3 · Operator views
 
@@ -42,92 +42,92 @@ What an operator sees during and after a governed run. The work graph,
 handoffs, receipts, contradictions, and the various inspection surfaces are all
 addressable as named views.
 
-- [Operator surface](/docs/reference/operator-surface)
-- [Work graph explorer](/docs/reference/work-graph-explorer)
-- [Handoff viewer](/docs/reference/handoff-viewer)
-- [Receipt viewer](/docs/reference/receipt-viewer)
-- [Contradiction inbox view](/docs/reference/contradiction-inbox-view)
-- [Evidence & assumption view](/docs/reference/evidence-assumption-view)
-- [Delegation queue view](/docs/reference/delegation-queue-view)
-- [Budget & quota view](/docs/reference/budget-quota-view)
-- [Quality gate view](/docs/reference/quality-gate-view)
-- [Run delta view](/docs/reference/run-delta-view)
-- [Memory impact preview view](/docs/reference/memory-impact-preview-view)
-- [Memory review nudges](/docs/reference/memory-review-nudges)
-- [Known traps view](/docs/reference/known-traps-view)
-- [Preference facts](/docs/reference/preference-facts)
-- [Instruction distillation view](/docs/reference/instruction-distillation-view)
-- [Instruction distillation workflow](/docs/reference/instruction-distillation-workflow)
-- [Instruction sources](/docs/reference/instruction-sources)
+- [Operator surface](reference/operator-surface.md)
+- [Work graph explorer](reference/work-graph-explorer.md)
+- [Handoff viewer](reference/handoff-viewer.md)
+- [Receipt viewer](reference/receipt-viewer.md)
+- [Contradiction inbox view](reference/contradiction-inbox-view.md)
+- [Evidence & assumption view](reference/evidence-assumption-view.md)
+- [Delegation queue view](reference/delegation-queue-view.md)
+- [Budget & quota view](reference/budget-quota-view.md)
+- [Quality gate view](reference/quality-gate-view.md)
+- [Run delta view](reference/run-delta-view.md)
+- [Memory impact preview view](reference/memory-impact-preview-view.md)
+- [Memory review nudges](reference/memory-review-nudges.md)
+- [Known traps view](reference/known-traps-view.md)
+- [Preference facts](reference/preference-facts.md)
+- [Instruction distillation view](reference/instruction-distillation-view.md)
+- [Instruction distillation workflow](reference/instruction-distillation-workflow.md)
+- [Instruction sources](reference/instruction-sources.md)
 
 ### 4 · Agents, context & learning loops
 
 How agents onboard, how context is budgeted, and how quality signals feed back
 into the runtime over time.
 
-- [Agent onboarding](/docs/guides/agent-onboarding)
-- [Context budgeting](/docs/guides/context-budgeting)
-- [Context debt](/docs/reference/context-debt)
-- [Scratchpad & unknowns](/docs/reference/scratchpad-and-unknowns)
-- [Exit discipline](/docs/reference/exit-discipline)
-- [Known traps & negative knowledge](/docs/reference/known-traps)
-- [Tool attestations & freshness](/docs/reference/freshness)
-- [Quality scores](/docs/reference/quality-scores)
-- [Learning loops](/docs/guides/learning-loops)
-- [Learning receipts](/docs/reference/learning-receipts)
-- [Trajectory exports](/docs/reference/trajectory-exports)
-- [Cross-agent review](/docs/reference/cross-agent-review)
-- [Structured debates](/docs/reference/debates)
-- [Human delegation](/docs/reference/human-delegation)
-- [Runtime critics & red team](/docs/reference/runtime-critics)
+- [Agent onboarding](guides/agent-onboarding.md)
+- [Context budgeting](guides/context-budgeting.md)
+- [Context debt](reference/context-debt.md)
+- [Scratchpad & unknowns](reference/scratchpad-and-unknowns.md)
+- [Exit discipline](reference/exit-discipline.md)
+- [Known traps & negative knowledge](reference/known-traps.md)
+- [Tool attestations & freshness](reference/freshness.md)
+- [Quality scores](reference/quality-scores.md)
+- [Learning loops](guides/learning-loops.md)
+- [Learning receipts](reference/learning-receipts.md)
+- [Trajectory exports](reference/trajectory-exports.md)
+- [Cross-agent review](reference/cross-agent-review.md)
+- [Structured debates](reference/debates.md)
+- [Human delegation](reference/human-delegation.md)
+- [Runtime critics & red team](reference/runtime-critics.md)
 
 ### 5 · Gateway & channels
 
 Running Craik as a daemon, ingesting messages from channels, and binding
 identity at the boundary.
 
-- [Gateway daemon mode](/docs/reference/gateway-daemon)
-- [Gateway troubleshooting](/docs/guides/gateway-troubleshooting)
-- [Channel adapter contract](/docs/reference/channel-adapter-contract)
-- [Messaging channel adapter](/docs/reference/messaging-channel-adapter)
-- [Channel identity pairing](/docs/reference/channel-identity-pairing)
-- [Channel allowlists](/docs/reference/channel-allowlists)
-- [Channel policy envelopes](/docs/reference/channel-policy-envelopes)
-- [Webhook ingress](/docs/reference/webhook-ingress)
-- [Scheduled task creation](/docs/reference/scheduled-task-creation)
-- [Scheduled automations](/docs/reference/scheduled-automations)
-- [Gateway receipts](/docs/reference/gateway-receipts)
+- [Gateway daemon mode](reference/gateway-daemon.md)
+- [Gateway troubleshooting](guides/gateway-troubleshooting.md)
+- [Channel adapter contract](reference/channel-adapter-contract.md)
+- [Messaging channel adapter](reference/messaging-channel-adapter.md)
+- [Channel identity pairing](reference/channel-identity-pairing.md)
+- [Channel allowlists](reference/channel-allowlists.md)
+- [Channel policy envelopes](reference/channel-policy-envelopes.md)
+- [Webhook ingress](reference/webhook-ingress.md)
+- [Scheduled task creation](reference/scheduled-task-creation.md)
+- [Scheduled automations](reference/scheduled-automations.md)
+- [Gateway receipts](reference/gateway-receipts.md)
 
 ### 6 · Companion apps & visual workspaces
 
 Decisions and contracts for the desktop, mobile, and live visual workspace
 surfaces.
 
-- [Companion app security](/docs/guides/companion-app-security)
-- [Desktop companion decision](/docs/reference/desktop-companion)
-- [Mobile companion decision](/docs/reference/mobile-companion)
-- [Live visual workspace decision](/docs/reference/visual-workspace)
-- [Work graph visual workspace bridge](/docs/reference/work-graph-visual-bridge)
-- [Accessibility requirements](/docs/reference/accessibility-requirements)
+- [Companion app security](guides/companion-app-security.md)
+- [Desktop companion decision](reference/desktop-companion.md)
+- [Mobile companion decision](reference/mobile-companion.md)
+- [Live visual workspace decision](reference/visual-workspace.md)
+- [Work graph visual workspace bridge](reference/work-graph-visual-bridge.md)
+- [Accessibility requirements](reference/accessibility-requirements.md)
 
 ### 7 · Multimodal & voice
 
 Contracts for handling images, audio, and other non-text artifacts.
 
-- [Multimodal artifact references](/docs/reference/multimodal-artifacts)
-- [Voice input & output posture](/docs/reference/voice-posture)
-- [Speech-to-text adapter contract](/docs/reference/speech-to-text-adapters)
-- [Text-to-speech adapter contract](/docs/reference/text-to-speech-adapters)
+- [Multimodal artifact references](reference/multimodal-artifacts.md)
+- [Voice input & output posture](reference/voice-posture.md)
+- [Speech-to-text adapter contract](reference/speech-to-text-adapters.md)
+- [Text-to-speech adapter contract](reference/text-to-speech-adapters.md)
 
 ### 8 · Translation & locale
 
 How non-English contributors and operators can use Craik.
 
-- [Translated documentation strategy](/docs/guides/translated-docs)
-- [Locale i18n framework](/docs/reference/locale-i18n-framework)
+- [Translated documentation strategy](guides/translated-docs.md)
+- [Locale i18n framework](reference/locale-i18n-framework.md)
 
 ## Where to go next
 
-- **Build something new** → [Build](/docs/build)
-- **Govern execution** → [Secure](/docs/secure)
-- **Understand the model** → [Learn](/docs/learn)
+- **Build something new** → [Build](build.md)
+- **Govern execution** → [Secure](secure.md)
+- **Understand the model** → [Learn](learn.md)
