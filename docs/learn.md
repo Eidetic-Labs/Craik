@@ -219,20 +219,338 @@ product thesis.
 
 </div>
 
-### 2 · Core concepts
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">02</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Core concepts</p>
+<h3 className="craik-section-banner__title">
+Nine typed objects <em>every other doc speaks.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Each concept below maps to a runtime object the rest of the docs reference
+by name. Read in order on a first pass — Build, Operate, and Secure all
+assume you know what these are. Project model is foundational; everything
+else composes on top.
+</p>
+</div>
+</header>
 
-Read these in order on your first pass. Each concept maps to a typed runtime
-object that the rest of the docs reference by name.
+<div className="craik-product-spread">
 
-1. [Project model](concepts/project-model.md)
-2. [Case files](concepts/case-files.md)
-3. [Single-agent execution loop](concepts/single-agent-loop.md)
-4. [Receipts](concepts/receipts.md)
-5. [Handoffs](concepts/handoffs.md)
-6. [Work graph](concepts/work-graph.md)
-7. [Memory & Stigmem](concepts/memory-and-stigmem.md)
-8. [Governance](concepts/governance.md)
-9. [Intent locks](concepts/intent-locks.md)
+<a className="craik-product-feature" href="concepts/project-model.md">
+<div>
+<p className="craik-product-feature__num">Foundation · 01</p>
+<h4 className="craik-product-feature__title">Project model</h4>
+<p className="craik-product-feature__summary">
+The runner-readable view Craik builds from a registered repository.
+Combines local configuration, repository state, documentation boundaries,
+memory backend posture, policy posture, and known continuity records into
+a single typed object every Craik component speaks. Case files, intent
+locks, and onboarding payloads are all drawn against it.
+</p>
+<ul className="craik-product-feature__topics">
+<li>mutable docs vs immutable evidence</li>
+<li>policy posture</li>
+<li>continuity</li>
+<li>onboarding payload</li>
+</ul>
+<span className="craik-product-feature__cta">Read the project model</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Operational by design</p>
+<p className="craik-product-feature__quote-text">
+The model tells an agent which repository it is entering, which docs are
+mutable, which paths are immutable evidence, which memory backend is
+configured, and which next actions are currently allowed.
+</p>
+<p className="craik-product-feature__quote-attribution">— Project model · §Overview</p>
+</blockquote>
+</a>
+
+<ol className="craik-product-list">
+
+<li>
+<a className="craik-product-card" href="concepts/case-files.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="14" y="10" width="36" height="44" rx="3" />
+<line x1="20" y1="20" x2="44" y2="20" />
+<line x1="20" y1="28" x2="40" y2="28" />
+<line x1="20" y1="36" x2="44" y2="36" />
+<line x1="20" y1="44" x2="36" y2="44" />
+<circle cx="50" cy="14" r="4" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">02 · Pre-run brief</p>
+<h4 className="craik-product-card__title">Case files</h4>
+<p className="craik-product-card__summary">
+The per-task pre-run brief. Evidence, assumptions, stale-risk markers,
+context-budget metadata, and a verification plan — sealed when built,
+addressable for audit, and the input every runner reads first.
+</p>
+<blockquote className="craik-product-card__quote">
+A case file is not a memory store, and it is not a transcript.
+<span className="craik-product-card__quote-attr">Case files · §Definition</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>evidence</li>
+<li>assumptions</li>
+<li>context budget</li>
+<li>verification plan</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: runners &middot; reviewers</span>
+<span className="craik-product-card__cta">6 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/single-agent-loop.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="32" cy="32" r="22" />
+<line x1="32" y1="10" x2="32" y2="18" />
+<line x1="54" y1="32" x2="46" y2="32" />
+<line x1="32" y1="54" x2="32" y2="46" />
+<line x1="10" y1="32" x2="18" y2="32" />
+<circle cx="32" cy="32" r="3" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">03 · Bounded iteration</p>
+<h4 className="craik-product-card__title">Single-agent execution loop</h4>
+<p className="craik-product-card__summary">
+Plan → Act → Observe → Evaluate → Continue or Stop. The v0.1 loop lets a
+runner work through a governed task without depending on an untracked
+chat transcript. Craik owns the durable boundary: run state, policy
+checks, receipts, step outputs, and recovery context.
+</p>
+<blockquote className="craik-product-card__quote">
+Side effects are policy-gated. A step such as shell execution must have
+a matching capability grant before it runs.
+<span className="craik-product-card__quote-attr">Single-agent loop · §Safety Boundaries</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>plan / act / observe / evaluate</li>
+<li>step results</li>
+<li>recovery</li>
+<li>intent-lock checks</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: implementers</span>
+<span className="craik-product-card__cta">4 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/receipts.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<path d="M 14 10 L 50 10 L 50 50 L 42 54 L 34 50 L 26 54 L 18 50 L 14 54 Z" />
+<line x1="20" y1="20" x2="44" y2="20" />
+<line x1="20" y1="28" x2="40" y2="28" />
+<line x1="20" y1="36" x2="36" y2="36" />
+<circle cx="44" cy="40" r="3" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">04 · Durable accountability</p>
+<h4 className="craik-product-card__title">Receipts</h4>
+<p className="craik-product-card__summary">
+A concise, durable record for every action that mattered. Each receipt
+names actor, credential, target, capability, reason, and result —
+joinable by task, policy envelope, and handoff. Redaction guard runs on
+every persistence path.
+</p>
+<blockquote className="craik-product-card__quote">
+Every receipt names who acted, what they used, what they touched, why it
+happened, and how it ended.
+<span className="craik-product-card__quote-attr">Receipts · §Definition</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>actor + credential</li>
+<li>redaction</li>
+<li>task linkage</li>
+<li>audit trail</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: auditors &middot; operators</span>
+<span className="craik-product-card__cta">5 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/handoffs.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="14" cy="32" r="6" />
+<circle cx="50" cy="32" r="6" fill="var(--craik-lavender)" stroke="none" />
+<line x1="22" y1="32" x2="42" y2="32" />
+<path d="M 38 26 L 44 32 L 38 38" />
+</svg>
+<p className="craik-product-card__num">05 · Continuity</p>
+<h4 className="craik-product-card__title">Handoffs</h4>
+<p className="craik-product-card__summary">
+Machine-readable run summaries the next agent — human or model — picks
+up from. Status, completed actions, validation, assumptions, context
+debt, policy exceptions, receipts, and memory proposals — plus a
+self-audit checklist that keeps incomplete runs honest.
+</p>
+<blockquote className="craik-product-card__quote">
+A handoff is not a transcript and not a chat log. It's the concise
+continuity record that lets the next actor pick up.
+<span className="craik-product-card__quote-attr">Handoffs · §Definition</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>structured + markdown</li>
+<li>self-audit</li>
+<li>policy exceptions</li>
+<li>next-step contract</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: runners &middot; humans</span>
+<span className="craik-product-card__cta">5 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/work-graph.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="32" cy="12" r="3.5" />
+<circle cx="14" cy="32" r="3.5" />
+<circle cx="50" cy="32" r="3.5" />
+<circle cx="32" cy="52" r="3.5" fill="var(--craik-lavender)" stroke="none" />
+<line x1="32" y1="16" x2="18" y2="28" />
+<line x1="32" y1="16" x2="46" y2="28" />
+<line x1="18" y1="36" x2="30" y2="48" />
+<line x1="46" y1="36" x2="34" y2="48" />
+</svg>
+<p className="craik-product-card__num">06 · Connected state</p>
+<h4 className="craik-product-card__title">Work graph</h4>
+<p className="craik-product-card__summary">
+A projection over the runtime objects already in <code>$CRAIK_HOME/state/</code>.
+Tasks, case files, handoffs, receipts, memory proposals, evidence,
+assumptions, and contradictions become queryable nodes connected by
+typed edges. Deterministic, redacted, exportable.
+</p>
+<blockquote className="craik-product-card__quote">
+The graph isn't a separate data store — it's a projection over the
+existing typed objects in <code>$CRAIK_HOME/state/</code>.
+<span className="craik-product-card__quote-attr">Work graph · §Definition</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>nodes &amp; edges</li>
+<li>graph export</li>
+<li>operator views</li>
+<li>cross-cutting queries</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: reviewers</span>
+<span className="craik-product-card__cta">5 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/memory-and-stigmem.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="22" cy="22" r="10" />
+<circle cx="42" cy="42" r="10" fill="var(--craik-lavender)" stroke="none" />
+<line x1="30" y1="22" x2="42" y2="22" stroke-dasharray="3 3" />
+<line x1="22" y1="30" x2="22" y2="42" stroke-dasharray="3 3" />
+</svg>
+<p className="craik-product-card__num">07 · Governed truth</p>
+<h4 className="craik-product-card__title">Memory &amp; Stigmem</h4>
+<p className="craik-product-card__summary">
+Memory is governed project state, not a transcript cache. Agent-created
+updates default to <em>proposals</em> with evidence; direct writes need
+the <code>memory.write</code> grant. Craik owns orchestration; Stigmem
+owns the durable fact substrate.
+</p>
+<blockquote className="craik-product-card__quote">
+Agent-created memory updates default to proposals — durable, evidence-
+backed candidate facts that remain reviewable until a human (or a policy
+grant) promotes them.
+<span className="craik-product-card__quote-attr">Memory &amp; Stigmem · §Proposal-First</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>proposal-first</li>
+<li>evidence + scope</li>
+<li>direct-write grant</li>
+<li>Stigmem ownership</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: memory operators</span>
+<span className="craik-product-card__cta">6 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/governance.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<path d="M 32 10 L 52 18 L 52 32 C 52 44 44 50 32 54 C 20 50 12 44 12 32 L 12 18 Z" />
+<path d="M 24 32 L 30 38 L 42 26" />
+<circle cx="32" cy="20" r="3" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">08 · Runtime guardrails</p>
+<h4 className="craik-product-card__title">Governance</h4>
+<p className="craik-product-card__summary">
+Policy envelopes, capability grants, immutable paths, redaction, receipt
+obligations, memory defaults, and the policy gate — all typed runtime
+objects, not advisory configuration. Strict by default; fail-open is
+opt-in only.
+</p>
+<blockquote className="craik-product-card__quote">
+Craik treats governance as a runtime concern. Policy envelopes,
+capability grants, and immutable paths are first-class records.
+<span className="craik-product-card__quote-attr">Governance · §Definition</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>policy profiles</li>
+<li>capability grants</li>
+<li>fail-open</li>
+<li>redaction</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: policy operators</span>
+<span className="craik-product-card__cta">6 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="concepts/intent-locks.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="16" y="26" width="32" height="24" rx="3" />
+<path d="M 22 26 L 22 18 C 22 14 26 10 32 10 C 38 10 42 14 42 18 L 42 26" />
+<circle cx="32" cy="38" r="3" fill="var(--craik-lavender)" stroke="none" />
+<line x1="32" y1="41" x2="32" y2="46" />
+</svg>
+<p className="craik-product-card__num">09 · Accepted scope</p>
+<h4 className="craik-product-card__title">Intent locks</h4>
+<p className="craik-product-card__summary">
+The runtime's accepted interpretation of a task — explicit, durable, and
+separate from the original request. In-scope, out-of-scope, allowed
+autonomy, stop conditions, and scope-change rules. Every case file and
+handoff carries the lock id.
+</p>
+<blockquote className="craik-product-card__quote">
+The lock is what the runtime committed to before the work began — every
+later decision can be checked against it.
+<span className="craik-product-card__quote-attr">Intent locks · §Why bother?</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>accepted interpretation</li>
+<li>in-scope / out-of-scope</li>
+<li>stop conditions</li>
+<li>scope-change rules</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: task owners</span>
+<span className="craik-product-card__cta">5 min read</span>
+</p>
+</a>
+</li>
+
+</ol>
+
+</div>
 
 ### 3 · Runtime contracts
 
