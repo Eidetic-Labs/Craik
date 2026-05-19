@@ -430,13 +430,15 @@
             concerns — not optional logging.
           </p>
 
-          <article class="terminal" aria-label="Craik CLI session">
+          <article class="terminal" aria-label="Craik CLI session" data-typewriter>
             <header class="terminal__chrome">
               <span class="terminal__dot terminal__dot--r"></span>
               <span class="terminal__dot terminal__dot--y"></span>
               <span class="terminal__dot terminal__dot--g"></span>
               <span class="terminal__path">~/repos/product · main</span>
             </header>
+            <!-- Static fallback for no-JS / reduced-motion. The typewriter
+                 below parses these lines, blanks the body, and replays them. -->
             <div class="terminal__body">
               <p><span class="prompt">$</span> craik project add ./repo --name product</p>
               <p class="comment">→ project registered · pid_8b3 · 4 ADRs · 17 facts indexed</p>
@@ -853,6 +855,135 @@ binding    = receipt.actor + receipt.credential</pre>
           } catch (_) {
             /* clipboard not available — fail silently */
           }
+        });
+      })();
+
+      // Terminal typewriter — parses the static fallback lines, blanks the
+      // body, and types them back in once the panel scrolls into view.
+      // Respects prefers-reduced-motion by leaving the static content alone.
+      (() => {
+        const terminals = document.querySelectorAll('[data-typewriter]');
+        if (!terminals.length) return;
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || !('IntersectionObserver' in window)) return;
+
+        terminals.forEach((terminal) => {
+          const body = terminal.querySelector('.terminal__body');
+          if (!body) return;
+
+          // Extract the script from the static fallback content.
+          const script = [];
+          let current = null;
+          body.querySelectorAll('p').forEach((p) => {
+            if (p.classList.contains('comment')) {
+              if (current) current.comment = p.textContent.trim();
+              return;
+            }
+            const cmd = p.textContent
+              .replace(/^\$\s*/, '')
+              .replace(/▌\s*$/, '')
+              .trim();
+            if (!cmd) return;
+            current = { cmd, comment: null };
+            script.push(current);
+          });
+          if (!script.length) return;
+
+          // Reserve the rendered height so the panel doesn't collapse while
+          // empty — the static fallback already occupied that space.
+          const measuredHeight = body.getBoundingClientRect().height;
+          body.style.minHeight = `${Math.ceil(measuredHeight)}px`;
+          body.innerHTML = '';
+
+          const writePrompt = (textContent, withCaret) => {
+            const p = document.createElement('p');
+            const prompt = document.createElement('span');
+            prompt.className = 'prompt';
+            prompt.textContent = '$';
+            p.appendChild(prompt);
+            p.appendChild(document.createTextNode(' ' + textContent));
+            if (withCaret) {
+              const caret = document.createElement('span');
+              caret.className = 'caret';
+              caret.textContent = '▌';
+              p.appendChild(caret);
+            }
+            return p;
+          };
+
+          let lineEl = null;
+
+          const step = (line, char, showComment) => {
+            const entry = script[line];
+            if (!entry) {
+              // Done — append a fresh prompt with a blinking caret.
+              body.appendChild(writePrompt('', true));
+              return;
+            }
+
+            // Ensure the current line exists / refresh its content.
+            if (!lineEl || +lineEl.dataset.line !== line) {
+              if (lineEl) {
+                const oldCaret = lineEl.querySelector('.caret');
+                if (oldCaret) oldCaret.remove();
+              }
+              lineEl = writePrompt(entry.cmd.slice(0, char), true);
+              lineEl.dataset.line = String(line);
+              body.appendChild(lineEl);
+            } else {
+              lineEl.lastChild &&
+                lineEl.removeChild(lineEl.lastChild); /* drop caret if present */
+              if (lineEl.childNodes.length > 1) {
+                lineEl.removeChild(lineEl.childNodes[1]); /* drop text node */
+              }
+              lineEl.appendChild(document.createTextNode(' ' + entry.cmd.slice(0, char)));
+              const caret = document.createElement('span');
+              caret.className = 'caret';
+              caret.textContent = '▌';
+              lineEl.appendChild(caret);
+            }
+
+            if (char < entry.cmd.length) {
+              const next = entry.cmd[char];
+              const delay = next === ' ' ? 32 + Math.random() * 28 : 38 + Math.random() * 44;
+              setTimeout(() => step(line, char + 1, false), delay);
+              return;
+            }
+
+            if (entry.comment && !showComment) {
+              setTimeout(() => {
+                const commentEl = document.createElement('p');
+                commentEl.className = 'comment';
+                commentEl.textContent = entry.comment;
+                body.appendChild(commentEl);
+                step(line, char, true);
+              }, 380);
+              return;
+            }
+
+            if (line < script.length - 1) {
+              const oldCaret = lineEl.querySelector('.caret');
+              if (oldCaret) oldCaret.remove();
+              setTimeout(() => step(line + 1, 0, false), 720);
+              return;
+            }
+
+            // Final command finished — drop its caret and add a fresh prompt.
+            const oldCaret = lineEl.querySelector('.caret');
+            if (oldCaret) oldCaret.remove();
+            setTimeout(() => step(line + 1, 0, false), 220);
+          };
+
+          const io = new IntersectionObserver(
+            (entries) => {
+              if (entries.some((e) => e.isIntersecting)) {
+                io.disconnect();
+                step(0, 0, false);
+              }
+            },
+            { threshold: 0.25 },
+          );
+          io.observe(terminal);
         });
       })();
 
