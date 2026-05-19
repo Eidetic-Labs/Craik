@@ -106,17 +106,28 @@ const config = {
     navbar: {
       title: 'Craik',
       logo: {
-        alt: 'Craik · product site',
+        alt: 'Craik docs',
         src: 'img/brand/favicon.svg',
         srcDark: 'img/brand/craik_icon_inverse.svg',
-        href: 'https://craik.eidetic-labs.com',
-        target: '_self',
       },
       items: [
         { type: 'docSidebar', sidebarId: 'learnSidebar', label: 'Learn', position: 'left' },
         { type: 'docSidebar', sidebarId: 'buildSidebar', label: 'Build', position: 'left' },
         { type: 'docSidebar', sidebarId: 'operateSidebar', label: 'Operate', position: 'left' },
         { type: 'docSidebar', sidebarId: 'secureSidebar', label: 'Secure', position: 'left' },
+        {
+          type: 'html',
+          position: 'right',
+          value: [
+            '<a class="cdocs-site-link" href="https://craik.eidetic-labs.com" aria-label="Open craik.eidetic-labs.com">',
+            '<span class="cdocs-site-link__url">craik.eidetic-labs.com</span>',
+            '<svg class="cdocs-site-link__icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">',
+            '<path d="M7 17 17 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+            '<path d="M9 7h8v8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+            '</svg>',
+            '</a>',
+          ].join(''),
+        },
         {
           type: 'html',
           position: 'right',
