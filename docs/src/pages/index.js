@@ -1,6 +1,125 @@
+import { Fragment, useEffect, useRef, useState } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+
+const QUICKSTART_SCRIPT = [
+  { cmd: 'pip install craik', comment: '→ installs craik · CLI on PATH' },
+  { cmd: 'craik login', comment: '→ device-code OIDC · operator: alice@acme' },
+  {
+    cmd: 'craik project add ./repo --name product',
+    comment: '→ project registered · pid_8b3 · 4 ADRs indexed',
+  },
+  {
+    cmd: 'craik case build task_042',
+    comment: '→ case file built · 12 evidence refs · 3 contradictions',
+  },
+  { cmd: 'craik run task_042 --runner codex', comment: null },
+];
+
+// Types each line of QUICKSTART_SCRIPT into the terminal when it scrolls
+// into view. Skips the per-character animation under prefers-reduced-motion.
+function QuickstartTerminal() {
+  const rootRef = useRef(null);
+  const [armed, setArmed] = useState(false);
+  const [done, setDone] = useState(false);
+  const [progress, setProgress] = useState({ line: 0, char: 0, showComment: false });
+
+  useEffect(() => {
+    if (armed || !rootRef.current) return undefined;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      setArmed(true);
+      setDone(true);
+      return undefined;
+    }
+    if (typeof IntersectionObserver === 'undefined') {
+      setArmed(true);
+      return undefined;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setArmed(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    obs.observe(rootRef.current);
+    return () => obs.disconnect();
+  }, [armed]);
+
+  useEffect(() => {
+    if (!armed || done) return undefined;
+    const current = QUICKSTART_SCRIPT[progress.line];
+    if (!current) return undefined;
+
+    let id;
+    if (progress.char < current.cmd.length) {
+      const next = current.cmd[progress.char];
+      const delay = next === ' ' ? 32 + Math.random() * 28 : 38 + Math.random() * 44;
+      id = setTimeout(() => {
+        setProgress({ line: progress.line, char: progress.char + 1, showComment: false });
+      }, delay);
+    } else if (current.comment && !progress.showComment) {
+      id = setTimeout(() => {
+        setProgress({ line: progress.line, char: progress.char, showComment: true });
+      }, 380);
+    } else if (progress.line < QUICKSTART_SCRIPT.length - 1) {
+      id = setTimeout(() => {
+        setProgress({ line: progress.line + 1, char: 0, showComment: false });
+      }, 720);
+    } else {
+      // Final line typed — hold here with the blinking caret.
+      setDone(true);
+    }
+    return () => clearTimeout(id);
+  }, [armed, done, progress]);
+
+  const visibleCount = done ? QUICKSTART_SCRIPT.length : progress.line + 1;
+
+  return (
+    <article ref={rootRef} className="cdocs-terminal" aria-label="Craik CLI quickstart">
+      <header className="cdocs-terminal__chrome">
+        <span className="cdocs-terminal__dot cdocs-terminal__dot--r" />
+        <span className="cdocs-terminal__dot cdocs-terminal__dot--y" />
+        <span className="cdocs-terminal__dot cdocs-terminal__dot--g" />
+        <span className="cdocs-terminal__path">~/repos/product</span>
+      </header>
+      <div className="cdocs-terminal__body" aria-live="polite">
+        {QUICKSTART_SCRIPT.slice(0, visibleCount).map((entry, i) => {
+          const isCurrent = !done && i === progress.line;
+          const text = isCurrent ? entry.cmd.slice(0, progress.char) : entry.cmd;
+          const showCaret = isCurrent;
+          const commentVisible = done
+            ? !!entry.comment
+            : isCurrent
+            ? progress.showComment && !!entry.comment
+            : !!entry.comment;
+          return (
+            <Fragment key={i}>
+              <p>
+                <span className="prompt">$</span> {text}
+                {showCaret && <span className="caret">▌</span>}
+              </p>
+              {commentVisible && entry.comment && (
+                <p className="comment">{entry.comment}</p>
+              )}
+            </Fragment>
+          );
+        })}
+        {done && (
+          <p>
+            <span className="prompt">$</span> <span className="caret">▌</span>
+          </p>
+        )}
+      </div>
+    </article>
+  );
+}
 
 const SECTIONS = [
   {
@@ -372,36 +491,7 @@ export default function Home() {
             <h2 id="cdocs-qs-title">From install to first governed run.</h2>
           </header>
           <div className="cdocs-quickstart__body">
-            <article className="cdocs-terminal" aria-label="Craik CLI quickstart">
-              <header className="cdocs-terminal__chrome">
-                <span className="cdocs-terminal__dot cdocs-terminal__dot--r" />
-                <span className="cdocs-terminal__dot cdocs-terminal__dot--y" />
-                <span className="cdocs-terminal__dot cdocs-terminal__dot--g" />
-                <span className="cdocs-terminal__path">~/repos/product</span>
-              </header>
-              <div className="cdocs-terminal__body">
-                <p>
-                  <span className="prompt">$</span> pip install craik
-                </p>
-                <p className="comment">→ installs craik · CLI on PATH</p>
-                <p>
-                  <span className="prompt">$</span> craik login
-                </p>
-                <p className="comment">→ device-code OIDC · operator: alice@acme</p>
-                <p>
-                  <span className="prompt">$</span> craik project add ./repo --name product
-                </p>
-                <p className="comment">→ project registered · pid_8b3 · 4 ADRs indexed</p>
-                <p>
-                  <span className="prompt">$</span> craik case build task_042
-                </p>
-                <p className="comment">→ case file built · 12 evidence refs · 3 contradictions</p>
-                <p>
-                  <span className="prompt">$</span> craik run task_042 --runner codex
-                  <span className="caret">▌</span>
-                </p>
-              </div>
-            </article>
+            <QuickstartTerminal />
             <aside className="cdocs-quickstart__side">
               <h3>What you get</h3>
               <ul>
@@ -438,11 +528,12 @@ export default function Home() {
               Eidetic Labs
             </p>
             <h2 id="cdocs-band-title">
-              Looking for the marketing page or the source?
+              Want the product story or the source?
             </h2>
             <p className="cdocs-band__lede">
-              The marketing page covers vision and positioning. The repository is
-              the source of truth for the runtime and these docs.
+              The product site sketches the runtime model and the long-term
+              direction. The repository is the source of truth for these docs
+              and the CLI.
             </p>
           </div>
           <div className="cdocs-band__actions">

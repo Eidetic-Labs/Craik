@@ -106,20 +106,17 @@ const config = {
     navbar: {
       title: 'Craik',
       logo: {
-        alt: 'Craik',
+        alt: 'Craik · product site',
         src: 'img/brand/favicon.svg',
         srcDark: 'img/brand/craik_icon_inverse.svg',
+        href: 'https://craik.eidetic-labs.com',
+        target: '_self',
       },
       items: [
         { type: 'docSidebar', sidebarId: 'learnSidebar', label: 'Learn', position: 'left' },
         { type: 'docSidebar', sidebarId: 'buildSidebar', label: 'Build', position: 'left' },
         { type: 'docSidebar', sidebarId: 'operateSidebar', label: 'Operate', position: 'left' },
         { type: 'docSidebar', sidebarId: 'secureSidebar', label: 'Secure', position: 'left' },
-        {
-          href: 'https://craik.eidetic-labs.com',
-          label: 'Marketing page',
-          position: 'right',
-        },
         {
           type: 'html',
           position: 'right',
@@ -187,7 +184,7 @@ const config = {
           items: [
             { label: 'GitHub', href: 'https://github.com/eidetic-labs/craik' },
             { label: 'PyPI · craik', href: 'https://pypi.org/project/craik/' },
-            { label: 'Marketing page', href: 'https://craik.eidetic-labs.com' },
+            { label: 'Product site', href: 'https://craik.eidetic-labs.com' },
             { label: 'Eidetic Labs', href: 'https://eidetic-labs.com' },
           ],
         },
