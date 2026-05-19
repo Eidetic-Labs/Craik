@@ -746,6 +746,425 @@ html[data-theme='dark'] .theme-doc-version-badge {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
+   DOC COMPONENTS
+   Reusable patterns any guide/concept doc can drop into prose via plain
+   HTML — no MDX import needed. Each is keyboard-accessible, prints well,
+   and respects light/dark.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Document meta strip — placed under H1 to set expectation.
+   Markup: <p class="craik-meta">5 min read · Updated 2026-05-19 · For operators</p> */
+.craik-meta {
+  align-items: center;
+  color: var(--craik-fg-mute);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--craik-font-mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+  gap: 14px;
+  letter-spacing: 0.02em;
+  margin: -0.4em 0 1.6em;
+  padding-bottom: 1.2em;
+  border-bottom: 1px solid var(--craik-rule);
+  text-transform: uppercase;
+}
+.craik-meta > span {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+.craik-meta > span + span::before {
+  background: var(--craik-rule-strong);
+  border-radius: 50%;
+  content: '';
+  height: 3px;
+  margin-right: 8px;
+  width: 3px;
+}
+
+/* "What you'll do / What you'll learn" lead box — sits above the body. */
+.craik-lead {
+  background: var(--craik-bg-sunk);
+  border: 1px solid var(--craik-rule);
+  border-left: 3px solid var(--craik-accent);
+  border-radius: 8px;
+  margin: 1.4em 0 2em;
+  padding: 18px 22px;
+}
+.craik-lead h4,
+.craik-lead p:first-child strong {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+.craik-lead ul,
+.craik-lead ol {
+  margin: 6px 0 0;
+  padding-left: 1.2em;
+}
+.craik-lead ul li::marker {
+  color: var(--craik-accent);
+}
+.craik-lead p {
+  margin: 0;
+}
+.craik-lead p + p,
+.craik-lead p + ul,
+.craik-lead p + ol {
+  margin-top: 8px;
+}
+
+/* Visual numbered procedure. Use instead of `<ol>` for sequential steps
+   that deserve emphasis (install / first run / migration). */
+.craik-steps {
+  counter-reset: cstep;
+  list-style: none;
+  margin: 1.6em 0;
+  padding: 0;
+}
+.craik-steps > li {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 12px;
+  counter-increment: cstep;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 38px minmax(0, 1fr);
+  margin-bottom: 14px;
+  padding: 18px 22px;
+  position: relative;
+  transition: border-color 200ms var(--craik-ease);
+}
+.craik-steps > li:hover {
+  border-color: var(--craik-rule-strong);
+}
+.craik-steps > li::before {
+  align-items: center;
+  background: color-mix(in srgb, var(--craik-accent) 12%, transparent);
+  border-radius: 999px;
+  color: var(--craik-accent);
+  content: counter(cstep, decimal-leading-zero);
+  display: flex;
+  font-family: var(--craik-font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  grid-row: 1 / span 2;
+  height: 30px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  width: 30px;
+}
+.craik-steps > li > * {
+  grid-column: 2;
+  margin: 0;
+}
+.craik-steps > li > * + * {
+  margin-top: 10px;
+}
+.craik-steps > li > h3,
+.craik-steps > li > h4,
+.craik-steps > li > strong:first-child {
+  font-size: 1.04rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.32;
+}
+.craik-steps > li > p {
+  color: var(--craik-fg-dim);
+  line-height: 1.65;
+}
+.craik-steps > li pre {
+  margin: 0;
+}
+
+/* Definition / key-concept highlight — for when you introduce a term. */
+.craik-keypoint {
+  border-left: 3px solid var(--craik-accent);
+  margin: 1.4em 0;
+  padding: 6px 0 6px 18px;
+}
+.craik-keypoint p {
+  color: var(--craik-fg);
+  font-size: 1.06rem;
+  line-height: 1.65;
+  margin: 0;
+}
+.craik-keypoint p + p {
+  color: var(--craik-fg-dim);
+  font-size: 0.96rem;
+  margin-top: 6px;
+}
+.craik-keypoint strong:first-child {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Two- or three-up feature/concept grid for prose-side reference. */
+.craik-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 1.4em 0 2em;
+}
+.craik-grid > * {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: border-color 200ms var(--craik-ease), transform 200ms var(--craik-ease);
+}
+.craik-grid > *:hover {
+  border-color: var(--craik-rule-strong);
+  transform: translateY(-1px);
+}
+.craik-grid h4 {
+  color: var(--craik-fg);
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  margin: 0 0 8px;
+}
+.craik-grid h4 code,
+.craik-grid h4 em {
+  background: color-mix(in srgb, var(--craik-accent) 12%, transparent);
+  border: 0;
+  border-radius: 4px;
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.82rem;
+  font-style: normal;
+  padding: 2px 7px;
+}
+.craik-grid p {
+  color: var(--craik-fg-dim);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Typed-object contract — fields with type and description. Renders from
+   a definition list so it stays semantic + accessible. */
+.craik-fields {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 10px;
+  display: grid;
+  margin: 1.4em 0;
+  overflow: hidden;
+}
+.craik-fields > div {
+  align-items: baseline;
+  border-top: 1px solid var(--craik-rule);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(140px, 0.25fr) minmax(90px, 0.15fr) minmax(0, 1fr);
+  padding: 14px 20px;
+}
+.craik-fields > div:first-child {
+  background: var(--craik-bg-sunk);
+  border-top: 0;
+  font-family: var(--craik-font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  padding: 10px 20px;
+  text-transform: uppercase;
+}
+.craik-fields dt {
+  color: var(--craik-fg);
+  font-family: var(--craik-font-mono);
+  font-size: 0.86rem;
+  font-weight: 500;
+  margin: 0;
+}
+.craik-fields .craik-fields__type {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.76rem;
+}
+.craik-fields dd {
+  color: var(--craik-fg-dim);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* When-to-use-X / when-to-use-Y decision matrix. */
+.craik-decision {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  margin: 1.4em 0;
+}
+.craik-decision > * {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.craik-decision h4 {
+  align-items: center;
+  display: flex;
+  font-size: 0.92rem;
+  font-weight: 500;
+  gap: 8px;
+  letter-spacing: -0.005em;
+  margin: 0 0 12px;
+}
+.craik-decision h4::before {
+  border-radius: 999px;
+  content: '';
+  height: 8px;
+  width: 8px;
+}
+.craik-decision > :first-child h4::before {
+  background: #1bbf6e;
+}
+.craik-decision > :last-child h4::before {
+  background: #d68608;
+}
+.craik-decision ul {
+  margin: 0;
+  padding-left: 1em;
+}
+.craik-decision li {
+  color: var(--craik-fg-dim);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+
+/* Inline annotated command — `$ command` with a short purpose line. */
+.craik-cmd {
+  background: var(--craik-bg-sunk);
+  border: 1px solid var(--craik-rule);
+  border-left: 3px solid var(--craik-accent);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  margin: 1.2em 0;
+  padding: 14px 18px;
+}
+.craik-cmd code:first-child {
+  background: transparent;
+  border: 0;
+  color: var(--craik-fg);
+  font-family: var(--craik-font-mono);
+  font-size: 0.92rem;
+  padding: 0;
+}
+.craik-cmd code:first-child::before {
+  color: var(--craik-accent);
+  content: '$';
+  font-weight: 500;
+  margin-right: 8px;
+}
+.craik-cmd p {
+  color: var(--craik-fg-dim);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* "Next steps" footer — soft cards linking to the next 2-3 docs. */
+.craik-next {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin: 2em 0 1em;
+}
+.craik-next a {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 10px;
+  color: var(--craik-fg) !important;
+  display: block;
+  padding: 16px 18px;
+  text-decoration: none !important;
+  transition: border-color 200ms var(--craik-ease), background 200ms var(--craik-ease);
+}
+.craik-next a:hover {
+  background: var(--craik-bg-elevated);
+  border-color: var(--craik-accent);
+}
+.craik-next a strong {
+  color: var(--craik-accent);
+  display: block;
+  font-family: var(--craik-font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.craik-next a span {
+  color: var(--craik-fg);
+  display: block;
+  font-size: 0.96rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.craik-next a small {
+  color: var(--craik-fg-dim);
+  display: block;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* Print: drop the heavy visuals so a printed page is clean. */
+@media print {
+  .navbar,
+  .theme-doc-sidebar-container,
+  .pagination-nav,
+  .table-of-contents,
+  .theme-edit-this-page,
+  .craik-meta,
+  .craik-next {
+    display: none !important;
+  }
+  .craik-steps > li,
+  .craik-grid > *,
+  .craik-decision > * {
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+}
+
+/* Accessibility — visible focus ring on every interactive component. */
+.craik-next a:focus-visible,
+.craik-steps > li a:focus-visible,
+.craik-grid a:focus-visible {
+  outline: 2px solid var(--craik-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .craik-decision {
+    grid-template-columns: 1fr;
+  }
+  .craik-fields > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .craik-fields > div:first-child {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
    HOMEPAGE
    ───────────────────────────────────────────────────────────────────────── */
 

@@ -1,48 +1,173 @@
 # Setup Wizard
 
-`craik setup` initializes the local Craik home, local store, and a default
-gateway configuration.
+<p className="craik-meta"><span>4 min read</span><span>For first-time operators</span><span>Updated 2026-05-19</span></p>
 
-```sh
+<div className="craik-lead">
+
+**What you'll do**
+
+Run `craik setup` once to initialize the local Craik home, the local
+SQLite store, and a default gateway configuration. By the end you'll
+have inspectable, non-secret configuration on disk and a clear path to
+adding identity, credentials, and gateway access.
+
+</div>
+
+## The minimal setup
+
+```bash title="One command to get a workable Craik home"
 craik setup
 ```
 
-The command writes inspectable, non-secret configuration only. It does not ask
-for API keys, channel tokens, webhook secrets, or bearer credentials. Store those
-secrets in the operator's secret manager or environment variables for the
-specific adapter that needs them.
+This:
 
-For live provider calls, run OIDC operator login and add a credential profile
-after setup:
+- Resolves `CRAIK_HOME` (or `~/.craik/` by default).
+- Creates the per-data-class subdirectories Craik writes to.
+- Persists a default `craik.gateway_config` payload.
+- Prints the resolved paths and next-step guidance.
 
-```sh
-craik login
-craik auth add anthropic:work --kind=api-key --env-var=ANTHROPIC_API_KEY
+<div className="craik-keypoint">
+
+**`craik setup` is secrets-free**
+
+The wizard writes inspectable, non-secret configuration **only**. It does
+not ask for API keys, channel tokens, webhook secrets, or bearer
+credentials. The `secrets_written` field in the output is always `false`.
+
+Store secret material in your operator's secret manager or in environment
+variables that the specific adapter consumes — Craik references them by
+name, never copies them into config.
+
+</div>
+
+## What gets written
+
+```text
+$CRAIK_HOME/
+  config/
+    craik.toml          # user-level CLI defaults
+    gateway.json        # persisted craik.gateway_config payload
+  state/
+    craik.sqlite        # the local store
+  secrets/              # empty — operator-managed
+  receipts/  handoffs/  case-files/  projects/  logs/  cache/
 ```
 
-See [Authentication and Credentials](authentication.md) for the full credential
-surface, including local-CLI OAuth, secret references, Stigmem-backed
-credentials, workload identity, and approval-gated first use.
+Everything in `config/` is safe to read, diff, and version. Nothing in
+`config/` references a secret by value; secret references are by name only.
 
-## Gateway Options
+## Add identity and a credential profile
 
-Enable the persisted gateway configuration:
+`craik setup` stops short of identity and credentials on purpose — those
+deserve a deliberate decision. Once setup completes:
 
-```sh
+```bash title="Log in as an OIDC operator"
+craik login
+```
+
+```bash title="Add a credential profile that points at an env var"
+craik auth add anthropic:work \
+  --kind=api-key \
+  --env-var=ANTHROPIC_API_KEY
+craik auth status
+```
+
+The full credential surface — local-CLI OAuth, secret-manager references,
+Stigmem-backed credential references, workload identity, RFC 8693 token
+exchange, approval-gated first use — lives in
+[Authentication and credentials](authentication.md).
+
+## Enable the gateway
+
+Craik ships a gateway daemon mode for serving Slack, webhook, scheduled,
+and webhook-style ingress under one governed boundary. Wire it in during
+setup or any time after:
+
+```bash title="Persist the gateway config with a policy envelope"
 craik setup --enable-gateway --policy-envelope-id policy_gateway
 ```
 
-Public gateway binds require a policy envelope:
+For a public bind, the gateway requires an explicit policy envelope —
+Craik refuses to expose itself to a non-loopback host without one:
 
-```sh
-craik setup --gateway-bind-host 0.0.0.0 --policy-envelope-id policy_gateway
+```bash title="Public bind with explicit policy"
+craik setup \
+  --gateway-bind-host 0.0.0.0 \
+  --policy-envelope-id policy_gateway
 ```
 
-The setup output includes:
+The setup output prints:
 
-- resolved local state paths;
-- the persisted `craik.gateway_config` payload;
-- `secrets_written = false`;
-- next steps for diagnostics and gateway review.
+<div className="craik-grid">
 
-Run diagnostics before starting an always-on gateway.
+<div>
+<h4>Resolved paths</h4>
+<p><code>CRAIK_HOME</code>, state, config, and gateway file locations.</p>
+</div>
+
+<div>
+<h4><code>gateway_config</code></h4>
+<p>The persisted payload — including the bound policy envelope id, channel allowlists, and ingress paths.</p>
+</div>
+
+<div>
+<h4><code>secrets_written = false</code></h4>
+<p>Always. Confirmation that the wizard hasn't asked for or stored secret material.</p>
+</div>
+
+<div>
+<h4>Next steps</h4>
+<p>Recommended commands: <code>craik doctor</code> for diagnostics, gateway review pointers, and the right docs to read before enabling channel ingress.</p>
+</div>
+
+</div>
+
+## Run diagnostics before going live
+
+Don't start an always-on gateway without running `craik doctor` first:
+
+```bash title="Health-check identity, credentials, and provider posture"
+craik doctor
+```
+
+Diagnostics surface unreachable credential profiles, expired tokens, bad
+policy bindings, and missing gateway dependencies — every one of which is
+better caught at the operator's terminal than at the gateway's first
+inbound request.
+
+## Reset and re-run
+
+`craik setup` is idempotent. Re-running it doesn't blow away project
+registrations or receipts — it re-resolves paths and updates the gateway
+config when flags change.
+
+To start from a clean slate:
+
+```bash title="Start over completely"
+rm -rf "$CRAIK_HOME"
+craik setup
+```
+
+## What's next
+
+<div className="craik-next">
+
+<a href="authentication.md">
+<strong>Do next</strong>
+<span>Authentication &amp; credentials</span>
+<small>OIDC login, credential profiles, pools, workload identity, and approval flow.</small>
+</a>
+
+<a href="doctor.md">
+<strong>Diagnose</strong>
+<span>Run doctor</span>
+<small>Health-check the whole identity / credential / provider chain before live calls.</small>
+</a>
+
+<a href="../reference/gateway-daemon.md">
+<strong>Reference</strong>
+<span>Gateway daemon mode</span>
+<small>The full gateway contract, channels, and ingress policy options.</small>
+</a>
+
+</div>
