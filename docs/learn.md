@@ -552,17 +552,235 @@ later decision can be checked against it.
 
 </div>
 
-### 3 · Runtime contracts
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">03</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Runtime contracts</p>
+<h3 className="craik-section-banner__title">
+The typed spine <em>every component speaks.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Six contracts the runtime persists, versions, and validates. Adapters,
+memory backends, and future plugins integrate through these — break one
+and the policy gate fails closed. Read this when you need to write a
+policy, ship an adapter, or interpret a receipt.
+</p>
+</div>
+</header>
 
-The typed objects every Craik component speaks. Read these when you need to
-implement an adapter, write a policy, or interpret a receipt.
+<div className="craik-product-spread">
 
-- [Runtime contracts overview](runtime-contracts.md)
-- [Schemas](reference/schemas.md)
-- [Project profile](reference/project-profile.md)
-- [Run state](reference/run-state.md)
-- [Worker results](reference/worker-results.md)
-- [Failure modes](reference/failure-modes.md)
+<a className="craik-product-feature" href="runtime-contracts.md">
+<div>
+<p className="craik-product-feature__num">Foundation · 01</p>
+<h4 className="craik-product-feature__title">Runtime contracts overview</h4>
+<p className="craik-product-feature__summary">
+The product spine. Every persisted contract carries
+<code>schema</code> and <code>version</code> fields; breaking changes
+require a new version and a migration path. Task requests, case files,
+policy envelopes, capability grants, capability receipts, handoffs,
+proposed facts, contradiction reports, verification results, and
+work-graph events — all live here.
+</p>
+<ul className="craik-product-feature__topics">
+<li>versioning</li>
+<li>shape examples</li>
+<li>migration policy</li>
+<li>adapter integration</li>
+</ul>
+<span className="craik-product-feature__cta">Read the contracts</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Why a spine</p>
+<p className="craik-product-feature__quote-text">
+Craik should be built around stable, versioned contracts. The contracts
+are the product spine: adapters, agents, memory backends, and future
+plugins should integrate through them.
+</p>
+<p className="craik-product-feature__quote-attribution">— Runtime contracts · §Intro</p>
+</blockquote>
+</a>
+
+<ol className="craik-product-list">
+
+<li>
+<a className="craik-product-card" href="reference/schemas.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="14" y="14" width="36" height="36" rx="2" />
+<line x1="14" y1="22" x2="50" y2="22" />
+<line x1="14" y1="30" x2="50" y2="30" />
+<line x1="14" y1="38" x2="50" y2="38" />
+<circle cx="22" cy="18" r="1.6" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">02 · Strict typing</p>
+<h4 className="craik-product-card__title">Schemas</h4>
+<p className="craik-product-card__summary">
+Every contract is a strict Pydantic model. <code>craik schema list</code>
+enumerates them; <code>craik schema show &lt;name&gt;</code> prints JSON
+Schema. Unknown fields are rejected so adapters and plugins can't
+silently depend on accidental payload shape.
+</p>
+<blockquote className="craik-product-card__quote">
+Unknown fields are rejected so adapters, memory backends, and future
+plugins do not silently depend on accidental payload shape.
+<span className="craik-product-card__quote-attr">Schemas · §Intro</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>pydantic models</li>
+<li>schema CLI</li>
+<li>JSON Schema export</li>
+<li>strict validation</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: integrators</span>
+<span className="craik-product-card__cta">Reference</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="reference/project-profile.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="14" y="14" width="36" height="36" rx="3" />
+<path d="M 22 24 L 30 24 L 32 28 L 42 28 L 42 38 L 22 38 Z" />
+<circle cx="46" cy="44" r="2.5" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">03 · Repo wiring</p>
+<h4 className="craik-product-card__title">Project profile</h4>
+<p className="craik-product-card__summary">
+The <code>craik.project_profile</code> shape: stable id, repo paths,
+default branch, docs and immutable paths, memory backend and scope.
+Inputs to every case-file build and onboarding payload.
+</p>
+<blockquote className="craik-product-card__quote">
+Project profiles describe repositories Craik can reason about.
+<span className="craik-product-card__quote-attr">Project profile · §Intro</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>repo metadata</li>
+<li>docs boundaries</li>
+<li>memory backend</li>
+<li>git detection</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: operators</span>
+<span className="craik-product-card__cta">Reference</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="reference/run-state.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="14" cy="32" r="3" />
+<circle cx="32" cy="32" r="3" />
+<circle cx="50" cy="32" r="3" fill="var(--craik-lavender)" stroke="none" />
+<line x1="17" y1="32" x2="29" y2="32" />
+<line x1="35" y1="32" x2="47" y2="32" />
+<rect x="22" y="14" width="20" height="8" rx="2" />
+<rect x="22" y="42" width="20" height="8" rx="2" />
+</svg>
+<p className="craik-product-card__num">04 · Inspectable runs</p>
+<h4 className="craik-product-card__title">Run state</h4>
+<p className="craik-product-card__summary">
+<code>craik.task_run</code> links task request, case file, policy
+envelope, runner identity, intent lock, receipts, and final handoff.
+Status (<code>pending → running → completed/blocked/failed/interrupted</code>)
+and phase (<code>plan/act/observe/evaluate/continue/stop</code>) are
+both first-class fields.
+</p>
+<blockquote className="craik-product-card__quote">
+It gives later loop orchestration an inspectable record without
+depending on an untracked chat transcript.
+<span className="craik-product-card__quote-attr">Run state · §Intro</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>task_run</li>
+<li>status + phase</li>
+<li>recovery</li>
+<li>step results</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: implementers</span>
+<span className="craik-product-card__cta">Reference</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="reference/worker-results.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="32" cy="14" r="4" />
+<rect x="16" y="26" width="32" height="8" rx="2" />
+<rect x="12" y="40" width="18" height="8" rx="2" />
+<rect x="34" y="40" width="18" height="8" rx="2" fill="var(--craik-lavender)" stroke="none" />
+<line x1="32" y1="18" x2="32" y2="26" />
+<line x1="22" y1="34" x2="22" y2="40" />
+<line x1="42" y1="34" x2="42" y2="40" />
+</svg>
+<p className="craik-product-card__num">05 · Typed specialist output</p>
+<h4 className="craik-product-card__title">Worker results</h4>
+<p className="craik-product-card__summary">
+<code>craik.worker_result</code> preserves role-specific specialist
+output: findings with severity and evidence, artifacts, assumptions,
+risks, proposed actions, contradiction ids, receipts, diagnostics.
+Conflicting specialist outputs stay conflicting — review decides later.
+</p>
+<blockquote className="craik-product-card__quote">
+Specialist outputs should remain typed even when agents disagree. Do
+not flatten conflicting results into a single consensus.
+<span className="craik-product-card__quote-attr">Worker results · §Typed outputs</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>typed findings</li>
+<li>severity + evidence</li>
+<li>contradiction preservation</li>
+<li>multi-agent</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: orchestration</span>
+<span className="craik-product-card__cta">Reference</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="reference/failure-modes.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<path d="M 32 10 L 54 50 L 10 50 Z" />
+<line x1="32" y1="26" x2="32" y2="38" />
+<circle cx="32" cy="44" r="2.2" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">06 · MVP hardening</p>
+<h4 className="craik-product-card__title">Failure modes</h4>
+<p className="craik-product-card__summary">
+The fail-closed posture. Prompt-injection containment, secret rejection
+at persistence, denied-capability handling, fail-open visibility,
+automation stops, recovery requirements — and an explicit list of paths
+the MVP does <em>not</em> claim (live provider calls as default, broad
+daemon mode, dashboards, direct durable memory writes).
+</p>
+<blockquote className="craik-product-card__quote">
+The runtime should preserve enough state to recover or review a failed
+run without silently promoting uncertain work to durable facts.
+<span className="craik-product-card__quote-attr">Failure modes · §Intro</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>fail-closed</li>
+<li>prompt injection</li>
+<li>secret rejection</li>
+<li>MVP boundaries</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: security &middot; reviewers</span>
+<span className="craik-product-card__cta">Reference</span>
+</p>
+</a>
+</li>
+
+</ol>
+
+</div>
 
 ### 4 · Status & roadmap
 
