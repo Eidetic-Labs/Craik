@@ -1027,33 +1027,310 @@ with the channel and ingress path that produced them.
 
 </ol>
 
-### 6 · Companion apps & visual workspaces
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">06</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Companion apps &amp; visual workspaces</p>
+<h3 className="craik-section-banner__title">
+Governed operator surfaces — <em>not autonomous agents.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Six docs cover the decisions and contracts for desktop and mobile
+companions plus live visual workspaces. Every companion is a governed
+operator surface over existing work records — it can expose status,
+review, and explicit operator-triggered actions, but it cannot widen
+runtime authority on its own.
+</p>
+</div>
+</header>
 
-Decisions and contracts for the desktop, mobile, and live visual workspace
-surfaces.
+<div className="craik-product-spread">
 
-- [Companion app security](guides/companion-app-security.md)
-- [Desktop companion decision](reference/desktop-companion.md)
-- [Mobile companion decision](reference/mobile-companion.md)
-- [Live visual workspace decision](reference/visual-workspace.md)
-- [Work graph visual workspace bridge](reference/work-graph-visual-bridge.md)
-- [Accessibility requirements](reference/accessibility-requirements.md)
+<a className="craik-product-feature" href="guides/companion-app-security.md">
+<div>
+<p className="craik-product-feature__num">Security · 01</p>
+<h4 className="craik-product-feature__title">Companion app security</h4>
+<p className="craik-product-feature__summary">
+The umbrella for every companion surface. Companions are read- and
+review-oriented; they may surface notifications and explicit operator
+actions but never grant runtime authority or sidestep policy. The
+security guide is what every desktop / mobile / visual-workspace
+adapter must implement against.
+</p>
+<ul className="craik-product-feature__topics">
+<li>read + review</li>
+<li>operator-triggered actions</li>
+<li>no widening of authority</li>
+<li>policy parity</li>
+</ul>
+<span className="craik-product-feature__cta">Read the security model</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Governed surfaces</p>
+<p className="craik-product-feature__quote-text">
+Companion app surfaces are governed operator surfaces. They can
+expose status, review notifications, and explicit operator-triggered
+actions, but they must not [grant runtime authority on their own].
+</p>
+<p className="craik-product-feature__quote-attribution">— Companion app security · §Intro</p>
+</blockquote>
+</a>
 
-### 7 · Multimodal & voice
+</div>
 
-Contracts for handling images, audio, and other non-text artifacts.
+<ol className="craik-adr-grid">
 
-- [Multimodal artifact references](reference/multimodal-artifacts.md)
-- [Voice input & output posture](reference/voice-posture.md)
-- [Speech-to-text adapter contract](reference/speech-to-text-adapters.md)
-- [Text-to-speech adapter contract](reference/text-to-speech-adapters.md)
+<li>
+<a className="craik-adr-card" href="reference/desktop-companion.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Decision · desktop</span>
+</div>
+<h4 className="craik-adr-card__title">Desktop companion</h4>
+<p className="craik-adr-card__decision">
+The desktop companion decision: status, notifications, and controlled
+actions in a tray-style app — bounded by the same governance the CLI
+runs under.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
 
-### 8 · Translation & locale
+<li>
+<a className="craik-adr-card" href="reference/mobile-companion.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Decision · mobile</span>
+</div>
+<h4 className="craik-adr-card__title">Mobile companion</h4>
+<p className="craik-adr-card__decision">
+The mobile companion decision: review notifications and
+operator-triggered approvals — phone surface focused on review, not
+edit.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
 
-How non-English contributors and operators can use Craik.
+<li>
+<a className="craik-adr-card" href="reference/visual-workspace.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Decision · visual</span>
+</div>
+<h4 className="craik-adr-card__title">Live visual workspace</h4>
+<p className="craik-adr-card__decision">
+Treats visual workspaces and canvases as governed operator surfaces
+over existing work records. May make work-graph state easier to read;
+must not silently mutate it.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
 
-- [Translated documentation strategy](guides/translated-docs.md)
-- [Locale i18n framework](reference/locale-i18n-framework.md)
+<li>
+<a className="craik-adr-card" href="reference/work-graph-visual-bridge.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Bridge · visual</span>
+</div>
+<h4 className="craik-adr-card__title">Work graph visual bridge</h4>
+<p className="craik-adr-card__decision">
+Projects <code>craik.work_graph_export</code> records into portable
+visual-workspace records. The contract every visual workspace adapter
+implements against.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/accessibility-requirements.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">A11y</span>
+</div>
+<h4 className="craik-adr-card__title">Accessibility requirements</h4>
+<p className="craik-adr-card__decision">
+Multimodal and companion surfaces must remain usable without relying
+on a single input mode, visual presentation, or motion pattern. A11y
+is a contract, not a polish step.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
+
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">07</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Multimodal &amp; voice</p>
+<h3 className="craik-section-banner__title">
+Audio, image, video — <em>under the same governance.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Four docs cover the contracts for non-text artifacts. Multimodal
+artifact references travel as typed citations (not embedded media);
+voice and speech adapters convert between redacted transcripts and
+referenced artifacts while preserving Craik's policy, evidence, and
+receipt model.
+</p>
+</div>
+</header>
+
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="reference/multimodal-artifacts.md">
+<div>
+<p className="craik-product-feature__num">Contract · 01</p>
+<h4 className="craik-product-feature__title">Multimodal artifact references</h4>
+<p className="craik-product-feature__summary">
+The typed citation surface for audio, image, video, transcript,
+canvas, document, and other media. Workflows cite media by reference,
+not by embedded payload — keeps case files, receipts, and handoffs
+deterministic and redaction-friendly.
+</p>
+<ul className="craik-product-feature__topics">
+<li>typed citations</li>
+<li>no embedded media</li>
+<li>redaction-friendly</li>
+<li>deterministic</li>
+</ul>
+<span className="craik-product-feature__cta">Read the contract</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">By reference</p>
+<p className="craik-product-feature__quote-text">
+Multimodal artifact references let Craik workflows cite audio, image,
+video, transcript, canvas, document, and other media without embedding
+raw media.
+</p>
+<p className="craik-product-feature__quote-attribution">— Multimodal artifacts · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/voice-posture.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Posture · voice</span>
+</div>
+<h4 className="craik-adr-card__title">Voice input &amp; output posture</h4>
+<p className="craik-adr-card__decision">
+Treats voice input and output as governed operator surfaces — not as
+an always-on assistant layer. Voice is opt-in, scoped, and receipted.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/speech-to-text-adapters.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Adapter · STT</span>
+</div>
+<h4 className="craik-adr-card__title">Speech-to-text adapter contract</h4>
+<p className="craik-adr-card__decision">
+Converts referenced audio artifacts into redacted transcripts while
+preserving Craik's policy, evidence, and receipt model. STT is a
+boundary, not a passthrough.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/text-to-speech-adapters.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Adapter · TTS</span>
+</div>
+<h4 className="craik-adr-card__title">Text-to-speech adapter contract</h4>
+<p className="craik-adr-card__decision">
+Converts redacted text requests into referenced generated speech
+artifacts while preserving policy, evidence, and receipt model. The
+inverse of STT, same boundary discipline.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
+
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">08</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Translation &amp; locale</p>
+<h3 className="craik-section-banner__title">
+Localized docs — <em>without forking the source of truth.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Craik docs start from English source-of-truth pages and use translation
+metadata to expose localized versions without changing runtime
+identifiers. Two docs cover the strategy and the framework that
+implements it.
+</p>
+</div>
+</header>
+
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="guides/translated-docs.md">
+<div>
+<p className="craik-product-feature__num">Strategy · 01</p>
+<h4 className="craik-product-feature__title">Translated documentation strategy</h4>
+<p className="craik-product-feature__summary">
+English pages are the source of truth. Translations live alongside
+them via translation metadata, so runtime identifiers, command names,
+and schema names stay stable across locales — only operator-facing
+prose changes.
+</p>
+<ul className="craik-product-feature__topics">
+<li>English source-of-truth</li>
+<li>translation metadata</li>
+<li>stable identifiers</li>
+<li>locale-aware prose</li>
+</ul>
+<span className="craik-product-feature__cta">Read the strategy</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Approach</p>
+<p className="craik-product-feature__quote-text">
+Craik documentation starts from English source-of-truth pages and
+uses translation metadata to expose localized docs without changing
+runtime identifiers.
+</p>
+<p className="craik-product-feature__quote-attribution">— Translated docs · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/locale-i18n-framework.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Framework · locale</span>
+</div>
+<h4 className="craik-adr-card__title">Locale i18n framework</h4>
+<p className="craik-adr-card__decision">
+Keeps runtime identifiers stable and language-neutral while allowing
+docs and operator-facing text to resolve through locale preferences
+and translation metadata.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ## Where to go next
 
