@@ -782,16 +782,231 @@ run without silently promoting uncertain work to durable facts.
 
 </div>
 
-### 4 · Status & roadmap
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">04</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Status &amp; roadmap</p>
+<h3 className="craik-section-banner__title">
+Where Craik is today — <em>and where it is going.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Honest about what's not yet built. Six docs together describe the
+active MVP boundary, the upcoming releases, the current end-to-end
+surfaces, and the gates an item must clear before it ships.
+</p>
+</div>
+</header>
 
-Where Craik is today and where it is going. Honest about what's not yet built.
+<div className="craik-product-spread">
 
-- [Current MVP](mvp.md)
-- [MVP roadmap](mvp-roadmap.md)
-- [Roadmap](roadmap.md)
-- [Release readiness · v0.1.0](release-readiness.md)
-- [Limitations](limitations.md)
-- [Implementation plan](implementation-plan.md)
+<a className="craik-product-feature" href="mvp-roadmap.md">
+<div>
+<p className="craik-product-feature__num">Active · 01</p>
+<h4 className="craik-product-feature__title">MVP roadmap</h4>
+<p className="craik-product-feature__summary">
+The robust <code>0.x.0</code> MVP target — not <code>1.0.0</code>. Names
+the readiness work that affects trust, release hygiene, documentation
+accuracy, provider support, and package publication. Read this when you
+want to know what blocks the first public release.
+</p>
+<ul className="craik-product-feature__topics">
+<li>OIDC operator identity</li>
+<li>credential profiles</li>
+<li>OpenAI + Anthropic support</li>
+<li>release gates</li>
+</ul>
+<span className="craik-product-feature__cta">Read the MVP roadmap</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Definition of done</p>
+<p className="craik-product-feature__quote-text">
+The MVP is complete when Craik can run one real software-delivery
+workflow end to end with OIDC-authenticated operators, typed credential
+profiles, policy-enforced side effects, durable receipts, a useful
+handoff, accurate documentation, and package-release quality gates.
+</p>
+<p className="craik-product-feature__quote-attribution">— MVP roadmap · §MVP Definition</p>
+</blockquote>
+</a>
+
+<ol className="craik-product-list">
+
+<li>
+<a className="craik-product-card" href="mvp.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<circle cx="32" cy="32" r="22" />
+<circle cx="32" cy="32" r="12" />
+<circle cx="32" cy="32" r="4" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">02 · One workflow</p>
+<h4 className="craik-product-card__title">MVP plan</h4>
+<p className="craik-product-card__summary">
+The original MVP scope: prove one complete workflow instead of a broad
+platform shell. The accepted primary demo is Stigmem documentation and
+state reconciliation — the workflow CI exercises end-to-end.
+</p>
+<blockquote className="craik-product-card__quote">
+The MVP should prove one complete workflow instead of building a broad
+platform shell.
+<span className="craik-product-card__quote-attr">MVP plan · §MVP Goal</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>stigmem demo</li>
+<li>governed workflow</li>
+<li>handoff backed by memory</li>
+<li>capability receipts</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: contributors</span>
+<span className="craik-product-card__cta">Read MVP</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="roadmap.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<line x1="10" y1="32" x2="54" y2="32" />
+<circle cx="14" cy="32" r="3" fill="var(--craik-lavender)" stroke="none" />
+<circle cx="28" cy="32" r="3" />
+<circle cx="42" cy="32" r="3" />
+<circle cx="54" cy="32" r="3" />
+<line x1="14" y1="14" x2="14" y2="50" stroke-dasharray="2 3" />
+</svg>
+<p className="craik-product-card__num">03 · Long view</p>
+<h4 className="craik-product-card__title">Roadmap</h4>
+<p className="craik-product-card__summary">
+The broader trajectory: smallest useful runtime first, then Stigmem-
+native memory, runner adapters, multi-agent coordination, instruction
+distillation, community extensions. Seven roadmap rules keep features
+from shipping without docs, evidence, and policy posture.
+</p>
+<blockquote className="craik-product-card__quote">
+Every roadmap item must produce implementation, tests or validation,
+and documentation. Craik should not ship features that only exist as
+code or only exist as strategy.
+<span className="craik-product-card__quote-attr">Roadmap · §Roadmap Rules</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>seven rules</li>
+<li>CLI first</li>
+<li>evidence before memory</li>
+<li>strict-by-default</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: anyone</span>
+<span className="craik-product-card__cta">Read roadmap</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="release-readiness.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="14" y="14" width="36" height="36" rx="3" />
+<path d="M 22 32 L 30 40 L 44 24" />
+<circle cx="48" cy="48" r="3" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">04 · Pass / fail snapshot</p>
+<h4 className="craik-product-card__title">Release readiness · v0.1.0</h4>
+<p className="craik-product-card__summary">
+The concrete checklist validated on 2026-05-17 against <code>main</code>.
+CI green, CodeQL green, schema and contract regressions verified.
+Repository-owned readiness is complete; remaining work is the protected
+publication process at tag time.
+</p>
+<blockquote className="craik-product-card__quote">
+Repository-owned readiness checks are complete. The remaining work is
+outside the repository: create the <code>v0.1.0</code> tag and run the
+protected publication process when the maintainer is ready.
+<span className="craik-product-card__quote-attr">Release readiness · §Summary</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>CI green</li>
+<li>CodeQL green</li>
+<li>schema regressions</li>
+<li>publication gate</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: maintainers</span>
+<span className="craik-product-card__cta">Snapshot</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="limitations.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="10" y="14" width="44" height="36" rx="3" />
+<line x1="14" y1="22" x2="40" y2="22" />
+<line x1="14" y1="30" x2="34" y2="30" />
+<line x1="14" y1="38" x2="44" y2="38" />
+<path d="M 36 14 L 50 28" stroke-dasharray="3 3" />
+<path d="M 50 14 L 36 28" stroke-dasharray="3 3" />
+<circle cx="42" cy="44" r="2.5" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">05 · What's not yet</p>
+<h4 className="craik-product-card__title">Limitations</h4>
+<p className="craik-product-card__summary">
+The honest scope boundary. Lists the v0.1 end-to-end surfaces that
+work today (home init, project registration, case-file assembly, local
+state inspection, policy gates) and the deliberately post-MVP surfaces
+(gateway daemon, operator dashboards, multi-agent orchestration,
+broad live tool execution).
+</p>
+<blockquote className="craik-product-card__quote">
+Several surfaces are not yet end-to-end production workflows.
+<span className="craik-product-card__quote-attr">Limitations · §Intro</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>working today</li>
+<li>post-MVP scope</li>
+<li>v0.12 contract coverage</li>
+<li>honesty boundary</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: everyone</span>
+<span className="craik-product-card__cta">Honest scope</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="implementation-plan.md">
+<svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
+<rect x="14" y="14" width="36" height="8" rx="1" />
+<rect x="14" y="26" width="28" height="8" rx="1" />
+<rect x="14" y="38" width="34" height="8" rx="1" />
+<rect x="14" y="50" width="24" height="6" rx="1" fill="var(--craik-lavender)" stroke="none" />
+</svg>
+<p className="craik-product-card__num">06 · How it gets built</p>
+<h4 className="craik-product-card__title">Implementation plan</h4>
+<p className="craik-product-card__summary">
+The accepted stack and build sequence. Python 3.12+, Typer CLI, Pydantic
+schemas, SQLite for local state, stdlib HTTP for first integrations,
+<code>pytest</code> for tests, ruff and mypy for quality. The sequence
+of milestones that gets v0.1 to release.
+</p>
+<blockquote className="craik-product-card__quote">
+This plan turns the Craik concept into a buildable sequence.
+<span className="craik-product-card__quote-attr">Implementation plan · §Intro</span>
+</blockquote>
+<ul className="craik-product-card__topics">
+<li>python 3.12+</li>
+<li>typer + pydantic</li>
+<li>milestones</li>
+<li>quality gates</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: contributors</span>
+<span className="craik-product-card__cta">Build plan</span>
+</p>
+</a>
+</li>
+
+</ol>
+
+</div>
 
 ### 5 · Architecture Decision Records
 
