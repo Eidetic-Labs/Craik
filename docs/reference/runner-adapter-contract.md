@@ -1,97 +1,112 @@
-# Runner Adapter Contract
+# Runner adapter contract
 
-Runner adapters are the boundary between Craik core and concrete agent
-environments. The contract is intentionally runner-agnostic: adapters receive
-Craik state and return normalized Craik state without leaking provider-specific
-details into core contracts.
+<p className="craik-meta"><span>7 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll find here**
+
+The runner-agnostic contract between Craik core and concrete agent
+environments. Adapters receive Craik state and return normalized Craik
+state without leaking provider-specific details into core contracts.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Adapters translate, they don't grant authority.**
+
+Side effects still require explicit capability grants. Adapter
+metadata describes what a runner *can* do; policy decides what it
+*may* do.
+
+</div>
 
 ## Contracts
 
-`craik.runner_metadata` records stable adapter identity:
+<div className="craik-fields">
 
-- runner id and display name,
-- adapter id and adapter version,
-- execution mode: `fixture`, `prompt-handoff`, or `live`,
-- capability names,
-- and structured adapter metadata.
+<div>
+<dt>Contract</dt>
+<dt><span className="craik-fields__type">Role</span></dt>
+<dd>Fields</dd>
+</div>
 
-`craik.runner_adapter_request` is the input from Craik core to an adapter:
+<div>
+<dt><code>craik.runner_metadata</code></dt>
+<dt><span className="craik-fields__type">identity</span></dt>
+<dd>Runner id &amp; display name · adapter id &amp; version · execution mode (<code>fixture</code> / <code>prompt-handoff</code> / <code>live</code>) · capability names · structured adapter metadata.</dd>
+</div>
 
-- task id,
-- runner metadata,
-- task request id,
-- case file id,
-- policy envelope id,
-- capability grant ids,
-- expected output schemas,
-- and bounded context prepared by Craik.
+<div>
+<dt><code>craik.runner_adapter_request</code></dt>
+<dt><span className="craik-fields__type">input</span></dt>
+<dd>Task id · runner metadata · task request id · case file id · policy envelope id · capability grant ids · expected output schemas · bounded context prepared by Craik.</dd>
+</div>
 
-`craik.runner_adapter_result` is the normalized adapter output:
+<div>
+<dt><code>craik.runner_adapter_result</code></dt>
+<dt><span className="craik-fields__type">output</span></dt>
+<dd>Status (<code>completed</code> / <code>blocked</code> / <code>failed</code> / <code>partial</code>) · summary · structured outputs · receipt ids · optional handoff id · memory proposal ids · artifacts · diagnostics · runner metadata.</dd>
+</div>
 
-- status: `completed`, `blocked`, `failed`, or `partial`,
-- summary,
-- structured outputs,
-- receipt ids,
-- optional handoff id,
-- memory proposal ids,
-- artifacts,
-- diagnostics,
-- and runner metadata.
+<div>
+<dt><code>craik.runner_step_request</code></dt>
+<dt><span className="craik-fields__type">step input</span></dt>
+<dd>Run id · task id · phase (<code>plan</code> / <code>act</code> / <code>observe</code> / <code>evaluate</code> / <code>continue</code> / <code>stop</code>) · runner metadata · policy envelope id · optional intent lock id · capability grant ids · expected output schemas · input prompt · bounded context · redaction requirement.</dd>
+</div>
 
-`craik.runner_step_request` is the bounded input for one loop phase:
+<div>
+<dt><code>craik.runner_step_result</code></dt>
+<dt><span className="craik-fields__type">step output</span></dt>
+<dd>Request id · run id · task id · phase · runner metadata · status · summary · observed output · diagnostics · receipt ids · memory proposal ids · artifacts · redaction state.</dd>
+</div>
 
-- run id,
-- task id,
-- phase: `plan`, `act`, `observe`, `evaluate`, `continue`, or `stop`,
-- runner metadata,
-- policy envelope id,
-- optional intent lock id,
-- capability grant ids,
-- expected output schemas,
-- input prompt,
-- bounded context,
-- and whether redaction is required.
+<div>
+<dt><code>craik.runner_capability_matrix</code></dt>
+<dt><span className="craik-fields__type">capability profile</span></dt>
+<dd>Runner metadata · trust level &amp; boundary · default grant posture · whether receipts and redaction are required · normalized capability entries · policy notes.</dd>
+</div>
 
-`craik.runner_step_result` is the observed output from one loop phase:
+</div>
 
-- request id,
-- run id,
-- task id,
-- phase,
-- runner metadata,
-- status: `completed`, `blocked`, `failed`, or `partial`,
-- summary,
-- observed output,
-- diagnostics,
-- receipt ids,
-- memory proposal ids,
-- artifacts,
-- and whether the payload is redacted.
+### Capability support levels
 
-`craik.runner_capability_matrix` records the stable capability and trust profile
-Craik uses before selecting or prompting a runner:
+<div className="craik-fields">
 
-- runner metadata,
-- trust level and boundary,
-- default grant posture,
-- whether receipts and redaction are required,
-- normalized capability entries,
-- and policy notes.
+<div>
+<dt>Support</dt>
+<dt><span className="craik-fields__type">Behavior</span></dt>
+<dd>When to use</dd>
+</div>
 
-Capability support is one of:
+<div>
+<dt><code>unsupported</code></dt>
+<dt><span className="craik-fields__type">block</span></dt>
+<dd>The runner should not be asked to perform the action.</dd>
+</div>
 
-- `unsupported`: the runner should not be asked to perform the action,
-- `prompt-handoff`: the runner can reason about or propose the action, but Craik
-  must route side effects through review,
-- `supported`: the runner can perform the action when policy grants allow it.
+<div>
+<dt><code>prompt-handoff</code></dt>
+<dt><span className="craik-fields__type">review</span></dt>
+<dd>The runner can reason about or propose the action, but Craik routes side effects through review.</dd>
+</div>
 
-Side-effect capabilities default to `grant_required: true`. Read-only context and
-structured-result capabilities may be marked grant-free when the runner profile
-can consume them without widening authority.
+<div>
+<dt><code>supported</code></dt>
+<dt><span className="craik-fields__type">grant-gated</span></dt>
+<dd>The runner can perform the action when policy grants allow it.</dd>
+</div>
 
-## Adapter Interface
+</div>
 
-Python adapters implement the `RunnerAdapter` protocol:
+Side-effect capabilities default to `grant_required: true`. Read-only
+context and structured-result capabilities may be marked grant-free
+when the runner profile can consume them without widening authority.
+
+## Adapter interface
+
+Python adapters implement the `RunnerAdapter` protocol.
 
 ```python
 from craik.runtime.runners import RunnerAdapter
@@ -101,98 +116,169 @@ def run_task(adapter: RunnerAdapter, request):
     return adapter.run(request)
 ```
 
-Adapters must validate the request they receive, preserve runner metadata, and
-return a `craik.runner_adapter_result` payload. Fixture adapters can use
-`FixtureRunnerAdapter` for deterministic contract tests without live runner
-credentials.
+<div className="craik-keypoint">
 
-The [Codex Runner Adapter Preview](codex-runner-adapter.md) implements this
-interface for Codex-compatible prompt handoff and deterministic fixture runs.
-The [Claude Runner Adapter Preview](claude-runner-adapter.md) implements the
-same interface for Claude-compatible prompt handoff and deterministic fixture
-runs.
-The [Gemini Runner Adapter Preview](gemini-runner-adapter.md) implements the
-same interface for Gemini-compatible read/review-oriented prompt handoff and
-deterministic fixture runs.
+**Validate · preserve · normalize.**
 
-## Capability Matrix
+Adapters validate the request they receive, preserve runner metadata,
+and return a <code>craik.runner_adapter_result</code> payload.
+Fixture adapters can use <code>FixtureRunnerAdapter</code> for
+deterministic contract tests without live runner credentials.
 
-Built-in preview matrices are exposed through:
+</div>
+
+## Shipped preview adapters
+
+<div className="craik-grid">
+
+<div><h4><a href="codex-runner-adapter/">Codex</a></h4><p>Codex-compatible prompt handoff and deterministic fixture runs.</p></div>
+<div><h4><a href="claude-runner-adapter/">Claude</a></h4><p>Claude-compatible prompt handoff and deterministic fixture runs.</p></div>
+<div><h4><a href="gemini-runner-adapter/">Gemini</a></h4><p>Gemini-compatible read/review-oriented prompt handoff and deterministic fixture runs.</p></div>
+
+</div>
+
+## Capability matrix
 
 ```sh
 craik runners matrix
 craik runners matrix --runner codex
 ```
 
-The v0.1.0 runner profiles are conservative:
+The v0.1.0 runner profiles are conservative.
 
-- `codex`: live local runner, medium trust, side effects require explicit grants
-  and receipts.
-- `claude`: prompt-handoff runner, medium trust, side effects return through
-  Craik review and receipt workflows.
-- `gemini`: prompt-handoff runner, low trust until adapter tests justify broader
-  authority.
-- `fixture`: deterministic test runner with no external side effects.
+<div className="craik-fields">
 
-Future prompt compilation and policy decisions should consume
-`craik.runner_capability_matrix` rather than inferring authority from a runner
-name or free-form metadata.
+<div>
+<dt>Runner</dt>
+<dt><span className="craik-fields__type">Trust</span></dt>
+<dd>Posture</dd>
+</div>
 
-The [Prompt Compiler](prompt-compiler.md) uses these matrices to include
-runner-specific capability notes and policy boundaries in deterministic prompts.
+<div>
+<dt><code>codex</code></dt>
+<dt><span className="craik-fields__type">medium</span></dt>
+<dd>Live local runner. Side effects require explicit grants and receipts.</dd>
+</div>
+
+<div>
+<dt><code>claude</code></dt>
+<dt><span className="craik-fields__type">medium</span></dt>
+<dd>Prompt-handoff runner. Side effects return through Craik review and receipt workflows.</dd>
+</div>
+
+<div>
+<dt><code>gemini</code></dt>
+<dt><span className="craik-fields__type">low</span></dt>
+<dd>Prompt-handoff runner. Low trust until adapter tests justify broader authority.</dd>
+</div>
+
+<div>
+<dt><code>fixture</code></dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd>Test runner with no external side effects.</dd>
+</div>
+
+</div>
+
+Future prompt compilation and policy decisions consume
+`craik.runner_capability_matrix` rather than inferring authority from
+a runner name or free-form metadata. The
+[prompt compiler](prompt-compiler.md) uses these matrices to include
+runner-specific capability notes and policy boundaries in
+deterministic prompts.
 
 ## Boundaries
 
-Craik core owns:
+<div className="craik-decision">
 
-- task requests,
-- case files,
-- policy envelopes,
-- capability grants,
-- receipts,
-- handoffs,
-- memory proposals,
-- and contract validation.
+<div>
+<h4>Craik core owns</h4>
+<ul>
+<li>Task requests</li>
+<li>Case files</li>
+<li>Policy envelopes</li>
+<li>Capability grants</li>
+<li>Receipts</li>
+<li>Handoffs</li>
+<li>Memory proposals</li>
+<li>Contract validation</li>
+</ul>
+</div>
 
-Adapters own:
+<div>
+<h4>Adapters own</h4>
+<ul>
+<li>Runner invocation or prompt handoff</li>
+<li>Runner-specific session details</li>
+<li>Runner-specific diagnostics</li>
+<li>Mapping runner output back into Craik contracts</li>
+</ul>
+</div>
 
-- runner invocation or prompt handoff,
-- runner-specific session details,
-- runner-specific diagnostics,
-- and mapping runner output back into Craik contracts.
+</div>
 
-Runner-specific details should stay inside the `metadata`, `outputs`, or
-`diagnostics` fields unless they become stable cross-runner contract fields.
-Adapter-produced receipts and handoff inputs should include the stable
-[Runner Metadata](runner-metadata.md) snapshot so downstream agents can see the
-runner id, adapter version, execution mode, trust profile, and capability
-profile involved in the work.
+Runner-specific details stay inside the `metadata`, `outputs`, or
+`diagnostics` fields unless they become stable cross-runner contract
+fields. Adapter-produced receipts and handoff inputs include the
+stable [runner metadata](runner-metadata.md) snapshot.
 
-See [Runner Preview Workflows](../guides/runner-preview-workflows.md) for the
-end-to-end preview path and smoke-test checklist.
-## Provider-Backed MVP Runner
+## Provider-backed MVP runner
 
 The MVP provider-backed runner is implemented in
-`craik.runtime.provider_runner`. It uses the normal case-file and prompt compiler
-flow, then runs deterministic provider-normalized steps through the governed
-loop.
+`craik.runtime.provider_runner`. It uses the normal case-file and
+prompt compiler flow, then runs deterministic provider-normalized
+steps through the governed loop.
 
-Provider-backed runs must persist:
+**Provider-backed runs must persist:**
 
-- the compiled prompt;
-- one task run;
-- normalized run outputs for each executed step;
-- provider receipts for each model step;
-- side-effect or denial receipts emitted by the loop;
-- a handoff for completion, block, failure, or interruption.
+<div className="craik-grid">
+
+<div><h4>Compiled prompt</h4></div>
+<div><h4>Task run</h4></div>
+<div><h4>Normalized run outputs</h4><p>Per executed step.</p></div>
+<div><h4>Provider receipts</h4><p>Per model step.</p></div>
+<div><h4>Side-effect / denial receipts</h4><p>Emitted by the loop.</p></div>
+<div><h4>Handoff</h4><p>For completion · block · failure · interruption.</p></div>
+
+</div>
 
 OpenAI and Anthropic parity is covered by deterministic tests for
-`provider_openai` and `provider_anthropic`. The MVP runner path does not perform
-live API calls by default.
+`provider_openai` and `provider_anthropic`. **The MVP runner path
+does not perform live API calls by default.**
 
-Additional live runner adapters are post-MVP. Preview adapters may remain useful
-for prompt handoff, local fixtures, and contract validation, but they should not
-be documented as operational live execution paths until they meet the same
-certification, budget, retry, redaction, receipt, and side-effect requirements
-as the MVP OpenAI and Anthropic provider paths. See
+<div className="craik-keypoint">
+
+**Additional live runner adapters are post-MVP.**
+
+Preview adapters may remain useful for prompt handoff, local fixtures,
+and contract validation, but they should not be documented as
+operational live execution paths until they meet the same
+certification, budget, retry, redaction, receipt, and side-effect
+requirements as the MVP OpenAI and Anthropic provider paths. See
 [Post-MVP Scope](post-mvp-scope.md).
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="runner-metadata/">
+<strong>Reference</strong>
+<span>Runner metadata</span>
+<small>The stable identity snapshot every adapter preserves.</small>
+</a>
+
+<a href="../guides/runner-preview-workflows/">
+<strong>Guide</strong>
+<span>Runner preview workflows</span>
+<small>The end-to-end preview path and smoke-test checklist.</small>
+</a>
+
+<a href="prompt-compiler/">
+<strong>Reference</strong>
+<span>Prompt compiler</span>
+<small>How matrices flow into compiled prompts.</small>
+</a>
+
+</div>

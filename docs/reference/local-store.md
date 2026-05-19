@@ -1,26 +1,55 @@
-# Local Store
+# Local store
 
-Craik uses SQLite for local runtime persistence.
+<p className="craik-meta"><span>4 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-Default database path:
+<div className="craik-lead">
 
-```text
-~/.craik/state/craik.sqlite3
-```
+**What you'll find here**
 
-With `CRAIK_HOME`:
+The SQLite-backed local persistence layer — paths, stored records,
+migrations, secret-handling, receipt queries, and backup/cleanup
+practice.
 
-```text
-$CRAIK_HOME/state/craik.sqlite3
-```
+</div>
 
-The local store is the persistence foundation for local and degraded operation. Users who opt out of Stigmem can still keep durable local records for projects, tasks, task runs, receipts, handoffs, memory proposals, assumptions, evidence, and work graph events.
+<div className="craik-keypoint">
 
-This is not full Stigmem-equivalent shared memory. Local SQLite is single-node state. It does not provide federation, shared team truth, source attestation, or cross-node conflict resolution. The user-facing local memory backend uses local memory proposals and exposes approved proposals as searchable local facts.
+**Local SQLite is single-node state.**
 
-## Stored Records
+Useful for local and degraded operation. It is not Stigmem-equivalent
+shared memory — no federation, shared team truth, source attestation,
+or cross-node conflict resolution.
 
-The first migration stores supported v0.1.0 contracts as validated JSON payloads:
+</div>
+
+## Paths
+
+<div className="craik-fields">
+
+<div>
+<dt>Variable</dt>
+<dt><span className="craik-fields__type">Default</span></dt>
+<dd>Database path</dd>
+</div>
+
+<div>
+<dt>Default</dt>
+<dt><span className="craik-fields__type">no override</span></dt>
+<dd><code>~/.craik/state/craik.sqlite3</code></dd>
+</div>
+
+<div>
+<dt><code>CRAIK_HOME</code></dt>
+<dt><span className="craik-fields__type">override</span></dt>
+<dd><code>$CRAIK_HOME/state/craik.sqlite3</code></dd>
+</div>
+
+</div>
+
+## Stored records
+
+The first migration stores supported v0.1.0 contracts as validated
+JSON payloads.
 
 | Kind | Contract |
 | --- | --- |
@@ -81,45 +110,89 @@ The first migration stores supported v0.1.0 contracts as validated JSON payloads
 | `skill_packages` | `craik.skill_package` |
 | `skill_registries` | `craik.skill_registry` |
 
-Every stored payload is validated through the Pydantic contract registry before persistence and again when loaded.
+Every stored payload is validated through the Pydantic contract
+registry **before persistence and again when loaded**.
 
 ## Migrations
 
-Craik tracks the local store migration through SQLite `PRAGMA user_version` and
-the `migrations` table. Migration `2` adds `local_store_metadata` so diagnostics
-can distinguish the store schema version from the package version.
+Craik tracks migration state through SQLite `PRAGMA user_version` and
+the `migrations` table. Migration `2` adds `local_store_metadata` so
+diagnostics can distinguish the store schema version from the package
+version.
 
-Rules:
+<div className="craik-grid">
 
-- migrations must be deterministic,
-- new stored contract kinds require tests and docs,
-- newer unsupported database versions should fail clearly,
-- and corrupt or unreadable databases should raise a local store error instead of being silently recreated.
+<div><h4>Deterministic</h4><p>Migrations must be deterministic.</p></div>
+<div><h4>New kinds require tests + docs</h4></div>
+<div><h4>Newer DB versions fail clearly</h4></div>
+<div><h4>Corrupt DBs raise an error</h4><p>Never silently recreated.</p></div>
 
-See [Local Store Migrations](../guides/local-store-migrations.md) for fixture
-compatibility and recovery guidance.
+</div>
+
+See [Local store migrations](../guides/local-store-migrations.md) for
+fixture compatibility and recovery guidance.
 
 ## Secrets
 
-The local store must not persist unredacted secrets. Payloads are checked with the central redaction utility before persistence and rejected if they still appear to contain secret material.
+<div className="craik-keypoint">
 
-## Receipt Queries
+**No unredacted secrets persist.**
 
-The receipt store builds on local SQLite persistence for `craik.capability_receipt` records.
+Payloads are checked with the central redaction utility before
+persistence and rejected if they still appear to contain secret
+material.
 
-Supported lookup paths:
+</div>
 
-- all receipts,
-- one receipt by id,
-- receipts by task id,
-- receipts linked to a policy envelope id,
-- and receipts linked to a handoff id.
+## Receipt queries
 
-Policy envelope, handoff, and runner links are read from receipt result metadata
-keys `policy_envelope_id`, `handoff_ids`, and `runner_metadata`.
+The receipt store builds on local SQLite persistence for
+`craik.capability_receipt` records.
 
-## Backup And Cleanup
+<div className="craik-grid">
 
-Back up the SQLite database while Craik is not running, or use SQLite backup tooling once long-running gateway mode exists.
+<div><h4>All receipts</h4></div>
+<div><h4>One receipt by id</h4></div>
+<div><h4>Receipts by task id</h4></div>
+<div><h4>Receipts linked to a policy envelope id</h4></div>
+<div><h4>Receipts linked to a handoff id</h4></div>
 
-For local cleanup, remove only rebuildable files under `cache/`. Do not delete `state/craik.sqlite3`, `receipts/`, `handoffs/`, or `case-files/` unless you intentionally want to discard local continuity.
+</div>
+
+Policy envelope, handoff, and runner links are read from receipt
+result metadata keys `policy_envelope_id`, `handoff_ids`, and
+`runner_metadata`.
+
+## Backup and cleanup
+
+Back up the SQLite database while Craik is not running, or use SQLite
+backup tooling once long-running gateway mode exists.
+
+For local cleanup, remove only rebuildable files under `cache/`.
+**Do not delete** `state/craik.sqlite3`, `receipts/`, `handoffs/`, or
+`case-files/` unless you intentionally want to discard local
+continuity.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../guides/local-store-migrations/">
+<strong>Guide</strong>
+<span>Local store migrations</span>
+<small>Recovery from failed migrations.</small>
+</a>
+
+<a href="schemas/">
+<strong>Reference</strong>
+<span>Schema reference</span>
+<small>The contracts these tables persist.</small>
+</a>
+
+<a href="redaction/">
+<strong>Reference</strong>
+<span>Redaction</span>
+<small>The boundary that keeps secrets out of the store.</small>
+</a>
+
+</div>

@@ -1,74 +1,132 @@
-# Operator Surface
+# Operator surface
 
-Craik has read-only operator view contracts and formatter helpers. A complete TUI
-or dashboard is post-MVP scope; see [Post-MVP Scope](post-mvp-scope.md).
+<p className="craik-meta"><span>3 min read</span><span>Reference · preview</span><span>Updated 2026-05-19</span></p>
 
-## Decision
+<div className="craik-lead">
 
-The first operator inspection work is terminal-friendly formatting backed by
-local-store queries and validated contracts.
+**What you'll find here**
 
-A full TUI remains a later option because the formatter-first path:
+The read-only operator view contracts and formatter helpers Craik
+ships, and the boundary between them and a complete dashboard.
 
-- works in the same terminal where agents and operators already run Craik;
-- can inspect local SQLite state without starting a service;
-- keeps read-only review workflows simple;
-- avoids adding browser, server, authentication, and asset concerns before the
-  operator views are proven;
-- can reuse the same formatter contracts that future dashboard views may call.
+</div>
+
+<div className="craik-keypoint">
+
+**A complete TUI or dashboard is post-MVP scope.**
+
+The first operator inspection work is terminal-friendly formatting
+backed by local-store queries and validated contracts. See
+[Post-MVP Scope](post-mvp-scope.md).
+
+</div>
+
+## Why formatter-first
+
+<div className="craik-grid">
+
+<div><h4>Same terminal</h4><p>Works where agents and operators already run Craik.</p></div>
+<div><h4>No service required</h4><p>Inspects local SQLite state without starting a process.</p></div>
+<div><h4>Keeps review simple</h4><p>Read-only workflows stay lightweight.</p></div>
+<div><h4>Avoids premature complexity</h4><p>No browser, server, auth, or asset concerns before views are proven.</p></div>
+<div><h4>Future-compatible</h4><p>Dashboard views can reuse the same formatter contracts.</p></div>
+
+</div>
 
 ## Boundary
 
-The v0.7.0 operator surface is read-only by default. It may display state from
-the local store, docs, fixtures, and validated contracts. It must not mutate
-memory, approve grants, resolve contradictions, delete records, or execute
+<div className="craik-keypoint">
+
+**Read-only by default.**
+
+The v0.7.0 operator surface may display state from the local store,
+docs, fixtures, and validated contracts. It must not mutate memory,
+approve grants, resolve contradictions, delete records, or execute
 plugins without an explicit future command and policy boundary.
 
-## Preview Navigation
+</div>
 
-Future TUI or dashboard work should organize views around operator questions:
+## Preview navigation
 
-- `Overview`: project, active tasks, recent handoffs, and blocked states;
-- `Work Graph`: graph events, exports, dependencies, and verification links;
-- `Handoffs`: summaries, next steps, receipts, evidence, and risks;
-- `Receipts`: capability and plugin action records;
-- `Inbox`: contradictions, delegations, and context requests;
-- `Evidence`: evidence references, assumptions, and memory impact previews;
-- `Quality`: quality scores, critic findings, red-team findings, and gates;
-- `Instructions`: sources, snapshots, distilled proposals, and reviews;
-- `Traps`: known traps and negative knowledge;
-- `Run Deltas`: recovery and continuity changes.
+Future TUI or dashboard work should organize views around operator
+questions.
 
-Each view should degrade cleanly when records are missing. Missing data should be
-shown as unavailable state, not inferred.
+<div className="craik-grid">
 
-## Data Sources
+<div><h4>Overview</h4><p>Project · active tasks · recent handoffs · blocked states.</p></div>
+<div><h4>Work Graph</h4><p>Graph events · exports · dependencies · verification links.</p></div>
+<div><h4>Handoffs</h4><p>Summaries · next steps · receipts · evidence · risks.</p></div>
+<div><h4>Receipts</h4><p>Capability and plugin action records.</p></div>
+<div><h4>Inbox</h4><p>Contradictions · delegations · context requests.</p></div>
+<div><h4>Evidence</h4><p>References · assumptions · memory impact previews.</p></div>
+<div><h4>Quality</h4><p>Quality scores · critic findings · red-team findings · gates.</p></div>
+<div><h4>Instructions</h4><p>Sources · snapshots · distilled proposals · reviews.</p></div>
+<div><h4>Traps</h4><p>Known traps · negative knowledge.</p></div>
+<div><h4>Run Deltas</h4><p>Recovery and continuity changes.</p></div>
 
-The initial surface should read from existing contracts and store helpers:
+</div>
 
-- [`craik.handoff`](schemas.md);
-- [`craik.capability_receipt`](schemas.md);
-- [`craik.plugin_receipt`](schemas.md);
-- [`craik.work_graph_event`](schemas.md);
-- [`craik.contradiction_report`](schemas.md);
-- [`craik.evidence_reference`](schemas.md);
-- [`craik.assumption`](schemas.md);
-- [`craik.memory_impact_preview`](schemas.md);
-- [`craik.human_delegation_point`](schemas.md);
-- [`craik.context_request`](schemas.md);
-- [`craik.handoff_quality_score`](schemas.md);
-- [`craik.evidence_coverage_score`](schemas.md);
-- [`craik.runtime_critic_finding`](schemas.md);
-- [`craik.red_team_finding`](schemas.md);
-- [`craik.instruction_source`](schemas.md);
-- [`craik.distilled_instruction_proposal`](schemas.md);
-- [`craik.known_trap`](schemas.md);
-- [`craik.negative_knowledge`](schemas.md);
-- [`craik.run_delta`](schemas.md).
+Each view degrades cleanly when records are missing. Missing data is
+shown as unavailable state — never inferred.
 
-## Follow-On Views
+## Data sources
 
-Post-MVP work can add these views incrementally behind the same read-only
-boundary. Each view should have focused tests for formatting, empty-state
-behavior, and links to the underlying contracts before it is described as
-operational.
+The initial surface reads from existing contracts and store helpers.
+
+<div className="craik-grid">
+
+<div><h4><code>craik.handoff</code></h4></div>
+<div><h4><code>craik.capability_receipt</code></h4></div>
+<div><h4><code>craik.plugin_receipt</code></h4></div>
+<div><h4><code>craik.work_graph_event</code></h4></div>
+<div><h4><code>craik.contradiction_report</code></h4></div>
+<div><h4><code>craik.evidence_reference</code></h4></div>
+<div><h4><code>craik.assumption</code></h4></div>
+<div><h4><code>craik.memory_impact_preview</code></h4></div>
+<div><h4><code>craik.human_delegation_point</code></h4></div>
+<div><h4><code>craik.context_request</code></h4></div>
+<div><h4><code>craik.handoff_quality_score</code></h4></div>
+<div><h4><code>craik.evidence_coverage_score</code></h4></div>
+<div><h4><code>craik.runtime_critic_finding</code></h4></div>
+<div><h4><code>craik.red_team_finding</code></h4></div>
+<div><h4><code>craik.instruction_source</code></h4></div>
+<div><h4><code>craik.distilled_instruction_proposal</code></h4></div>
+<div><h4><code>craik.known_trap</code></h4></div>
+<div><h4><code>craik.negative_knowledge</code></h4></div>
+<div><h4><code>craik.run_delta</code></h4></div>
+
+</div>
+
+See the [schema reference](schemas.md) for the persisted field shapes
+of each contract.
+
+## Follow-on views
+
+Post-MVP work can add these views incrementally behind the same
+read-only boundary. Each view should have focused tests for
+formatting, empty-state behavior, and links to the underlying
+contracts before it is described as operational.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="post-mvp-scope/">
+<strong>Reference</strong>
+<span>Post-MVP scope</span>
+<small>What a full dashboard would add beyond the preview surface.</small>
+</a>
+
+<a href="schemas/">
+<strong>Reference</strong>
+<span>Schema reference</span>
+<small>The persisted contracts these views read.</small>
+</a>
+
+<a href="handoff-viewer/">
+<strong>Reference</strong>
+<span>Handoff viewer</span>
+<small>The first operator-surface contract.</small>
+</a>
+
+</div>
