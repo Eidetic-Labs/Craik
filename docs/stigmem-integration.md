@@ -1,160 +1,179 @@
 # Stigmem Integration
 
-Craik should use Stigmem as its reference memory and truth substrate.
+<p className="craik-meta"><span>9 min read</span><span>For integrators</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll find here**
+
+How Craik integrates with Stigmem as its reference memory and truth
+substrate — the boundary, the memory-store interface, the minimum
+compatibility target, endpoint mapping, capability detection, fact
+mapping, source identity, the local proposal model, contradiction and
+memory-diff strategies, error mapping, and the local backend.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Stigmem is the truth substrate. Craik is the runtime.**
+
+Stigmem owns durable facts, provenance, scopes, trust, and conflict
+detection. Craik owns case files, policy, capability grants, receipts,
+handoffs, and the orchestration loop. The interface between them is a
+small, versioned set of HTTP calls.
+
+</div>
 
 ## Boundary
 
-Stigmem owns:
+<div className="craik-decision">
 
-- facts,
-- provenance,
-- scopes,
-- trust metadata,
-- contradiction tracking,
-- federation,
-- auth,
-- and memory plugin hooks.
+<div>
+<h4>Stigmem owns</h4>
+<ul>
+<li>Facts</li>
+<li>Provenance</li>
+<li>Scopes</li>
+<li>Trust metadata</li>
+<li>Contradiction tracking</li>
+<li>Federation</li>
+<li>Auth</li>
+<li>Memory plugin hooks</li>
+</ul>
+</div>
 
-Craik owns:
+<div>
+<h4>Craik owns</h4>
+<ul>
+<li>Task orchestration</li>
+<li>Project case files</li>
+<li>Agent role assignment</li>
+<li>Capability grants</li>
+<li>Receipts</li>
+<li>Handoffs</li>
+<li>Work graph state</li>
+<li>Operator workflows</li>
+</ul>
+</div>
 
-- task orchestration,
-- project case files,
-- agent role assignment,
-- capability grants,
-- receipts,
-- handoffs,
-- work graph state,
-- and operator workflows.
+</div>
 
-## Memory Store Interface
+## Memory-store interface
 
-Craik should define a memory store interface based on capabilities.
+Craik defines a capability-based memory interface so non-Stigmem
+backends remain feasible.
 
-Required base capabilities:
+<div className="craik-grid">
 
-- read facts,
-- propose facts,
-- write facts,
-- search facts,
-- list facts by entity,
-- attach provenance,
-- and record handoff references.
+<div>
+<h4>Required base</h4>
+<p>Read facts · propose facts · write facts · search facts · list by entity · attach provenance · record handoff references.</p>
+</div>
 
-Advanced capabilities:
+<div>
+<h4>Advanced</h4>
+<p>Contradiction detection · trust tiers · scoped visibility · memory diff · expiration / stale-risk markers · federation.</p>
+</div>
 
-- contradiction detection,
-- trust tiers,
-- scoped visibility,
-- memory diff,
-- fact expiration or stale-risk markers,
-- and federation.
+</div>
 
-## Minimum Compatibility Target
+## Minimum compatibility target
 
-Craik's first Stigmem backend should target the current Stigmem HTTP API shape exposed by the reference node.
+The first Stigmem backend targets the current reference-node HTTP API.
 
-Required endpoints:
+<div className="craik-fields">
 
-- `GET /healthz`
-- `GET /.well-known/stigmem`
-- `POST /v1/facts`
-- `GET /v1/facts`
-- `GET /v1/facts/{fact_id}`
-- `GET /v1/facts/{fact_id}/provenance`
+<div>
+<dt>Required endpoints</dt>
+<dt><span className="craik-fields__type">HTTP</span></dt>
+<dd><code>GET /healthz</code> · <code>GET /.well-known/stigmem</code> · <code>POST /v1/facts</code> · <code>GET /v1/facts</code> · <code>GET /v1/facts/{`{fact_id}`}</code> · <code>GET /v1/facts/{`{fact_id}`}/provenance</code></dd>
+</div>
 
-Required auth behavior:
+<div>
+<dt>Required auth</dt>
+<dt><span className="craik-fields__type">behavior</span></dt>
+<dd>Bearer API keys via <code>Authorization: Bearer &lt;key&gt;</code>. Detect requirement from <code>/.well-known/stigmem</code>. Surface <code>401</code>/<code>403</code> as configuration errors. Never log raw API keys.</dd>
+</div>
 
-- support bearer API keys through `Authorization: Bearer <key>`,
-- detect whether auth is required from `/.well-known/stigmem`,
-- surface `401` and `403` as configuration or permission errors,
-- and never log raw API keys.
+<div>
+<dt>Fact-model fields</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd><code>id</code> · <code>entity</code> · <code>relation</code> · <code>value</code> · <code>source</code> · <code>timestamp</code> · <code>confidence</code> · <code>scope</code></dd>
+</div>
 
-Required fact model fields:
+<div>
+<dt>Assertion fields</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd><code>entity</code> · <code>relation</code> · <code>value</code> · <code>source</code> · <code>confidence</code> · <code>scope</code> · optional <code>valid_until</code> · optional <code>garden_id</code> · optional <code>attestation</code></dd>
+</div>
 
-- `id`,
-- `entity`,
-- `relation`,
-- `value`,
-- `source`,
-- `timestamp`,
-- `confidence`,
-- `scope`.
+<div>
+<dt>Query filters</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd><code>entity</code> · <code>relation</code> · <code>source</code> · <code>scope</code> · <code>min_confidence</code> · <code>include_contradicted</code> · <code>include_expired</code> · <code>after</code> · <code>cursor</code> · <code>limit</code></dd>
+</div>
 
-Required assertion fields:
+<div>
+<dt>Scopes</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd><code>local</code> · <code>team</code> · <code>company</code> · <code>public</code></dd>
+</div>
 
-- `entity`,
-- `relation`,
-- `value`,
-- `source`,
-- `confidence`,
-- `scope`,
-- optional `valid_until`,
-- optional `garden_id`,
-- optional `attestation`.
+</div>
 
-Required query filters:
+<div className="craik-keypoint">
 
-- `entity`,
-- `relation`,
-- `source`,
-- `scope`,
-- `min_confidence`,
-- `include_contradicted`,
-- `include_expired`,
-- `after`,
-- `cursor`,
-- `limit`.
+**Federation, gardens, source attestation, quarantine, tombstones,
+vector recall, and plugins are not required.** Craik uses them when
+the backend advertises them and falls back gracefully when it doesn't.
 
-Required scopes:
+</div>
 
-- `local`,
-- `team`,
-- `company`,
-- `public`.
-
-Craik should not require federation, gardens, source attestation, quarantine, tombstones, vector recall, or plugins for its first backend. It may use them when advertised or available.
-
-## Endpoint Mapping
+## Endpoint mapping
 
 | Craik memory method | Stigmem endpoint | Required | Notes |
 | --- | --- | --- | --- |
 | `health()` | `GET /healthz` | Yes | Confirms node is reachable. |
-| `discover()` | `GET /.well-known/stigmem` | Yes | Reads node id, node URL, auth mode, federation, source attestation, namespaces. |
+| `discover()` | `GET /.well-known/stigmem` | Yes | Reads node id, URL, auth mode, federation, attestation, namespaces. |
 | `write_fact(fact)` | `POST /v1/facts` | Yes | Used only when policy grants direct memory write. |
-| `propose_fact(proposal)` | Local Craik store, optional later Stigmem fact | Yes | Stigmem has immutable facts, not a generic proposal queue; Craik keeps proposals locally until approved. |
-| `search_facts(query, scope)` | Prefer `POST /v1/recall`; fallback to `GET /v1/facts` | Optional recall, required fallback | Recall gives ranked results; query endpoint is the minimum reliable path. |
-| `list_facts(entity, relation, scope)` | `GET /v1/facts` | Yes | Use pagination with `cursor` and `limit`. |
-| `get_fact(fact_id)` | `GET /v1/facts/{fact_id}` | Yes | Supports UUID or CID where node supports CID addressing. |
+| `propose_fact(proposal)` | Local Craik store, optional later Stigmem fact | Yes | Stigmem has immutable facts, not a proposal queue; Craik keeps proposals locally until approved. |
+| `search_facts(query, scope)` | Prefer `POST /v1/recall`; fallback to `GET /v1/facts` | Optional recall, required fallback | Recall gives ranked results; query is the minimum reliable path. |
+| `list_facts(entity, relation, scope)` | `GET /v1/facts` | Yes | Paginate with `cursor` and `limit`. |
+| `get_fact(fact_id)` | `GET /v1/facts/{fact_id}` | Yes | UUID or CID where node supports CID addressing. |
 | `get_provenance(fact_id)` | `GET /v1/facts/{fact_id}/provenance` | Yes | Used to populate evidence and case files. |
-| `list_contradictions()` | `GET /v1/conflicts` | Optional | Use if available; otherwise use local contradiction reports. |
-| `resolve_contradiction()` | `POST /v1/conflicts/{conflict_id}/resolve` | Optional | Craik should require explicit memory-write grant. |
-| `memory_diff(run_id)` | Craik local store | Yes | Stigmem does not provide run-scoped memory diffs; Craik computes from its proposals/writes. |
+| `list_contradictions()` | `GET /v1/conflicts` | Optional | Use if available; otherwise local contradiction reports. |
+| `resolve_contradiction()` | `POST /v1/conflicts/{conflict_id}/resolve` | Optional | Requires explicit memory-write grant. |
+| `memory_diff(run_id)` | Craik local store | Yes | Stigmem does not provide run-scoped diffs; Craik computes from proposals/writes. |
 
-## Capability Detection
+## Capability detection
 
-The Stigmem backend should perform capability detection at connect time.
+At connect time, Craik probes the backend.
 
-Required checks:
+<ol className="craik-steps">
+<li><code>GET /healthz</code> returns success.</li>
+<li><code>GET /.well-known/stigmem</code> returns metadata.</li>
+<li>If auth is required, authenticated <code>GET /v1/facts?limit=1</code> succeeds.</li>
+<li>If writes are configured, Craik validates permissions by policy and surfaces the first write failure clearly (no dry-run available).</li>
+</ol>
 
-1. `GET /healthz` returns success.
-2. `GET /.well-known/stigmem` returns metadata.
-3. If auth is required, authenticated `GET /v1/facts?limit=1` succeeds.
-4. If writes are configured, a dry-run is not available; Craik should validate permissions by policy and surface first write failure clearly.
+Optional probes — used when available, never required.
 
-Optional checks:
+<div className="craik-grid">
 
-- `POST /v1/recall` availability,
-- `GET /v1/conflicts` availability,
-- `GET /v1/auth/keys` availability for key inspection,
-- `GET /v1/facts/{fact_id}/provenance` availability,
-- source-attestation mode from well-known metadata,
-- federation status from well-known metadata.
+<div><h4><code>POST /v1/recall</code></h4><p>Ranked retrieval.</p></div>
+<div><h4><code>GET /v1/conflicts</code></h4><p>Stigmem-level contradictions.</p></div>
+<div><h4><code>GET /v1/auth/keys</code></h4><p>Key inspection.</p></div>
+<div><h4>Provenance endpoint</h4><p><code>GET /v1/facts/{`{fact_id}`}/provenance</code> availability.</p></div>
+<div><h4>Source attestation</h4><p>Mode from well-known metadata.</p></div>
+<div><h4>Federation</h4><p>Status from well-known metadata.</p></div>
 
-Detected capabilities should be stored in Craik local state and included in case files when relevant.
+</div>
 
-## Fact Mapping
+Detected capabilities live in Craik local state and surface in case
+files when relevant.
 
-Craik fact proposals map to Stigmem assertions as follows:
+## Fact mapping
 
 | Craik field | Stigmem field |
 | --- | --- |
@@ -168,149 +187,213 @@ Craik fact proposals map to Stigmem assertions as follows:
 | `garden_id` | `garden_id` |
 | `attestation` | `attestation` |
 
-Craik should use stable relation namespaces and avoid the reserved `stigmem:` relation prefix for ordinary product facts.
+Craik uses stable relation namespaces and avoids the reserved
+`stigmem:` prefix for ordinary product facts.
 
-Recommended Craik relation prefixes:
+**Recommended prefixes:** `craik:task:*` · `craik:handoff:*` ·
+`craik:receipt:*` · `craik:docs:*` · `craik:policy:*` · `codex:*` only
+for Codex-specific automation or team-fact compatibility.
 
-- `craik:task:*`
-- `craik:handoff:*`
-- `craik:receipt:*`
-- `craik:docs:*`
-- `craik:policy:*`
-- `codex:*` only for facts written by Codex-specific automation or compatibility with existing team facts.
+## Source and identity
 
-## Source And Identity
+<div className="craik-fields">
 
-Craik should write facts with an explicit source identity.
+<div>
+<dt>Source form</dt>
+<dt><span className="craik-fields__type">When to use</span></dt>
+<dd>Notes</dd>
+</div>
 
-Recommended source forms:
+<div>
+<dt><code>agent:craik</code></dt>
+<dt><span className="craik-fields__type">generic</span></dt>
+<dd>Anonymous runtime source.</dd>
+</div>
 
-- `agent:craik`
-- `agent:craik:<runner>`
-- `agent:craik:<runner>:<stable-agent-id>`
-- `user:<id>` when the human is the source of the assertion.
+<div>
+<dt><code>agent:craik:&lt;runner&gt;</code></dt>
+<dt><span className="craik-fields__type">runner-scoped</span></dt>
+<dd>Identifies the executing runner adapter.</dd>
+</div>
 
-If Stigmem source attestation is in `enforce` mode, Craik must either:
+<div>
+<dt><code>agent:craik:&lt;runner&gt;:&lt;stable-agent-id&gt;</code></dt>
+<dt><span className="craik-fields__type">identity-scoped</span></dt>
+<dd>Identifies a stable agent identity within the runner.</dd>
+</div>
 
-- set `source` to the authenticated entity URI,
-- or attach a valid Stigmem agent-key attestation.
+<div>
+<dt><code>user:&lt;id&gt;</code></dt>
+<dt><span className="craik-fields__type">human</span></dt>
+<dd>When the operator is the source of the assertion.</dd>
+</div>
 
-If source attestation is in `warn` mode, Craik should surface warnings in receipts and handoffs.
+</div>
 
-## Local Proposal Model
+<div className="craik-keypoint">
 
-Craik should not treat every proposed fact as an immediate Stigmem write.
+**Attestation modes.**
 
-Default behavior:
+If Stigmem source attestation runs in `enforce` mode, Craik either
+sets `source` to the authenticated entity URI or attaches a valid
+Stigmem agent-key attestation. In `warn` mode, Craik surfaces warnings
+through receipts and handoffs.
 
-- agent-created facts become local memory proposals,
-- direct Stigmem writes require a memory write grant,
-- user approval can promote proposals to Stigmem facts,
-- rejected proposals stay local for audit unless retention policy removes them.
+</div>
 
-This preserves Craik's strict-by-default posture while still using Stigmem as the durable truth substrate.
+## Local proposal model
 
-## Contradiction Strategy
+Craik does not treat every proposed fact as an immediate Stigmem write.
 
-Stigmem exposes conflicts when facts with the same entity, relation, and scope disagree.
+<div className="craik-grid">
 
-Craik should use Stigmem conflicts when available:
+<div><h4>Agent-created facts</h4><p>Default to local memory proposals.</p></div>
+<div><h4>Direct Stigmem writes</h4><p>Require an explicit memory-write grant.</p></div>
+<div><h4>Approval flow</h4><p>User approval promotes proposals to Stigmem facts.</p></div>
+<div><h4>Rejected proposals</h4><p>Stay local for audit unless retention policy removes them.</p></div>
 
-- list open conflicts with `GET /v1/conflicts?status=unresolved`,
-- link conflict facts into case files,
-- require explicit memory-write grant before resolving with `POST /v1/conflicts/{conflict_id}/resolve`.
+</div>
 
-Craik should also keep local contradiction reports because not all Craik contradictions are Stigmem-level conflicts. Examples:
+This preserves Craik's strict-by-default posture while keeping Stigmem
+as the durable truth substrate.
 
-- documentation says a task is planned while GitHub shows it merged,
-- public docs contain internal-only implementation labels,
-- a handoff contradicts a later branch state,
-- a runner result conflicts with a verifier result.
+## Contradiction strategy
+
+Stigmem exposes conflicts when facts with the same entity, relation,
+and scope disagree. Craik uses Stigmem conflicts where the backend
+provides them, but always keeps its own local contradiction reports.
+
+<div className="craik-decision">
+
+<div>
+<h4>Stigmem conflicts</h4>
+<p>When available, list with <code>GET /v1/conflicts?status=unresolved</code>. Link conflict facts into case files. Require explicit memory-write grant before <code>POST /v1/conflicts/{`{conflict_id}`}/resolve</code>.</p>
+</div>
+
+<div>
+<h4>Local contradiction reports</h4>
+<p>Not every Craik contradiction is a Stigmem-level conflict. Examples: docs say a task is planned but GitHub shows it merged · public docs contain internal-only labels · a handoff contradicts later branch state · a runner result conflicts with a verifier result.</p>
+</div>
+
+</div>
 
 Local contradiction reports may later produce Stigmem fact proposals.
 
-## Memory Diff Strategy
+## Memory diff
 
 Craik owns run-scoped memory diffs.
 
-A memory diff should include:
+<div className="craik-grid">
 
-- local proposals created,
-- proposals approved,
-- Stigmem facts written,
-- Stigmem write failures,
-- facts read into the case file,
-- contradictions opened,
-- contradictions resolved,
-- and handoff summary facts written.
+<div><h4>Local proposals created</h4></div>
+<div><h4>Proposals approved</h4></div>
+<div><h4>Stigmem facts written</h4></div>
+<div><h4>Stigmem write failures</h4></div>
+<div><h4>Facts read into case file</h4></div>
+<div><h4>Contradictions opened</h4></div>
+<div><h4>Contradictions resolved</h4></div>
+<div><h4>Handoff summary fact writes</h4></div>
 
-Stigmem facts should be referenced by `id` and `cid` when available.
+</div>
 
-## Error Mapping
+Stigmem facts are referenced by `id` and `cid` when available.
 
-Craik should map Stigmem errors into actionable backend errors.
+## Error mapping
 
 | HTTP status | Craik meaning |
 | --- | --- |
-| `400` | invalid request or unsupported query shape |
-| `401` | missing or invalid API key |
-| `403` | insufficient Stigmem permission |
-| `404` | missing fact, endpoint, or tombstone-hidden fact |
-| `409` | duplicate or already-resolved lifecycle conflict |
-| `422` | schema validation failure |
-| `5xx` | node unavailable or internal node error |
+| `400` | Invalid request or unsupported query shape. |
+| `401` | Missing or invalid API key. |
+| `403` | Insufficient Stigmem permission. |
+| `404` | Missing fact, endpoint, or tombstone-hidden fact. |
+| `409` | Duplicate or already-resolved lifecycle conflict. |
+| `422` | Schema validation failure. |
+| `5xx` | Node unavailable or internal node error. |
 
-Error messages must be redacted before they are persisted in receipts, logs, handoffs, or case files.
+<div className="craik-keypoint">
 
-## Stigmem Fact Usage
+**Error redaction is mandatory.**
 
-Craik should use Stigmem facts to assemble case files.
+Error messages must be redacted before they are persisted in receipts,
+logs, handoffs, or case files.
 
-Relevant fact types:
+</div>
 
-- repo current state,
-- branch and PR status,
-- docs policy,
-- ADR policy,
-- implementation decisions,
-- known gaps,
-- stale-risk docs,
-- agent handoffs,
-- capability constraints,
-- and project-specific conventions.
+## Stigmem fact usage
 
-## Stigmem Fact Writes
+Craik uses Stigmem facts to assemble case files.
 
-Craik should write facts when agents learn reusable project state.
+<div className="craik-grid">
 
-Examples:
+<div><h4>Repo current state</h4></div>
+<div><h4>Branch and PR status</h4></div>
+<div><h4>Docs policy</h4></div>
+<div><h4>ADR policy</h4></div>
+<div><h4>Implementation decisions</h4></div>
+<div><h4>Known gaps</h4></div>
+<div><h4>Stale-risk docs</h4></div>
+<div><h4>Agent handoffs</h4></div>
+<div><h4>Capability constraints</h4></div>
+<div><h4>Project conventions</h4></div>
 
-- a doc policy that future agents must respect,
-- a recurring validation command,
-- an implementation constraint,
-- a repository convention,
-- a stale documentation warning,
-- a completed migration status,
-- or a contradiction that needs resolution.
+</div>
 
-## Handoff Storage
+## Stigmem fact writes
 
-Craik should store handoffs as structured artifacts and write summary facts to Stigmem.
+Craik writes facts when agents learn reusable project state.
 
-The full handoff may live in Craik storage or the repository. Stigmem should receive enough metadata for discovery:
+<div className="craik-grid">
 
-- task id,
-- repository,
-- branch,
-- agent identity,
-- summary,
-- changed artifacts,
-- facts learned,
-- unresolved questions,
-- and handoff URI.
+<div><h4>Doc policy</h4><p>That future agents must respect.</p></div>
+<div><h4>Recurring validation command</h4></div>
+<div><h4>Implementation constraint</h4></div>
+<div><h4>Repository convention</h4></div>
+<div><h4>Stale documentation warning</h4></div>
+<div><h4>Completed migration status</h4></div>
+<div><h4>Contradiction needing resolution</h4></div>
 
-## Local Development
+</div>
 
-Craik should support a local memory backend for development and tests.
+## Handoff storage
 
-This should not become an alternate product thesis. The local backend exists to lower setup friction and make tests deterministic. Stigmem remains the production-grade reference backend.
+Handoffs live as structured artifacts; summary facts go to Stigmem.
+
+The full handoff may live in Craik storage or the repository. Stigmem
+receives enough metadata for discovery: task id · repository · branch ·
+agent identity · summary · changed artifacts · facts learned ·
+unresolved questions · handoff URI.
+
+## Local development
+
+<div className="craik-keypoint">
+
+**Local memory is for dev and tests — not a product thesis.**
+
+A local memory backend exists to lower setup friction and keep tests
+deterministic. Stigmem remains the production-grade reference backend.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="guides/stigmem-memory-backend.md">
+<strong>Guide</strong>
+<span>Stigmem memory backend</span>
+<small>Concrete connection steps, capability detection, and troubleshooting.</small>
+</a>
+
+<a href="governance.md">
+<strong>Read</strong>
+<span>Governance</span>
+<small>How memory writes are policy-gated and receipt-backed.</small>
+</a>
+
+<a href="runtime-contracts.md">
+<strong>Read</strong>
+<span>Runtime contracts</span>
+<small>The fact-proposal and memory-backend contract shapes.</small>
+</a>
+
+</div>
