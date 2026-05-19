@@ -1,45 +1,102 @@
-# Security Release Process
+# Security release process
 
-Craik security releases use the same package gates as normal releases with
-private coordination before disclosure.
+<p className="craik-meta"><span>3 min read</span><span>For maintainers</span><span>Updated 2026-05-19</span></p>
 
-## Security Patch Flow
+<div className="craik-lead">
 
-1. Triage the report privately and record the impacted versions.
-2. Open a private fix branch or security advisory branch.
-3. Add regression tests that fail without the fix.
-4. Run quality, package, docs, and security checks.
-5. Publish the smallest viable `0.x.y` patch release.
-6. Publish advisory details after patched artifacts are available.
+**What you'll find here**
 
-## Private Coordination
+The same package gates as a normal release, with private coordination
+before disclosure. Use this when responding to a vulnerability report
+or any security-sensitive fix.
 
-Do not disclose exploit details in public issues, public PR titles, changelog
-drafts, or generated docs before patched packages are available. Use GitHub
-Security Advisories or a private maintainer channel for coordination.
+</div>
 
-## Release Notes
+<div className="craik-keypoint">
 
-Security release notes should state:
+**Patch first, disclose second.**
 
-- affected versions;
-- fixed version;
-- severity and impact in user terms;
-- mitigation if users cannot upgrade immediately;
-- whether secrets, receipts, local state, provider calls, or memory writes may
-  have been exposed.
+No exploit details in public issues, PR titles, changelog drafts, or
+generated docs until patched artifacts are available.
+
+</div>
+
+## Security patch flow
+
+<ol className="craik-steps">
+<li>Triage the report privately and record the impacted versions.</li>
+<li>Open a private fix branch or security advisory branch.</li>
+<li>Add regression tests that fail without the fix.</li>
+<li>Run quality, package, docs, and security checks.</li>
+<li>Publish the smallest viable <code>0.x.y</code> patch release.</li>
+<li>Publish advisory details after patched artifacts are available.</li>
+</ol>
+
+## Private coordination
+
+<div className="craik-keypoint">
+
+**No public exploit details before patched packages are available.**
+
+Use GitHub Security Advisories or a private maintainer channel for
+coordination. Avoid leaking impacted-version detail in public-facing
+PR titles or commit messages.
+
+</div>
+
+## Release notes
+
+Security release notes must state:
+
+<div className="craik-grid">
+
+<div><h4>Affected versions</h4></div>
+<div><h4>Fixed version</h4></div>
+<div><h4>Severity and impact</h4><p>In user terms — not internal jargon.</p></div>
+<div><h4>Mitigation</h4><p>For users who cannot upgrade immediately.</p></div>
+<div><h4>Exposure scope</h4><p>Whether secrets · receipts · local state · provider calls · or memory writes may have been exposed.</p></div>
+
+</div>
 
 ## Disclosure
 
-Disclosure should happen after:
+Disclosure happens only after every gate below is green.
 
-- the patch release is published to PyPI;
-- GitHub release notes are live;
-- the changelog is updated;
-- any required advisory or CVE entry is ready.
+<ol className="craik-steps">
+<li>The patch release is published to PyPI.</li>
+<li>GitHub release notes are live.</li>
+<li>The changelog is updated.</li>
+<li>Any required advisory or CVE entry is ready.</li>
+</ol>
 
-## Post-Release Verification
+## Post-release verification
 
-After release, install the patched package from PyPI in a clean environment and
-run the relevant regression tests or smoke workflow. Confirm that docs and
-release notes point to the fixed version.
+<ol className="craik-steps">
+<li>Install the patched package from PyPI in a clean environment.</li>
+<li>Run the relevant regression tests or smoke workflow.</li>
+<li>Confirm that docs and release notes point to the fixed version.</li>
+</ol>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../release-readiness/">
+<strong>Read</strong>
+<span>Release readiness</span>
+<small>The in-repo gates a security patch must still pass.</small>
+</a>
+
+<a href="../guides/release-management/">
+<strong>Guide</strong>
+<span>Release management</span>
+<small>The day-to-day release procedure this overlays on.</small>
+</a>
+
+<a href="../adr/secret-handling/">
+<strong>ADR</strong>
+<span>0003 · Secret handling</span>
+<small>Why receipts and fixtures don't leak credentials by design.</small>
+</a>
+
+</div>

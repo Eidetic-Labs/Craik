@@ -1,14 +1,32 @@
-# Authentication and Credentials
+# Authentication and credentials
 
-Craik separates operator identity from credential identity. The operator is the
-human or automation identity driving a run. The credential is the provider
-account used for model calls. Provider receipts record both so audit can answer
-"who authorized this" and "which credential carried it out" without inspecting
-secret material.
+<p className="craik-meta"><span>7 min read</span><span>For operators</span><span>Updated 2026-05-19</span></p>
 
-## Operator Login
+<div className="craik-lead">
 
-Use OIDC login when a policy requires an authenticated operator:
+**What you'll do**
+
+Set up operator identity, register provider credential profiles, opt
+into approval-gated first-use, and bind credentials to policy. Every
+provider receipt names both the human who authorized the work and the
+credential that carried it.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Two identity axes.**
+
+Operator identity = the human or automation driving a run. Credential
+identity = the provider account behind model calls. Receipts record
+both — audit answers "who authorized this" and "which credential
+carried it out" without inspecting secret material.
+
+</div>
+
+## Operator login
+
+Use OIDC login when a policy requires an authenticated operator.
 
 ```sh
 export CRAIK_OIDC_ISSUER=https://idp.example.com
@@ -17,11 +35,12 @@ craik login
 craik whoami
 ```
 
-`craik login` starts the CLI device-code flow, prints the verification URL and
-user code, validates the returned ID token against the issuer JWKS, and stores
-the session at `<CRAIK_HOME>/operator-session.json` with owner-only
-permissions. The lower-level OIDC authenticator also supports loopback + PKCE
-for IdPs and entrypoints that are configured to use a browser redirect.
+`craik login` starts the CLI device-code flow, prints the verification
+URL and user code, validates the returned ID token against the issuer
+JWKS, and stores the session at
+`<CRAIK_HOME>/operator-session.json` with owner-only permissions. The
+lower-level OIDC authenticator also supports loopback + PKCE for IdPs
+and entrypoints that are configured to use a browser redirect.
 
 End the local session with:
 
@@ -29,18 +48,16 @@ End the local session with:
 craik logout
 ```
 
-Logout removes the session file and attempts refresh-token revocation when the
-issuer exposes a revocation endpoint.
+Logout removes the session file and attempts refresh-token revocation
+when the issuer exposes a revocation endpoint.
 
-## Credential Profiles
+## Credential profiles
 
-Credential profiles live in `<CRAIK_HOME>/auth-profiles.json` and use
+Profiles live in `<CRAIK_HOME>/auth-profiles.json` and use
 `<provider_family>:<name>` IDs such as `anthropic:work` or
 `chat_completions:local`. Profile metadata is masked in CLI output.
 
-### Env-Var API Key
-
-Use an environment variable for the simplest live provider setup:
+### Env-var API key
 
 ```sh
 export ANTHROPIC_API_KEY=...
@@ -48,18 +65,18 @@ craik auth add anthropic:work --kind=api-key --env-var=ANTHROPIC_API_KEY
 craik auth test anthropic:work
 ```
 
-Anthropic profiles send `x-api-key`. OpenAI and OpenAI-compatible
-Chat Completions profiles send `Authorization: Bearer`.
+Anthropic profiles send `x-api-key`. OpenAI and OpenAI-compatible Chat
+Completions profiles send `Authorization: Bearer`.
 
-### Local-CLI OAuth Fallback
+### Local-CLI OAuth fallback
 
-Claude Code users can reuse the local CLI credential file:
+Claude Code users can reuse the local CLI credential file.
 
 ```sh
 craik auth add anthropic:claude-code --kind=oauth-token --source=local-cli
 ```
 
-The default path is `~/.claude/.credentials.json`; override it when needed:
+The default path is `~/.claude/.credentials.json`; override when needed:
 
 ```sh
 craik auth add anthropic:claude-code \
@@ -69,93 +86,141 @@ craik auth add anthropic:claude-code \
   --refresh-endpoint https://idp.example.com/oauth/token
 ```
 
-Subscription OAuth tokens may route to a different billing pool than API-key
-provider calls. Receipts name the auth profile so operators can distinguish the
-credential path used by a run.
+<div className="craik-keypoint">
 
-### Vendor CLI Bridge
+**Subscription tokens route differently.**
 
-`cli-bridge` profiles are for vendor tools that mint a token through a
-subprocess or maintain a credentials file. The runtime supports `stdout_json`,
-`stdout_line`, and `credentials_file` extractors. Today these profiles are
-created by writing profile metadata into `auth-profiles.json`; the CLI does not
-yet expose dedicated bridge flags.
+Subscription OAuth tokens may route to a different billing pool than
+API-key provider calls. Receipts name the auth profile so operators
+can distinguish the credential path used by a run.
 
-### External Secret Manager
+</div>
 
-`secret-ref` profiles resolve provider credentials through a secret manager. The
-built-in managers treat the ref as an environment variable name or a local file
-path. Custom managers can implement the same resolver protocol for Vault, AWS
-Secrets Manager, cloud KMS brokers, or internal secret services.
+### Other credential kinds
 
-### Stigmem-Backed Credentials
+<div className="craik-fields">
 
-`stigmem-ref` profiles resolve credential material from a Stigmem fact, normally
-using relation `craik:credential:value`. The profile metadata includes the node
-URL, entity, optional API key, scope, relation, and timeout. This supports
-team-shared credentials with Stigmem provenance and revocation semantics. See
-[Connecting Stigmem](connecting-stigmem.md) for node configuration.
+<div>
+<dt>Kind</dt>
+<dt><span className="craik-fields__type">When to use</span></dt>
+<dd>Notes</dd>
+</div>
 
-### Marker Profiles
+<div>
+<dt><code>cli-bridge</code></dt>
+<dt><span className="craik-fields__type">vendor subprocess</span></dt>
+<dd>Vendor tools that mint a token through a subprocess or maintain a credentials file. Supports <code>stdout_json</code>, <code>stdout_line</code>, and <code>credentials_file</code> extractors. Today created by writing profile metadata into <code>auth-profiles.json</code>; the CLI does not yet expose dedicated bridge flags.</dd>
+</div>
 
-Marker credential identity is used when a provider path intentionally needs no
-secret, such as a local OpenAI-compatible server. The provider receipt records a
-`<provider_family>:no-credential` marker instead of a secret-bearing profile.
+<div>
+<dt><code>secret-ref</code></dt>
+<dt><span className="craik-fields__type">external secret manager</span></dt>
+<dd>Built-in managers treat the ref as an env var name or local file path. Custom managers can implement the same resolver protocol for Vault, AWS Secrets Manager, cloud KMS brokers, or internal services.</dd>
+</div>
 
-## Credential Pool
+<div>
+<dt><code>stigmem-ref</code></dt>
+<dt><span className="craik-fields__type">team-shared</span></dt>
+<dd>Resolve credential material from a Stigmem fact (typically relation <code>craik:credential:value</code>). Metadata includes node URL · entity · optional API key · scope · relation · timeout. Supports Stigmem provenance and revocation semantics.</dd>
+</div>
 
-Use a credential pool when a provider has multiple usable accounts and the run
-should rotate or fail over between them. Pools are stored in
-`<CRAIK_HOME>/credential_pool.json` and support `round_robin`, `failover`, and
-`weighted` strategies with per-profile health tracking. The current CLI exposes
-profile operations; pool configuration is file-backed/runtime configuration.
+<div>
+<dt><code>marker</code></dt>
+<dt><span className="craik-fields__type">no-secret providers</span></dt>
+<dd>For provider paths that intentionally need no secret (e.g., local OpenAI-compatible server). The provider receipt records a <code>&lt;provider_family&gt;:no-credential</code> marker instead of a secret-bearing profile.</dd>
+</div>
 
-## Approval Flow
+</div>
 
-The first live use of an auth profile is approval-gated. When a run pauses with
-a credential approval request, approve the profile for that run:
+## Credential pool
+
+Use a credential pool when a provider has multiple usable accounts and
+the run should rotate or fail over between them. Pools are stored in
+`<CRAIK_HOME>/credential_pool.json`.
+
+<div className="craik-grid">
+
+<div><h4><code>round_robin</code></h4><p>Even distribution.</p></div>
+<div><h4><code>failover</code></h4><p>Primary first; fall over on failure.</p></div>
+<div><h4><code>weighted</code></h4><p>Weighted selection by configured priority.</p></div>
+<div><h4>Per-profile health</h4><p>Tracked across calls.</p></div>
+
+</div>
+
+The current CLI exposes profile operations; pool configuration is
+file-backed.
+
+## Approval flow
+
+<div className="craik-keypoint">
+
+**First live use of a profile is approval-gated.**
+
+When a run pauses with a credential approval request, approve the
+profile for that run.
+
+</div>
 
 ```sh
 craik auth approve anthropic:work --run=run_123
 ```
 
-The approval is recorded as a receipt. Operator-to-profile authorization grants
-are also receipted:
+The approval is recorded as a receipt. Operator-to-profile
+authorization grants are also receipted:
 
 ```sh
 craik auth grant anthropic:work --to-group=prod-deploy
 craik auth grant anthropic:work --to-subject=operator-subject-123
 ```
 
-## Workload Identity
+## Workload identity
 
-Workload identity lets CI or cloud platforms mint short-lived credentials
-without storing long-lived provider secrets.
+Workload identity lets CI or cloud platforms mint short-lived
+credentials without storing long-lived provider secrets.
 
-GitHub Actions uses the standard Actions OIDC environment:
+<div className="craik-fields">
 
-```sh
-ACTIONS_ID_TOKEN_REQUEST_URL=...
-ACTIONS_ID_TOKEN_REQUEST_TOKEN=...
-```
+<div>
+<dt>Platform</dt>
+<dt><span className="craik-fields__type">Source</span></dt>
+<dd>Notes</dd>
+</div>
 
-Kubernetes reads a projected service account token from
-`/var/run/secrets/tokens/craik` by default. Generic file and env-var workload
-providers support other CI systems that expose a current OIDC token directly.
+<div>
+<dt>GitHub Actions</dt>
+<dt><span className="craik-fields__type">Actions OIDC</span></dt>
+<dd>Reads <code>ACTIONS_ID_TOKEN_REQUEST_URL</code> and <code>ACTIONS_ID_TOKEN_REQUEST_TOKEN</code> from the runner.</dd>
+</div>
 
-## OIDC Token Exchange
+<div>
+<dt>Kubernetes</dt>
+<dt><span className="craik-fields__type">projected token</span></dt>
+<dd>Reads a projected service-account token from <code>/var/run/secrets/tokens/craik</code> by default.</dd>
+</div>
 
-The RFC 8693 token-exchange manager combines workload identity with an external
-broker. Craik sends a platform-issued OIDC token to the exchange endpoint and
-caches the returned short-lived credential until expiry. A common deployment is
-GitHub Actions OIDC exchanged for a provider credential that is never committed,
-printed, or stored as a long-lived secret in the repo.
+<div>
+<dt>Generic file / env-var</dt>
+<dt><span className="craik-fields__type">other CI</span></dt>
+<dd>Supports any CI system that exposes a current OIDC token directly.</dd>
+</div>
 
-## Policy-Bound Auth
+</div>
 
-Policy envelopes can constrain both operators and credentials. This example
-requires a logged-in operator from the corporate issuer, restricts access to the
-`prod-deploy` group, and allows only secret-manager-backed credentials:
+## OIDC token exchange
+
+The RFC 8693 token-exchange manager combines workload identity with an
+external broker. Craik sends a platform-issued OIDC token to the
+exchange endpoint and caches the returned short-lived credential until
+expiry. A common deployment is GitHub Actions OIDC exchanged for a
+provider credential that is never committed, printed, or stored as a
+long-lived secret in the repo.
+
+## Policy-bound auth
+
+Policy envelopes can constrain both operators and credentials. This
+example requires a logged-in operator from the corporate issuer,
+restricts access to the `prod-deploy` group, and allows only
+secret-manager-backed credentials.
 
 ```json
 {
@@ -167,49 +232,89 @@ requires a logged-in operator from the corporate issuer, restricts access to the
 }
 ```
 
-Denied runs produce denial receipts that name the failing policy condition
-without exposing credential material.
+Denied runs produce denial receipts that name the failing policy
+condition without exposing credential material.
 
-## Receipts and Audit
+## Receipts and audit
 
-Provider receipts include:
+Provider receipts include both identity dimensions:
 
-- `auth_profile_id`
-- `auth_kind`
-- `auth_identity_hash`
-- `operator_subject`
-- `operator_issuer`
-- `operator_email`
-- `operator_groups`
+<div className="craik-grid">
 
-The identity hash is stable across runs but non-reversible. It supports queries
-like "every action taken by this operator" and "every action carried by this
-credential identity" without storing the raw credential or account identifier in
-the receipt.
+<div><h4><code>auth_profile_id</code></h4></div>
+<div><h4><code>auth_kind</code></h4></div>
+<div><h4><code>auth_identity_hash</code></h4></div>
+<div><h4><code>operator_subject</code></h4></div>
+<div><h4><code>operator_issuer</code></h4></div>
+<div><h4><code>operator_email</code></h4></div>
+<div><h4><code>operator_groups</code></h4></div>
 
-## Health Check
+</div>
 
-Use `craik auth status` for stored profile state and `craik doctor` for
-read-only health checks:
+The identity hash is stable across runs but non-reversible. It
+supports queries like "every action taken by this operator" and "every
+action carried by this credential identity" without storing the raw
+credential or account identifier in the receipt.
 
-```sh
-craik auth status
-craik doctor
-```
+## Health check
 
-Doctor reports per-profile health, including environment variable presence,
-local credential file readability, and OAuth token expiry when the source can
-inspect it.
+<div className="craik-grid">
 
-## Common Failures
+<div><h4><code>craik auth status</code></h4><p>Stored profile state.</p></div>
+<div><h4><code>craik doctor</code></h4><p>Read-only health checks · env-var presence · local credential file readability · OAuth token expiry when the source can inspect it.</p></div>
 
-Missing operator session: A policy with `required_operator=true` fails before
-any provider call. Run `craik login`, then retry.
+</div>
 
-Expired OAuth token: Local-CLI OAuth sources refresh when possible. If refresh
-cannot complete, the profile is reported as rejected or expired, and
-long-running case files can surface token-expiry risk before the run starts.
+## Common failures
 
-Credential approval required: First live use of a profile pauses with a
-credential approval request. Run `craik auth approve <profile_id> --run=<run_id>`
-to unblock the run.
+<div className="craik-fields">
+
+<div>
+<dt>Symptom</dt>
+<dt><span className="craik-fields__type">Cause</span></dt>
+<dd>Fix</dd>
+</div>
+
+<div>
+<dt>Missing operator session</dt>
+<dt><span className="craik-fields__type">policy</span></dt>
+<dd>A policy with <code>required_operator=true</code> fails before any provider call. Run <code>craik login</code>, then retry.</dd>
+</div>
+
+<div>
+<dt>Expired OAuth token</dt>
+<dt><span className="craik-fields__type">credential</span></dt>
+<dd>Local-CLI OAuth sources refresh when possible. If refresh cannot complete, the profile is reported as rejected or expired, and long-running case files surface token-expiry risk before the run starts.</dd>
+</div>
+
+<div>
+<dt>Credential approval required</dt>
+<dt><span className="craik-fields__type">first-use gate</span></dt>
+<dd>Run <code>craik auth approve &lt;profile_id&gt; --run=&lt;run_id&gt;</code> to unblock the run.</dd>
+</div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../connecting-stigmem/">
+<strong>Guide</strong>
+<span>Connecting Stigmem</span>
+<small>Configure the node URL Stigmem-backed credentials resolve against.</small>
+</a>
+
+<a href="../../adr/credential-and-identity-architecture/">
+<strong>ADR</strong>
+<span>0007 · Credential and identity architecture</span>
+<small>The design behind these dual identity records.</small>
+</a>
+
+<a href="../../governance/">
+<strong>Read</strong>
+<span>Governance</span>
+<small>How policy envelopes constrain both identity dimensions.</small>
+</a>
+
+</div>
