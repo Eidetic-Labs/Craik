@@ -1,13 +1,23 @@
 // @ts-check
 const { themes: prismThemes } = require('prism-react-renderer');
 
+const isReadTheDocs = process.env.READTHEDOCS === 'True';
+const readTheDocsLanguage = process.env.READTHEDOCS_LANGUAGE || 'en';
+const readTheDocsVersion = process.env.READTHEDOCS_VERSION || 'latest';
+
+const siteUrl = isReadTheDocs
+  ? process.env.READTHEDOCS_CANONICAL_URL || 'https://docs.craik.eidetic-labs.com'
+  : 'https://eidetic-labs.github.io';
+const baseUrl = isReadTheDocs ? `/${readTheDocsLanguage}/${readTheDocsVersion}/` : '/craik/';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Craik',
   tagline: 'Durable agent runtime for governed software work',
   favicon: 'img/favicon.ico',
-  url: 'https://eidetic-labs.github.io',
-  baseUrl: '/craik/',
+  url: siteUrl,
+  baseUrl,
+  trailingSlash: true,
   onBrokenLinks: 'throw',
   i18n: {
     defaultLocale: 'en',
