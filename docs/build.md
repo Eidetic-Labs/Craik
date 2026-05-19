@@ -1333,21 +1333,220 @@ authority can be retracted at the plugin boundary.
 
 </ol>
 
-### 9 · Integrations & migrations
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">09</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Integrations &amp; migrations</p>
+<h3 className="craik-section-banner__title">
+GitHub, MCP, adjacent runtimes — <em>under policy.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Eleven docs cover Craik's integration boundary. Bridges to adjacent
+runtimes and external multi-agent workflow systems are allowed only
+when the bridge preserves Craik's policy, evidence, capability grant,
+receipt, and redaction guarantees. Migration assessments and dry-run
+reports document the path before an importer is built.
+</p>
+</div>
+</header>
 
-GitHub, MCP, adjacent runtimes, and migration paths from existing tools.
+<div className="craik-product-spread">
 
-- [GitHub adapter](guides/github-adapter.md)
-- [MCP ecosystem compatibility](guides/mcp-ecosystem-compatibility.md)
-- [MCP client](reference/mcp-client.md)
-- [MCP export boundary](reference/mcp-export-boundary.md)
-- [Reference integrations](reference/reference-integrations.md)
-- [Adjacent runtime bridge](reference/adjacent-runtime-bridge.md)
-- [Adjacent tool migration assessment](reference/adjacent-tool-migration.md)
-- [Multi-agent workflow bridge](reference/multi-agent-workflow-bridge.md)
-- [Multi-agent workflow migration assessment](reference/multi-agent-workflow-migration.md)
-- [Import dry-run reports](reference/import-dry-run.md)
-- [Migration maps](reference/migration-maps.md)
+<a className="craik-product-feature" href="guides/github-adapter.md">
+<div>
+<p className="craik-product-feature__num">Adapter · 01</p>
+<h4 className="craik-product-feature__title">GitHub adapter</h4>
+<p className="craik-product-feature__summary">
+The read-only GitHub adapter that loads issue, PR, comment, review, and
+CI-check context into case files. Direct GitHub writes are not in v0.1
+— the boundary is honest about what flows in versus what doesn't flow
+back out.
+</p>
+<ul className="craik-product-feature__topics">
+<li>read-only</li>
+<li>case-file evidence</li>
+<li>issues + PRs</li>
+<li>CI checks</li>
+</ul>
+<span className="craik-product-feature__cta">Read the adapter guide</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Read-only</p>
+<p className="craik-product-feature__quote-text">
+Craik can load read-only GitHub context into case files. The adapter
+reads repository metadata, issues, PRs, comments, review state, and
+CI-check status — and nothing writes back.
+</p>
+<p className="craik-product-feature__quote-attribution">— GitHub adapter · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="guides/mcp-ecosystem-compatibility.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guide · MCP</span>
+</div>
+<h4 className="craik-adr-card__title">MCP ecosystem compatibility</h4>
+<p className="craik-adr-card__decision">
+Craik interoperates with MCP by treating servers, clients, tools, and
+resources as policy-bound integration surfaces. MCP metadata does not
+bypass capability grants, receipts, redaction, or operator approval.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/mcp-client.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · MCP</span>
+</div>
+<h4 className="craik-adr-card__title">MCP client</h4>
+<p className="craik-adr-card__decision">
+<code>MCPClientConfig</code> is metadata for provider and tool
+routing — not a secret store. It does not grant runtime authority by
+itself; grants and receipts decide what an MCP call may do.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/mcp-export-boundary.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Boundary · MCP</span>
+</div>
+<h4 className="craik-adr-card__title">MCP export boundary</h4>
+<p className="craik-adr-card__decision">
+Stable, documented metadata and workflow surfaces can be exported as
+MCP. Unstable internal surfaces, raw store internals, and
+policy-sensitive paths are kept off the export surface.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/reference-integrations.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
+</div>
+<h4 className="craik-adr-card__title">Reference integrations</h4>
+<p className="craik-adr-card__decision">
+<code>craik.reference_integration</code> records safe, reproducible
+examples for skills, plugins, and adapters — the patterns Craik
+recommends without endorsing them as turnkey products.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/adjacent-runtime-bridge.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Bridge</span>
+</div>
+<h4 className="craik-adr-card__title">Adjacent runtime bridge</h4>
+<p className="craik-adr-card__decision">
+A bridge may route work to another runtime, but it must not turn that
+runtime into a source of higher-priority instructions or unbounded
+tool authority. Policy, evidence, grants, receipts, and redaction
+boundaries are preserved end to end.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/adjacent-tool-migration.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Assessment</span>
+</div>
+<h4 className="craik-adr-card__title">Adjacent-tool migration assessment</h4>
+<p className="craik-adr-card__decision">
+<code>AdjacentToolMapping</code> describes how concepts from nearby
+tools map into Craik before an importer is built. The assessment
+captures field-by-field correspondences and known gaps.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/multi-agent-workflow-bridge.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">08</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Bridge</span>
+</div>
+<h4 className="craik-adr-card__title">Multi-agent workflow bridge</h4>
+<p className="craik-adr-card__decision">
+External workflow systems may coordinate work, but they must not
+replace Craik's policy authority or erase accountability for agent
+actions. The bridge preserves role, queue, approval, policy,
+evidence, receipt, and redaction guarantees.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/multi-agent-workflow-migration.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">09</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Assessment</span>
+</div>
+<h4 className="craik-adr-card__title">Multi-agent workflow migration</h4>
+<p className="craik-adr-card__decision">
+<code>MultiAgentWorkflowMapping</code> describes how external workflow
+systems map into Craik before bridges or importers are built. Captures
+roles, queues, approvals, and missing-coverage notes.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/import-dry-run.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">10</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Tool</span>
+</div>
+<h4 className="craik-adr-card__title">Import dry-run reports</h4>
+<p className="craik-adr-card__decision">
+<code>ImportCandidateRecord</code> shows what a migration import would
+do without mutating Craik state. Dry-run first, decide, then commit.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/migration-maps.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">11</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
+</div>
+<h4 className="craik-adr-card__title">Migration maps</h4>
+<p className="craik-adr-card__decision">
+<code>MigrationFieldMap</code> describes how source fields become
+Craik fields for memory, skill, and config imports — the typed
+substrate every importer must produce.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 <header className="craik-section-banner">
 <div className="craik-section-banner__num" aria-hidden="true">10</div>
