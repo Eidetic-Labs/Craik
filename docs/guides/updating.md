@@ -1,34 +1,90 @@
 # Updating Craik
 
-`craik update` prints safe update guidance. It does not modify the installed
-package, rewrite source checkouts, fetch remote release metadata, or migrate
-local state.
+<p className="craik-meta"><span>2 min read</span><span>For operators</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll do**
+
+Read the non-mutating update guidance `craik update` prints, then run
+the recommended manual flow. `craik update` never modifies the
+installed package, source checkouts, remote release metadata, or local
+state.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Non-mutating by default.**
+
+Update guidance is informational. Craik will not silently upgrade
+itself or migrate local state.
+
+</div>
+
+## Run it
 
 ```sh
 craik update
 ```
 
-The output includes:
+Output covers:
 
-- installed version;
-- supported Python range;
-- local store migration compatibility;
-- contract compatibility;
-- manual update steps;
-- boundaries for what Craik will not do automatically.
+<div className="craik-grid">
 
-## Recommended Flow
+<div><h4>Installed version</h4></div>
+<div><h4>Supported Python range</h4></div>
+<div><h4>Local store migration compatibility</h4></div>
+<div><h4>Contract compatibility</h4></div>
+<div><h4>Manual update steps</h4></div>
+<div><h4>Boundaries</h4><p>For what Craik will not do automatically.</p></div>
 
-1. Review release notes and migration notes.
-2. Run `craik doctor`.
-3. Update Craik with the package manager or source checkout that installed it.
-4. Run `craik doctor` again.
-5. Run project validation before starting the gateway.
+</div>
 
-For published `0.x.y` patch releases, prefer the newest patch in the current
-minor line unless release notes say a migration is required. Capability-bearing
-`0.x.0` upgrades should be treated as minor compatibility events until Craik
-reaches a later `1.0.0` stability signal.
+## Recommended flow
 
-Future migration commands may add explicit local-state migrations, but update
-guidance remains non-mutating by default.
+<ol className="craik-steps">
+<li>Review release notes and migration notes.</li>
+<li>Run <code>craik doctor</code>.</li>
+<li>Update Craik with the package manager or source checkout that installed it.</li>
+<li>Run <code>craik doctor</code> again.</li>
+<li>Run project validation before starting the gateway.</li>
+</ol>
+
+<div className="craik-keypoint">
+
+**Patch first, then minor.**
+
+For published <code>0.x.y</code> patch releases, prefer the newest
+patch in the current minor line unless release notes call for a
+migration. Capability-bearing <code>0.x.0</code> upgrades are minor
+compatibility events until Craik reaches <code>1.0.0</code>.
+
+</div>
+
+Future migration commands may add explicit local-state migrations, but
+update guidance remains non-mutating by default.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../doctor/">
+<strong>Guide</strong>
+<span>Doctor diagnostics</span>
+<small>The health check to run before and after an upgrade.</small>
+</a>
+
+<a href="../local-store-migrations/">
+<strong>Guide</strong>
+<span>Local store migrations</span>
+<small>How forward-only migrations run during <code>LocalStore.initialize()</code>.</small>
+</a>
+
+<a href="../release-management/">
+<strong>Guide</strong>
+<span>Release management</span>
+<small>How the releases you're consuming are produced.</small>
+</a>
+
+</div>

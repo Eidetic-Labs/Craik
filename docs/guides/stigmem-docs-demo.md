@@ -1,26 +1,47 @@
-# Stigmem Documentation Reconciliation Demo
+# Stigmem documentation reconciliation demo
 
-Craik's first runnable demo reconciles Stigmem documentation and observed runtime
-state without editing files by default.
+<p className="craik-meta"><span>6 min read</span><span>For first-time operators</span><span>Updated 2026-05-19</span></p>
 
-The workflow:
+<div className="craik-lead">
 
-- registers the Stigmem repository as a Craik project,
-- optionally checks a local Stigmem node,
-- creates a documentation reconciliation task,
-- assembles a case file from repository docs, ADRs, repo state, and optional GitHub state,
-- surfaces stale-risk and boundary findings,
-- proposes public-safe documentation updates,
-- records a receipt,
-- creates a handoff,
-- creates a local memory proposal,
-- records the memory write path as a reviewable proposal instead of a direct
-  write,
-- opens a local contradiction report,
-- executes deterministic OpenAI and Anthropic provider-backed runner paths,
-- and exports a task-scoped work graph.
+**What you'll do**
 
-## Run It
+Run Craik's first end-to-end demo — reconciling Stigmem documentation
+against observed runtime state without editing files by default. The
+workflow exercises case-file assembly, receipts, handoffs, memory
+proposals, contradictions, deterministic provider runs, and a
+task-scoped work-graph export.
+
+</div>
+
+<div className="craik-keypoint">
+
+**This is the accepted release-acceptance workflow.**
+
+Every v0.x.0 candidate must pass this demo from a clean install.
+
+</div>
+
+## What the demo does
+
+<div className="craik-grid">
+
+<div><h4>Registers Stigmem repo</h4><p>As a Craik project.</p></div>
+<div><h4>Checks Stigmem node</h4><p>Optional — if URL configured.</p></div>
+<div><h4>Creates a reconciliation task</h4></div>
+<div><h4>Assembles a case file</h4><p>Repository docs · ADRs · repo state · optional GitHub state.</p></div>
+<div><h4>Surfaces findings</h4><p>Stale-risk and boundary issues.</p></div>
+<div><h4>Proposes doc updates</h4><p>Public-safe suggestions only.</p></div>
+<div><h4>Records a receipt</h4></div>
+<div><h4>Creates a handoff</h4></div>
+<div><h4>Creates a memory proposal</h4><p>Local — direct writes need a grant.</p></div>
+<div><h4>Opens a contradiction report</h4><p>Local.</p></div>
+<div><h4>Runs provider paths</h4><p>Deterministic OpenAI + Anthropic.</p></div>
+<div><h4>Exports work graph</h4><p>Task-scoped.</p></div>
+
+</div>
+
+## Run it
 
 From a Stigmem repository checkout:
 
@@ -38,30 +59,89 @@ For an offline local run without GitHub or live Stigmem:
 uv run --python 3.12 --extra dev craik demo stigmem-docs --repo-path . --no-github
 ```
 
-That offline command is the quickstart smoke path used by CI.
+<div className="craik-keypoint">
 
-To limit deterministic provider execution to one provider while debugging:
+**Offline = CI quickstart smoke path.**
+
+The `--no-github` form is the smoke path CI runs.
+
+</div>
+
+To limit deterministic provider execution to one provider while
+debugging:
 
 ```sh
 uv run --python 3.12 --extra dev craik demo stigmem-docs --repo-path . --no-github --provider-id provider_openai
 ```
 
-The command prints a `craik.demo.stigmem_docs_reconciliation` JSON payload.
+The command prints a `craik.demo.stigmem_docs_reconciliation` JSON
+payload.
 
-## Expected Artifacts
+## Expected artifacts
 
-The demo creates deterministic local records:
+<div className="craik-fields">
 
-- project: `project_stigmem`,
-- task: `task_stigmem_documentation_reconciliation`,
-- case file: `case_stigmem_documentation_reconciliation`,
-- receipt: `receipt_demo_stigmem_documentation_reconciliation`,
-- handoff: `handoff_stigmem_documentation_reconciliation`,
-- graph: `graph_task_stigmem_documentation_reconciliation`,
-- one local memory proposal,
-- and one local contradiction report.
-- provider-backed OpenAI and Anthropic run summaries under
-  `provider_executions`.
+<div>
+<dt>Artifact</dt>
+<dt><span className="craik-fields__type">Kind</span></dt>
+<dd>ID</dd>
+</div>
+
+<div>
+<dt>Project</dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd><code>project_stigmem</code></dd>
+</div>
+
+<div>
+<dt>Task</dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd><code>task_stigmem_documentation_reconciliation</code></dd>
+</div>
+
+<div>
+<dt>Case file</dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd><code>case_stigmem_documentation_reconciliation</code></dd>
+</div>
+
+<div>
+<dt>Receipt</dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd><code>receipt_demo_stigmem_documentation_reconciliation</code></dd>
+</div>
+
+<div>
+<dt>Handoff</dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd><code>handoff_stigmem_documentation_reconciliation</code></dd>
+</div>
+
+<div>
+<dt>Graph</dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd><code>graph_task_stigmem_documentation_reconciliation</code></dd>
+</div>
+
+<div>
+<dt>Local memory proposal</dt>
+<dt><span className="craik-fields__type">created</span></dt>
+<dd>One.</dd>
+</div>
+
+<div>
+<dt>Local contradiction report</dt>
+<dt><span className="craik-fields__type">created</span></dt>
+<dd>One.</dd>
+</div>
+
+<div>
+<dt>Provider runs</dt>
+<dt><span className="craik-fields__type">summary</span></dt>
+<dd>OpenAI + Anthropic under <code>provider_executions</code>.</dd>
+</div>
+
+</div>
 
 Inspect follow-up artifacts:
 
@@ -73,31 +153,35 @@ craik handoff show task_stigmem_documentation_reconciliation
 craik graph export --task-id task_stigmem_documentation_reconciliation
 ```
 
-## Boundary Behavior
+## Boundary behavior
 
-The demo treats ADRs and configured immutable paths as evidence. It does not edit
-repository files. Proposed documentation updates are emitted as reviewable
-suggestions in the JSON payload.
+<div className="craik-keypoint">
 
-The demo also surfaces public/internal boundaries. Public docs should not receive
-internal-only labels, private planning names, local filesystem paths, or secrets.
+**ADRs and immutable paths are evidence.**
 
-## Memory Behavior
+The demo never edits repository files. Proposed documentation updates
+are emitted as reviewable suggestions in the JSON payload. Public docs
+do not receive internal-only labels, private planning names, local
+filesystem paths, or secrets.
 
-The demo creates a local memory proposal. It does not write directly to Stigmem
-because direct durable memory writes require explicit policy grants. This keeps
-the workflow safe for first runs and CI. The JSON payload includes
-`memory_write.status = "proposal_created"` so release acceptance can verify that
-the memory write path remained explicit.
+</div>
 
-## Provider Behavior
+## Memory behavior
 
-The demo exercises `provider_openai` and `provider_anthropic` through the
-deterministic provider-backed runner. These runs normalize provider payloads,
-record provider receipts, create run-scoped handoffs, and do not require live
-OpenAI or Anthropic credentials.
+The demo creates a local memory proposal. It does not write directly
+to Stigmem because direct durable memory writes require explicit
+policy grants. The JSON payload includes
+`memory_write.status = "proposal_created"` so release acceptance can
+verify the memory-write path remained explicit.
 
-## Expected Output Shape
+## Provider behavior
+
+The demo exercises `provider_openai` and `provider_anthropic` through
+the deterministic provider-backed runner. These runs normalize
+provider payloads, record provider receipts, create run-scoped
+handoffs, and do not require live OpenAI or Anthropic credentials.
+
+## Expected output shape
 
 ```json
 {
@@ -119,14 +203,60 @@ OpenAI or Anthropic credentials.
 
 ## Troubleshooting
 
-If Stigmem is not running, the demo still runs and reports
-`stigmem_backend_status.status = "not_configured"` or `"error"`.
+<div className="craik-fields">
 
-If GitHub is unavailable, use `--no-github`. The case file will include an open
-assumption or stale-risk warning that GitHub state was not loaded.
+<div>
+<dt>Symptom</dt>
+<dt><span className="craik-fields__type">Cause</span></dt>
+<dd>Fix</dd>
+</div>
 
-If no ADRs are discovered, confirm the repository has `docs/adr/` or pass
-project registration options in a separate setup step when those are available.
+<div>
+<dt><code>stigmem_backend_status.status = "not_configured"</code> or <code>"error"</code></dt>
+<dt><span className="craik-fields__type">offline backend</span></dt>
+<dd>Demo still runs — these statuses are informational, not blocking.</dd>
+</div>
 
-If a run fails because the path is not a Git repository, pass `--repo-path` to a
-directory inside the Stigmem checkout.
+<div>
+<dt>GitHub unavailable</dt>
+<dt><span className="craik-fields__type">network</span></dt>
+<dd>Use <code>--no-github</code>. The case file will include an open assumption or stale-risk warning that GitHub state was not loaded.</dd>
+</div>
+
+<div>
+<dt>No ADRs discovered</dt>
+<dt><span className="craik-fields__type">repo layout</span></dt>
+<dd>Confirm the repository has <code>docs/adr/</code>, or pass project registration options.</dd>
+</div>
+
+<div>
+<dt>Not a Git repository</dt>
+<dt><span className="craik-fields__type">path</span></dt>
+<dd>Pass <code>--repo-path</code> to a directory inside the Stigmem checkout.</dd>
+</div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../quickstart/">
+<strong>Guide</strong>
+<span>Quickstart</span>
+<small>The shorter introductory workflow.</small>
+</a>
+
+<a href="../connecting-stigmem/">
+<strong>Guide</strong>
+<span>Connecting Stigmem</span>
+<small>Set up the optional live backend.</small>
+</a>
+
+<a href="../using-case-files/">
+<strong>Guide</strong>
+<span>Using case files</span>
+<small>Read the case-file structure the demo produces.</small>
+</a>
+
+</div>
