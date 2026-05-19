@@ -9,7 +9,7 @@ python3.12 -m pip install craik
 Or install it with `pipx` if you want an isolated CLI:
 
 ```sh
-pipx install craik
+pipx install --python python3.12 craik
 ```
 
 For contributor development, install it from a local checkout:
@@ -24,7 +24,8 @@ After installation, verify the CLI is available:
 craik --version
 ```
 
-Craik requires Python 3.12 or newer.
+Craik requires Python 3.12 or 3.13. Python 3.14 is not supported yet because
+the current Pydantic runtime dependency does not publish compatible wheels.
 
 For reproducible source-tree commands, use `uv`:
 

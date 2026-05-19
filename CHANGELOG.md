@@ -12,6 +12,19 @@ within the `0.x.0` stability expectations described in
 
 _No unreleased changes._
 
+## 0.1.1 - 2026-05-18
+
+### Fixed
+
+- Restricted package metadata to Python 3.12 and 3.13 so `pipx install craik`
+  does not select Python 3.14, where the current Pydantic runtime dependency
+  cannot build compatible wheels.
+- Updated installation and development docs to call out the Python 3.12/3.13
+  support window and the `pipx --python` install path.
+- Generalized the publish workflow tag guard so patch releases are checked
+  against their own immutable version tag instead of being hardcoded to
+  `v0.1.0`.
+
 ## 0.1.0 - 2026-05-17
 
 ### Added
