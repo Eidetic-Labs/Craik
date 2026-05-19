@@ -529,26 +529,283 @@ an instruction by default.
 
 </ol>
 
-### 4 · Agents, context & learning loops
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">04</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Agents, context &amp; learning</p>
+<h3 className="craik-section-banner__title">
+How agents onboard, budget context, and <em>feed back into the runtime.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Fifteen docs cover the agent lifecycle: onboarding, context budgeting
+and debt, scratchpad rules, exit discipline, knowledge boundaries
+(traps, freshness, quality), the learning loop, and the multi-agent
+coordination primitives. Every typed object here is reviewable —
+nothing rewrites itself silently.
+</p>
+</div>
+</header>
 
-How agents onboard, how context is budgeted, and how quality signals feed back
-into the runtime over time.
+<div className="craik-product-spread">
 
-- [Agent onboarding](guides/agent-onboarding.md)
-- [Context budgeting](guides/context-budgeting.md)
-- [Context debt](reference/context-debt.md)
-- [Scratchpad & unknowns](reference/scratchpad-and-unknowns.md)
-- [Exit discipline](reference/exit-discipline.md)
-- [Known traps & negative knowledge](reference/known-traps.md)
-- [Tool attestations & freshness](reference/freshness.md)
-- [Quality scores](reference/quality-scores.md)
-- [Learning loops](guides/learning-loops.md)
-- [Learning receipts](reference/learning-receipts.md)
-- [Trajectory exports](reference/trajectory-exports.md)
-- [Cross-agent review](reference/cross-agent-review.md)
-- [Structured debates](reference/debates.md)
-- [Human delegation](reference/human-delegation.md)
-- [Runtime critics & red team](reference/runtime-critics.md)
+<a className="craik-product-feature" href="guides/agent-onboarding.md">
+<div>
+<p className="craik-product-feature__num">Onboarding · 01</p>
+<h4 className="craik-product-feature__title">Agent onboarding</h4>
+<p className="craik-product-feature__summary">
+<code>craik onboard</code> emits the canonical
+<code>craik.agent_onboarding</code> payload — project model, policy
+envelope, docs boundaries, recent handoffs, unresolved contradictions,
+stale-risk warnings, validation commands, Stigmem backend status,
+known traps, and allowed next actions.
+</p>
+<ul className="craik-product-feature__topics">
+<li>onboarding payload</li>
+<li>policy envelope</li>
+<li>continuity context</li>
+<li>safe for runners</li>
+</ul>
+<span className="craik-product-feature__cta">Run onboarding</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Before any work</p>
+<p className="craik-product-feature__quote-text">
+Use onboarding before starting project work. The command prints a
+JSON <code>craik.agent_onboarding</code> report — safe for runners to
+parse directly.
+</p>
+<p className="craik-product-feature__quote-attribution">— Agent onboarding · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="guides/context-budgeting.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guide · context</span>
+</div>
+<h4 className="craik-adr-card__title">Context budgeting</h4>
+<p className="craik-adr-card__decision">
+Case files are bounded. The context budget records what was included
+and what was omitted — every cut is auditable, every inclusion is
+justifiable.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/context-debt.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · context</span>
+</div>
+<h4 className="craik-adr-card__title">Context debt</h4>
+<p className="craik-adr-card__decision">
+Records preserve known gaps in the context an agent used. Future
+agents decide whether to continue, refresh, or stop — instead of
+inheriting silent omissions.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/scratchpad-and-unknowns.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · context</span>
+</div>
+<h4 className="craik-adr-card__title">Scratchpad &amp; unknowns</h4>
+<p className="craik-adr-card__decision">
+Scratchpad records are temporary working notes. They must expire and
+must not be treated as durable context unless promoted through an
+explicit review path.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/exit-discipline.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · context</span>
+</div>
+<h4 className="craik-adr-card__title">Context requests &amp; exit discipline</h4>
+<p className="craik-adr-card__decision">
+Structured asks for information needed before work can continue
+safely. Link to handoffs, recovery sessions, and unresolved
+delegation points so a stop is never silent.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/known-traps.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · knowledge</span>
+</div>
+<h4 className="craik-adr-card__title">Known traps &amp; negative knowledge</h4>
+<p className="craik-adr-card__decision">
+Evidence-backed pitfalls agents should avoid, plus statements about
+what is <em>not</em> true or <em>not</em> available. Negative
+knowledge is first-class, not implied by absence.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/freshness.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · knowledge</span>
+</div>
+<h4 className="craik-adr-card__title">Tool attestations &amp; freshness</h4>
+<p className="craik-adr-card__decision">
+Attestations record observed command or tool results with a trust
+boundary. Freshness probes track when knowledge should be considered
+fresh, expiring, or stale.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/quality-scores.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">08</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · knowledge</span>
+</div>
+<h4 className="craik-adr-card__title">Quality scores</h4>
+<p className="craik-adr-card__decision">
+Derived review records. They help agents decide whether a handoff or
+evidence set is ready to rely on — but they are not proof of truth
+or a substitute for evidence.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/learning-loops.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">09</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guide · learning</span>
+</div>
+<h4 className="craik-adr-card__title">Learning loops</h4>
+<p className="craik-adr-card__decision">
+Turn observed skill behavior into reviewable improvement records.
+Loops do not let an agent silently rewrite reusable guidance —
+proposals route through the skill promotion gates.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/learning-receipts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">10</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · learning</span>
+</div>
+<h4 className="craik-adr-card__title">Learning receipts</h4>
+<p className="craik-adr-card__decision">
+Normal <code>craik.capability_receipt</code> records for
+self-improvement decisions. Every promotion or rollback is receipted
+the same way every other governed action is.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/trajectory-exports.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">11</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · learning</span>
+</div>
+<h4 className="craik-adr-card__title">Training trajectory exports</h4>
+<p className="craik-adr-card__decision">
+Stable review and replay format for self-improvement loops. Exports
+are deterministic, redacted, and joinable to the runs that produced
+the trajectory.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/cross-agent-review.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">12</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
+</div>
+<h4 className="craik-adr-card__title">Cross-agent review</h4>
+<p className="craik-adr-card__decision">
+Lets one specialist role request review from another without
+collapsing distinct decisions into a single worker result.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/debates.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">13</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
+</div>
+<h4 className="craik-adr-card__title">Structured debates</h4>
+<p className="craik-adr-card__decision">
+Captures bounded multi-agent disagreement without erasing minority
+positions. Debates are coordination records, not a consensus
+mechanism.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/human-delegation.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">14</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
+</div>
+<h4 className="craik-adr-card__title">Human delegation &amp; scope changes</h4>
+<p className="craik-adr-card__decision">
+Human delegation points mark places where autonomous agents must stop
+or hand off instead of continuing silently. The "ask a human" surface
+is itself a typed object.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/runtime-critics.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">15</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
+</div>
+<h4 className="craik-adr-card__title">Runtime critics &amp; red team</h4>
+<p className="craik-adr-card__decision">
+Critic and red-team findings are typed review inputs — not facts,
+final decisions, or policy overrides — until a separate adjudication
+accepts them.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 5 · Gateway & channels
 
