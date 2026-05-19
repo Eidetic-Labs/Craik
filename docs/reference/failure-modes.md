@@ -1,55 +1,131 @@
-# MVP Failure Modes
+# MVP failure modes
 
-Craik's MVP hardening posture is fail-closed. The runtime should preserve enough
-state to recover or review a failed run without silently promoting uncertain
-work to durable facts.
+<p className="craik-meta"><span>3 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-## Boundaries
+<div className="craik-lead">
 
-The MVP supports one release acceptance workflow, deterministic provider-backed
-OpenAI and Anthropic execution, local case files, receipts, handoffs, memory
-proposals, and work graphs. It does not treat live provider calls, broad daemon
-operation, dashboards, or direct durable memory writes as required MVP paths.
+**What you'll find here**
 
-## Prompt Injection
+The MVP hardening posture and the specific boundaries that hold under
+adversarial input — prompt injection, secrets, tool calls, timeouts,
+persistence, and recovery.
 
-User text, repository text, documentation, and memory facts can contain hostile
-instructions. Prompt compilation keeps those inputs inside task or context
-sections and always renders the policy envelope, denied capabilities, grants,
-context omissions, and stop conditions. Hostile text is evidence or input; it is
-not authority to remove policy constraints.
+</div>
+
+<div className="craik-keypoint">
+
+**Fail-closed by default.**
+
+The runtime preserves enough state to recover or review a failed run
+without silently promoting uncertain work to durable facts.
+
+</div>
+
+## MVP boundaries
+
+<div className="craik-fields">
+
+<div>
+<dt>Supported</dt>
+<dt><span className="craik-fields__type">in scope</span></dt>
+<dd>One release-acceptance workflow · deterministic provider-backed OpenAI &amp; Anthropic execution · local case files · receipts · handoffs · memory proposals · work graphs.</dd>
+</div>
+
+<div>
+<dt>Not required</dt>
+<dt><span className="craik-fields__type">out of scope</span></dt>
+<dd>Live provider calls · broad daemon operation · dashboards · direct durable memory writes.</dd>
+</div>
+
+</div>
+
+## Prompt injection
+
+<div className="craik-keypoint">
+
+**Hostile text is input, not authority.**
+
+User text, repository text, documentation, and memory facts can
+contain hostile instructions. Prompt compilation keeps those inputs
+inside task or context sections and always renders the policy
+envelope, denied capabilities, grants, context omissions, and stop
+conditions.
+
+</div>
 
 ## Secrets
 
-Persisted payloads are validated before writing to the local store. Secret-shaped
-values in keys or strings are rejected or redacted at persistence and receipt
-boundaries. Public documentation checks also block secrets, private paths, and
-private task names from Docusaurus content.
+Persisted payloads are validated before writing to the local store.
+Secret-shaped values in keys or strings are rejected or redacted at
+persistence and receipt boundaries. Public documentation checks also
+block secrets, private paths, and private task names from Docusaurus
+content.
 
-## Tool Calls And Side Effects
+## Tool calls and side effects
 
-Side effects require matching policy grants and receipts. Missing or mismatched
-grants block shell, file write, memory write, and GitHub write attempts. Immutable
-documentation paths require explicit approval metadata. Unsupported loop
-side-effect capabilities fail closed before runner output is accepted.
+<div className="craik-grid">
 
-## Timeouts, Retries, And Budgets
+<div><h4>Missing grants block side effects</h4></div>
+<div><h4>Immutable docs require approval</h4></div>
+<div><h4>Unsupported capabilities fail closed</h4></div>
+<div><h4>Receipts cover shell · file · memory · GitHub writes</h4></div>
 
-Network clients expose timeout configuration and default to bounded requests.
-Provider adapters classify retryable throttling and transient failures without
-performing hidden live retries. Provider routing blocks exhausted or mismatched
-budget and quota status. Agent loops enforce max-iteration limits and persist an
-interrupted run when the limit is reached.
+</div>
 
-## Persisted Payloads
+## Timeouts, retries, budgets
 
-The SQLite store validates every registered contract payload before persistence
-and rejects unknown schemas, wrong versions, extra fields, and unredacted secret
-material. CI exercises persisted demo artifacts by reading them back through the
-contract registry and revalidating their JSON payloads.
+<div className="craik-grid">
 
-## Recovery Expectations
+<div><h4>Network clients</h4><p>Expose timeout configuration · bounded by default.</p></div>
+<div><h4>Provider adapters</h4><p>Classify retryable throttling and transient failures · no hidden live retries.</p></div>
+<div><h4>Routing</h4><p>Blocks exhausted or mismatched budget/quota status.</p></div>
+<div><h4>Agent loops</h4><p>Enforce max-iteration limits and persist an interrupted run at the limit.</p></div>
 
-When a run blocks or fails, review the case file, receipts, handoff, run state,
-and memory proposals before retrying. Do not convert assumptions, stale risks, or
-omitted context into facts without new evidence.
+</div>
+
+## Persisted payloads
+
+<div className="craik-keypoint">
+
+**Validate twice.**
+
+The SQLite store validates every registered contract payload before
+persistence and rejects unknown schemas, wrong versions, extra fields,
+and unredacted secret material. CI exercises persisted demo artifacts
+by reading them back through the contract registry and revalidating
+their JSON payloads.
+
+</div>
+
+## Recovery expectations
+
+When a run blocks or fails:
+
+<ol className="craik-steps">
+<li>Review the case file, receipts, handoff, run state, and memory proposals before retrying.</li>
+<li>Do not convert assumptions, stale risks, or omitted context into facts without new evidence.</li>
+</ol>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="exit-discipline/">
+<strong>Reference</strong>
+<span>Exit discipline</span>
+<small>The checklist that turns failure into reviewable state.</small>
+</a>
+
+<a href="redaction/">
+<strong>Reference</strong>
+<span>Redaction</span>
+<small>The boundary that keeps secrets out of receipts.</small>
+</a>
+
+<a href="../limitations/">
+<strong>Read</strong>
+<span>Limitations</span>
+<small>The honest current-vs-deferred boundary.</small>
+</a>
+
+</div>
