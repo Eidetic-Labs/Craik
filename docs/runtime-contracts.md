@@ -1,10 +1,33 @@
 # Runtime Contracts
 
-Craik should be built around stable, versioned contracts. The contracts are the product spine: adapters, agents, memory backends, and future plugins should integrate through them.
+<p className="craik-meta"><span>6 min read</span><span>For integrators</span><span>Updated 2026-05-19</span></p>
 
-Contract examples below use JSON-like shapes for clarity. The final implementation should define them as typed schemas with validation.
+<div className="craik-lead">
 
-The initial typed implementation lives in `src/craik/contracts/` and is documented in [Schema Reference](reference/schemas.md).
+**What you'll find here**
+
+The JSON-shaped catalog of every persisted Craik contract — task
+request, project profile, policy envelope, capability grant and
+receipt, case file, intent lock, agent role, worker result, handoff,
+memory proposal, memory-backend capabilities, contradiction report,
+work-graph event. Use this when you need to know the wire shape an
+adapter or plugin must produce.
+
+</div>
+
+<div className="craik-keypoint">
+
+**The product spine.**
+
+Craik is built around stable, versioned contracts. Adapters, agents,
+memory backends, and future plugins integrate through them. The
+typed Python implementation lives in <code>src/craik/contracts/</code>
+and is documented in <a href="reference/schemas.md">Schema reference</a>.
+
+Contract examples below use JSON-like shapes for clarity. The shipped
+implementation defines them as strict Pydantic models with validation.
+
+</div>
 
 ## Versioning
 
@@ -359,3 +382,27 @@ Events update the graph.
   "created_at": "..."
 }
 ```
+
+## What's next
+
+<div className="craik-next">
+
+<a href="reference/schemas.md">
+<strong>Reference</strong>
+<span>Schema reference</span>
+<small>Strict Pydantic models, JSON Schema export, and the <code>craik schema</code> CLI.</small>
+</a>
+
+<a href="features.md">
+<strong>Read</strong>
+<span>Features</span>
+<small>How the contracts compose into the implementable feature surface.</small>
+</a>
+
+<a href="architecture.md">
+<strong>Read</strong>
+<span>Architecture</span>
+<small>The seven runtime layers these contracts hold together.</small>
+</a>
+
+</div>

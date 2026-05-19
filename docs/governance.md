@@ -1,295 +1,467 @@
 # Governance Model
 
-Craik should be governance-native. Policy is not an enterprise add-on; it is part of the runtime contract.
+<p className="craik-meta"><span>7 min read</span><span>For policy operators</span><span>Updated 2026-05-19</span></p>
 
-## Policy Envelope
+<div className="craik-lead">
 
-Every task runs inside a policy envelope.
+**What you'll learn**
 
-The envelope defines:
+- The runtime contracts that make governance native — not an enterprise
+  add-on.
+- The default security posture and the three named policy profiles.
+- How capability grants, receipts, redaction, immutable paths, memory
+  policy, and contradictions all compose.
+- How Craik degrades transparently when Stigmem isn't available.
 
-- actor identity,
-- task scope,
-- repository scope,
-- memory scope,
-- allowed capabilities,
-- write boundaries,
-- required approvals,
-- required verification,
-- documentation obligations,
-- and handoff obligations.
+</div>
 
-## Default Security Posture
+<div className="craik-keypoint">
 
-Craik should be secure by default and explicitly fail-open by policy.
+**Governance-native runtime.**
 
-Default behavior:
+Policy is not an enterprise add-on; it is part of the runtime contract.
+Every governed action — file write, shell command, GitHub write, memory
+write, sandbox decision — runs inside a typed envelope and emits a
+receipt.
 
-- task execution starts read-only,
-- file writes require capability grants,
-- shell commands require capability grants,
-- GitHub writes require capability grants,
-- memory writes default to proposals,
-- immutable paths are denied by default,
-- runner adapters cannot bypass Craik grants,
-- plugins start probationary,
-- and important actions create receipts.
+</div>
 
-Fail-open behavior is allowed only through named policy profiles. It should never happen as an accidental fallback.
+## Policy envelope
 
-Every fail-open decision must be visible in:
+Every task runs inside a policy envelope. The envelope is a typed
+runtime record that travels with the task and defines authority.
 
-- the policy envelope,
-- the case file,
-- capability receipts,
-- and the final handoff.
+<div className="craik-fields">
 
-The v0.1.0 policy profile implementation generates the policy envelope directly
-and provides a mandatory fail-open receipt shape for trusted-local opt-ins. Case
-files and handoffs preserve those fields when assembled and written.
+<div>
+<dt>Field</dt>
+<dt><span className="craik-fields__type">Type</span></dt>
+<dd>Purpose</dd>
+</div>
 
-## Policy Profiles
+<div>
+<dt>actor</dt>
+<dt><span className="craik-fields__type">operator_uri</span></dt>
+<dd>OIDC operator identity driving the task.</dd>
+</div>
 
-Craik should ship with conservative named policy profiles.
+<div>
+<dt>task_scope</dt>
+<dt><span className="craik-fields__type">scope</span></dt>
+<dd>Which tasks this envelope authorizes.</dd>
+</div>
+
+<div>
+<dt>repository_scope</dt>
+<dt><span className="craik-fields__type">scope</span></dt>
+<dd>Which repositories the actions may touch.</dd>
+</div>
+
+<div>
+<dt>memory_scope</dt>
+<dt><span className="craik-fields__type">scope</span></dt>
+<dd>Which memory scopes the run can read or propose into.</dd>
+</div>
+
+<div>
+<dt>allowed_capabilities</dt>
+<dt><span className="craik-fields__type">capability[]</span></dt>
+<dd>The explicit allowed actions for this envelope.</dd>
+</div>
+
+<div>
+<dt>write_boundaries</dt>
+<dt><span className="craik-fields__type">paths</span></dt>
+<dd>Where writes may land — immutable paths excluded.</dd>
+</div>
+
+<div>
+<dt>required_approvals</dt>
+<dt><span className="craik-fields__type">capability[]</span></dt>
+<dd>Actions that require explicit approval before execution.</dd>
+</div>
+
+<div>
+<dt>required_verification</dt>
+<dt><span className="craik-fields__type">command[]</span></dt>
+<dd>Validation steps that must run before completion.</dd>
+</div>
+
+<div>
+<dt>documentation_obligations</dt>
+<dt><span className="craik-fields__type">obligation[]</span></dt>
+<dd>Doc updates the run must produce or propose.</dd>
+</div>
+
+<div>
+<dt>handoff_obligations</dt>
+<dt><span className="craik-fields__type">obligation[]</span></dt>
+<dd>Required handoff fields and self-audit items.</dd>
+</div>
+
+</div>
+
+## Default security posture
+
+<div className="craik-keypoint">
+
+**Secure by default. Fail-open by named policy only.**
+
+Fail-open behavior is allowed only through named policy profiles. It
+should never happen as an accidental fallback. Every fail-open
+decision is visible in the envelope, the case file, the receipts, and
+the handoff.
+
+</div>
+
+**Default behavior:** task execution starts read-only · file writes
+require grants · shell commands require grants · GitHub writes require
+grants · memory writes default to proposals · immutable paths denied
+by default · runner adapters cannot bypass Craik grants · plugins
+start probationary · important actions create receipts.
+
+The v0.1 policy profile implementation generates the envelope directly
+and provides a mandatory fail-open receipt shape for trusted-local
+opt-ins. Case files and handoffs preserve those fields when assembled
+and written.
+
+## Policy profiles
+
+Craik ships three conservative named profiles. Switching between them
+is a policy decision — never an agent decision.
 
 ### Strict
 
-Default profile for normal tasks.
+The default profile for normal tasks.
 
-```yaml
+```yaml title="strict.yaml"
 policy:
   mode: strict
   fail_open: false
 ```
 
-Expected behavior:
+**Expected behavior:** read-only by default · explicit grants for all
+writes · memory writes become proposals unless direct write is granted
+· shell commands require grant · GitHub writes require grant ·
+immutable path writes denied.
 
-- read-only by default,
-- explicit grants for all writes,
-- memory writes become proposals unless direct write is granted,
-- shell commands require grant,
-- GitHub writes require grant,
-- immutable path writes denied.
+### Trusted-local
 
-### Trusted Local
+Opt-in profile for tightly-scoped local development.
 
-Opt-in profile for trusted local development.
-
-```yaml
+```yaml title="trusted-local.yaml"
 policy:
   mode: trusted-local
   fail_open: true
   require_receipts: true
 ```
 
-Expected behavior:
-
-- broader local file and shell access may be allowed,
-- receipts remain mandatory,
-- secrets are still redacted,
-- immutable path writes still require explicit override,
-- and direct memory writes still require a memory write grant.
+**Expected behavior:** broader local file and shell access may be
+allowed · receipts remain mandatory · secrets still redacted ·
+immutable path writes still require explicit override · direct memory
+writes still require a `memory.write` grant.
 
 ### Automation
 
 Profile for CI and unattended workflows.
 
-```yaml
+```yaml title="automation.yaml"
 policy:
   mode: automation
   fail_open: false
 ```
 
-Expected behavior:
+**Expected behavior:** deterministic grants · no interactive approval
+requirement · no broad shell access unless granted · no direct memory
+writes unless granted · failures stop execution instead of widening
+permissions.
 
-- deterministic grants,
-- no interactive approval requirement,
-- no broad shell access unless granted,
-- no direct memory writes unless granted,
-- and failures should stop execution instead of widening permissions.
+## Capability grants
 
-## Capability Grants
+Agents do not receive ambient authority. A capability grant is a
+typed, narrow, time-bound permission.
 
-Agents should not receive ambient authority.
+<div className="craik-fields">
 
-A capability grant should include:
+<div>
+<dt>Field</dt>
+<dt><span className="craik-fields__type">Type</span></dt>
+<dd>Purpose</dd>
+</div>
 
-- capability name,
-- target scope,
-- allowed operations,
-- reason,
-- expiration,
-- approval requirement,
-- and receipt requirement.
+<div>
+<dt>capability</dt>
+<dt><span className="craik-fields__type">capability_name</span></dt>
+<dd>The specific authority being granted (e.g. <code>repo.write.docs</code>).</dd>
+</div>
 
-Examples:
+<div>
+<dt>target_scope</dt>
+<dt><span className="craik-fields__type">scope</span></dt>
+<dd>What this grant applies to — path globs, remote URIs, memory scope.</dd>
+</div>
 
-- read repository files,
-- write docs only,
-- run tests,
-- inspect GitHub PRs,
-- create GitHub comments,
-- write Stigmem facts in a specific scope.
+<div>
+<dt>allowed_operations</dt>
+<dt><span className="craik-fields__type">operation[]</span></dt>
+<dd><code>read</code> · <code>write</code> · <code>execute</code> · <code>propose</code>.</dd>
+</div>
 
-## Secret Handling And Redaction
+<div>
+<dt>reason</dt>
+<dt><span className="craik-fields__type">text</span></dt>
+<dd>Short, human-readable justification.</dd>
+</div>
 
-Craik should treat secrets as toxic runtime data.
+<div>
+<dt>expiration</dt>
+<dt><span className="craik-fields__type">timestamp</span></dt>
+<dd>When the grant stops being valid.</dd>
+</div>
 
-Secret storage:
+<div>
+<dt>approval_requirement</dt>
+<dt><span className="craik-fields__type">approver_uri</span></dt>
+<dd>Who approved the grant.</dd>
+</div>
 
-- store local secrets under `~/.craik/secrets/` by default,
-- support environment variables for CI and agent-runner workflows,
-- use owner-only file permissions where supported,
-- and avoid writing secrets to project-local state.
+<div>
+<dt>receipt_requirement</dt>
+<dt><span className="craik-fields__type">bool</span></dt>
+<dd>Whether actions under this grant must produce receipts.</dd>
+</div>
 
-Redaction requirements:
+</div>
 
-- centralize redaction in a shared runtime utility,
-- redact known tokens, API keys, bearer headers, auth URLs, and configured secret patterns,
-- apply redaction before writing logs, receipts, handoffs, case files, memory proposals, errors, and work graph events,
-- preserve enough shape to debug without exposing raw secret values,
-- and treat redaction failures as security bugs.
+**Grant examples:** read repository files · write docs only · run
+tests · inspect GitHub PRs · create GitHub comments · write Stigmem
+facts in a specific scope.
 
-The v0.1.0 utility is `craik.runtime.policy.redaction`; local persistence rejects
-payloads that still appear to contain unredacted secret material.
+## Secret handling and redaction
 
-Secrets must not be written to Stigmem facts.
+<div className="craik-keypoint">
 
-## Capability-Gated Actions
+**Secrets are toxic runtime data.**
+
+They are referenced, not copied. The redaction guard runs before every
+persistence boundary — and redaction failures are treated as security
+bugs.
+
+</div>
+
+**Secret storage:** local secrets under `~/.craik/secrets/` by default
+· environment variables for CI and agent-runner workflows · owner-only
+file permissions where supported · no secrets in project-local state.
+
+**Redaction requirements:** centralized in
+`craik.runtime.policy.redaction` · scrubs known tokens, API keys,
+bearer headers, auth URLs, and configured patterns · applied before
+writing logs, receipts, handoffs, case files, memory proposals,
+errors, and work-graph events · preserves enough shape to debug
+without exposing raw values · local persistence rejects payloads that
+still appear to contain unredacted secret material.
+
+**Secrets must not be written to Stigmem facts.**
+
+## Capability-gated actions
 
 The following actions require explicit grants:
 
-- file writes,
-- file deletion,
-- shell command execution,
-- Git branch mutation,
-- Git commit creation,
-- Git push,
-- GitHub issue/PR/comment creation or mutation,
-- Stigmem direct fact writes,
-- contradiction resolution that invalidates facts,
-- plugin execution with side effects,
-- and runner actions that invoke tools outside read-only context.
+<div className="craik-grid">
 
-Read-only actions may still require grants when they can expose sensitive data.
+<div><h4>File writes</h4></div>
+<div><h4>File deletion</h4></div>
+<div><h4>Shell execution</h4></div>
+<div><h4>Git branch mutation</h4></div>
+<div><h4>Git commit</h4></div>
+<div><h4>Git push</h4></div>
+<div><h4>GitHub issue / PR / comment</h4></div>
+<div><h4>Stigmem direct fact writes</h4></div>
+<div><h4>Contradiction resolution that invalidates facts</h4></div>
+<div><h4>Plugin execution with side effects</h4></div>
+<div><h4>Runner actions that invoke non-read-only tools</h4></div>
 
-## Immutable Path Protection
+</div>
 
-Project profiles may define immutable paths.
+Read-only actions may still require grants when they could expose
+sensitive data.
 
-Examples:
+## Immutable path protection
 
-- ADR directories,
-- signed release artifacts,
-- generated audit records,
-- historical migration records.
+Project profiles can declare immutable paths — ADR directories, signed
+release artifacts, generated audit records, historical migration
+records. **Immutable paths are denied by default.**
 
-Immutable paths are denied by default. A write to an immutable path requires:
+A write to an immutable path requires **all** of:
 
-- explicit immutable-path override,
-- user or maintainer approval,
-- receipt,
-- and handoff note explaining why the override was used.
+<ol className="craik-steps">
+<li>Explicit immutable-path override metadata.</li>
+<li>User or maintainer approval (recorded in the override).</li>
+<li>A capability receipt sealed at the action site.</li>
+<li>A handoff note explaining why the override was used.</li>
+</ol>
 
-In v0.1.0 grant checks, override metadata must include who approved the override and why. The override is still denied unless a matching immutable write grant is present.
+In v0.1 grant checks, override metadata must include who approved the
+override and why. **The override is still denied unless a matching
+`repo.write.immutable` grant is present.**
 
-## Capability Receipts
+## Capability receipts
 
-Important actions produce receipts.
+Important actions produce receipts. Receipts are not log lines —
+they're concise accountability records for actions that matter.
 
-Receipt fields:
+**Receipt fields:** receipt id · actor · task id · capability · target
+· reason · input summary · result summary · timestamp · policy
+envelope id · links to artifacts.
 
-- receipt id,
-- actor,
-- task id,
-- capability,
-- target,
-- reason,
-- input summary,
-- result summary,
-- timestamp,
-- policy envelope id,
-- and links to artifacts.
+Receipts must record when a task runs under a fail-open policy profile
+or when a capability grant widens access beyond strict defaults.
 
-Receipts are not meant to replace logs. They are concise accountability records for actions that matter.
+The v0.1 receipt store persists validated `craik.capability_receipt`
+records and exposes local lookup through `craik receipts list` and
+`craik receipts show`. Receipts link directly to tasks and can link to
+policy envelopes and handoffs through redacted result metadata.
 
-Receipts must record when a task runs under a fail-open policy profile or when a capability grant widens access beyond strict defaults.
+## Memory write policy
 
-The v0.1.0 receipt store persists validated `craik.capability_receipt` records and exposes local lookup through `craik receipts list` and `craik receipts show`. Receipts link directly to tasks and can link to policy envelopes and handoffs through redacted result metadata.
+Memory writes are classified by source so policy can decide what may
+act directly versus what must propose.
 
-## Memory Write Policy
+<div className="craik-fields">
 
-Memory writes should be governed by confidence and source.
+<div>
+<dt>Class</dt>
+<dt><span className="craik-fields__type">Source</span></dt>
+<dd>Typical handling</dd>
+</div>
 
-Initial write classes:
+<div>
+<dt><strong>observed</strong></dt>
+<dt><span className="craik-fields__type">direct</span></dt>
+<dd>Seen in repo, tool output, API response, or artifact. May be acted on directly under policy.</dd>
+</div>
 
-- **observed:** directly seen in repo, tool output, API response, or artifact,
-- **reported:** stated by a user or agent,
-- **inferred:** reasoned from evidence,
-- **policy:** sourced from ADRs, repo rules, or governance docs,
-- **external:** sourced from web or package registries,
-- **stale-risk:** likely to change and should be refreshed before use.
+<div>
+<dt><strong>reported</strong></dt>
+<dt><span className="craik-fields__type">testimonial</span></dt>
+<dd>Stated by a user or agent. Treat as a lead until confirmed.</dd>
+</div>
 
-Agents may be allowed to act directly on observed and policy facts while treating inferred and reported facts as leads unless confirmed.
+<div>
+<dt><strong>inferred</strong></dt>
+<dt><span className="craik-fields__type">derived</span></dt>
+<dd>Reasoned from evidence. Confirmation required before durable action.</dd>
+</div>
 
-## Human Overrides
+<div>
+<dt><strong>policy</strong></dt>
+<dt><span className="craik-fields__type">governance</span></dt>
+<dd>Sourced from ADRs, repo rules, or governance docs. Durable; act on.</dd>
+</div>
 
-Human overrides should create durable records.
+<div>
+<dt><strong>external</strong></dt>
+<dt><span className="craik-fields__type">third-party</span></dt>
+<dd>Web or package-registry sources. Time-sensitive.</dd>
+</div>
 
-An override should capture:
+<div>
+<dt><strong>stale-risk</strong></dt>
+<dt><span className="craik-fields__type">aging</span></dt>
+<dd>Likely to change. Refresh via freshness probe before use.</dd>
+</div>
 
-- what was overridden,
-- who overrode it,
-- why,
-- what evidence or policy applies,
-- and what downstream facts or tasks are affected.
+</div>
+
+## Human overrides
+
+Human overrides create durable records. An override captures **what
+was overridden · who overrode it · why · what evidence or policy
+applies · what downstream facts or tasks are affected.**
 
 ## Contradictions
 
-Contradictions should not be silently resolved by last write wins.
+Contradictions are not silently resolved by last-write-wins. Craik
+surfaces **conflicting assertions · source and confidence for each ·
+affected tasks · affected docs · proposed resolution · required
+reviewer or owner.**
 
-Craik should surface:
+## Degraded mode
 
-- conflicting assertions,
-- source and confidence for each,
-- affected tasks,
-- affected docs,
-- proposed resolution,
-- and required reviewer or owner.
+Craik may run without Stigmem, but governance features should degrade
+transparently — and the product is explicit about unavailable
+capabilities.
 
-## Degraded Mode
+<div className="craik-decision">
 
-Craik may run without Stigmem, but governance features should degrade transparently.
+<div>
+<h4>With Stigmem</h4>
+<ul>
+<li>Durable facts with provenance.</li>
+<li>Cross-scope contradiction tracking.</li>
+<li>Federation between Stigmem nodes.</li>
+<li>Trust tiers enforced.</li>
+</ul>
+</div>
 
-Without Stigmem:
+<div>
+<h4>Without Stigmem</h4>
+<ul>
+<li>Facts are local or ephemeral.</li>
+<li>Contradiction tracking is local only.</li>
+<li>Provenance may be limited.</li>
+<li>Federation is unavailable.</li>
+<li>Trust tiers may be advisory.</li>
+</ul>
+</div>
 
-- facts may be local or ephemeral,
-- contradiction tracking may be local only,
-- provenance may be limited,
-- federation is unavailable,
-- and trust tiers may be advisory.
+</div>
 
-The product should be explicit about unavailable capabilities.
+## Local state governance
 
-## Local State Governance
+Craik uses `~/.craik` as the default local home, with `CRAIK_HOME` as
+the primary override. Local state keeps data classes separated.
 
-Craik uses `~/.craik` as the default local home, with `CRAIK_HOME` as the primary override.
+<div className="craik-grid">
 
-Local state should keep data classes separated:
+<div><h4><code>config/</code></h4><p>User-editable configuration.</p></div>
+<div><h4><code>secrets/</code></h4><p>Local credentials and tokens (owner-only).</p></div>
+<div><h4><code>state/</code></h4><p>SQLite databases and durable runtime state.</p></div>
+<div><h4><code>cache/</code></h4><p>Disposable data.</p></div>
+<div><h4><code>logs/</code></h4><p>Runtime logs.</p></div>
+<div><h4><code>receipts/</code></h4><p>Capability receipts.</p></div>
+<div><h4><code>handoffs/</code></h4><p>Durable handoff artifacts.</p></div>
+<div><h4><code>case-files/</code></h4><p>Assembled task context.</p></div>
+<div><h4><code>projects/</code></h4><p>Project registry metadata.</p></div>
 
-- `config/` for user-editable configuration,
-- `secrets/` for local credentials and tokens,
-- `state/` for SQLite databases and durable runtime state,
-- `cache/` for disposable data,
-- `logs/` for runtime logs,
-- `receipts/` for capability receipts,
-- `handoffs/` for durable handoff artifacts,
-- `case-files/` for assembled task context,
-- `projects/` for project registry metadata.
+</div>
 
-Security expectations:
+**Security expectations:** home and secrets paths should be owner-only
+where supported · secret values must not appear in receipts, logs,
+handoffs, or case files · path commands make active local paths
+inspectable · project-local `.craik/` directories are explicit opt-in
+only.
 
-- home and secrets paths should be owner-only where supported,
-- secret values should not appear in receipts, logs, handoffs, or case files,
-- path commands should make active local paths inspectable,
-- and project-local `.craik/` directories should be explicit opt-in only.
+## What's next
+
+<div className="craik-next">
+
+<a href="concepts/governance.md">
+<strong>Read</strong>
+<span>Governance concept</span>
+<small>The same model from the runtime side — how the pieces fit together.</small>
+</a>
+
+<a href="reference/policy-profiles.md">
+<strong>Reference</strong>
+<span>Policy profiles</span>
+<small>The full ruleset for every profile Craik ships.</small>
+</a>
+
+<a href="reference/policy-tests.md">
+<strong>Reference</strong>
+<span>Policy tests</span>
+<small>The CI gate that verifies this contract on every PR.</small>
+</a>
+
+</div>
