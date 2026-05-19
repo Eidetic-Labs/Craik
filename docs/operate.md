@@ -220,29 +220,314 @@ policy outcomes — <code>redact</code>, <code>strip</code>,
 
 </ol>
 
-### 3 · Operator views
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">03</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Operator views</p>
+<h3 className="craik-section-banner__title">
+Seventeen <em>read-only inspection surfaces.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Every typed runtime record has a matching named view. Work graph,
+handoffs, receipts, contradictions, evidence, delegation queues,
+budget, quality, run deltas, memory previews, traps, preferences, and
+instruction provenance — each surfaces what an operator needs without
+mutating state.
+</p>
+<p className="craik-section-banner__lede">
+<strong>Current scope:</strong> Craik ships the typed view contracts
+and formatter helpers today. A complete TUI or dashboard is
+<a href="../reference/post-mvp-scope/">post-MVP scope</a>.
+</p>
+</div>
+</header>
 
-What an operator sees during and after a governed run. The work graph,
-handoffs, receipts, contradictions, and the various inspection surfaces are all
-addressable as named views.
+<div className="craik-product-spread">
 
-- [Operator surface](reference/operator-surface.md)
-- [Work graph explorer](reference/work-graph-explorer.md)
-- [Handoff viewer](reference/handoff-viewer.md)
-- [Receipt viewer](reference/receipt-viewer.md)
-- [Contradiction inbox view](reference/contradiction-inbox-view.md)
-- [Evidence & assumption view](reference/evidence-assumption-view.md)
-- [Delegation queue view](reference/delegation-queue-view.md)
-- [Budget & quota view](reference/budget-quota-view.md)
-- [Quality gate view](reference/quality-gate-view.md)
-- [Run delta view](reference/run-delta-view.md)
-- [Memory impact preview view](reference/memory-impact-preview-view.md)
-- [Memory review nudges](reference/memory-review-nudges.md)
-- [Known traps view](reference/known-traps-view.md)
-- [Preference facts](reference/preference-facts.md)
-- [Instruction distillation view](reference/instruction-distillation-view.md)
-- [Instruction distillation workflow](reference/instruction-distillation-workflow.md)
-- [Instruction sources](reference/instruction-sources.md)
+<a className="craik-product-feature" href="reference/operator-surface.md">
+<div>
+<p className="craik-product-feature__num">Catalog · 01</p>
+<h4 className="craik-product-feature__title">Operator surface</h4>
+<p className="craik-product-feature__summary">
+The umbrella catalog. Names every operator view, the records it reads,
+and the formatter helpers Craik ships for rendering them. The contracts
+are stable enough today that any TUI or dashboard can be built on top
+without renegotiating with core.
+</p>
+<ul className="craik-product-feature__topics">
+<li>view contracts</li>
+<li>formatter helpers</li>
+<li>read-only</li>
+<li>dashboard substrate</li>
+</ul>
+<span className="craik-product-feature__cta">Read the catalog</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Today</p>
+<p className="craik-product-feature__quote-text">
+Craik has read-only operator view contracts and formatter helpers. A
+complete TUI or dashboard is post-MVP scope.
+</p>
+<p className="craik-product-feature__quote-attribution">— Operator surface · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/work-graph-explorer.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · graph</span>
+</div>
+<h4 className="craik-adr-card__title">Work graph explorer</h4>
+<p className="craik-adr-card__decision">
+Reads <code>craik.work_graph_export</code> and
+<code>craik.work_graph_event</code> records. Renders the connected
+state of tasks, case files, handoffs, receipts, memory proposals,
+evidence, assumptions, and contradictions.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/handoff-viewer.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · handoff</span>
+</div>
+<h4 className="craik-adr-card__title">Handoff viewer</h4>
+<p className="craik-adr-card__decision">
+Renders one <code>craik.handoff</code> record with its receipts, memory
+proposals, assumptions, context debt, and self-audit. The default
+surface for picking up a paused or completed run.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/receipt-viewer.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · receipt</span>
+</div>
+<h4 className="craik-adr-card__title">Receipt viewer</h4>
+<p className="craik-adr-card__decision">
+Renders one <code>craik.capability_receipt</code> with operator,
+credential, capability, target, reason, result, and the policy
+envelope that gated it. Joins back to the task and handoff.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/contradiction-inbox-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · contradiction</span>
+</div>
+<h4 className="craik-adr-card__title">Contradiction inbox view</h4>
+<p className="craik-adr-card__decision">
+Read-only view over <code>craik.contradiction_report</code> records.
+Surfaces open contradictions with their evidence, owner, proposed
+resolution, status, and optional Stigmem conflict id.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/evidence-assumption-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · evidence</span>
+</div>
+<h4 className="craik-adr-card__title">Evidence &amp; assumption view</h4>
+<p className="craik-adr-card__decision">
+Renders <code>craik.evidence_reference</code> and
+<code>craik.assumption</code> records side by side so a reviewer can
+tell what was cited from what was guessed.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/delegation-queue-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · delegation</span>
+</div>
+<h4 className="craik-adr-card__title">Delegation queue view</h4>
+<p className="craik-adr-card__decision">
+Read-only view over <code>craik.human_delegation_point</code> records
+— the things a run paused on, waiting for a human decision.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/budget-quota-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">08</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · budget</span>
+</div>
+<h4 className="craik-adr-card__title">Budget &amp; quota view</h4>
+<p className="craik-adr-card__decision">
+Configured limits, observed usage, missing data, exceeded limits, and
+operator notes for tokens, time, and credentials.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/quality-gate-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">09</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · quality</span>
+</div>
+<h4 className="craik-adr-card__title">Quality gate view</h4>
+<p className="craik-adr-card__decision">
+Handoff quality scores, evidence coverage, runtime critic findings,
+and red-team outcomes — every quality signal in one operator panel.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/run-delta-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">10</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · delta</span>
+</div>
+<h4 className="craik-adr-card__title">Run delta view</h4>
+<p className="craik-adr-card__decision">
+Continuity-relevant changes since the previous usable handoff or
+resume point. The "what's new since I was last here?" surface.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/memory-impact-preview-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">11</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · memory</span>
+</div>
+<h4 className="craik-adr-card__title">Memory impact preview view</h4>
+<p className="craik-adr-card__decision">
+Read-only preview of proposed memory writes <em>before</em> promotion
+or direct write attempts. Surfaces facts that would be added or
+invalidated and likely contradictions.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/memory-review-nudges.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">12</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · memory</span>
+</div>
+<h4 className="craik-adr-card__title">Memory review nudges</h4>
+<p className="craik-adr-card__decision">
+Identifies facts that should be reviewed without directly rewriting
+memory. Nudges are signals for the reviewer, never autonomous edits.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/known-traps-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">13</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · traps</span>
+</div>
+<h4 className="craik-adr-card__title">Known traps view</h4>
+<p className="craik-adr-card__decision">
+Surfaces known traps and negative knowledge — what <em>not</em> to do
+on this project, with reasons. The institutional memory of failed
+approaches.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/preference-facts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">14</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · preferences</span>
+</div>
+<h4 className="craik-adr-card__title">Preference facts</h4>
+<p className="craik-adr-card__decision">
+Models user and team preferences as reviewable records. Preferences
+are facts with explicit scope, not implicit settings buried in config.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/instruction-distillation-view.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">15</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">View · instructions</span>
+</div>
+<h4 className="craik-adr-card__title">Instruction distillation view</h4>
+<p className="craik-adr-card__decision">
+Renders declared instruction sources, observed source snapshots,
+provenance, and distilled proposals so a reviewer can see where each
+runtime constraint actually came from.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/instruction-distillation-workflow.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">16</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Workflow · instructions</span>
+</div>
+<h4 className="craik-adr-card__title">Instruction distillation workflow</h4>
+<p className="craik-adr-card__decision">
+Turns declared instruction files into reviewed, provenance-linked
+runtime constraints. Raw instruction files are evidence — never
+authority — until distilled through review.
+</p>
+<span className="craik-adr-card__cta">Workflow</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/instruction-sources.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">17</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Registry · instructions</span>
+</div>
+<h4 className="craik-adr-card__title">Instruction sources</h4>
+<p className="craik-adr-card__decision">
+Registries declaring which project files Craik may use for runtime
+instruction distillation. Craik does not treat every Markdown file as
+an instruction by default.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 4 · Agents, context & learning loops
 
