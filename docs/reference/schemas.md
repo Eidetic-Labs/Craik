@@ -1,6 +1,26 @@
-# Schema Reference
+# Schema reference
 
-Craik runtime contracts are strict Pydantic models. Persisted contracts include:
+<p className="craik-meta"><span>5 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll find here**
+
+Craik runtime contracts as strict Pydantic models, how to inspect
+them, the full v0.1.0 contract catalog, the fixture path used by
+tests, and the versioning/migration rules.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Every persisted contract is versioned.**
+
+Every persisted record includes a `schema` and `version` field.
+Unknown fields are rejected so adapters, memory backends, and future
+plugins don't silently depend on accidental payload shape.
+
+</div>
 
 ```json
 {
@@ -9,23 +29,14 @@ Craik runtime contracts are strict Pydantic models. Persisted contracts include:
 }
 ```
 
-The `schema` value identifies the contract type. The `version` value identifies the contract version. Unknown fields are rejected so adapters, memory backends, and future plugins do not silently depend on accidental payload shape.
-
-## Inspecting Schemas
-
-List registered schemas:
+## Inspecting schemas
 
 ```sh
 craik schema list
-```
-
-Print JSON Schema for one contract:
-
-```sh
 craik schema show craik.task_request
 ```
 
-## v0.1.0 Contracts
+## v0.1.0 contracts
 
 | Schema | Purpose |
 | --- | --- |
@@ -112,17 +123,77 @@ Fixture examples for every v0.1.0 contract live in:
 tests/fixtures/contracts/v0_1/contracts.json
 ```
 
-Those fixtures are loaded by tests, validated against the registered Pydantic models, and round-tripped through JSON.
+Fixtures are loaded by tests, validated against the registered
+Pydantic models, and round-tripped through JSON.
 
-## Versioning And Migration
+## Versioning and migration
 
-The first contract version is `0.1.0`.
+<div className="craik-fields">
 
-Rules:
+<div>
+<dt>Rule</dt>
+<dt><span className="craik-fields__type">Applies to</span></dt>
+<dd>Required action</dd>
+</div>
 
-- Compatible field additions require tests, docs, and fixture updates.
-- Breaking changes require a new schema version and migration notes.
-- Runtime code should reject unknown fields by default.
-- Durable memory writes should preserve source, confidence, scope, and trust metadata.
-- Policy and receipt contracts should preserve profile, fail-open, redaction, and approval metadata.
-- Adapter-produced receipts and handoffs should preserve stable runner metadata while keeping provider-specific details nested and redacted.
+<div>
+<dt>Compatible field additions</dt>
+<dt><span className="craik-fields__type">minor</span></dt>
+<dd>Require tests, docs, and fixture updates.</dd>
+</div>
+
+<div>
+<dt>Breaking changes</dt>
+<dt><span className="craik-fields__type">major</span></dt>
+<dd>New schema version + migration notes.</dd>
+</div>
+
+<div>
+<dt>Unknown fields</dt>
+<dt><span className="craik-fields__type">runtime</span></dt>
+<dd>Rejected by default.</dd>
+</div>
+
+<div>
+<dt>Memory writes</dt>
+<dt><span className="craik-fields__type">durable</span></dt>
+<dd>Preserve source, confidence, scope, and trust metadata.</dd>
+</div>
+
+<div>
+<dt>Policy / receipt contracts</dt>
+<dt><span className="craik-fields__type">governance</span></dt>
+<dd>Preserve profile, fail-open, redaction, and approval metadata.</dd>
+</div>
+
+<div>
+<dt>Adapter receipts / handoffs</dt>
+<dt><span className="craik-fields__type">runner output</span></dt>
+<dd>Preserve stable runner metadata; keep provider-specific details nested and redacted.</dd>
+</div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../runtime-contracts/">
+<strong>Read</strong>
+<span>Runtime contracts</span>
+<small>The wire-shape walkthrough behind these schemas.</small>
+</a>
+
+<a href="../adr/receipts-and-handoffs-as-public-contracts/">
+<strong>ADR</strong>
+<span>0005 · Receipts &amp; handoffs as public contracts</span>
+<small>Why these contracts are versioned and safe to cite.</small>
+</a>
+
+<a href="cli/">
+<strong>Reference</strong>
+<span>CLI</span>
+<small>Inspect schemas via the <code>craik schema</code> command.</small>
+</a>
+
+</div>

@@ -1,36 +1,88 @@
-# Policy Profiles
+# Policy profiles
 
-Design rationale: [ADR 0004 Policy Envelope Shape](../adr/0004-policy-envelope-shape.md).
+<p className="craik-meta"><span>3 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-Craik ships with conservative v0.1.0 policy profiles.
+<div className="craik-lead">
 
-Every generated policy envelope includes:
+**What you'll find here**
 
-- profile name,
-- fail-open status,
-- allowed capabilities,
-- denied capabilities,
-- approval requirements,
-- verification requirements,
-- receipt requirement,
-- handoff requirement,
-- and redaction requirement.
+The three shipped v0.1.0 policy profiles — strict, trusted-local,
+automation — what each allows by default, how to preview them, and
+how to run the regression gate.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Design rationale: [ADR 0004 · Policy envelope shape](../adr/0004-policy-envelope-shape.md).**
+
+</div>
+
+## Every envelope includes
+
+<div className="craik-grid">
+
+<div><h4>Profile name</h4></div>
+<div><h4>Fail-open status</h4></div>
+<div><h4>Allowed capabilities</h4></div>
+<div><h4>Denied capabilities</h4></div>
+<div><h4>Approval requirements</h4></div>
+<div><h4>Verification requirements</h4></div>
+<div><h4>Receipt requirement</h4></div>
+<div><h4>Handoff requirement</h4></div>
+<div><h4>Redaction requirement</h4></div>
+
+</div>
 
 ## Strict
 
 `strict` is the default profile.
 
-Default behavior:
+<div className="craik-fields">
 
-- fail-open is disabled,
-- read-only repository and memory access are allowed,
-- receipts are required,
-- redaction is required,
-- writes require explicit grants,
-- shell commands require explicit grants,
-- GitHub writes require explicit grants,
-- direct memory writes require explicit grants,
-- immutable path writes are denied.
+<div>
+<dt>Property</dt>
+<dt><span className="craik-fields__type">Default</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt>Fail-open</dt>
+<dt><span className="craik-fields__type">disabled</span></dt>
+<dd></dd>
+</div>
+
+<div>
+<dt>Repository &amp; memory read</dt>
+<dt><span className="craik-fields__type">allowed</span></dt>
+<dd>Read-only.</dd>
+</div>
+
+<div>
+<dt>Receipts</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd></dd>
+</div>
+
+<div>
+<dt>Redaction</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd></dd>
+</div>
+
+<div>
+<dt>Writes · shell · GitHub writes · direct memory writes</dt>
+<dt><span className="craik-fields__type">grant required</span></dt>
+<dd>Explicit grants only.</dd>
+</div>
+
+<div>
+<dt>Immutable path writes</dt>
+<dt><span className="craik-fields__type">denied</span></dt>
+<dd></dd>
+</div>
+
+</div>
 
 Preview:
 
@@ -38,40 +90,108 @@ Preview:
 craik policy show
 ```
 
-## Trusted Local
+## Trusted-local
 
-`trusted-local` is an explicit fail-open profile for trusted local development.
+<div className="craik-keypoint">
 
-It is never selected accidentally. Callers must explicitly opt in:
+**Never selected accidentally.**
+
+`trusted-local` is an explicit fail-open profile for trusted local
+development. Callers must opt in.
+
+</div>
 
 ```sh
 craik policy show --profile trusted-local --trusted-local-fail-open
 ```
 
-Expected behavior:
+<div className="craik-fields">
 
-- fail-open is enabled,
-- broader local file and shell capabilities may be allowed,
-- receipts remain required,
-- redaction remains required,
-- immutable path writes remain denied unless separately approved,
-- direct memory writes still require approval.
+<div>
+<dt>Property</dt>
+<dt><span className="craik-fields__type">Default</span></dt>
+<dd>Notes</dd>
+</div>
 
-Every trusted-local fail-open decision must create a receipt.
+<div>
+<dt>Fail-open</dt>
+<dt><span className="craik-fields__type">enabled</span></dt>
+<dd>Every fail-open decision creates a receipt.</dd>
+</div>
 
-Trusted-local does not bypass immutable path protection. Immutable writes still require explicit override metadata and a matching immutable write grant.
+<div>
+<dt>Local file &amp; shell</dt>
+<dt><span className="craik-fields__type">may be broader</span></dt>
+<dd>Compared to strict.</dd>
+</div>
+
+<div>
+<dt>Receipts &amp; redaction</dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd>Unchanged.</dd>
+</div>
+
+<div>
+<dt>Immutable path writes</dt>
+<dt><span className="craik-fields__type">denied</span></dt>
+<dd>Unless separately approved.</dd>
+</div>
+
+<div>
+<dt>Direct memory writes</dt>
+<dt><span className="craik-fields__type">approval required</span></dt>
+<dd></dd>
+</div>
+
+</div>
+
+Trusted-local does not bypass immutable path protection. Immutable
+writes still require explicit override metadata and a matching
+immutable write grant.
 
 ## Automation
 
 `automation` is for CI and unattended workflows.
 
-Expected behavior:
+<div className="craik-fields">
 
-- fail-open is disabled,
-- approval prompts are not required,
-- failures stop execution instead of widening authority,
-- broad shell capabilities are denied,
-- direct memory writes are denied unless granted elsewhere.
+<div>
+<dt>Property</dt>
+<dt><span className="craik-fields__type">Default</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt>Fail-open</dt>
+<dt><span className="craik-fields__type">disabled</span></dt>
+<dd></dd>
+</div>
+
+<div>
+<dt>Approval prompts</dt>
+<dt><span className="craik-fields__type">not required</span></dt>
+<dd></dd>
+</div>
+
+<div>
+<dt>Failures</dt>
+<dt><span className="craik-fields__type">stop</span></dt>
+<dd>Stop execution instead of widening authority.</dd>
+</div>
+
+<div>
+<dt>Broad shell</dt>
+<dt><span className="craik-fields__type">denied</span></dt>
+<dd></dd>
+</div>
+
+<div>
+<dt>Direct memory writes</dt>
+<dt><span className="craik-fields__type">denied</span></dt>
+<dd>Unless granted elsewhere.</dd>
+</div>
+
+</div>
 
 Preview:
 
@@ -81,18 +201,60 @@ craik policy show --profile automation
 
 ## Visibility
 
-Fail-open profile use is visible in the policy envelope immediately. Later runtime layers must also preserve it in case files, receipts, and handoffs.
+<div className="craik-keypoint">
 
-Capability grants are evaluated separately from profile generation. Profiles define default allowed, denied, approval, and verification sets; grants authorize specific side-effect requests.
+**Fail-open is always traceable.**
 
-## Regression Gate
+Fail-open profile use is visible in the policy envelope immediately
+and is preserved in case files, receipts, and handoffs.
 
-Run the policy regression harness before release-sensitive changes:
+</div>
+
+Capability grants are evaluated separately from profile generation.
+Profiles define default allowed, denied, approval, and verification
+sets; grants authorize specific side-effect requests.
+
+## Regression gate
+
+Run before release-sensitive changes:
 
 ```sh
 craik policy test
 ```
 
-The gate verifies immutable path protection, memory proposal defaults,
-trusted-local fail-open receipts, automation fail-closed behavior, runner grant
-boundary tracking, and redaction for policy-relevant payload shapes.
+The gate verifies:
+
+<div className="craik-grid">
+
+<div><h4>Immutable path protection</h4></div>
+<div><h4>Memory proposal defaults</h4></div>
+<div><h4>Trusted-local fail-open receipts</h4></div>
+<div><h4>Automation fail-closed behavior</h4></div>
+<div><h4>Runner grant boundary tracking</h4></div>
+<div><h4>Redaction</h4><p>For policy-relevant payload shapes.</p></div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../adr/policy-envelope-shape/">
+<strong>ADR</strong>
+<span>0004 · Policy envelope shape</span>
+<small>Design rationale for the envelope contract.</small>
+</a>
+
+<a href="../guides/fail-open/">
+<strong>Guide</strong>
+<span>Fail-open</span>
+<small>How trusted-local opt-in works in practice.</small>
+</a>
+
+<a href="../guides/running-policy-tests/">
+<strong>Guide</strong>
+<span>Running policy tests</span>
+<small>The regression-gate workflow.</small>
+</a>
+
+</div>
