@@ -332,21 +332,216 @@ contaminate the next run's context.
 
 </div>
 
-### 3 · Connecting a runner
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">03</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Connecting a runner</p>
+<h3 className="craik-section-banner__title">
+Codex, Claude, Gemini — <em>or your own.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Every runner consumes the same Craik contracts. The runner-adapter
+boundary is intentionally runner-agnostic: adapters receive Craik state
+and return normalized Craik state without leaking provider-specific
+details into core. Eleven docs cover the contract, the three preview
+adapters that ship today, and the workflows around them.
+</p>
+</div>
+</header>
 
-Codex, Claude, Gemini — or your own. Every runner consumes the same contracts.
+<div className="craik-product-spread">
 
-- [Runner adapter contract](reference/runner-adapter-contract.md)
-- [Runner step contracts](reference/runner-step-contracts.md)
-- [Runner metadata](reference/runner-metadata.md)
-- [Codex runner adapter](reference/codex-runner-adapter.md)
-- [Claude runner adapter](reference/claude-runner-adapter.md)
-- [Gemini runner adapter](reference/gemini-runner-adapter.md)
-- [Runner preview workflows](guides/runner-preview-workflows.md)
-- [Single-agent fixture loop](guides/single-agent-fixture-loop.md)
-- [Agent roles](reference/agent-roles.md)
-- [Adapter packages](reference/adapter-packages.md)
-- [Worker results](reference/worker-results.md)
+<a className="craik-product-feature" href="reference/runner-adapter-contract.md">
+<div>
+<p className="craik-product-feature__num">Protocol · 01</p>
+<h4 className="craik-product-feature__title">Runner adapter contract</h4>
+<p className="craik-product-feature__summary">
+The protocol every runner adapter implements. Defines the boundary
+where Craik core hands off compiled prompts and policy envelopes, and
+where the runner returns normalized worker results, receipts, and
+handoff metadata.
+</p>
+<ul className="craik-product-feature__topics">
+<li>RunnerAdapter protocol</li>
+<li>compiled prompt boundary</li>
+<li>normalized return</li>
+<li>v0.1 preview adapters</li>
+</ul>
+<span className="craik-product-feature__cta">Read the contract</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Boundary</p>
+<p className="craik-product-feature__quote-text">
+Adapters receive Craik state and return normalized Craik state without
+leaking provider-specific details into core contracts.
+</p>
+<p className="craik-product-feature__quote-attribution">— Runner adapter contract · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/runner-step-contracts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
+</div>
+<h4 className="craik-adr-card__title">Runner step contracts</h4>
+<p className="craik-adr-card__decision">
+Each phase (<code>plan / act / observe / evaluate / continue / stop</code>)
+is a typed step request and step result — invoked by the loop, not the
+runner itself.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/runner-metadata.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
+</div>
+<h4 className="craik-adr-card__title">Runner metadata</h4>
+<p className="craik-adr-card__decision">
+Captured at adapter boundaries so receipts and handoffs can explain
+which runner produced work without adding provider-specific fields to
+the stable contract surface.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/codex-runner-adapter.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Adapter · preview</span>
+</div>
+<h4 className="craik-adr-card__title">Codex runner adapter</h4>
+<p className="craik-adr-card__decision">
+Conservative v0.1 preview. Turns a compiled prompt into a normalized
+runner request and returns deterministic fixture results when live
+execution is unavailable.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/claude-runner-adapter.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Adapter · preview</span>
+</div>
+<h4 className="craik-adr-card__title">Claude runner adapter</h4>
+<p className="craik-adr-card__decision">
+Focuses on prompt handoff and deterministic fixture output. Live
+external execution is a later milestone in the adapter roadmap.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/gemini-runner-adapter.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Adapter · preview</span>
+</div>
+<h4 className="craik-adr-card__title">Gemini runner adapter</h4>
+<p className="craik-adr-card__decision">
+Read/review-oriented in v0.1. Uses prompt handoff plus deterministic
+fixture output rather than direct external execution; full live
+adapter is post-MVP.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/runner-preview-workflows.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Workflow</span>
+</div>
+<h4 className="craik-adr-card__title">Runner preview workflows</h4>
+<p className="craik-adr-card__decision">
+Threads the four pieces together: context discovery, policy-aware
+prompt compilation, runner fixture or prompt-handoff execution, and
+receipt-plus-handoff metadata capture.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/single-agent-fixture-loop.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">08</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Workflow</span>
+</div>
+<h4 className="craik-adr-card__title">Single-agent fixture loop</h4>
+<p className="craik-adr-card__decision">
+Smoke-test the loop boundary without live runner credentials or
+external side effects. The pattern CI uses for every PR.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/agent-roles.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">09</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Reference · v0.3</span>
+</div>
+<h4 className="craik-adr-card__title">Agent roles</h4>
+<p className="craik-adr-card__decision">
+<code>craik.agent_role</code> defines the role boundary for v0.3
+multi-agent coordination. Roles describe responsibility and authority;
+they do not grant new runtime permissions by themselves.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/adapter-packages.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">10</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Reference</span>
+</div>
+<h4 className="craik-adr-card__title">Adapter packages</h4>
+<p className="craik-adr-card__decision">
+The <code>craik.adapter_package</code> contract records adapter
+identity, package version, implementation entrypoints, and the metadata
+plugin discovery uses.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/worker-results.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">11</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
+</div>
+<h4 className="craik-adr-card__title">Worker results</h4>
+<p className="craik-adr-card__decision">
+<code>craik.worker_result</code> preserves typed specialist output:
+findings, artifacts, assumptions, risks, contradiction ids, receipts.
+Conflicts stay conflicting — review decides later.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 4 · Connecting a provider
 

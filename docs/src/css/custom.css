@@ -1655,6 +1655,12 @@ html[data-theme='dark'] .craik-product-feature::before {
   padding: 2px 8px;
   text-transform: uppercase;
 }
+/* Type-tag variant for non-ADR uses (Contract / Adapter / Workflow / etc.) */
+.craik-adr-card__status--type {
+  background: color-mix(in srgb, var(--craik-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--craik-accent) 28%, transparent);
+  color: var(--craik-accent);
+}
 .craik-adr-card__title {
   color: var(--craik-fg);
   font-size: 1.02rem;
