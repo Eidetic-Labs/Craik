@@ -543,29 +543,290 @@ Conflicts stay conflicting — review decides later.
 
 </ol>
 
-### 4 · Connecting a provider
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">04</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Connecting a provider</p>
+<h3 className="craik-section-banner__title">
+The transport sits <em>under</em> the runner.
+</h3>
+<p className="craik-section-banner__lede">
+Provider transport is independent of the runner: OpenAI Responses,
+Anthropic Messages, and OAI-compatible Chat Completions are separate
+transport families. Seven docs cover the model-provider contract,
+routing decisions, the operator CLI surface, failover policy,
+certification, identity, and prompt compilation.
+</p>
+</div>
+</header>
 
-The provider transport is independent of the runner. Use OpenAI, Anthropic, or
-any OAI-compatible endpoint — including local servers like Ollama.
+<div className="craik-product-spread">
 
-- [Model providers](reference/model-providers.md)
-- [Provider routing](guides/provider-routing.md)
-- [Provider switching](reference/provider-switching.md)
-- [Provider failover](reference/provider-failover.md)
-- [Provider certification](reference/provider-certification.md)
-- [Authentication & credentials](guides/authentication.md)
-- [Prompt compiler](reference/prompt-compiler.md)
+<a className="craik-product-feature" href="reference/model-providers.md">
+<div>
+<p className="craik-product-feature__num">Contract · 01</p>
+<h4 className="craik-product-feature__title">Model providers</h4>
+<p className="craik-product-feature__summary">
+The <code>craik.model_provider</code> contract records model and
+runtime metadata used for routing. Provider transport is selected per
+call — fixture, local OAI-compatible, or hosted (OpenAI Responses /
+Anthropic Messages). Design rationale lives in
+<a href="../adr/provider-transport-and-mode-families/">ADR 0002</a>.
+</p>
+<ul className="craik-product-feature__topics">
+<li>transport families</li>
+<li>routing metadata</li>
+<li>OAI-compatible servers</li>
+<li>ADR 0002</li>
+</ul>
+<span className="craik-product-feature__cta">Read the contract</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Routing input</p>
+<p className="craik-product-feature__quote-text">
+<code>craik.model_provider</code> records model provider and runtime
+execution path metadata for provider routing.
+</p>
+<p className="craik-product-feature__quote-attribution">— Model providers · §Intro</p>
+</blockquote>
+</a>
 
-### 5 · Connecting memory & Stigmem
+</div>
 
-Local SQLite by default; Stigmem when you need durable team-scale memory.
+<ol className="craik-adr-grid">
 
-- [Connecting Stigmem](guides/connecting-stigmem.md)
-- [Stigmem docs demo](guides/stigmem-docs-demo.md)
-- [Memory backends](reference/memory-backends.md)
-- [Stigmem compatibility](reference/stigmem-compatibility.md)
-- [Local store](reference/local-store.md)
-- [Local state](reference/local-state.md)
+<li>
+<a className="craik-adr-card" href="guides/provider-routing.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guide</span>
+</div>
+<h4 className="craik-adr-card__title">Provider routing &amp; sandboxes</h4>
+<p className="craik-adr-card__decision">
+Routing chooses model/runtime metadata. Sandbox routing chooses an
+execution environment. Keep those decisions separate so policy,
+receipts, and redaction can audit each boundary independently.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/provider-switching.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">CLI</span>
+</div>
+<h4 className="craik-adr-card__title">Provider switching</h4>
+<p className="craik-adr-card__decision">
+<code>craik provider</code> exposes the operator-facing surface for
+model/provider routing — list, show, and switch the active provider
+within the bounds the policy envelope allows.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/provider-failover.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Policy</span>
+</div>
+<h4 className="craik-adr-card__title">Provider failover</h4>
+<p className="craik-adr-card__decision">
+Failover is an explicit routing policy. Craik only falls back from one
+provider to another when a <code>ProviderFailoverPolicy</code> rule
+matches — every fallback preserves the active policy envelope id.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/provider-certification.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">MVP bar</span>
+</div>
+<h4 className="craik-adr-card__title">Provider certification</h4>
+<p className="craik-adr-card__decision">
+OpenAI and Anthropic share one certification bar. Provider metadata
+alone is not enough; a provider is MVP-ready only when tests and
+receipts show the runtime can safely use it in a governed workflow.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/authentication.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Identity</span>
+</div>
+<h4 className="craik-adr-card__title">Authentication &amp; credentials</h4>
+<p className="craik-adr-card__decision">
+Operator identity (OIDC) is separate from credential identity (the
+provider account used for model calls). Every receipt records both —
+audit can answer "who authorized this" and "which credential carried
+it out" without inspecting secret material.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/prompt-compiler.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Tool</span>
+</div>
+<h4 className="craik-adr-card__title">Prompt compiler</h4>
+<p className="craik-adr-card__decision">
+<code>craik prompt compile</code> turns Craik runtime state into a
+deterministic runner-ready prompt. It does not invoke a runner — it
+prepares the prompt boundary for adapter previews.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
+
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">05</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Connecting memory &amp; Stigmem</p>
+<h3 className="craik-section-banner__title">
+Local SQLite by default — <em>Stigmem for team-scale memory.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Craik runs in degraded local mode against the SQLite store at
+<code>$CRAIK_HOME/state/craik.sqlite</code>. When you need durable,
+shared team memory you connect a Stigmem node through the minimum
+v0.1 HTTP endpoint surface. Six docs cover the integration, the demo,
+and the contracts beneath.
+</p>
+</div>
+</header>
+
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="guides/connecting-stigmem.md">
+<div>
+<p className="craik-product-feature__num">Wire it up · 01</p>
+<h4 className="craik-product-feature__title">Connecting Stigmem</h4>
+<p className="craik-product-feature__summary">
+Point Craik at a Stigmem node via <code>CRAIK_STIGMEM_URL</code> and,
+when the node requires it, a bearer API key. The integration uses the
+minimum v0.1 HTTP surface — health, capability discovery, fact read,
+and fact provenance — without printing credentials.
+</p>
+<ul className="craik-product-feature__topics">
+<li>HTTP endpoints</li>
+<li>capability discovery</li>
+<li>bearer auth</li>
+<li>read APIs</li>
+</ul>
+<span className="craik-product-feature__cta">Connect Stigmem</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Minimum surface</p>
+<p className="craik-product-feature__quote-text">
+Craik can detect and use a Stigmem node through the minimum v0.1.0
+HTTP endpoint surface.
+</p>
+<p className="craik-product-feature__quote-attribution">— Connecting Stigmem · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="guides/stigmem-docs-demo.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Demo</span>
+</div>
+<h4 className="craik-adr-card__title">Stigmem docs demo</h4>
+<p className="craik-adr-card__decision">
+The first runnable demo. Reconciles Stigmem documentation and observed
+runtime state without editing files. CI exercises the same command on
+every PR — <code>craik demo stigmem-docs --repo-path . --no-github</code>.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/memory-backends.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
+</div>
+<h4 className="craik-adr-card__title">Memory backends</h4>
+<p className="craik-adr-card__decision">
+The proposal-first interface every memory backend implements: create
+reviewable proposals, list by task or status, approve or reject with
+audit, and refuse direct durable writes without a matching grant.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/stigmem-compatibility.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Compatibility</span>
+</div>
+<h4 className="craik-adr-card__title">Stigmem compatibility</h4>
+<p className="craik-adr-card__decision">
+The minimum endpoint matrix for v0.1: health, capability discovery,
+fact read, fact provenance. Future endpoints (direct write, federation
+hooks) remain explicitly post-MVP.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/local-store.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Persistence</span>
+</div>
+<h4 className="craik-adr-card__title">Local store</h4>
+<p className="craik-adr-card__decision">
+SQLite at <code>$CRAIK_HOME/state/craik.sqlite3</code>. Holds projects,
+tasks, case files, intent locks, receipts, handoffs, memory proposals,
+contradictions, run state, and work-graph projections.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/local-state.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">On-disk layout</span>
+</div>
+<h4 className="craik-adr-card__title">Local state layout</h4>
+<p className="craik-adr-card__decision">
+The full <code>~/.craik/</code> directory map: <code>config/</code>,
+<code>secrets/</code>, <code>state/</code>, <code>cache/</code>,
+<code>logs/</code>, <code>receipts/</code>, <code>handoffs/</code>,
+<code>case-files/</code>, <code>projects/</code>.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 6 · CLI & configuration reference
 
