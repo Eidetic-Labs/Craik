@@ -5,8 +5,12 @@ const isReadTheDocs = process.env.READTHEDOCS === 'True';
 const readTheDocsLanguage = process.env.READTHEDOCS_LANGUAGE || 'en';
 const readTheDocsVersion = process.env.READTHEDOCS_VERSION || 'latest';
 
+function originOnly(url) {
+  return new URL(url).origin;
+}
+
 const siteUrl = isReadTheDocs
-  ? process.env.READTHEDOCS_CANONICAL_URL || 'https://docs.craik.eidetic-labs.com'
+  ? originOnly(process.env.READTHEDOCS_CANONICAL_URL || 'https://docs.craik.eidetic-labs.com')
   : 'https://eidetic-labs.github.io';
 const baseUrl = isReadTheDocs ? `/${readTheDocsLanguage}/${readTheDocsVersion}/` : '/craik/';
 
