@@ -204,19 +204,19 @@ the run. Until you do all three, the fixture path is what runs.
 
 <div className="craik-next">
 
-<a href="quickstart.md">
+<a href="../quickstart/">
 <strong>Step 2</strong>
 <span>Quickstart</span>
 <small>Register a project, build a case file, run a governed task.</small>
 </a>
 
-<a href="setup.md">
+<a href="../setup/">
 <strong>Step 3</strong>
 <span>Run the setup wizard</span>
 <small>An interactive walkthrough that wires together home, identity, and a first project.</small>
 </a>
 
-<a href="../concepts/project-model.md">
+<a href="../../concepts/project-model/">
 <strong>Concept</strong>
 <span>Read the runtime model</span>
 <small>Understand the typed objects Craik composes — project, case file, receipt, handoff.</small>

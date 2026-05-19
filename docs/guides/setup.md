@@ -152,19 +152,19 @@ craik setup
 
 <div className="craik-next">
 
-<a href="authentication.md">
+<a href="../authentication/">
 <strong>Do next</strong>
 <span>Authentication &amp; credentials</span>
 <small>OIDC login, credential profiles, pools, workload identity, and approval flow.</small>
 </a>
 
-<a href="doctor.md">
+<a href="../doctor/">
 <strong>Diagnose</strong>
 <span>Run doctor</span>
 <small>Health-check the whole identity / credential / provider chain before live calls.</small>
 </a>
 
-<a href="../reference/gateway-daemon.md">
+<a href="../../reference/gateway-daemon/">
 <strong>Reference</strong>
 <span>Gateway daemon mode</span>
 <small>The full gateway contract, channels, and ingress policy options.</small>

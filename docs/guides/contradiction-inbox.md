@@ -177,19 +177,19 @@ fact, set `stigmem_conflict_id` so the trail is joinable.
 
 <div className="craik-next">
 
-<a href="memory-proposals.md">
+<a href="../memory-proposals/">
 <strong>Do</strong>
 <span>Memory proposals</span>
 <small>Where new facts go when they're proposed against a contradicted memory.</small>
 </a>
 
-<a href="../concepts/memory-and-stigmem.md">
+<a href="../../concepts/memory-and-stigmem/">
 <strong>Read</strong>
 <span>Memory &amp; Stigmem</span>
 <small>The memory model Craik composes against.</small>
 </a>
 
-<a href="../reference/contradiction-inbox-view.md">
+<a href="../../reference/contradiction-inbox-view/">
 <strong>Reference</strong>
 <span>Contradiction inbox view</span>
 <small>The operator surface that renders the inbox with full context.</small>

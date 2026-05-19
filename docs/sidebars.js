@@ -63,7 +63,7 @@ const sidebars = {
         'mvp',
         'mvp-roadmap',
         'roadmap',
-        'release-readiness-v0.1.0',
+        'release-readiness',
         'limitations',
         'implementation-plan',
       ],

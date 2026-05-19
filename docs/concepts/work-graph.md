@@ -223,19 +223,19 @@ full operator-view list.
 
 <div className="craik-next">
 
-<a href="handoffs.md">
+<a href="../handoffs/">
 <strong>Read</strong>
 <span>Handoffs</span>
 <small>How a run closes and what it leaves for the next agent.</small>
 </a>
 
-<a href="../reference/graph-export.md">
+<a href="../../reference/graph-export/">
 <strong>Reference</strong>
 <span>Graph export</span>
 <small>Output shape, flags, and downstream consumer guidance.</small>
 </a>
 
-<a href="../reference/work-graph-explorer.md">
+<a href="../../reference/work-graph-explorer/">
 <strong>Reference</strong>
 <span>Work graph explorer</span>
 <small>The operator surface that renders the graph for review.</small>

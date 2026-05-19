@@ -137,19 +137,19 @@ caches. Use it only when you really mean it.
 
 <div className="craik-next">
 
-<a href="setup.md">
+<a href="../setup/">
 <strong>Do</strong>
 <span>Run the setup wizard</span>
 <small>An interactive walkthrough that wires home, identity, and a first project together.</small>
 </a>
 
-<a href="doctor.md">
+<a href="../doctor/">
 <strong>Diagnose</strong>
 <span>Run doctor</span>
 <small>Health-check Craik home, identity, credentials, and provider posture.</small>
 </a>
 
-<a href="../reference/local-state.md">
+<a href="../../reference/local-state/">
 <strong>Reference</strong>
 <span>Local state layout</span>
 <small>The on-disk shape of every directory under <code>CRAIK_HOME</code>.</small>

@@ -153,19 +153,19 @@ review step is tedious," that's usually a signal that:
 
 <div className="craik-next">
 
-<a href="memory-proposals.md">
+<a href="../memory-proposals/">
 <strong>Do</strong>
 <span>Manage memory proposals</span>
 <small>The full proposal lifecycle from creation to approval.</small>
 </a>
 
-<a href="contradiction-inbox.md">
+<a href="../contradiction-inbox/">
 <strong>Do</strong>
 <span>Resolve contradictions</span>
 <small>How conflicting facts are surfaced, recorded, and resolved.</small>
 </a>
 
-<a href="../concepts/memory-and-stigmem.md">
+<a href="../../concepts/memory-and-stigmem/">
 <strong>Read</strong>
 <span>Memory &amp; Stigmem</span>
 <small>Why memory is governed and how scope, evidence, and trust compose.</small>

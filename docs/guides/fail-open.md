@@ -143,19 +143,19 @@ change instead.
 
 <div className="craik-next">
 
-<a href="../reference/policy-profiles.md">
+<a href="../../reference/policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>Every profile Craik ships and what it gates.</small>
 </a>
 
-<a href="capability-grants.md">
+<a href="../capability-grants/">
 <strong>Do</strong>
 <span>Capability grants</span>
 <small>How to narrow what a runner can do without reaching for fail-open.</small>
 </a>
 
-<a href="../concepts/governance.md">
+<a href="../../concepts/governance/">
 <strong>Read</strong>
 <span>Governance</span>
 <small>Why policy is a runtime object, and how all of this composes.</small>

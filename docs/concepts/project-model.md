@@ -180,19 +180,19 @@ faithful to the project state at the time the run ended.
 
 <div className="craik-next">
 
-<a href="case-files.md">
+<a href="../case-files/">
 <strong>Read next</strong>
 <span>Case files</span>
 <small>The per-task pre-run brief Craik assembles from the project model.</small>
 </a>
 
-<a href="governance.md">
+<a href="../governance/">
 <strong>Read</strong>
 <span>Governance</span>
 <small>The policy envelope, capability grants, and review gates that ride on top of the project model.</small>
 </a>
 
-<a href="../guides/project-registry.md">
+<a href="../../guides/project-registry/">
 <strong>Do</strong>
 <span>Register a project</span>
 <small>Step-by-step: hook a Git repo into Craik and inspect what the runtime sees.</small>

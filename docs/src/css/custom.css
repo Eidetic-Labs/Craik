@@ -1145,6 +1145,552 @@ html[data-theme='dark'] .theme-doc-version-badge {
   margin: 0;
 }
 
+/* Dramatic section banner — replaces inline h3 for high-priority sections.
+   Oversized mono numeral + manifesto title + lede + accent rule. */
+.craik-section-banner {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 2em 0 1.6em;
+  padding-bottom: 1.8em;
+  position: relative;
+}
+.craik-section-banner::after {
+  background: var(--craik-accent);
+  border-radius: 999px;
+  bottom: 0;
+  content: '';
+  height: 3px;
+  left: 0;
+  position: absolute;
+  width: 64px;
+}
+.craik-section-banner__num {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-feature-settings: 'tnum';
+  font-size: clamp(3.4rem, 7.5vw, 5.6rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  padding-top: 0.06em;
+  user-select: none;
+}
+.craik-section-banner__body {
+  max-width: 64ch;
+}
+.craik-section-banner__kicker {
+  align-items: center;
+  color: var(--craik-fg-mute);
+  display: inline-flex;
+  font-family: var(--craik-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  gap: 10px;
+  letter-spacing: 0.2em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+.craik-section-banner__kicker::before {
+  background: var(--craik-fg-mute);
+  content: '';
+  display: inline-block;
+  height: 1px;
+  width: 22px;
+}
+.craik-section-banner__title {
+  color: var(--craik-fg);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin: 0 0 14px;
+}
+.craik-section-banner__title em {
+  color: var(--craik-accent);
+  font-style: normal;
+  font-weight: 300;
+}
+.craik-section-banner__lede {
+  color: var(--craik-fg-dim);
+  font-size: 1.04rem;
+  line-height: 1.65;
+  margin: 0;
+}
+.craik-section-banner__lede strong {
+  color: var(--craik-fg);
+  font-weight: 500;
+}
+@media (max-width: 720px) {
+  .craik-section-banner {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .craik-section-banner__num {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+/* Small SVG motif used in product-card top-right */
+.craik-card-motif {
+  color: var(--craik-fg-dim);
+  height: 44px;
+  opacity: 0.55;
+  pointer-events: none;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  transition: opacity 240ms var(--craik-ease), color 240ms var(--craik-ease),
+    transform 320ms var(--craik-ease);
+  width: 44px;
+}
+.craik-card-motif line,
+.craik-card-motif path,
+.craik-card-motif rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+.craik-card-motif circle:not([fill]) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+.craik-product-card:hover .craik-card-motif {
+  color: var(--craik-accent);
+  opacity: 1;
+  transform: rotate(-3deg);
+}
+
+/* Inline source quote inside a product card */
+.craik-product-card__quote {
+  border-left: 2px solid var(--craik-lavender);
+  color: var(--craik-fg);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  margin: 0;
+  padding: 4px 0 4px 14px;
+  position: relative;
+}
+.craik-product-card__quote::before {
+  color: color-mix(in srgb, var(--craik-lavender) 70%, transparent);
+  content: '“';
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 2.4em;
+  font-style: normal;
+  left: -6px;
+  line-height: 0.85;
+  position: absolute;
+  top: -0.05em;
+}
+.craik-product-card__quote-attr {
+  color: var(--craik-fg-mute);
+  display: block;
+  font-family: var(--craik-font-mono);
+  font-size: 0.66rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* Editorial product spread — for the Learn landing's "The product"
+   section. One featured card with a pull-quote, four secondary cards
+   in a 2x2 grid below. Cards are whole-card links. */
+.craik-product-spread {
+  display: grid;
+  gap: 18px;
+  margin: 1.6em 0 2.4em;
+}
+
+.craik-product-feature {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 14px;
+  color: var(--craik-fg) !important;
+  display: grid;
+  gap: clamp(28px, 4vw, 56px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  overflow: hidden;
+  padding: clamp(28px, 3.4vw, 44px);
+  position: relative;
+  text-decoration: none !important;
+  transition: border-color 240ms var(--craik-ease),
+    transform 240ms var(--craik-ease);
+}
+.craik-product-feature::before {
+  background: radial-gradient(
+    circle at 100% 0%,
+    color-mix(in srgb, var(--craik-lavender) 28%, transparent),
+    transparent 60%
+  );
+  content: '';
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+html[data-theme='dark'] .craik-product-feature::before {
+  background: radial-gradient(
+    circle at 100% 0%,
+    rgba(180, 172, 230, 0.16),
+    transparent 60%
+  );
+}
+.craik-product-feature:hover {
+  border-color: var(--craik-accent);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+.craik-product-feature > * {
+  position: relative;
+}
+
+.craik-product-feature__num {
+  align-items: center;
+  color: var(--craik-accent);
+  display: inline-flex;
+  font-family: var(--craik-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  gap: 8px;
+  letter-spacing: 0.14em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+.craik-product-feature__num::before {
+  background: var(--craik-lavender);
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--craik-lavender) 22%, transparent);
+  content: '';
+  height: 6px;
+  width: 6px;
+}
+.craik-product-feature__title {
+  color: var(--craik-fg);
+  font-size: clamp(1.5rem, 3vw, 2.05rem);
+  font-weight: 500;
+  letter-spacing: -0.018em;
+  line-height: 1.1;
+  margin: 0 0 14px;
+}
+.craik-product-feature__summary {
+  color: var(--craik-fg-dim);
+  font-size: 1.02rem;
+  line-height: 1.66;
+  margin: 0 0 18px;
+}
+.craik-product-feature__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+}
+.craik-product-feature__topics li {
+  background: var(--craik-bg-sunk);
+  border: 1px solid var(--craik-rule);
+  border-radius: 999px;
+  color: var(--craik-fg-dim);
+  font-family: var(--craik-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+}
+.craik-product-feature__cta {
+  align-items: center;
+  color: var(--craik-accent);
+  display: inline-flex;
+  font-size: 0.86rem;
+  font-weight: 500;
+  gap: 6px;
+  margin-top: auto;
+}
+.craik-product-feature__cta::after {
+  content: '→';
+  font-family: var(--craik-font-mono);
+  transition: transform 280ms var(--craik-ease);
+}
+.craik-product-feature:hover .craik-product-feature__cta::after {
+  transform: translateX(4px);
+}
+
+/* The pull-quote side of the featured card */
+.craik-product-feature__quote {
+  align-self: center;
+  border-left: 3px solid var(--craik-lavender);
+  margin: 0;
+  padding: 8px 0 8px 22px;
+  position: relative;
+}
+.craik-product-feature__quote-eyebrow {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+.craik-product-feature__quote-text {
+  color: var(--craik-fg);
+  font-size: clamp(1.18rem, 1.8vw, 1.46rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  line-height: 1.32;
+  margin: 0;
+}
+.craik-product-feature__quote-attribution {
+  color: var(--craik-fg-mute);
+  font-family: var(--craik-font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  margin: 14px 0 0;
+  text-transform: uppercase;
+}
+
+/* Secondary 2x2 card grid */
+.craik-product-list {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.craik-product-list > li {
+  margin: 0;
+}
+
+.craik-product-card {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 12px;
+  color: var(--craik-fg) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 22px 24px 20px;
+  position: relative;
+  text-decoration: none !important;
+  transition: border-color 240ms var(--craik-ease),
+    background 240ms var(--craik-ease), transform 240ms var(--craik-ease);
+}
+.craik-product-card::before {
+  background: var(--craik-accent);
+  content: '';
+  height: 0;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transition: height 320ms var(--craik-ease);
+  width: 2px;
+}
+.craik-product-card:hover {
+  background: var(--craik-bg-elevated);
+  border-color: var(--craik-rule-strong);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.craik-product-card:hover::before {
+  height: 100%;
+}
+
+.craik-product-card__num {
+  color: var(--craik-fg-mute);
+  font-family: var(--craik-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  margin: 0;
+  padding-right: 56px; /* room for the SVG motif top-right */
+}
+.craik-product-card__title {
+  color: var(--craik-fg);
+  font-size: 1.18rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.22;
+  margin: 0;
+  padding-right: 56px; /* room for the SVG motif top-right */
+}
+.craik-product-card__summary {
+  color: var(--craik-fg-dim);
+  font-size: 0.94rem;
+  line-height: 1.6;
+  margin: 0;
+}
+.craik-product-card__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.craik-product-card__topics li {
+  background: var(--craik-bg-sunk);
+  border: 1px solid var(--craik-rule);
+  border-radius: 4px;
+  color: var(--craik-fg-dim);
+  font-family: var(--craik-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+}
+.craik-product-card__meta {
+  align-items: center;
+  border-top: 1px solid var(--craik-rule);
+  color: var(--craik-fg-mute);
+  display: flex;
+  font-family: var(--craik-font-mono);
+  font-size: 0.7rem;
+  gap: 12px;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  margin-top: auto;
+  padding-top: 12px;
+  text-transform: uppercase;
+}
+.craik-product-card__cta {
+  align-items: center;
+  color: var(--craik-accent);
+  display: inline-flex;
+  gap: 4px;
+  text-transform: none;
+}
+.craik-product-card__cta::after {
+  content: '→';
+  transition: transform 280ms var(--craik-ease);
+}
+.craik-product-card:hover .craik-product-card__cta::after {
+  transform: translateX(3px);
+}
+
+@media (max-width: 900px) {
+  .craik-product-feature {
+    grid-template-columns: 1fr;
+  }
+  .craik-product-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Compact ADR-card grid — denser than .craik-product-card. For short,
+   structured Architecture Decision Records where number + title + one-line
+   decision + status pill is enough. */
+.craik-adr-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.craik-adr-grid > li {
+  margin: 0;
+}
+.craik-adr-card {
+  background: var(--craik-bg);
+  border: 1px solid var(--craik-rule);
+  border-radius: 10px;
+  color: var(--craik-fg) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 18px 20px;
+  position: relative;
+  text-decoration: none !important;
+  transition: border-color 220ms var(--craik-ease),
+    background 220ms var(--craik-ease), transform 220ms var(--craik-ease);
+}
+.craik-adr-card::before {
+  background: var(--craik-accent);
+  content: '';
+  height: 0;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transition: height 280ms var(--craik-ease);
+  width: 2px;
+}
+.craik-adr-card:hover {
+  background: var(--craik-bg-elevated);
+  border-color: var(--craik-rule-strong);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.craik-adr-card:hover::before {
+  height: 100%;
+}
+.craik-adr-card__head {
+  align-items: center;
+  display: flex;
+  font-family: var(--craik-font-mono);
+  gap: 10px;
+  justify-content: space-between;
+}
+.craik-adr-card__num {
+  color: var(--craik-accent);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+.craik-adr-card__status {
+  background: color-mix(in srgb, #1bbf6e 14%, transparent);
+  border: 1px solid color-mix(in srgb, #1bbf6e 30%, transparent);
+  border-radius: 999px;
+  color: #1bbf6e;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+/* Type-tag variant for non-ADR uses (Contract / Adapter / Workflow / etc.) */
+.craik-adr-card__status--type {
+  background: color-mix(in srgb, var(--craik-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--craik-accent) 28%, transparent);
+  color: var(--craik-accent);
+}
+.craik-adr-card__title {
+  color: var(--craik-fg);
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.28;
+  margin: 0;
+}
+.craik-adr-card__decision {
+  color: var(--craik-fg-dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+.craik-adr-card__cta {
+  color: var(--craik-accent);
+  font-family: var(--craik-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.craik-adr-card__cta::after {
+  content: ' →';
+  transition: padding 240ms var(--craik-ease);
+}
+.craik-adr-card:hover .craik-adr-card__cta::after {
+  padding-left: 4px;
+}
+
 /* "Next steps" footer — soft cards linking to the next 2-3 docs. */
 .craik-next {
   display: grid;

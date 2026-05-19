@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=premise-rev1" />
     <script>
       (() => {
         const saved = localStorage.getItem('craik-theme');
@@ -380,38 +380,67 @@
         </figure>
       </section>
 
-      <!-- ───────────── DIRECTIVE / PROBLEM ───────────── -->
-      <section class="directive" aria-label="The problem Craik exists to fix">
-        <div class="directive__inner">
-          <p class="directive__kicker">§ Premise</p>
-          <p class="directive__statement">
-            <span>Most agent frameworks optimize for tool calling, prompt routing, parallel execution.</span>
-            <strong>Those are necessary. They are not enough.</strong>
-            <span>
-              Agent systems become useful at organizational scale only when they can
-              <em>remember</em>, <em>justify</em>, <em>coordinate</em>, <em>dispute</em>,
-              and <em>hand off</em> work over time.
-            </span>
-          </p>
-          <ul class="directive__contrasts">
-            <li>
-              <span class="contrast__from">Sessions end.</span>
-              <span class="contrast__to">Context dies.</span>
-            </li>
-            <li>
-              <span class="contrast__from">Tools fire.</span>
-              <span class="contrast__to">Authority drifts.</span>
-            </li>
-            <li>
-              <span class="contrast__from">Memory is mocked.</span>
-              <span class="contrast__to">Truth degrades.</span>
-            </li>
-            <li>
-              <span class="contrast__from">Runs finish.</span>
-              <span class="contrast__to">Evidence is lost.</span>
-            </li>
-          </ul>
+      <!-- ───────────── PREMISE ───────────── -->
+      <section class="premise" aria-label="The premise behind Craik">
+        <div class="premise__inner">
+          <aside class="premise__marker" aria-hidden="true">
+            <span class="premise__marker-dot"></span>
+            <span class="premise__marker-text">§01 · Premise</span>
+          </aside>
+
+          <div class="premise__body">
+            <p class="premise__setup">
+              Most agent frameworks optimize for
+              <span class="premise__chip">tool calling</span>,
+              <span class="premise__chip">prompt routing</span>,
+              <span class="premise__chip">parallel execution</span>.
+            </p>
+
+            <p class="premise__quote">
+              <span class="premise__quote-mark" aria-hidden="true">“</span>
+              <span class="premise__quote-line">Those are necessary.</span>
+              <span class="premise__quote-line premise__quote-line--accent">
+                They are not enough.
+              </span>
+            </p>
+
+            <p class="premise__resolution">
+              Agent systems become useful at organizational scale only when
+              they can <span class="premise__verb">remember</span>,
+              <span class="premise__verb">justify</span>,
+              <span class="premise__verb">coordinate</span>,
+              <span class="premise__verb">dispute</span>, and
+              <span class="premise__verb">hand off</span> work over time.
+            </p>
+          </div>
         </div>
+
+        <ol class="premise__ledger" aria-label="Failure modes Craik addresses">
+          <li>
+            <span class="premise__ledger-num">01</span>
+            <span class="premise__ledger-from">Sessions end</span>
+            <span class="premise__ledger-arrow" aria-hidden="true">→</span>
+            <span class="premise__ledger-to">Context dies.</span>
+          </li>
+          <li>
+            <span class="premise__ledger-num">02</span>
+            <span class="premise__ledger-from">Tools fire</span>
+            <span class="premise__ledger-arrow" aria-hidden="true">→</span>
+            <span class="premise__ledger-to">Authority drifts.</span>
+          </li>
+          <li>
+            <span class="premise__ledger-num">03</span>
+            <span class="premise__ledger-from">Memory is mocked</span>
+            <span class="premise__ledger-arrow" aria-hidden="true">→</span>
+            <span class="premise__ledger-to">Truth degrades.</span>
+          </li>
+          <li>
+            <span class="premise__ledger-num">04</span>
+            <span class="premise__ledger-from">Runs finish</span>
+            <span class="premise__ledger-arrow" aria-hidden="true">→</span>
+            <span class="premise__ledger-to">Evidence is lost.</span>
+          </li>
+        </ol>
       </section>
 
       <!-- ───────────── RUNTIME LAYER ───────────── -->
@@ -1006,7 +1035,7 @@ binding    = receipt.actor + receipt.credential</pre>
         );
         document
           .querySelectorAll(
-            '.section, .directive, .cap, .workflow__steps li, .artifact, .vision__matrix > div',
+            '.section, .premise, .premise__ledger li, .cap, .workflow__steps li, .artifact, .vision__matrix > div',
           )
           .forEach((el) => {
             el.setAttribute('data-reveal', '');

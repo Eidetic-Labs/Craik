@@ -132,19 +132,19 @@ CI surprising you on a vanilla change are low.
 
 <div className="craik-next">
 
-<a href="doctor.md">
+<a href="../doctor/">
 <strong>Diagnose</strong>
 <span>Run doctor</span>
 <small>Health-check identity, credentials, and provider posture without firing a real run.</small>
 </a>
 
-<a href="release-management.md">
+<a href="../release-management/">
 <strong>Operate</strong>
 <span>Release management</span>
 <small>How releases are cut, signed, and gated for v0.x.</small>
 </a>
 
-<a href="../reference/policy-tests.md">
+<a href="../../reference/policy-tests/">
 <strong>Reference</strong>
 <span>Policy tests</span>
 <small>What <code>craik policy test</code> actually checks and how to extend it.</small>
