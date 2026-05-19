@@ -1,27 +1,71 @@
-# Handoff Viewer
+# Handoff viewer
 
-Design rationale: [ADR 0005 Receipts And Handoffs As Public Contracts](../adr/0005-receipts-and-handoffs-as-public-contracts.md).
+<p className="craik-meta"><span>2 min read</span><span>Reference · preview</span><span>Updated 2026-05-19</span></p>
 
-The handoff viewer is a read-only operator view over `craik.handoff` records.
+<div className="craik-lead">
 
-The v0.7.0 TUI surface formats:
+**What you'll find here**
 
-- handoff id, task id, project id, status, agent, and summary;
-- completed actions;
-- next steps;
-- receipt links;
-- evidence-like artifacts and changed files;
-- risks;
-- open follow-ups such as context debt, assumptions, contradictions, and human
-  delegation ids.
+The read-only operator view over `craik.handoff` records — what the
+v0.7.0 TUI surface formats and the redaction boundary it preserves.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Design rationale: [ADR 0005 · Receipts and handoffs as public contracts](../adr/0005-receipts-and-handoffs-as-public-contracts.md).**
+
+</div>
+
+## What the surface formats
+
+<div className="craik-grid">
+
+<div><h4>Handoff id · task id · project id · status · agent · summary</h4></div>
+<div><h4>Completed actions</h4></div>
+<div><h4>Next steps</h4></div>
+<div><h4>Receipt links</h4></div>
+<div><h4>Evidence-like artifacts</h4><p>And changed files.</p></div>
+<div><h4>Risks</h4></div>
+<div><h4>Open follow-ups</h4><p>Context debt · assumptions · contradictions · human delegation ids.</p></div>
+
+</div>
 
 ## Boundaries
 
-The handoff viewer must preserve redaction boundaries. It displays the durable
-summary already captured in the handoff and linked ids for deeper inspection. It
-must not read raw logs or expand potentially sensitive command output.
+<div className="craik-keypoint">
 
-Missing sections should render as `none` so operators can distinguish an empty
-section from a formatter failure.
+**Read durable summaries, not raw logs.**
 
-See [Operator Surface](operator-surface.md) for the shared TUI boundary.
+The viewer displays the durable summary already captured in the
+handoff and linked ids for deeper inspection. It must not read raw
+logs or expand potentially sensitive command output.
+
+</div>
+
+Missing sections render as `none` so operators can distinguish an
+empty section from a formatter failure.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="operator-surface/">
+<strong>Reference</strong>
+<span>Operator surface</span>
+<small>The shared TUI boundary.</small>
+</a>
+
+<a href="receipt-viewer/">
+<strong>Reference</strong>
+<span>Receipt viewer</span>
+<small>The receipts the handoff links to.</small>
+</a>
+
+<a href="../adr/receipts-and-handoffs-as-public-contracts/">
+<strong>ADR</strong>
+<span>0005 · Receipts &amp; handoffs as public contracts</span>
+<small>Why handoffs are first-class.</small>
+</a>
+
+</div>
