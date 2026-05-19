@@ -217,35 +217,299 @@ suite, and where the harness touches local state.
 
 </ol>
 
-### 3 · Identity & credentials
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">03</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Identity &amp; credentials</p>
+<h3 className="craik-section-banner__title">
+Operator identity — <em>separate from credential identity.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Every provider call is bound to both an OIDC operator identity and a
+typed credential profile. Receipts record both, so audit can answer
+both "who authorized this" and "which credential carried it" without
+inspecting secret material. Two docs cover the working surface and the
+underlying design.
+</p>
+</div>
+</header>
 
-Operator identity is OIDC. Credentials live in typed profiles, can be pooled,
-rotated, and bound to policy. Every provider call is bound to both an operator
-and a credential identity.
+<div className="craik-product-spread">
 
-- [Authentication & credentials](guides/authentication.md)
-- [ADR 0007 · Credential & identity architecture](adr/0007-credential-and-identity-architecture.md)
+<a className="craik-product-feature" href="guides/authentication.md">
+<div>
+<p className="craik-product-feature__num">Workflow · 01</p>
+<h4 className="craik-product-feature__title">Authentication &amp; credentials</h4>
+<p className="craik-product-feature__summary">
+The operator-facing surface: OIDC login, credential profiles (api-key,
+oauth-token, vendor-cli), credential pools with rotation and failover,
+workload identity for CI, and the approval-gated first-use flow. Every
+credential is referenced — never copied.
+</p>
+<ul className="craik-product-feature__topics">
+<li>OIDC operator identity</li>
+<li>typed credential profiles</li>
+<li>credential pools</li>
+<li>workload identity</li>
+</ul>
+<span className="craik-product-feature__cta">Walk the auth flow</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Two identities</p>
+<p className="craik-product-feature__quote-text">
+Craik separates operator identity from credential identity. The
+operator is the human or automation identity driving a run. The
+credential is the provider account used for model calls. Provider
+receipts record both.
+</p>
+<p className="craik-product-feature__quote-attribution">— Authentication · §Intro</p>
+</blockquote>
+</a>
 
-### 4 · Secrets, redaction & release
+</div>
 
-How secret material is stored, redacted, migrated, and how those properties are
-preserved across releases.
+<ol className="craik-adr-grid">
 
-- [Secrets](security/secrets.md)
-- [Redaction](reference/redaction.md)
-- [Secret migration policy](reference/secret-migration-policy.md)
-- [Release process](security/release-process.md)
+<li>
+<a className="craik-adr-card" href="adr/0007-credential-and-identity-architecture.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">ADR 0007</span>
+<span className="craik-adr-card__status">Accepted</span>
+</div>
+<h4 className="craik-adr-card__title">Credential &amp; identity architecture</h4>
+<p className="craik-adr-card__decision">
+The design rationale. Credentials and operator identity are
+governance inputs — never incidental plumbing. Every receipt names
+which human authorized work, which credential carried the call,
+which policy allowed it, and which grant made the credential usable.
+</p>
+<span className="craik-adr-card__cta">Read decision</span>
+</a>
+</li>
 
-### 5 · Evidence & memory governance
+</ol>
 
-Memory is governed too. Evidence-backed proposals, contradiction handling, and
-preview surfaces keep truth from being silently overwritten.
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">04</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Secrets, redaction &amp; release</p>
+<h3 className="craik-section-banner__title">
+Secrets travel as <em>references — never values.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Four docs cover the secret lifecycle: where secret material lives,
+the central redaction utility that scrubs every persistence boundary,
+the migration policy that refuses to copy secrets across runtime
+boundaries, and the release process that preserves these properties
+across version bumps.
+</p>
+</div>
+</header>
 
-- [Evidence & assumptions](guides/evidence-and-assumptions.md)
-- [Contradiction inbox](guides/contradiction-inbox.md)
-- [Memory proposals](guides/memory-proposals.md)
-- [Memory diffs](guides/memory-diffs.md)
-- [Memory impact preview](guides/memory-impact-preview.md)
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="security/secrets.md">
+<div>
+<p className="craik-product-feature__num">Overview · 01</p>
+<h4 className="craik-product-feature__title">Secrets</h4>
+<p className="craik-product-feature__summary">
+Where secret material lives, the owner-only-permissions discipline,
+what the redaction guard never lets through to receipts / handoffs /
+logs / case files / memory proposals, why policy and grants don't
+override redaction, and how to extend the guard for project-specific
+patterns.
+</p>
+<ul className="craik-product-feature__topics">
+<li>secrets directory</li>
+<li>five redaction categories</li>
+<li>policy + grants don't override</li>
+<li>extensibility</li>
+</ul>
+<span className="craik-product-feature__cta">Read the overview</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Tier</p>
+<p className="craik-product-feature__quote-text">
+Craik treats secrets as sensitive runtime material — not as
+configuration. They live in a single, narrow directory; they never
+leak into receipts, case files, or handoffs in raw form.
+</p>
+<p className="craik-product-feature__quote-attribution">— Secrets · §Key-point</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/redaction.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guard</span>
+</div>
+<h4 className="craik-adr-card__title">Redaction</h4>
+<p className="craik-adr-card__decision">
+The central runtime redaction utility runs before every persistence
+boundary. Bearer tokens, key/value secret shapes, auth URLs,
+configured patterns, and structured fields with secret-like names —
+all scrubbed before storage.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/secret-migration-policy.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Policy</span>
+</div>
+<h4 className="craik-adr-card__title">Secret migration policy</h4>
+<p className="craik-adr-card__decision">
+Migrations must never copy secret values across runtime boundaries.
+Four policy outcomes: <code>redact</code> · <code>strip</code> ·
+<code>reference</code> · <code>reject</code> — never copy as-is.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="security/release-process.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Process</span>
+</div>
+<h4 className="craik-adr-card__title">Security release process</h4>
+<p className="craik-adr-card__decision">
+Security releases use the same package gates as normal releases, plus
+additional advisory and disclosure handling — so security fixes never
+skip the regression suite or the doc-update obligation.
+</p>
+<span className="craik-adr-card__cta">Process</span>
+</a>
+</li>
+
+</ol>
+
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">05</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Evidence &amp; memory governance</p>
+<h3 className="craik-section-banner__title">
+Memory is governed — <em>truth doesn't silently overwrite truth.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Five docs cover how Craik separates evidence from assumptions, how
+contradictions surface and resolve, and how every memory update
+flows through proposals, diffs, and impact previews before it can
+become a durable fact.
+</p>
+</div>
+</header>
+
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="guides/evidence-and-assumptions.md">
+<div>
+<p className="craik-product-feature__num">Foundation · 01</p>
+<h4 className="craik-product-feature__title">Evidence &amp; assumptions</h4>
+<p className="craik-product-feature__summary">
+The honesty rule that grounds memory governance. Evidence is source
+material the runtime can cite. Assumptions are unresolved claims that
+should not be treated as facts yet. Promotion requires evidence —
+period.
+</p>
+<ul className="craik-product-feature__topics">
+<li>evidence_reference fields</li>
+<li>assumption ledger</li>
+<li>promotion rule</li>
+<li>immutable docs as evidence</li>
+</ul>
+<span className="craik-product-feature__cta">Read the foundation</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Honesty rule</p>
+<p className="craik-product-feature__quote-text">
+Evidence is source material the runtime can cite. Assumptions are
+unresolved claims that should not be treated as facts yet. Conflating
+the two is how an agent runtime starts hallucinating policy.
+</p>
+<p className="craik-product-feature__quote-attribution">— Evidence &amp; assumptions · §Key-point</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="guides/contradiction-inbox.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Inbox</span>
+</div>
+<h4 className="craik-adr-card__title">Contradiction inbox</h4>
+<p className="craik-adr-card__decision">
+First-class workflow record for "two things disagree" — docs vs.
+implementation, handoff vs. branch state, reviewer vs. implementer.
+Distinct from Stigmem memory-substrate conflicts; cross-linkable when
+both exist.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/memory-proposals.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Lifecycle</span>
+</div>
+<h4 className="craik-adr-card__title">Memory proposals</h4>
+<p className="craik-adr-card__decision">
+Create, list, approve, reject — and the promotion rule that requires
+evidence. Direct durable writes still need a
+<code>memory.write</code> grant; until then, proposals are the path.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/memory-diffs.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Audit</span>
+</div>
+<h4 className="craik-adr-card__title">Memory diffs</h4>
+<p className="craik-adr-card__decision">
+What a task changed in memory: proposals created, approved, rejected;
+facts written and read; write failures. The single object reviewers
+inspect when deciding whether a run's memory effect was acceptable.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="guides/memory-impact-preview.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Preview</span>
+</div>
+<h4 className="craik-adr-card__title">Memory impact preview</h4>
+<p className="craik-adr-card__decision">
+The read-only forecast before promotion: facts that would be added or
+invalidated, likely contradictions, proposals missing evidence, and
+scope visibility counts. Previews never write.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+</ol>
 
 ### 6 · Sandboxing
 
