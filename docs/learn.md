@@ -21,14 +21,138 @@ If you'd rather jump straight to installing the CLI, head to
 
 ### 1 · The product
 
-Start here to understand the thesis, who Craik is for, and why it is different
-from agent frameworks that focus only on tool calling.
+Start here to understand the thesis: that agent work needs an **operating
+layer** — not another framework — and why Craik's bet is durability,
+governance, and shared state over more clever prompting.
 
-- [Vision](vision.md) — the long-term direction.
-- [Product strategy](product-strategy.md) — positioning and audience.
-- [Differentiators](differentiators.md) — what makes Craik distinct.
-- [Features](features.md) — feature surface at a glance.
-- [Architecture](architecture.md) — the runtime architecture.
+<div className="craik-product-spread">
+
+<a className="craik-product-feature" href="../vision/">
+<div>
+<p className="craik-product-feature__num">Featured · 01</p>
+<h4 className="craik-product-feature__title">Vision</h4>
+<p className="craik-product-feature__summary">
+Craik's central claim is that agents need an operating layer that gives
+them a shared model of the work, evidence-backed memory, explicit authority
+boundaries, structured handoffs, durable artifacts, and a way to resolve
+disagreement. Read this first — every other doc is downstream of it.
+</p>
+<ul className="craik-product-feature__topics">
+<li>durable agent runtime</li>
+<li>north star</li>
+<li>design principles</li>
+<li>initial wedge</li>
+</ul>
+<span className="craik-product-feature__cta">Read the vision</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">North star</p>
+<p className="craik-product-feature__quote-text">
+A new agent should be able to join a project and understand its current
+state better than a human who has been away for two weeks.
+</p>
+<p className="craik-product-feature__quote-attribution">— Vision · §North Star</p>
+</blockquote>
+</a>
+
+<ol className="craik-product-list">
+
+<li>
+<a className="craik-product-card" href="../product-strategy/">
+<p className="craik-product-card__num">02 · Positioning</p>
+<h4 className="craik-product-card__title">Product strategy</h4>
+<p className="craik-product-card__summary">
+Why Craik is a <em>durable agent runtime</em>, not a framework. The
+market wedge, the agent-runner strategy (Codex / Claude / Gemini as
+first-class adapters), the MIT license rationale, and the patterns Craik
+borrows from local runtimes versus the patterns it adds on top.
+</p>
+<ul className="craik-product-card__topics">
+<li>runner strategy</li>
+<li>license</li>
+<li>gateway ergonomics</li>
+<li>multi-agent coordination</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: founders &middot; product</span>
+<span className="craik-product-card__cta">5 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="../differentiators/">
+<p className="craik-product-card__num">03 · What's distinct</p>
+<h4 className="craik-product-card__title">Differentiators</h4>
+<p className="craik-product-card__summary">
+The features that keep the roadmap from collapsing into basic CLI
+plumbing. Evidence-first execution ("no durable assertion without
+evidence"), the assumption ledger, belief promotion lifecycle, context
+budgeting as policy, and end-to-end run reproducibility.
+</p>
+<ul className="craik-product-card__topics">
+<li>evidence-first</li>
+<li>assumption ledger</li>
+<li>belief promotion</li>
+<li>reproducibility</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: engineers &middot; reviewers</span>
+<span className="craik-product-card__cta">10 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="../features/">
+<p className="craik-product-card__num">04 · What ships</p>
+<h4 className="craik-product-card__title">Features</h4>
+<p className="craik-product-card__summary">
+The implementable feature surface — every MVP behavior with acceptance
+criteria. Project registry, case-file assembler, policy envelope,
+capability grants, runner adapters, work graph, receipts, handoffs.
+Read this to know exactly what v0.1 ships.
+</p>
+<ul className="craik-product-card__topics">
+<li>case files</li>
+<li>policy envelope</li>
+<li>receipts</li>
+<li>handoffs</li>
+<li>work graph</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: implementers</span>
+<span className="craik-product-card__cta">10 min read</span>
+</p>
+</a>
+</li>
+
+<li>
+<a className="craik-product-card" href="../architecture/">
+<p className="craik-product-card__num">05 · How it composes</p>
+<h4 className="craik-product-card__title">Architecture</h4>
+<p className="craik-product-card__summary">
+The seven runtime layers — gateway, project model, orchestration, runner
+adapters, capability, memory, work graph, experience — plus the typed
+contracts that hold them together. The map for anyone extending Craik
+or integrating a new runner.
+</p>
+<ul className="craik-product-card__topics">
+<li>seven layers</li>
+<li>runtime flow</li>
+<li>core contracts</li>
+<li>borrowed patterns</li>
+</ul>
+<p className="craik-product-card__meta">
+<span>For: architects &middot; contributors</span>
+<span className="craik-product-card__cta">4 min read</span>
+</p>
+</a>
+</li>
+
+</ol>
+
+</div>
 
 ### 2 · Core concepts
 
