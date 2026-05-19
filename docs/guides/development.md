@@ -1,6 +1,7 @@
 # Development Checks
 
-Craik requires Python 3.12 or newer.
+Craik requires Python 3.12 or 3.13. Python 3.14 is not supported yet because
+the current Pydantic runtime dependency does not publish compatible wheels.
 
 Use `uv` for reproducible local validation:
 

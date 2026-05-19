@@ -536,7 +536,7 @@ Each workstream below should become one or more GitHub milestones/issues. Docume
 Scope:
 
 - package metadata,
-- Python 3.12+ project skeleton,
+- Python 3.12/3.13 project skeleton,
 - `craik` CLI,
 - MIT license,
 - governance files,

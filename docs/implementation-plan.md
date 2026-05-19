@@ -8,7 +8,7 @@ The initial implementation should optimize for fast, testable CLI development.
 
 Accepted default:
 
-- Python 3.12+,
+- Python 3.12/3.13,
 - Typer for CLI,
 - Pydantic for schema validation,
 - SQLite for local persistent state,
@@ -629,7 +629,7 @@ These should be decided before coding starts, but they should not block the plan
 - Initial first-class agent runners: Codex, Claude, and Gemini.
 - Adjacent runtime relationship: design reference and possible future bridge, not a required dependency.
 - Differentiator objective: evidence-first, assumption-aware, policy-tested, budgeted, human-delegable agent work.
-- Core implementation language: Python 3.12+.
+- Core implementation language: Python 3.12/3.13.
 - PyPI distribution: `craik`.
 - Python module: `craik`.
 - CLI command: `craik`.
