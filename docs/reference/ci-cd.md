@@ -15,6 +15,7 @@ Craik CI is split by surface so failures point at the area that regressed.
 | `CodeQL` | GitHub code scanning for Python on pull requests and pushes to `main`. |
 | `docs` | Generated CLI docs, docs hygiene, and Docusaurus build. |
 | `package` | Source distribution and wheel build, metadata validation, smoke install. |
+| `Product Site` | Validates the static marketing site on pull requests and publishes it to GitHub Pages from `main`. |
 
 ## Coverage Ratchet
 
@@ -57,6 +58,15 @@ to `main`, using the default query suite with `build-mode: none`. The analyze
 step uses its default SARIF upload behavior, so results are published to GitHub
 Security -> Code scanning when repository code-scanning configuration permits
 advanced workflow uploads.
+
+## Product Site Deploy
+
+The `Product Site` workflow publishes the static `site/` directory to GitHub
+Pages for `craik.eidetic-labs.com`. Pull requests only validate required files
+and never deploy. Pushes to `main` deploy automatically. Manual
+`workflow_dispatch` runs on `main` also deploy so maintainers can recover from
+Pages setup changes, custom-domain changes, or earlier failed deploy attempts
+without creating an empty follow-up commit.
 
 ## Dependency Audit
 
