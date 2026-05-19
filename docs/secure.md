@@ -511,17 +511,138 @@ scope visibility counts. Previews never write.
 
 </ol>
 
-### 6 · Sandboxing
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">06</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Sandboxing</p>
+<h3 className="craik-section-banner__title">
+Tool execution under <em>policy-bound sandboxes.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Side effects run inside a sandbox backend chosen to match your trust
+boundary. Six docs cover the sandbox contract, the four backends Craik
+records (local process, remote shell, Docker, browser), and the
+environment receipts every sandbox decision emits.
+</p>
+</div>
+</header>
 
-Tool execution and side effects run inside policy-bound sandboxes. Pick the
-backend that matches your trust boundary.
+<div className="craik-product-spread">
 
-- [Sandbox backends](reference/sandbox-backends.md)
-- [Local process backend](reference/local-process-backend.md)
-- [Remote shell backend](reference/remote-shell-backend.md)
-- [Docker sandbox backend](reference/docker-sandbox-backend.md)
-- [Browser tool boundary](reference/browser-tool-boundary.md)
-- [Environment receipts](reference/environment-receipts.md)
+<a className="craik-product-feature" href="reference/sandbox-backends.md">
+<div>
+<p className="craik-product-feature__num">Contract · 01</p>
+<h4 className="craik-product-feature__title">Sandbox backends</h4>
+<p className="craik-product-feature__summary">
+<code>craik.sandbox_backend</code> describes an execution environment
+backend without binding it to any model provider. The backend names
+its identity, capability requirements, redaction posture, and the
+receipts it emits — runners pick a backend by name, not by ambient
+process state.
+</p>
+<ul className="craik-product-feature__topics">
+<li>provider-agnostic</li>
+<li>capability requirements</li>
+<li>receipt boundary</li>
+<li>four backends today</li>
+</ul>
+<span className="craik-product-feature__cta">Read the contract</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Decision boundary</p>
+<p className="craik-product-feature__quote-text">
+<code>craik.sandbox_backend</code> describes an execution environment
+backend without binding it to any model provider.
+</p>
+<p className="craik-product-feature__quote-attribution">— Sandbox backends · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="reference/local-process-backend.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Backend · local</span>
+</div>
+<h4 className="craik-adr-card__title">Local process backend</h4>
+<p className="craik-adr-card__decision">
+Execution through the host process environment. Intentionally a
+decision boundary — not ambient shell. Local backend doesn't grant
+runtime authority unless a matching grant exists.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/remote-shell-backend.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Backend · remote</span>
+</div>
+<h4 className="craik-adr-card__title">Remote shell backend</h4>
+<p className="craik-adr-card__decision">
+SSH or equivalent remote command execution as an auditable boundary.
+The backend records the decision; it does not open connections or
+execute commands by itself.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/docker-sandbox-backend.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Backend · docker</span>
+</div>
+<h4 className="craik-adr-card__title">Docker sandbox backend</h4>
+<p className="craik-adr-card__decision">
+Containerized execution as an explicit environment boundary. The
+backend records image, build args, and grant boundaries — it doesn't
+start containers itself.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/browser-tool-boundary.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Backend · browser</span>
+</div>
+<h4 className="craik-adr-card__title">Browser tool boundary</h4>
+<p className="craik-adr-card__decision">
+Browser automation and tool execution as a policy-controlled sandbox.
+The boundary captures origin, profile, allowed surfaces, and the
+receipts emitted for each navigation or action.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/environment-receipts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Receipt</span>
+</div>
+<h4 className="craik-adr-card__title">Environment receipts</h4>
+<p className="craik-adr-card__decision">
+Normal <code>craik.capability_receipt</code> records for provider,
+MCP, sandbox, local process, remote shell, browser, and container
+decisions. One receipt shape across every environment surface.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ## Where to go next
 
