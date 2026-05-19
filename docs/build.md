@@ -1067,25 +1067,271 @@ surfaces.
 
 </ol>
 
-### 8 · Extending with skills & plugins
+<header className="craik-section-banner">
+<div className="craik-section-banner__num" aria-hidden="true">08</div>
+<div className="craik-section-banner__body">
+<p className="craik-section-banner__kicker">Skills &amp; plugins</p>
+<h3 className="craik-section-banner__title">
+Growing the runtime — <em>without giving up governance.</em>
+</h3>
+<p className="craik-section-banner__lede">
+Skills package reusable operating guidance. Plugins package executable
+extensions. Both have to compose with policy, grants, receipts,
+provenance, and promotion gates so reviewers can audit what changed and
+why. Fourteen docs cover the contracts.
+</p>
+<p className="craik-section-banner__lede">
+<strong>Note:</strong> broad marketplace and community-ecosystem
+workflows are explicitly <em>post-MVP scope</em>. The MVP ships the
+contracts and approval flow; distribution is later.
+</p>
+</div>
+</header>
 
-Skill and plugin contracts so the runtime can grow without giving up
-governance.
+<div className="craik-product-spread">
 
-- [Community skills](guides/community-skills.md)
-- [Community plugins](guides/community-plugins.md)
-- [Skill packages](reference/skill-packages.md)
-- [Skill registries](reference/skill-registries.md)
-- [Skill invocation contexts](reference/skill-contexts.md)
-- [Skill telemetry](reference/skill-telemetry.md)
-- [Skill proposals](reference/skill-proposals.md)
-- [Skill replay](reference/skill-replay.md)
-- [Skill promotion gates](reference/skill-promotion-gates.md)
-- [Skill rollbacks](reference/skill-rollbacks.md)
-- [Plugin descriptors](reference/plugin-descriptors.md)
-- [Plugin probation](reference/plugin-probation.md)
-- [Plugin receipts](reference/plugin-receipts.md)
-- [Plugin capability grants](reference/plugin-capability-grants.md)
+<a className="craik-product-feature" href="guides/community-skills.md">
+<div>
+<p className="craik-product-feature__num">Entry · 01</p>
+<h4 className="craik-product-feature__title">Community skills</h4>
+<p className="craik-product-feature__summary">
+Skills package reusable instructions, examples, and optional assets
+for a bounded workflow. They should be easy to inspect before use and
+safe to run under Craik policy. The skill flow runs in MVP today;
+marketplace distribution is post-MVP.
+</p>
+<ul className="craik-product-feature__topics">
+<li>reusable guidance</li>
+<li>inspect before use</li>
+<li>policy-safe</li>
+<li>post-MVP marketplace</li>
+</ul>
+<span className="craik-product-feature__cta">Read the guide</span>
+</div>
+<blockquote className="craik-product-feature__quote">
+<p className="craik-product-feature__quote-eyebrow">Bounded</p>
+<p className="craik-product-feature__quote-text">
+Community skills package reusable instructions, examples, and optional
+assets for a bounded workflow. They should be easy to inspect before
+use and safe to run under Craik policy.
+</p>
+<p className="craik-product-feature__quote-attribution">— Community skills · §Intro</p>
+</blockquote>
+</a>
+
+</div>
+
+<ol className="craik-adr-grid">
+
+<li>
+<a className="craik-adr-card" href="guides/community-plugins.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">02</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Guide · plugins</span>
+</div>
+<h4 className="craik-adr-card__title">Community plugins</h4>
+<p className="craik-adr-card__decision">
+Plugins package executable extensions. Treat them as untrusted until
+their descriptor, provenance, review state, grants, and receipts have
+been inspected. Marketplace workflows are post-MVP.
+</p>
+<span className="craik-adr-card__cta">Guide</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-packages.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">03</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill packages</h4>
+<p className="craik-adr-card__decision">
+<code>craik.skill_package</code> records reusable instructions,
+entrypoints, docs, and assets. Packages do not carry plugin runtime
+authority — they are pure operating guidance.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-registries.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">04</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill registries</h4>
+<p className="craik-adr-card__decision">
+<code>craik.skill_registry</code> records project-local and global
+skill entries and where each came from — so a reviewer can audit
+which skills a project can use at a given point in time.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-contexts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">05</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill invocation contexts</h4>
+<p className="craik-adr-card__decision">
+<code>craik.skill_invocation_context</code> links a skill run to its
+task, skill package, policy envelope, and optional handoff — the
+auditable boundary for one skill invocation.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-telemetry.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">06</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill telemetry</h4>
+<p className="craik-adr-card__decision">
+<code>SkillPerformanceTelemetry</code> records how one invocation
+behaved without allowing the agent to silently rewrite reusable
+guidance.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-proposals.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">07</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill proposals</h4>
+<p className="craik-adr-card__decision">
+<code>SkillChangeProposal</code> lets agents draft changes to reusable
+operating guidance without silently changing their own authority.
+Reviewer approval gates promotion.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-replay.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">08</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill replay</h4>
+<p className="craik-adr-card__decision">
+<code>SkillReplayFixture</code> compares current skill behavior against
+redacted, reproducible fixtures before learning-loop changes are
+promoted.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-promotion-gates.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">09</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill promotion gates</h4>
+<p className="craik-adr-card__decision">
+<code>SkillPromotionRequest</code> prevents reviewed skill proposals
+from becoming promoted guidance without explicit approval — every
+promotion is named and dated.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/skill-rollbacks.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">10</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
+</div>
+<h4 className="craik-adr-card__title">Skill rollbacks</h4>
+<p className="craik-adr-card__decision">
+<code>SkillRollbackTarget</code> provides a reviewable path for
+reverting promoted skill updates when a promoted version causes
+regressions or violates policy.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/plugin-descriptors.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">11</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
+</div>
+<h4 className="craik-adr-card__title">Plugin descriptors</h4>
+<p className="craik-adr-card__decision">
+<code>craik.plugin_descriptor</code> records governed plugin metadata
+without granting runtime authority. Authority comes from grants and
+receipts — never the descriptor alone.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/plugin-probation.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">12</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
+</div>
+<h4 className="craik-adr-card__title">Plugin probation</h4>
+<p className="craik-adr-card__decision">
+<code>craik.plugin_probation</code> keeps new or changed plugins out of
+durable trust until review criteria are satisfied. Probation is the
+gate between "available" and "trusted".
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/plugin-receipts.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">13</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
+</div>
+<h4 className="craik-adr-card__title">Plugin receipts</h4>
+<p className="craik-adr-card__decision">
+<code>craik.plugin_receipt</code> records plugin actions and outputs
+under policy — joinable to the task, actor, and the plugin descriptor
+that authorized the call.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+<li>
+<a className="craik-adr-card" href="reference/plugin-capability-grants.md">
+<div className="craik-adr-card__head">
+<span className="craik-adr-card__num">14</span>
+<span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
+</div>
+<h4 className="craik-adr-card__title">Plugin capability grants</h4>
+<p className="craik-adr-card__decision">
+The grant shape that authorizes a plugin to act under policy. Like
+regular capability grants but with plugin-descriptor binding so the
+authority can be retracted at the plugin boundary.
+</p>
+<span className="craik-adr-card__cta">Reference</span>
+</a>
+</li>
+
+</ol>
 
 ### 9 · Integrations & migrations
 
