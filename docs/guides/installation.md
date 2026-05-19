@@ -1,7 +1,18 @@
 # Installation
 
-Craik is not published to PyPI yet. <!-- TODO: update when PyPI publish lands -->
-During `0.x.0` MVP development, install it from a local checkout:
+Install Craik from PyPI:
+
+```sh
+python3.12 -m pip install craik
+```
+
+Or install it with `pipx` if you want an isolated CLI:
+
+```sh
+pipx install craik
+```
+
+For contributor development, install it from a local checkout:
 
 ```sh
 python3.12 -m pip install -e ".[dev]"
