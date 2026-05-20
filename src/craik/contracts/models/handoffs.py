@@ -184,6 +184,7 @@ class TaskRun(CraikModel):
     phase: TaskRunPhase = "plan"
     iteration: int = Field(default=0, ge=0)
     max_iterations: int = Field(default=5, ge=1)
+    wall_clock_budget_seconds: float | None = Field(default=None, gt=0)
     started_at: datetime
     phase_started_at: datetime
     updated_at: datetime

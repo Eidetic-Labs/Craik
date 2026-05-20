@@ -35,6 +35,7 @@ from craik.runtime.work.loop_support.execution import (
     result_with_idempotency_key,
     runtime_policy_context,
     stream_chunks_from_output,
+    time_budget_stop_reason,
 )
 from craik.runtime.work.loop_support.execution import (
     operator_policy_decision as check_active_operator_policy,
@@ -60,6 +61,7 @@ __all__ = [
     "LoopExecutionResult",
     "LoopMaxIterationsError",
     "LoopPolicyBlockedError",
+    "LoopTimeBudgetExceededError",
     "LoopStep",
     "RunnerStepHandler",
     "SingleAgentLoopExecutor",
@@ -77,6 +79,10 @@ class LoopPolicyBlockedError(LoopExecutionError):
 
 class LoopMaxIterationsError(LoopExecutionError):
     """Raised when the loop reaches its iteration bound."""
+
+
+class LoopTimeBudgetExceededError(LoopExecutionError):
+    """Raised when the loop exhausts its wall-clock budget."""
 
 
 class RunnerStepHandler(Protocol):
@@ -157,6 +163,7 @@ class SingleAgentLoopExecutor:
         grants: list[CapabilityGrant] | None = None,
         steps: list[LoopStep] | None = None,
         max_iterations: int = 5,
+        wall_clock_budget_seconds: float | None = None,
         started_at: datetime | None = None,
         resume_run_id: str | None = None,
     ) -> LoopExecutionResult:
@@ -177,6 +184,7 @@ class SingleAgentLoopExecutor:
                 runner_id=runner_metadata.id,
                 runner_mode=runner_metadata.mode,
                 max_iterations=max_iterations,
+                wall_clock_budget_seconds=wall_clock_budget_seconds,
                 created_at=started_at,
             )
         )
@@ -216,6 +224,23 @@ class SingleAgentLoopExecutor:
                 if existing_capture is not None:
                     output_captures.append(existing_capture)
                     continue
+
+            stop_reason = time_budget_stop_reason(
+                started_at=run.started_at,
+                budget_seconds=run.wall_clock_budget_seconds,
+            )
+            if stop_reason is not None:
+                run = self.runs.transition(
+                    run.id,
+                    RunTransition(
+                        status="interrupted",
+                        phase="stop",
+                        iteration=iteration,
+                        stop_reason=stop_reason,
+                        at=datetime.now(UTC),
+                    ),
+                )
+                raise LoopTimeBudgetExceededError(run.stop_reason or stop_reason)
 
             if iteration >= max_iterations:
                 run = self.runs.transition(
