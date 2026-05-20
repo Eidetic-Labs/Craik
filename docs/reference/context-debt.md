@@ -1,24 +1,92 @@
-# Context Debt
+# Context debt
 
-Context debt records preserve known gaps in the context an agent used. They make
-omissions explicit so future agents can decide whether to continue, refresh, or
-stop for more information.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`craik.context_debt_record` can represent:
+<div className="craik-lead">
 
-- omitted documentation,
-- documentation excluded by discovery rules,
-- stale instruction constraints,
-- unresolved assumptions,
-- missing external state such as GitHub,
-- missing memory facts,
-- active instruction constraints carried forward,
-- missing case files,
-- or another explicit context gap.
+**What you'll find here**
 
-Open and carried-forward records must include `next_action`. Resolved records
-must include `resolved_at`.
+The `craik.context_debt_record` contract — how Craik makes known gaps
+in the context an agent used explicit, so future agents can decide
+whether to continue, refresh, or stop for more information.
 
-Handoffs continue to expose a deterministic `context_debt` summary list for
-runner readability. The structured records are persisted separately so callers
-can track owner, source links, next action, carry-forward state, and resolution.
+</div>
+
+<div className="craik-keypoint">
+
+**Make omissions explicit.**
+
+The structured records are persisted separately so callers can track
+owner, source links, next action, carry-forward state, and resolution.
+
+</div>
+
+## What records can represent
+
+<div className="craik-grid">
+
+<div><h4>Omitted documentation</h4></div>
+<div><h4>Excluded docs</h4><p>By discovery rules.</p></div>
+<div><h4>Stale instruction constraints</h4></div>
+<div><h4>Unresolved assumptions</h4></div>
+<div><h4>Missing external state</h4><p>Such as GitHub.</p></div>
+<div><h4>Missing memory facts</h4></div>
+<div><h4>Active instruction constraints carried forward</h4></div>
+<div><h4>Missing case files</h4></div>
+<div><h4>Other explicit context gaps</h4></div>
+
+</div>
+
+## Lifecycle rules
+
+<div className="craik-fields">
+
+<div>
+<dt>State</dt>
+<dt><span className="craik-fields__type">Required field</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt>Open or carried-forward</dt>
+<dt><span className="craik-fields__type"><code>next_action</code></span></dt>
+<dd>Must be set so the resuming agent knows what to do.</dd>
+</div>
+
+<div>
+<dt>Resolved</dt>
+<dt><span className="craik-fields__type"><code>resolved_at</code></span></dt>
+<dd>Must include the resolution timestamp.</dd>
+</div>
+
+</div>
+
+## Handoff summary
+
+Handoffs continue to expose a deterministic `context_debt` summary
+list for runner readability. The structured records persist
+separately.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../guides/context-budgeting/">
+<strong>Guide</strong>
+<span>Context budgeting</span>
+<small>How case-file omissions become debt.</small>
+</a>
+
+<a href="evidence-assumption-view/">
+<strong>Reference</strong>
+<span>Evidence and assumption view</span>
+<small>The operator surface where unresolved debt surfaces.</small>
+</a>
+
+<a href="schemas/">
+<strong>Reference</strong>
+<span>Schema reference</span>
+<small>The <code>context_debt_record</code> shape.</small>
+</a>
+
+</div>
