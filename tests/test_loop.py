@@ -20,6 +20,7 @@ from craik.runtime.store import LocalStore
 from craik.runtime.work.loop import (
     FixtureStepRunner,
     LoopMaxIterationsError,
+    LoopProviderBudgetExceededError,
     LoopStep,
     LoopTimeBudgetExceededError,
     SingleAgentLoopExecutor,
@@ -159,6 +160,42 @@ def test_loop_enforces_wall_clock_budget_before_next_step(store: LocalStore) -> 
     assert run.wall_clock_budget_seconds == 1
     assert run.stop_reason == "wall-clock budget 1s exceeded"
     assert runner.requests == []
+
+
+def test_loop_enforces_provider_token_budget_before_next_provider_call(
+    store: LocalStore,
+) -> None:
+    runner = TokenUsageStepRunner(total_tokens=30)
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    with pytest.raises(LoopProviderBudgetExceededError, match="provider token budget exhausted"):
+        executor.execute(
+            task_id="task_docs_reconcile",
+            case_file_id="case_docs_reconcile",
+            policy=generate_policy_envelope(
+                task_id="task_docs_reconcile",
+                actor="runner:fixture",
+            ),
+            runner_metadata=_runner(),
+            steps=[
+                LoopStep(phase="plan", input_prompt="Plan."),
+                LoopStep(phase="act", input_prompt="Act."),
+            ],
+            provider_token_budget=30,
+        )
+
+    run = store.list_task_runs()[0]
+    assert run.status == "interrupted"
+    assert run.iteration == 1
+    assert run.provider_token_budget == 30
+    assert run.provider_tokens_used == 30
+    assert run.provider_token_budget_remaining == 0
+    assert run.stop_reason == "provider token budget exhausted"
+    assert [request.phase for request in runner.requests] == ["plan"]
 
 
 def test_loop_resumes_interrupted_run_from_completed_phase_boundary(
@@ -484,6 +521,33 @@ class RecordingStepRunner:
             status="completed",
             summary="Recorded step.",
             observed_output={"phase": request.phase},
+            created_at=datetime.now(UTC),
+        )
+
+
+class TokenUsageStepRunner:
+    def __init__(self, *, total_tokens: int) -> None:
+        self.total_tokens = total_tokens
+        self.requests: list[RunnerStepRequest] = []
+
+    def run_step(
+        self,
+        request: RunnerStepRequest,
+        *,
+        stream_callback: Callable[[str], None] | None = None,
+    ) -> RunnerStepResult:
+        _ = stream_callback
+        self.requests.append(request)
+        return RunnerStepResult(
+            id=f"runner_step_result_{request.run_id}_{request.phase}",
+            request_id=request.id,
+            run_id=request.run_id,
+            task_id=request.task_id,
+            phase=request.phase,
+            runner=request.runner,
+            status="completed",
+            summary="Recorded provider usage.",
+            observed_output={"usage": {"total_tokens": self.total_tokens}},
             created_at=datetime.now(UTC),
         )
 

@@ -177,6 +177,9 @@ def test_task_run_identity_fields_round_trip(
             "completed_step_keys": ["run_docs:1:plan", "run_docs:2:act"],
             "last_step_key": "run_docs:2:act",
             "wall_clock_budget_seconds": 120.5,
+            "provider_token_budget": 24000,
+            "provider_tokens_used": 1500,
+            "provider_token_budget_remaining": 22500,
         }
     )
 
@@ -190,6 +193,9 @@ def test_task_run_identity_fields_round_trip(
     assert dumped["completed_step_keys"] == ["run_docs:1:plan", "run_docs:2:act"]
     assert dumped["last_step_key"] == "run_docs:2:act"
     assert dumped["wall_clock_budget_seconds"] == 120.5
+    assert dumped["provider_token_budget"] == 24000
+    assert dumped["provider_tokens_used"] == 1500
+    assert dumped["provider_token_budget_remaining"] == 22500
 
 
 def test_runner_contract_models_keep_legacy_import_surface() -> None:

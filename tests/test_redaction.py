@@ -77,6 +77,16 @@ def test_context_budget_token_counts_are_not_secret_keys() -> None:
     assert not contains_unredacted_secret({"max_tokens": 24000, "estimated_tokens": 12})
 
 
+def test_provider_token_budget_counts_are_not_secret_keys() -> None:
+    assert not contains_unredacted_secret(
+        {
+            "provider_token_budget": 24000,
+            "provider_tokens_used": 1500,
+            "provider_token_budget_remaining": 22500,
+        }
+    )
+
+
 def test_policy_credential_constraints_are_not_secret_keys() -> None:
     assert not contains_unredacted_secret(
         {

@@ -110,6 +110,26 @@ def time_budget_stop_reason(
     return None
 
 
+def provider_budget_stop_reason(remaining_tokens: int | None) -> str | None:
+    """Return a stop reason when the provider token budget is exhausted."""
+    if remaining_tokens == 0:
+        return "provider token budget exhausted"
+    return None
+
+
+def provider_usage_total_tokens(observed_output: dict[str, object]) -> int:
+    """Extract normalized provider token usage from a runner observed output."""
+    usage = observed_output.get("usage")
+    if not isinstance(usage, dict):
+        return 0
+    raw_total = usage.get("total_tokens", usage.get("total", 0))
+    if isinstance(raw_total, bool):
+        return 0
+    if isinstance(raw_total, int):
+        return max(raw_total, 0)
+    return 0
+
+
 def request_id(run_id: str, index: int, phase: TaskRunPhase, tool_round: int) -> str:
     """Return the stable request id for a loop step/tool round."""
     base = f"runner_step_request_{run_id}_{index}_{phase}"

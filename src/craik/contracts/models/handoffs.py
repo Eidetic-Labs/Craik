@@ -185,6 +185,9 @@ class TaskRun(CraikModel):
     iteration: int = Field(default=0, ge=0)
     max_iterations: int = Field(default=5, ge=1)
     wall_clock_budget_seconds: float | None = Field(default=None, gt=0)
+    provider_token_budget: int | None = Field(default=None, gt=0)
+    provider_tokens_used: int = Field(default=0, ge=0)
+    provider_token_budget_remaining: int | None = Field(default=None, ge=0)
     started_at: datetime
     phase_started_at: datetime
     updated_at: datetime

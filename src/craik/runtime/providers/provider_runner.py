@@ -40,6 +40,7 @@ from craik.runtime.work.handoffs import HandoffWriter
 from craik.runtime.work.loop import (
     LoopExecutionResult,
     LoopMaxIterationsError,
+    LoopProviderBudgetExceededError,
     LoopStep,
     SingleAgentLoopExecutor,
     default_loop_steps,
@@ -216,6 +217,7 @@ class ProviderBackedRunExecutor:
         steps: list[LoopStep] | None = None,
         statuses: list[RunnerResultStatus] | None = None,
         max_iterations: int = 5,
+        provider_token_budget: int | None = None,
         live_enabled: bool | None = None,
         started_at: datetime | None = None,
     ) -> ProviderBackedRunResult:
@@ -257,6 +259,7 @@ class ProviderBackedRunExecutor:
                 grants=grants or [],
                 steps=steps or default_loop_steps(),
                 max_iterations=max_iterations,
+                provider_token_budget=provider_token_budget,
                 started_at=started_at,
             )
             handoff = HandoffWriter(self.store).create_from_run(
@@ -272,7 +275,7 @@ class ProviderBackedRunExecutor:
                 handoff=handoff,
                 provider_results=list(runner.provider_results),
             )
-        except LoopMaxIterationsError as error:
+        except (LoopMaxIterationsError, LoopProviderBudgetExceededError) as error:
             run = _latest_run_for_task(self.store, task_id)
             handoff = HandoffWriter(self.store).create_from_run(
                 run.id,

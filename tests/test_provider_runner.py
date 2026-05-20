@@ -120,6 +120,28 @@ def test_provider_backed_runner_records_interruption_handoff(
     assert "Inspect run state" in result.handoff.next_steps[0]
 
 
+def test_provider_backed_runner_interrupts_when_provider_token_budget_exhausts(
+    store: LocalStore,
+    tmp_path: Path,
+) -> None:
+    task_id = _seed_task(store, tmp_path)
+
+    result = ProviderBackedRunExecutor(store).execute(
+        task_id=task_id,
+        provider_id="provider_openai",
+        grants=[_shell_grant(task_id)],
+        provider_token_budget=30,
+    )
+
+    assert result.interrupted_error == "provider token budget exhausted"
+    assert result.run.status == "interrupted"
+    assert result.run.provider_token_budget == 30
+    assert result.run.provider_tokens_used == 30
+    assert result.run.provider_token_budget_remaining == 0
+    assert len(result.provider_results) == 1
+    assert result.handoff.status == "incomplete"
+
+
 def _seed_task(store: LocalStore, tmp_path: Path) -> str:
     repo = tmp_path / "repo"
     repo.mkdir()
