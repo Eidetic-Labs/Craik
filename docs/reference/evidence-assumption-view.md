@@ -1,30 +1,85 @@
-# Evidence And Assumption View
+# Evidence and assumption view
 
-The evidence and assumption view is a read-only operator view over
-`craik.evidence_reference` and `craik.assumption` records.
+<p className="craik-meta"><span>2 min read</span><span>Reference · preview</span><span>Updated 2026-05-19</span></p>
 
-The v0.7.0 TUI surface formats evidence with:
+<div className="craik-lead">
 
-- evidence id and kind;
-- source and locator;
-- capture timestamp when present;
-- summary.
+**What you'll find here**
 
-It formats assumptions separately with:
+The read-only operator view over `craik.evidence_reference` and
+`craik.assumption` records — what the v0.7.0 TUI surface formats and
+the boundary that keeps assumptions visually separate from evidence.
 
-- assumption id and status;
-- task id;
-- confidence;
-- linked evidence ids;
-- statement.
+</div>
+
+<div className="craik-keypoint">
+
+**Assumptions are not facts.**
+
+The view keeps assumptions visually separate from evidence and shows
+confidence and status so operators can review whether an assumption is
+open, validated, or rejected.
+
+</div>
+
+## What it formats
+
+<div className="craik-decision">
+
+<div>
+<h4>Evidence</h4>
+<ul>
+<li>Evidence id and kind</li>
+<li>Source and locator</li>
+<li>Capture timestamp when present</li>
+<li>Summary</li>
+</ul>
+</div>
+
+<div>
+<h4>Assumptions</h4>
+<ul>
+<li>Assumption id and status</li>
+<li>Task id</li>
+<li>Confidence</li>
+<li>Linked evidence ids</li>
+<li>Statement</li>
+</ul>
+</div>
+
+</div>
 
 ## Boundaries
 
-Assumptions are not facts. The view must keep assumptions visually separate from
-evidence and must show confidence and status so operators can review whether an
-assumption is open, validated, or rejected.
+<div className="craik-keypoint">
 
-Missing evidence or assumptions render as `none`. The view does not validate,
-reject, promote, or write memory facts.
+**Read-only.**
 
-See [Operator Surface](operator-surface.md) for the shared TUI boundary.
+Missing evidence or assumptions render as `none`. The view does not
+validate, reject, promote, or write memory facts.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="operator-surface/">
+<strong>Reference</strong>
+<span>Operator surface</span>
+<small>The shared TUI boundary.</small>
+</a>
+
+<a href="../guides/evidence-and-assumptions/">
+<strong>Guide</strong>
+<span>Evidence and assumptions</span>
+<small>The operator workflow this view supports.</small>
+</a>
+
+<a href="schemas/">
+<strong>Reference</strong>
+<span>Schema reference</span>
+<small>The <code>evidence_reference</code> and <code>assumption</code> shapes.</small>
+</a>
+
+</div>

@@ -1,119 +1,193 @@
-# Provider Routing And Sandboxes
+# Provider routing and sandboxes
 
-Provider routing chooses model/runtime metadata. Sandbox routing chooses an
-execution environment. Keep those decisions separate so policy, receipts, and
-redaction can audit each boundary independently.
+<p className="craik-meta"><span>5 min read</span><span>For operators &amp; integrators</span><span>Updated 2026-05-19</span></p>
 
-## Routing Flow
+<div className="craik-lead">
 
-1. Select a model provider from [Model Providers](../reference/model-providers.md).
-2. Check provider budget and quota before dispatch.
-3. Evaluate [Provider Failover](../reference/provider-failover.md) only when a
-   configured fallback rule allows it.
-4. Use [MCP Client](../reference/mcp-client.md) metadata for provider or tool
-   routes that cross an MCP boundary.
-5. Select a [Sandbox Backend](../reference/sandbox-backends.md) for execution.
-6. Record [Environment Receipts](../reference/environment-receipts.md) for
-   allowed and denied provider or sandbox decisions.
+**What you'll do**
 
-## Provider Configuration
+Walk through provider selection, budget/quota gating, failover,
+optional MCP routing, sandbox selection, and the environment receipts
+that record each decision. Provider and sandbox routing are kept
+separate so policy can audit each boundary independently.
 
-Provider records store non-secret metadata:
+</div>
 
-- provider id, family, modes, and capabilities;
-- trust boundary;
-- config reference names;
-- secret reference names;
-- budget and quota refs;
-- runtime path;
-- docs links.
+<div className="craik-keypoint">
 
-Secret values do not belong in provider records, CLI output, docs, receipts, or
-fixtures. Store raw provider credentials outside Craik and refer to them by
-secret reference name.
+**Two independent decisions.**
 
-## MCP Integration
+Provider routing chooses model/runtime metadata. Sandbox routing
+chooses an execution environment. Keeping them separate lets policy,
+receipts, and redaction audit each boundary on its own terms.
 
-Use [MCP Export Boundary](../reference/mcp-export-boundary.md) to decide which
-Craik surfaces can be exported as MCP tools. Use
-[MCP Client](../reference/mcp-client.md) for client-side provider and tool
-routing.
+</div>
+
+## Routing flow
+
+<ol className="craik-steps">
+<li>Select a model provider from <a href="../../reference/model-providers/">Model providers</a>.</li>
+<li>Check provider budget and quota before dispatch.</li>
+<li>Evaluate <a href="../../reference/provider-failover/">provider failover</a> only when a configured fallback rule allows it.</li>
+<li>Use <a href="../../reference/mcp-client/">MCP client</a> metadata for provider or tool routes that cross an MCP boundary.</li>
+<li>Select a <a href="../../reference/sandbox-backends/">sandbox backend</a> for execution.</li>
+<li>Record <a href="../../reference/environment-receipts/">environment receipts</a> for allowed and denied provider or sandbox decisions.</li>
+</ol>
+
+## Provider configuration
+
+<div className="craik-grid">
+
+<div><h4>Provider id · family · modes · capabilities</h4></div>
+<div><h4>Trust boundary</h4></div>
+<div><h4>Config reference names</h4></div>
+<div><h4>Secret reference names</h4></div>
+<div><h4>Budget and quota refs</h4></div>
+<div><h4>Runtime path</h4></div>
+<div><h4>Docs links</h4></div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Secrets are references, not values.**
+
+Secret values never appear in provider records, CLI output, docs,
+receipts, or fixtures. Store raw credentials outside Craik and refer
+to them by secret reference name.
+
+</div>
+
+## MCP integration
+
+<div className="craik-decision">
+
+<div>
+<h4><a href="../../reference/mcp-export-boundary/">MCP export boundary</a></h4>
+<p>Decide which Craik surfaces can be exported as MCP tools.</p>
+</div>
+
+<div>
+<h4><a href="../../reference/mcp-client/">MCP client</a></h4>
+<p>Client-side provider and tool routing.</p>
+</div>
+
+</div>
 
 MCP routes must remain:
 
-- grant-required;
-- receipt-required;
-- redacted;
-- documented when they are part of the compatibility surface.
+<div className="craik-grid">
 
-## Sandbox Backends
+<div><h4>Grant-required</h4></div>
+<div><h4>Receipt-required</h4></div>
+<div><h4>Redacted</h4></div>
+<div><h4>Documented</h4><p>When part of the compatibility surface.</p></div>
 
-The v0.9.0 sandbox surfaces are:
+</div>
 
-- [Local Process Backend](../reference/local-process-backend.md);
-- [Remote Shell Backend](../reference/remote-shell-backend.md);
-- [Browser Tool Boundary](../reference/browser-tool-boundary.md);
-- [Docker Sandbox Backend](../reference/docker-sandbox-backend.md).
+## Sandbox backends
 
-All sandbox actions require explicit policy, capability grants, receipts, and
-redaction. Local and remote shell helpers use command references instead of
-inline shell strings. Docker requests require explicit network, mount, image,
-command, and environment references. Browser/tool results are redacted before
-receipt metadata is persisted.
+The v0.9.0 sandbox surfaces:
 
-## Safe Diagnostics
+<div className="craik-grid">
 
-List provider metadata:
+<div><h4><a href="../../reference/local-process-backend/">Local process</a></h4></div>
+<div><h4><a href="../../reference/remote-shell-backend/">Remote shell</a></h4></div>
+<div><h4><a href="../../reference/browser-tool-boundary/">Browser tool boundary</a></h4></div>
+<div><h4><a href="../../reference/docker-sandbox-backend/">Docker sandbox</a></h4></div>
 
-```sh
-craik provider list
-```
+</div>
 
-Expected output is JSON metadata with provider ids, modes, capabilities, trust
-boundaries, config refs, secret reference names, budget refs, quota refs, and
-docs. Secret values are not printed.
+<div className="craik-keypoint">
 
-Show one provider:
+**Policy, grants, receipts, redaction — every backend.**
 
-```sh
-craik provider show provider_fixture_local
-```
+All sandbox actions require explicit policy, capability grants,
+receipts, and redaction. Local and remote shell helpers use command
+references instead of inline shell strings. Docker requests require
+explicit network, mount, image, command, and environment references.
+Browser/tool results are redacted before receipt metadata is persisted.
 
-Expected output is one provider record. Missing provider ids return a clear CLI
-error.
+</div>
 
-Select a provider for a mode:
+## Safe diagnostics
 
-```sh
-craik provider select provider_fixture_local --mode runner --policy-envelope-id policy_provider
-```
+<div className="craik-fields">
 
-Expected output is a redacted selection payload with provider metadata, budget
-and quota refs, policy envelope id, and receipt ids. The command does not call a
-provider, load credentials, or grant execution authority.
+<div>
+<dt>Command</dt>
+<dt><span className="craik-fields__type">Output</span></dt>
+<dd>Notes</dd>
+</div>
 
-Run local validation:
+<div>
+<dt><code>craik provider list</code></dt>
+<dt><span className="craik-fields__type">JSON metadata</span></dt>
+<dd>Provider ids · modes · capabilities · trust boundaries · config refs · secret reference names · budget refs · quota refs · docs. Secret values are not printed.</dd>
+</div>
+
+<div>
+<dt><code>craik provider show &lt;id&gt;</code></dt>
+<dt><span className="craik-fields__type">one record</span></dt>
+<dd>Missing provider ids return a clear CLI error.</dd>
+</div>
+
+<div>
+<dt><code>craik provider select &lt;id&gt; --mode runner --policy-envelope-id &lt;id&gt;</code></dt>
+<dt><span className="craik-fields__type">redacted selection</span></dt>
+<dd>Returns provider metadata · budget &amp; quota refs · policy envelope id · receipt ids. Does NOT call a provider, load credentials, or grant execution authority.</dd>
+</div>
+
+</div>
+
+## Validation
 
 ```sh
 uv run --extra dev pytest tests/test_model_providers.py tests/test_mcp_client.py tests/test_sandbox_backend.py tests/test_environment_receipts.py
 ```
 
-Expected output is passing tests for provider metadata, MCP client routing,
-sandbox backend contracts, and environment receipts.
-
-Run the aggregate sandbox policy boundary tests:
+Expected output: passing tests for provider metadata, MCP client
+routing, sandbox backend contracts, and environment receipts.
 
 ```sh
 uv run --extra dev pytest tests/test_sandbox_policy_boundaries.py
 ```
 
-Expected output is passing tests for allowed sandbox actions, denied missing
-policy controls, denied unsafe isolation defaults, and redacted environment
-receipts.
+Expected output: passing tests for allowed sandbox actions, denied
+missing-policy controls, denied unsafe isolation defaults, and
+redacted environment receipts.
 
-## Public Boundary
+<div className="craik-keypoint">
 
-Do not include local filesystem paths, private hostnames, raw command payloads,
-environment maps, webhook secrets, bearer tokens, SSH keys, provider
-credentials, or unredacted tool outputs in public docs. Use stable fixture ids,
-config refs, and secret reference names instead.
+**Public boundary.**
+
+Do not include local filesystem paths, private hostnames, raw command
+payloads, environment maps, webhook secrets, bearer tokens, SSH keys,
+provider credentials, or unredacted tool outputs in public docs. Use
+stable fixture ids, config refs, and secret reference names instead.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../../reference/model-providers/">
+<strong>Reference</strong>
+<span>Model providers</span>
+<small>The shipped provider metadata catalog.</small>
+</a>
+
+<a href="../../reference/sandbox-backends/">
+<strong>Reference</strong>
+<span>Sandbox backends</span>
+<small>The full sandbox-contract surface.</small>
+</a>
+
+<a href="../../reference/environment-receipts/">
+<strong>Reference</strong>
+<span>Environment receipts</span>
+<small>The audit trail produced by every routing decision.</small>
+</a>
+
+</div>

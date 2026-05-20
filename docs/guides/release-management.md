@@ -1,53 +1,90 @@
 # Release Management
 
-Craik's first public package target is a robust `0.x.0` MVP, not `1.0.0`.
-The `0.x.0` series can still change contracts between minor releases, but each
-published release must be installable, documented, and recoverable.
+<p className="craik-meta"><span>5 min read</span><span>For maintainers</span><span>Updated 2026-05-19</span></p>
 
-## Release Cadence
+<div className="craik-lead">
 
-Use minor releases for MVP capability increments and patch releases for fixes.
-Do not publish a release only because changes have accumulated. Publish when the
-roadmap gate for that release has completed, CI is green, and release notes are
-reviewed.
+**What you'll do**
 
-Recommended cadence:
+Cut, tag, document, build, and publish a Craik release. Every release
+must be installable, documented, and recoverable — `0.x.0` is not a
+license to skip discipline.
 
-- `0.x.0`: capability-bearing MVP milestones;
-- `0.x.y`: bug, docs, packaging, compatibility, and security patches;
-- `1.0.0`: deferred until compatibility promises, upgrade paths, and real-world
-  security soak justify the stability signal.
+</div>
+
+<div className="craik-keypoint">
+
+**`0.x.0` MVP, not `1.0.0`.**
+
+The `0.x.0` series can still change contracts between minor releases,
+but each published release must pass the same packaging, docs,
+quality, and changelog gates as a stable line.
+
+</div>
+
+## Release cadence
+
+<div className="craik-fields">
+
+<div>
+<dt>Release line</dt>
+<dt><span className="craik-fields__type">Use for</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt><code>0.x.0</code></dt>
+<dt><span className="craik-fields__type">capability milestones</span></dt>
+<dd>MVP capability increments. Publish when the roadmap gate completes, CI is green, and release notes are reviewed.</dd>
+</div>
+
+<div>
+<dt><code>0.x.y</code></dt>
+<dt><span className="craik-fields__type">patches</span></dt>
+<dd>Bug · docs · packaging · compatibility · security fixes.</dd>
+</div>
+
+<div>
+<dt><code>1.0.0</code></dt>
+<dt><span className="craik-fields__type">deferred</span></dt>
+<dd>Waits until compatibility promises, upgrade paths, and real-world security soak justify the stability signal.</dd>
+</div>
+
+</div>
 
 ## Tag Policy
 
-Release tags use `vMAJOR.MINOR.PATCH`, for example `v0.1.0`.
+Release tags use `vMAJOR.MINOR.PATCH` — e.g. `v0.1.0`.
 
-Before tagging:
-
-1. Update `pyproject.toml`, `src/craik/__init__.py`, and `docs/package.json`.
-2. Move relevant `CHANGELOG.md` entries from `Unreleased` into the target
-   version section.
-3. Run package, docs, quality, and version checks.
-4. Open a release PR that links the completed roadmap issue.
-5. Tag only the merge commit from the release PR.
+<ol className="craik-steps">
+<li>Update <code>pyproject.toml</code>, <code>src/craik/__init__.py</code>, and <code>docs/package.json</code>.</li>
+<li>Move relevant <code>CHANGELOG.md</code> entries from <code>Unreleased</code> into the target version section.</li>
+<li>Run package, docs, quality, and version checks.</li>
+<li>Open a release PR that links the completed roadmap issue.</li>
+<li>Tag only the merge commit from the release PR.</li>
+</ol>
 
 ## Release Notes
 
-Every release needs a GitHub release entry and a matching `CHANGELOG.md`
-section. Release notes must include:
+Every release needs a GitHub release entry and a matching
+`CHANGELOG.md` section.
 
-- user-facing additions and fixes;
-- migration notes and compatibility risks;
-- provider, policy, persistence, and receipt changes;
-- known limitations that remain after the release;
-- links to the closing issues and release PR.
+<div className="craik-grid">
 
-## Package Verification
+<div><h4>User-facing additions and fixes</h4></div>
+<div><h4>Migration notes and compatibility risks</h4></div>
+<div><h4>Provider · policy · persistence · receipt changes</h4></div>
+<div><h4>Known limitations remaining</h4></div>
+<div><h4>Links to closing issues and release PR</h4></div>
 
-Package artifacts are built in CI by the Package workflow. That workflow checks
-version consistency, validates release-process docs, builds `sdist` and wheel
-artifacts, runs `twine check`, smoke-installs the wheel, and uploads the build
-artifacts for inspection.
+</div>
+
+## Package verification
+
+Package artifacts are built in CI by the Package workflow, which
+checks version consistency, validates release-process docs, builds
+`sdist` + wheel artifacts, runs `twine check`, smoke-installs the
+wheel, and uploads build artifacts.
 
 Local equivalent:
 
@@ -58,30 +95,60 @@ python -m build
 python -m twine check dist/*
 ```
 
-## PyPI Publishing
+## PyPI publishing
 
-Publishing is handled by the Publish workflow. Manual dispatch builds and
-validates artifacts only. PyPI publication runs only from the immutable release
-tag, currently `v0.1.0`, after the workflow verifies that the tag, package
-version, and changelog all agree.
+<div className="craik-keypoint">
 
-Publishing requires the `pypi` Protected Environment. The environment should
-require reviewer approval and should use trusted publishing through GitHub OIDC
-instead of stored PyPI tokens.
+**Tag-driven, OIDC-published.**
 
-## Protected Environment
+Publishing runs only from the immutable release tag (currently
+`v0.1.0`) after the workflow verifies tag, package version, and
+changelog all agree. Manual dispatch builds and validates artifacts
+only.
 
-Configure the `pypi` Protected Environment before the first public release:
+</div>
 
-- require at least one maintainer approval;
-- restrict the workflow to protected branches and release tags;
-- keep PyPI trusted publisher configuration aligned with
-  `eidetic-labs/craik`;
-- do not store long-lived PyPI credentials in repository secrets.
+Publishing requires the `pypi` Protected Environment:
+
+<div className="craik-grid">
+
+<div><h4>Reviewer approval</h4><p>At least one maintainer.</p></div>
+<div><h4>Branch / tag restriction</h4><p>Protected branches and release tags only.</p></div>
+<div><h4>Trusted publishing</h4><p>Through GitHub OIDC — not stored PyPI tokens.</p></div>
+<div><h4>PyPI publisher config</h4><p>Aligned with <code>eidetic-labs/craik</code>.</p></div>
+
+</div>
 
 ## Rollback
 
-PyPI releases are immutable from the perspective of dependent users. If a bad
-release ships, publish a patch release with a clear changelog entry and GitHub
-release note. Yank only when installation of the bad artifact is actively
-harmful.
+PyPI releases are immutable from dependents' perspective. If a bad
+release ships:
+
+<ol className="craik-steps">
+<li>Publish a patch release with a clear changelog entry and GitHub release note.</li>
+<li>Yank only when installation of the bad artifact is actively harmful.</li>
+</ol>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../../security/release-process/">
+<strong>Security</strong>
+<span>Security release process</span>
+<small>The private-coordination overlay for security-sensitive releases.</small>
+</a>
+
+<a href="../../release-readiness/">
+<strong>Read</strong>
+<span>Release readiness</span>
+<small>The in-repo readiness gates this procedure verifies.</small>
+</a>
+
+<a href="../updating/">
+<strong>Guide</strong>
+<span>Updating Craik</span>
+<small>What operators do after a release publishes.</small>
+</a>
+
+</div>

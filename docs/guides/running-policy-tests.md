@@ -159,19 +159,19 @@ CRAIK_HOME=/tmp/craik-policy-test craik policy test
 
 <div className="craik-next">
 
-<a href="../reference/policy-tests.md">
+<a href="../../reference/policy-tests/">
 <strong>Reference</strong>
 <span>Policy tests</span>
 <small>The full ruleset for every check the gate runs.</small>
 </a>
 
-<a href="../concepts/governance.md">
+<a href="../../concepts/governance/">
 <strong>Read</strong>
 <span>Governance</span>
 <small>The governance surface this gate enforces.</small>
 </a>
 
-<a href="release-management.md">
+<a href="../release-management/">
 <strong>Operate</strong>
 <span>Release management</span>
 <small>How the policy gate participates in cutting a release.</small>

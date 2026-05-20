@@ -1,53 +1,117 @@
-# Webhook Ingress
+# Webhook ingress
 
-Webhook ingress validates one request boundary before any gateway dispatch.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`craik.runtime.webhook_ingress` provides pure runtime helpers for:
+<div className="craik-lead">
 
-- HMAC SHA-256 signature validation;
-- JSON object parsing;
-- required `event_id` and `event_type` extraction;
-- idempotency checks against known event ids;
-- event type authorization;
-- redacted ingress receipts.
+**What you'll find here**
+
+The validation boundary for one webhook request — signature checks,
+JSON parsing, event-id idempotency, event-type authorization, and
+redacted ingress receipts.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Validation, not authority.**
+
+Webhook validation does not grant channel authority. Accepted events
+still need channel policy, allowlist, identity, and capability checks
+before any privileged gateway action.
+
+</div>
+
+## What it provides
+
+`craik.runtime.webhook_ingress` covers:
+
+<div className="craik-grid">
+
+<div><h4>HMAC SHA-256 signature validation</h4></div>
+<div><h4>JSON object parsing</h4></div>
+<div><h4>Required <code>event_id</code> &amp; <code>event_type</code> extraction</h4></div>
+<div><h4>Idempotency checks</h4><p>Against known event ids.</p></div>
+<div><h4>Event-type authorization</h4></div>
+<div><h4>Redacted ingress receipts</h4></div>
+
+</div>
 
 ## Signature
 
-Requests use the `X-Craik-Signature` header with the format:
+Requests use the `X-Craik-Signature` header.
 
 ```text
 sha256=<hex digest>
 ```
 
-The digest is computed over the raw request body with the configured webhook
-secret. Missing or invalid signatures are rejected before JSON parsing.
+The digest is computed over the raw request body with the configured
+webhook secret. Missing or invalid signatures are rejected before JSON
+parsing.
 
-## Event Shape
+## Event shape
 
-Accepted webhook bodies are JSON objects with:
+<div className="craik-fields">
 
-- `event_id`;
-- `event_type`;
-- optional object `payload`.
+<div>
+<dt>Field</dt>
+<dt><span className="craik-fields__type">Required</span></dt>
+<dd>Notes</dd>
+</div>
 
-Only configured event types are accepted. Duplicate event ids are rejected before
-dispatch.
+<div>
+<dt><code>event_id</code></dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd>Duplicate ids are rejected before dispatch.</dd>
+</div>
 
-## Safe Dispatch
+<div>
+<dt><code>event_type</code></dt>
+<dt><span className="craik-fields__type">required</span></dt>
+<dd>Only configured event types are accepted.</dd>
+</div>
 
-Accepted results include a `dispatch_payload` containing the event id, event
-type, and object payload. The helper does not perform side effects or enqueue
-work by itself.
+<div>
+<dt><code>payload</code></dt>
+<dt><span className="craik-fields__type">optional object</span></dt>
+<dd>Application-specific.</dd>
+</div>
+
+</div>
+
+## Safe dispatch
+
+Accepted results include a `dispatch_payload` containing the event id,
+event type, and object payload. **The helper does not perform side
+effects or enqueue work by itself.**
 
 ## Receipts
 
-Webhook ingress receipts use the `webhook.ingress` capability. Receipt metadata
-preserves event id, event type, policy envelope id, ingress status, and redaction
-fields. Raw body, signatures, and payload content are not stored in receipt
-metadata.
+Webhook ingress receipts use the `webhook.ingress` capability. Receipt
+metadata preserves event id, event type, policy envelope id, ingress
+status, and redaction fields. **Raw body, signatures, and payload
+content are not stored in receipt metadata.**
 
-## Security Boundary
+## What's next
 
-Webhook validation does not grant channel authority. Accepted webhook events
-still need channel policy, allowlist, identity, and capability checks before any
-privileged gateway action.
+<div className="craik-next">
+
+<a href="gateway-receipts/">
+<strong>Reference</strong>
+<span>Gateway receipts</span>
+<small>The receipt shape ingress produces.</small>
+</a>
+
+<a href="channel-policy-envelopes/">
+<strong>Reference</strong>
+<span>Channel policy envelopes</span>
+<small>The next stage in the gateway pipeline.</small>
+</a>
+
+<a href="../guides/gateway-troubleshooting/">
+<strong>Guide</strong>
+<span>Gateway troubleshooting</span>
+<small>Diagnose webhook failures.</small>
+</a>
+
+</div>

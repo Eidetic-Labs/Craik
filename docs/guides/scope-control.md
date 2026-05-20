@@ -212,19 +212,19 @@ designed. The right responses, in order:
 
 <div className="craik-next">
 
-<a href="../concepts/intent-locks.md">
+<a href="../../concepts/intent-locks/">
 <strong>Read</strong>
 <span>Intent locks</span>
 <small>The typed object you're configuring with these flags.</small>
 </a>
 
-<a href="capability-grants.md">
+<a href="../capability-grants/">
 <strong>Do</strong>
 <span>Capability grants</span>
 <small>Pair tight intent locks with narrow capability grants for double-belt-and-suspenders.</small>
 </a>
 
-<a href="writing-handoffs.md">
+<a href="../writing-handoffs/">
 <strong>Do</strong>
 <span>Write a handoff</span>
 <small>Record scope changes and stops in the handoff's policy exceptions.</small>

@@ -221,19 +221,19 @@ can tell known project state from unavailable context.
 
 <div className="craik-next">
 
-<a href="receipts.md">
+<a href="../receipts/">
 <strong>Read next</strong>
 <span>Receipts</span>
 <small>How Craik makes important actions accountable — every provider call, credential use, side effect.</small>
 </a>
 
-<a href="handoffs.md">
+<a href="../handoffs/">
 <strong>Read next</strong>
 <span>Handoffs</span>
 <small>The continuity record that ends every run.</small>
 </a>
 
-<a href="../guides/using-case-files.md">
+<a href="../../guides/using-case-files/">
 <strong>Do</strong>
 <span>Use case files in practice</span>
 <small>Practical patterns for building, inspecting, and refreshing case files day-to-day.</small>

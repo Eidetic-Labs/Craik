@@ -1,735 +1,724 @@
 # Differentiators
 
-Craik should not become a generic agent launcher. Its differentiators should center on durable, governed, evidence-backed agent work.
+<p className="craik-meta"><span>10 min read</span><span>For engineers &amp; reviewers</span><span>Updated 2026-05-19</span></p>
 
-This document captures the features that should keep the roadmap from collapsing into basic CLI, storage, and adapter work.
+<div className="craik-lead">
 
-## Evidence-First Execution
+**What you'll learn**
+
+- The features that keep Craik's roadmap from collapsing into basic CLI,
+  storage, and adapter work.
+- Why every durable assertion must be traceable to evidence.
+- How Craik separates raw agent output from organizational truth.
+- The runtime primitives — assumption ledger, scope locks, scratchpad
+  expiry, context debt, runtime critic — that make agent work auditable.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Don't become a generic agent launcher.**
+
+Craik's differentiators center on durable, governed, evidence-backed
+agent work. This doc captures the features that should keep the roadmap
+honest as it grows.
+
+</div>
+
+## Evidence-first execution
 
 Every durable conclusion should be traceable to evidence.
 
-Evidence sources include:
+<div className="craik-keypoint">
 
-- file reads,
-- command output,
-- GitHub issues, PRs, comments, and checks,
-- Stigmem facts,
-- user instructions,
-- web sources,
-- prior handoffs,
-- generated artifacts,
-- and runner outputs.
+**Runtime rule:** No durable assertion without evidence. Craik may
+allow low-confidence assumptions, but they must not be promoted to
+durable facts without evidence.
 
-Runtime rule:
+</div>
 
-> No durable assertion without evidence.
+**Evidence sources:** file reads · command output · GitHub issues, PRs, comments, checks · Stigmem facts · user instructions · web sources · prior handoffs · generated artifacts · runner outputs.
 
-Craik may allow low-confidence assumptions, but they must not be promoted to durable facts without evidence.
+## Assumption ledger
 
-## Assumption Ledger
+Agents make assumptions constantly. Craik should separate assumptions
+from facts. Each assumption captures **statement · source · confidence ·
+task context · verification requirement · expiration · whether action
+is allowed before verification.** Assumptions are visible in case
+files, handoffs, and memory diffs.
 
-Agents make assumptions constantly. Craik should separate assumptions from facts.
-
-Assumptions should capture:
-
-- statement,
-- source,
-- confidence,
-- task context,
-- verification requirement,
-- expiration or stale-risk,
-- and whether action is allowed before verification.
-
-Assumptions should be visible in case files, handoffs, and memory diffs.
-
-## Belief Promotion Workflow
+## Belief promotion workflow
 
 Craik should distinguish raw agent output from organizational truth.
 
-Recommended lifecycle:
-
 ```text
-observed -> proposed -> accepted -> relied_upon -> stale -> invalidated
+observed → proposed → accepted → relied_upon → stale → invalidated
 ```
 
-This lifecycle should apply to memory proposals and eventually to selected Stigmem facts through metadata or companion facts.
+The lifecycle applies to memory proposals and eventually to selected
+Stigmem facts through metadata or companion facts.
 
-## Context Budgeting As Policy
+## Context budgeting as policy
 
-Context assembly should be explainable.
+Context assembly should be explainable. Case files capture **why each
+item was included · what was summarized · what was excluded · what was
+omitted due to budget · what must be fetched on demand · whether
+omissions create risk.**
 
-Case files should capture:
+## Agent run reproducibility
 
-- why each fact, doc, or artifact was included,
-- what was summarized,
-- what was excluded,
-- what was omitted due to budget,
-- what must be fetched on demand,
-- and whether omitted context creates risk.
+Run records link the full provenance chain so reviewers can replay
+operationally — not deterministically — what an agent knew and what it
+was allowed to do.
 
-## Agent Run Reproducibility
+<div className="craik-fields">
 
-Craik should preserve enough state to understand what an agent knew and what it was allowed to do.
+<div>
+<dt>Linked record</dt>
+<dt><span className="craik-fields__type">Purpose</span></dt>
+<dd>Why it matters</dd>
+</div>
 
-Run records should link:
+<div>
+<dt>task_request</dt>
+<dt><span className="craik-fields__type">input</span></dt>
+<dd>Original ask the run was launched against.</dd>
+</div>
 
-- task request,
-- case file,
-- policy envelope,
-- runner adapter,
-- runner/model metadata,
-- capability grants,
-- relevant facts,
-- receipts,
-- commands,
-- outputs,
-- memory proposals,
-- contradictions,
-- and handoff.
+<div>
+<dt>case_file</dt>
+<dt><span className="craik-fields__type">brief</span></dt>
+<dd>Pre-run context bundle.</dd>
+</div>
 
-This is operational replay, not deterministic model replay.
+<div>
+<dt>policy_envelope</dt>
+<dt><span className="craik-fields__type">authority</span></dt>
+<dd>What the run was allowed to do.</dd>
+</div>
 
-## Trust Boundaries Between Agents
+<div>
+<dt>runner_adapter + metadata</dt>
+<dt><span className="craik-fields__type">execution</span></dt>
+<dd>Which runner produced output, with model identifiers.</dd>
+</div>
 
-Codex, Claude, Gemini, and future runners should not be treated as equally trusted by default.
+<div>
+<dt>capability_grants</dt>
+<dt><span className="craik-fields__type">authority</span></dt>
+<dd>Explicit permissions exercised.</dd>
+</div>
 
-Policy should be able to control whether a runner can:
+<div>
+<dt>relevant_facts</dt>
+<dt><span className="craik-fields__type">context</span></dt>
+<dd>Memory facts loaded into the case file.</dd>
+</div>
 
-- propose facts,
-- write facts,
-- edit files,
-- run shell commands,
-- open GitHub issues or PRs,
-- approve another agent's work,
-- resolve contradictions,
-- or use fail-open profiles.
+<div>
+<dt>receipts</dt>
+<dt><span className="craik-fields__type">accountability</span></dt>
+<dd>Every governed action that fired.</dd>
+</div>
 
-## Cross-Agent Review Protocol
+<div>
+<dt>commands + outputs</dt>
+<dt><span className="craik-fields__type">execution</span></dt>
+<dd>What ran and what came back, redacted.</dd>
+</div>
 
-Craik should define explicit review relationships instead of relying only on orchestrator/specialist decomposition.
+<div>
+<dt>memory_proposals</dt>
+<dt><span className="craik-fields__type">delta</span></dt>
+<dd>Reviewable facts the run wants to land.</dd>
+</div>
 
-Useful roles:
+<div>
+<dt>contradictions</dt>
+<dt><span className="craik-fields__type">delta</span></dt>
+<dd>Conflicts surfaced during the run.</dd>
+</div>
 
-- implementer,
-- verifier,
-- adversarial reviewer,
-- policy reviewer,
-- documentation reviewer,
-- memory curator,
-- release reviewer,
-- and adjudicator.
+<div>
+<dt>handoff</dt>
+<dt><span className="craik-fields__type">closure</span></dt>
+<dd>The terminal continuity record.</dd>
+</div>
 
-Review outputs should be typed, evidence-linked, and graph-connected.
+</div>
 
-## Staleness As A First-Class Signal
+## Trust boundaries between agents
 
-Old truths are a major failure mode.
+Codex, Claude, Gemini, and future runners are not equally trusted by
+default. Policy controls whether a runner may **propose facts · write
+facts · edit files · run shell · open issues or PRs · approve another
+agent's work · resolve contradictions · use fail-open profiles.**
 
-Craik should surface staleness for:
+## Cross-agent review protocol
 
-- facts,
-- docs,
-- handoffs,
-- assumptions,
-- GitHub issue state,
-- branch state,
-- runner outputs,
-- generated artifacts,
-- and project policies.
+Explicit review roles instead of single orchestrator/specialist
+decomposition.
 
-Every case file should be able to say what information is fresh, stale, or unknown.
+<div className="craik-grid">
 
-## Decision Record Suggestions
+<div><h4>Implementer</h4><p>Does the primary work.</p></div>
+<div><h4>Verifier</h4><p>Runs validation, confirms claims.</p></div>
+<div><h4>Adversarial reviewer</h4><p>Finds gaps and unsupported claims.</p></div>
+<div><h4>Policy reviewer</h4><p>Checks governance compliance.</p></div>
+<div><h4>Documentation reviewer</h4><p>Aligns docs with implementation.</p></div>
+<div><h4>Memory curator</h4><p>Hygiene over time.</p></div>
+<div><h4>Release reviewer</h4><p>Gate before publication.</p></div>
+<div><h4>Adjudicator</h4><p>Resolves disagreements.</p></div>
 
-Craik should notice when runtime knowledge is becoming durable project policy.
+</div>
 
-Signals:
+Review outputs are typed, evidence-linked, and graph-connected.
 
-- repeated reliance on the same fact,
-- resolved contradictions that affect future behavior,
-- recurring policy overrides,
-- repeated documentation updates from the same root cause,
-- cross-agent agreement on an architectural constraint.
+## Staleness as a first-class signal
 
-Craik should not automatically write ADRs. It should suggest that maintainers create or update appropriate decision records when runtime evidence shows a decision has become durable.
+Old truths are a major failure mode. Craik surfaces staleness for
+**facts · docs · handoffs · assumptions · GitHub issue state · branch
+state · runner outputs · generated artifacts · project policies.**
+Every case file says what's fresh, stale, or unknown.
 
-## Agent-Native Onboarding
+## Decision record suggestions
 
-Craik should make onboarding a new agent fast and safe.
+Craik notices when runtime knowledge is becoming durable project policy.
 
-Target command:
+**Signals:** repeated reliance on the same fact · resolved
+contradictions that affect future behavior · recurring policy overrides
+· repeated docs updates from the same root cause · cross-agent
+agreement on an architectural constraint.
 
-```text
-craik onboard --project <project-id>
-```
+Craik **suggests** that maintainers create or update ADRs — it does
+not write them automatically.
 
-Output should include:
+## Agent-native onboarding
 
-- current project model,
-- active policies,
-- relevant ADRs,
-- docs boundaries,
-- recent handoffs,
-- unresolved contradictions,
-- validation commands,
-- Stigmem connection status,
-- known traps,
-- and allowed next actions.
+`craik onboard --project <project-id>` outputs the canonical bundle a
+new runner needs.
 
-## Provenance-Aware Documentation
+**Output:** current project model · active policies · relevant ADRs ·
+docs boundaries · recent handoffs · unresolved contradictions ·
+validation commands · Stigmem connection status · known traps ·
+allowed next actions.
 
-Craik should help keep documentation tied to the evidence that justified it.
+## Provenance-aware documentation
 
-For generated or updated docs, Craik should be able to record:
+For generated or updated docs, Craik records **source facts · source
+files · source issues/PRs · relevant policies · validation commands ·
+authoring agent · review agent · update timestamp.** Documentation
+stays tied to the evidence that justified it.
 
-- source facts,
-- source files,
-- source issues/PRs,
-- relevant policies,
-- validation commands,
-- authoring agent,
-- review agent,
-- and update timestamp.
+## Policy tests
 
-## Policy Tests
+Craik policies are testable. Policy tests run in CI and fixture-based
+local tests.
 
-Craik policies should be testable.
+<div className="craik-grid">
 
-Examples:
+<div><h4>Immutable paths</h4><p>ADRs cannot be edited under strict mode.</p></div>
+<div><h4>Memory proposal default</h4><p>Memory writes become proposals unless granted.</p></div>
+<div><h4>Trusted-local receipts</h4><p>Fail-open still seals receipts.</p></div>
+<div><h4>Automation fail-closed</h4><p>Automation mode stops instead of widening.</p></div>
+<div><h4>Grant boundaries</h4><p>Runner adapters cannot bypass grants.</p></div>
+<div><h4>Redaction regressions</h4><p>Secrets are scrubbed from receipts and handoffs.</p></div>
 
-- ADR paths cannot be edited in strict mode.
-- Memory writes become proposals by default.
-- Trusted-local fail-open still records receipts.
-- Automation mode fails closed.
-- Runner adapters cannot bypass grants.
-- Secrets are redacted from receipts and handoffs.
+</div>
 
-Policy tests should run in CI and fixture-based local tests.
+## Human delegation points
 
-## Human Delegation Points
+Human involvement is a runtime primitive, not an interruption.
 
-Craik should treat human involvement as a runtime primitive, not an interruption.
+**Delegation kinds:** approval request · clarification request · policy
+override request · contradiction adjudication request · memory
+promotion request · release signoff request.
 
-Agents should be able to create structured delegation points:
+Delegation points become graph nodes, appear in handoffs, and produce
+receipts when resolved.
 
-- approval request,
-- clarification request,
-- policy override request,
-- contradiction adjudication request,
-- memory promotion request,
-- release signoff request.
+## Budget and quota controls
 
-Delegation points should be graph nodes, appear in handoffs, and produce receipts when resolved.
+Budgets bound agent work with operational limits visible in case files
+and receipts: **context tokens · model spend · wall-clock time · shell
+command count · GitHub write count · memory write count · parallel
+worker count · retry count · human approval count.**
 
-## Budget And Quota Controls
+## Learning without self-trust
 
-Craik should support policy-level budgets.
+Agents may propose **facts · skills · policy refinements · validation
+commands · docs updates · decision record suggestions · plugin ideas.**
+Promotion always requires evidence, policy, review, or explicit
+approval.
 
-Budgets may include:
+<div className="craik-keypoint">
 
-- context tokens,
-- model spend,
-- wall-clock time,
-- shell command count,
-- GitHub write count,
-- memory write count,
-- parallel worker count,
-- retry count,
-- and human approval count.
-
-Budgets should be visible in case files and receipts so agent work has operational bounds.
-
-## Learning Without Self-Trust
-
-Craik should improve from agent work without automatically trusting agent-generated conclusions.
-
-Agents may propose:
-
-- facts,
-- skills,
-- policy refinements,
-- validation commands,
-- docs updates,
-- decision record suggestions,
-- and plugin ideas.
-
-But promotion requires evidence, policy, review, or explicit approval.
-
-This principle should guide every self-improving feature:
+**The self-trust rule**
 
 > Craik may learn continuously, but it should not self-certify truth.
 
-## Runtime Instruction Distillation
+This principle guides every self-improving feature.
 
-Craik should turn declared agent-runtime instruction files into structured runtime memory.
+</div>
 
-Examples:
+## Runtime instruction distillation
 
-- `AGENTS.md`,
-- `CLAUDE.md`,
-- `GEMINI.md`,
-- `HERMES.md`,
-- `SKILLS.md`,
-- `.cursorrules`,
-- `.github/copilot-instructions.md`,
-- `.codex/instructions.md`,
-- and project policy docs explicitly listed in the project profile.
+Craik turns declared agent-runtime instruction files into structured
+runtime memory.
 
-The source Markdown remains canonical. Distilled output is a provenance-linked runtime projection.
+**Recognized sources:** `AGENTS.md` · `CLAUDE.md` · `GEMINI.md` ·
+`HERMES.md` · `SKILLS.md` · `.cursorrules` ·
+`.github/copilot-instructions.md` · `.codex/instructions.md` ·
+project policy docs explicitly listed in the project profile.
 
-Distilled categories:
+Source Markdown remains canonical. Distilled output is a
+provenance-linked runtime projection.
 
-- instruction,
-- policy,
-- preference,
-- command,
-- boundary,
-- handoff rule,
-- memory rule,
-- security rule,
-- stale-risk.
+**Distilled categories:** instruction · policy · preference · command
+· boundary · handoff rule · memory rule · security rule · stale-risk.
 
-Distillations should track source path, source hash, line/range where available, scope, timestamp, and extraction confidence. Extracted items should become proposals by default and should be invalidated or refreshed when the source hash changes.
+Distillations track source path, source hash, line/range, scope,
+timestamp, and extraction confidence. Extracted items become proposals
+by default and are invalidated when the source hash changes.
 
-## Task Intent Lock
+## Task intent lock
 
-Craik should freeze the accepted task intent before execution.
+Craik freezes the accepted task intent before execution. The lock
+captures **original request · accepted interpretation · excluded work ·
+allowed autonomy · stop conditions · scope-change rules** — giving
+agents a stable north star and making scope drift reviewable.
 
-It should capture:
+## Scratchpad with expiry
 
-- original request,
-- accepted interpretation,
-- excluded work,
-- allowed autonomy,
-- stop conditions,
-- and scope-change rules.
+Working memory that is not durable truth. Scratchpad space holds
+**temporary notes · candidate hypotheses · partial findings · links to
+inspect · unresolved fragments** — and expires at task end unless
+promoted to assumptions, facts, handoffs, or artifacts.
 
-This gives agents a stable north star and makes scope drift reviewable.
+## Negative knowledge
 
-## Scratchpad With Expiry
+Useful dead ends are preserved with freshness rules.
 
-Agents need working memory that is not durable truth.
+<div className="craik-grid">
 
-Craik should provide scratchpad space for:
+<div><h4>Approaches rejected</h4><p>What's already been tried and didn't work.</p></div>
+<div><h4>Failed commands</h4><p>Commands that errored and why.</p></div>
+<div><h4>Non-existent APIs</h4><p>Endpoints checked and not found.</p></div>
+<div><h4>Irrelevant files</h4><p>Files inspected and found unrelated.</p></div>
+<div><h4>Disproven assumptions</h4><p>Claims refuted by evidence.</p></div>
+<div><h4>Unavailable names</h4><p>Package or registry names checked and not free.</p></div>
 
-- temporary notes,
-- candidate hypotheses,
-- partial findings,
-- links to inspect,
-- and unresolved fragments.
+</div>
 
-Scratchpad entries should expire at task end unless promoted to assumptions, facts, handoffs, or artifacts.
+Absence can change — freshness rules apply to negative knowledge too.
 
-## Negative Knowledge
+## Capability dry run
 
-Craik should preserve useful dead ends.
+Before granting side-effecting capabilities, an agent previews intended
+actions: **files expected to change · shell commands expected to run ·
+GitHub writes expected · facts expected to be proposed or written ·
+policy triggers · approvals likely needed.** The runtime then grants
+narrower authority.
 
-Examples:
+## Evidence coverage score
 
-- approaches already rejected,
-- commands that failed and why,
-- APIs that do not exist,
-- files inspected and found irrelevant,
-- assumptions disproven,
-- and package/registry names checked and unavailable.
+A real coverage signal, not a fake certainty score.
 
-Negative knowledge should have freshness rules because absence can change.
+<div className="craik-fields">
 
-## Capability Dry Run
+<div>
+<dt>Level</dt>
+<dt><span className="craik-fields__type">Source</span></dt>
+<dd>What's behind the claim</dd>
+</div>
 
-Before granting side-effecting capabilities, Craik should let an agent preview intended actions.
+<div>
+<dt>unsupported</dt>
+<dt><span className="craik-fields__type">none</span></dt>
+<dd>No backing source. Always low-confidence.</dd>
+</div>
 
-The preview may include:
+<div>
+<dt>single-source</dt>
+<dt><span className="craik-fields__type">one citation</span></dt>
+<dd>One file/issue/fact. Confidence depends on the source.</dd>
+</div>
 
-- files expected to change,
-- shell commands expected to run,
-- GitHub writes expected,
-- facts expected to be proposed or written,
-- policy triggers,
-- and approvals likely needed.
+<div>
+<dt>multi-source</dt>
+<dt><span className="craik-fields__type">multiple citations</span></dt>
+<dd>Multiple independent supports.</dd>
+</div>
 
-The runtime can then grant narrower authority.
+<div>
+<dt>runtime-observed</dt>
+<dt><span className="craik-fields__type">live execution</span></dt>
+<dd>Output captured at runtime via a wrapper.</dd>
+</div>
 
-## Evidence Coverage Score
+<div>
+<dt>policy-backed</dt>
+<dt><span className="craik-fields__type">runtime contract</span></dt>
+<dd>The claim is what policy guarantees.</dd>
+</div>
+
+<div>
+<dt>verified by command/test</dt>
+<dt><span className="craik-fields__type">execution result</span></dt>
+<dd>A test or command confirms the claim.</dd>
+</div>
+
+<div>
+<dt>reviewed</dt>
+<dt><span className="craik-fields__type">another actor</span></dt>
+<dd>Another agent or human reviewed.</dd>
+</div>
+
+</div>
+
+## Structured agent debate
+
+When agents disagree, Craik structures the disagreement. Debate records
+capture **claim · evidence · counterclaim · counter-evidence · missing
+verification · adjudicator decision · resulting memory updates.**
 
-Craik should show whether conclusions are well-supported.
+## Self-audit before handoff
+
+Before finishing, agents run a standard self-audit.
 
-This should not be a fake certainty score. It should indicate evidence coverage:
+<ol className="craik-steps">
+<li>Answered the locked intent.</li>
+<li>Stayed in scope.</li>
+<li>Cited evidence.</li>
+<li>Recorded assumptions.</li>
+<li>Recorded validation.</li>
+<li>Created needed facts or proposals.</li>
+<li>Avoided forbidden paths.</li>
+<li>Left next steps.</li>
+<li>Produced a useful handoff.</li>
+</ol>
 
-- unsupported,
-- single-source,
-- multi-source,
-- runtime-observed,
-- policy-backed,
-- verified by command/test,
-- reviewed by another agent or human.
+## Context debt tracking
 
-## Structured Agent Debate
+When context is omitted, summarized, or deferred because of budget,
+Craik tracks **omitted item · reason · risk · required follow-up ·
+whether the current task may proceed.** Context debt is durable; the
+next run inherits it as carryover.
 
-When agents disagree, Craik should structure the disagreement.
+## Tool result attestation
 
-Debate records should capture:
+Different result sources have different trust profiles.
 
-- claim,
-- evidence,
-- counterclaim,
-- counter-evidence,
-- missing verification,
-- adjudicator decision,
-- and resulting memory updates.
+<div className="craik-fields">
 
-## Self-Audit Before Handoff
+<div>
+<dt>Class</dt>
+<dt><span className="craik-fields__type">Trust profile</span></dt>
+<dd>When acceptable</dd>
+</div>
 
-Before finishing, agents should run a standard self-audit.
+<div>
+<dt>runtime-observed</dt>
+<dt><span className="craik-fields__type">high</span></dt>
+<dd>Captured by a runtime wrapper; receipted.</dd>
+</div>
 
-Checklist:
+<div>
+<dt>agent-reported</dt>
+<dt><span className="craik-fields__type">low</span></dt>
+<dd>Agent's claim about a result. Needs verification.</dd>
+</div>
 
-- answered the locked intent,
-- stayed in scope,
-- cited evidence,
-- recorded assumptions,
-- recorded validation,
-- created needed facts or proposals,
-- avoided forbidden paths,
-- left next steps,
-- and produced a useful handoff.
+<div>
+<dt>user-reported</dt>
+<dt><span className="craik-fields__type">trust user</span></dt>
+<dd>Operator-asserted state.</dd>
+</div>
 
-## Context Debt Tracking
+<div>
+<dt>external API</dt>
+<dt><span className="craik-fields__type">scoped</span></dt>
+<dd>Captured from a remote service receipt.</dd>
+</div>
 
-When context is omitted, summarized, or deferred because of budget, Craik should track that as context debt.
+<div>
+<dt>inferred</dt>
+<dt><span className="craik-fields__type">low</span></dt>
+<dd>Derived from an artifact, not directly observed.</dd>
+</div>
 
-Context debt should capture:
+</div>
 
-- omitted item,
-- reason,
-- risk,
-- required follow-up,
-- and whether the current task may proceed.
+Important claims like "tests passed" should require runtime-observed
+receipts whenever possible.
 
-## Tool Result Attestation
+## Runtime memory hygiene
 
-Craik should distinguish how tool results are known.
+Curator workflows for memory quality. Curator tasks find **stale
+assumptions · duplicate facts · unpromoted useful proposals ·
+weak-evidence facts · contradictions · expired handoffs · obsolete
+negative knowledge.** Cleanup is proposed, never automatically
+destructive by default.
 
-Result source classes:
+## Recovery mode
 
-- runtime-observed,
-- agent-reported,
-- user-reported,
-- external API result,
-- inferred from artifact.
+Interrupted runs are resumable. Recovery uses **task request · intent
+lock · case file · policy envelope · partial receipts · scratchpad ·
+changed files · unfinished handoff · unresolved delegations · memory
+proposals.** Incomplete runs still leave useful handoffs.
 
-Important claims like "tests passed" should require runtime-observed receipts when possible.
+## Runner capability matrix
 
-## Runtime Memory Hygiene
+Craik knows what each runner can do — and routes accordingly.
 
-Craik should include curator workflows for memory quality.
+**Capabilities tracked:** shell access · file patching · browser/web
+access · MCP support · image input · structured output · long context ·
+background tasks · approval flow · tool-call reliability.
 
-Curator tasks should find:
+The matrix influences runner selection, prompt compilation, and policy
+grants.
 
-- stale assumptions,
-- duplicate facts,
-- unpromoted useful proposals,
-- weak-evidence facts,
-- contradictions,
-- expired handoffs,
-- and obsolete negative knowledge.
+## Scope change protocol
 
-Cleanup should be proposed, not automatically destructive by default.
+When an agent finds work outside the locked intent, it files a
+scope-change proposal capturing **requested scope change · rationale ·
+evidence · risk · whether current work is blocked · recommended
+action.**
 
-## Recovery Mode
+## Knowledge freshness probe
 
-Interrupted runs should be resumable.
+Before relying on stale or high-impact facts, Craik can refresh
+relevant state.
 
-Recovery should use:
+**Probe targets:** repo state · GitHub state · package registries ·
+Stigmem facts · local command output · web sources (when allowed).
 
-- task request,
-- intent lock,
-- case file,
-- policy envelope,
-- partial receipts,
-- scratchpad,
-- changed files,
-- unfinished handoff,
-- unresolved delegations,
-- and memory proposals.
+## Public / internal boundary classifier
 
-Incomplete runs should still leave useful handoffs.
+Craik classifies where content belongs and helps prevent internal-only
+labels or implementation tracking details from leaking into public
+docs.
 
-## Runner Capability Matrix
+**Targets:** public docs · internal docs · issue or PR comments ·
+memory facts · handoffs · release notes · audit artifacts.
 
-Craik should know what each runner can do.
+## Runtime context explanations
 
-Capabilities may include:
+Every case-file item is explainable. Agents should be able to ask, "Why
+am I seeing this?" and get a real answer.
 
-- shell access,
-- file patching,
-- browser/web access,
-- MCP support,
-- image input,
-- structured output,
-- long context,
-- background tasks,
-- approval flow,
-- and tool-call reliability.
+<div className="craik-grid">
 
-The matrix should influence runner selection, prompt compilation, and policy grants.
+<div><h4>Policy required</h4><p>Included because policy mandates it.</p></div>
+<div><h4>Recent handoff</h4><p>Included because a recent handoff referenced it.</p></div>
+<div><h4>Contradiction</h4><p>Included because it contradicts a current assumption.</p></div>
+<div><h4>Stale + high-risk</h4><p>Included because it is stale but high-risk.</p></div>
+<div><h4>Task-type</h4><p>Included because the task type requires it.</p></div>
 
-## Scope Change Protocol
+</div>
 
-When an agent finds work outside the locked intent, it should create a scope-change proposal.
+## Structured context requests
 
-The proposal should include:
+Agents request more context through a structured protocol. Fields:
+**need · reason · urgency · allowed source scope · blocking status ·
+expected output shape.** Craik fulfills requests through safe channels
+and records the result.
 
-- requested scope change,
-- rationale,
-- evidence,
-- risk,
-- whether current work is blocked,
-- and recommended action.
+## First-class unknowns
 
-## Knowledge Freshness Probe
+Agents say "unknown" without being treated as incomplete. Unknowns
+identify whether resolution requires **web access · user input · repo
+inspection · privileged tool use · Stigmem query · waiting for external
+state.**
 
-Before relying on stale or high-impact facts, Craik should be able to refresh relevant state.
+## Runtime critic
 
-Probe targets:
+A structured critic pass before accepting major outputs.
 
-- repo state,
-- GitHub state,
-- package registries,
-- Stigmem facts,
-- local command output,
-- and web sources when allowed.
+<div className="craik-grid">
 
-## Public/Internal Boundary Classifier
+<div><h4>Unsupported claims</h4><p>Claims without evidence references.</p></div>
+<div><h4>Policy violations</h4><p>Actions that crossed the envelope.</p></div>
+<div><h4>Scope drift</h4><p>Work outside the intent lock.</p></div>
+<div><h4>Missing validation</h4><p>Claims unverified by command or test.</p></div>
+<div><h4>Stale evidence</h4><p>Citations that may have moved.</p></div>
+<div><h4>Missing handoff</h4><p>Run that didn't close cleanly.</p></div>
+<div><h4>Unredacted content</h4><p>Sensitive data that slipped through.</p></div>
+<div><h4>Risky memory writes</h4><p>Promotions without sufficient evidence.</p></div>
 
-Craik should classify where content belongs.
+</div>
 
-Targets:
+## Agent workload memory
 
-- public docs,
-- internal docs,
-- issue or PR comments,
-- memory facts,
-- handoffs,
-- release notes,
-- and audit artifacts.
+Routing memory, not social reputation. Craik remembers which agents
+and runners perform well on which work.
 
-This should be policy-driven and should help prevent internal-only labels or implementation tracking details from leaking into public docs.
+**Signal examples:** strong at docs reconciliation · weak at
+shell-heavy debugging · strong at policy review · tends to miss stale
+GitHub state · needs stricter context · produces high-quality handoffs.
 
-## Runtime Context Explanations
+## Known traps
 
-Every case-file item should be explainable.
+Projects maintain known traps — negative knowledge appearing in
+onboarding and case files.
 
-Examples:
+<div className="craik-grid">
 
-- included because policy requires it,
-- included because a recent handoff referenced it,
-- included because it contradicts a current assumption,
-- included because it is stale but high-risk,
-- included because the task type requires it.
+<div><h4>Don't edit ADRs</h4></div>
+<div><h4>Public docs can't reference internal labels</h4></div>
+<div><h4>Tests must run outside the sandbox</h4></div>
+<div><h4>Generated docs live elsewhere</h4></div>
+<div><h4>Local node advertises a non-standard port</h4></div>
+<div><h4>Package version is intentionally pre-release</h4></div>
 
-Agents should be able to ask, "Why am I seeing this?"
+</div>
 
-## Structured Context Requests
+## Evidence expiration rules
 
-Agents should be able to request more context through a structured protocol.
+Different evidence kinds have different shelf lives.
 
-Example fields:
+<div className="craik-fields">
 
-- need,
-- reason,
-- urgency,
-- allowed source scope,
-- blocking status,
-- and expected output shape.
+<div>
+<dt>Source</dt>
+<dt><span className="craik-fields__type">Freshness</span></dt>
+<dd>Why</dd>
+</div>
 
-Craik should fulfill requests through safe channels and record the result.
+<div>
+<dt>GitHub branch state</dt>
+<dt><span className="craik-fields__type">expires quickly</span></dt>
+<dd>Branches advance every push.</dd>
+</div>
 
-## First-Class Unknowns
+<div>
+<dt>Package registry availability</dt>
+<dt><span className="craik-fields__type">expires quickly</span></dt>
+<dd>Names can be claimed at any time.</dd>
+</div>
 
-Agents should be able to say "unknown" without being treated as incomplete.
+<div>
+<dt>ADR policy</dt>
+<dt><span className="craik-fields__type">long-lived</span></dt>
+<dd>Decisions change rarely and explicitly.</dd>
+</div>
 
-Unknowns should identify whether resolution requires:
+<div>
+<dt>Command output</dt>
+<dt><span className="craik-fields__type">tied to commit</span></dt>
+<dd>Validity depends on the worktree state.</dd>
+</div>
 
-- web access,
-- user input,
-- repo inspection,
-- privileged tool use,
-- Stigmem query,
-- or waiting for external state.
+<div>
+<dt>Web search</dt>
+<dt><span className="craik-fields__type">time-sensitive</span></dt>
+<dd>Content can change at any moment.</dd>
+</div>
 
-## Runtime Critic
+<div>
+<dt>User instruction</dt>
+<dt><span className="craik-fields__type">until superseded</span></dt>
+<dd>Active until the operator updates it.</dd>
+</div>
 
-Craik should support a structured critic pass before accepting major outputs.
+</div>
 
-The critic should check:
+## Handoff quality score
 
-- unsupported claims,
-- policy violations,
-- scope drift,
-- missing validation,
-- stale evidence,
-- missing handoff,
-- unredacted sensitive content,
-- and risky memory writes.
+Handoffs are checked for completeness.
 
-## Agent Workload Memory
+**Signals:** completed work · changed files · validation · assumptions
+· unresolved questions · next steps · facts proposed or written ·
+receipts · context debt · delegation status.
 
-Craik should remember which agents and runners perform well on which work.
+## Policy-aware prompt compiler
 
-This is routing memory, not social reputation.
+Craik compiles runner-specific prompts from the same underlying
+runtime contracts.
 
-Signals:
+**Inputs:** locked task intent · policy envelope · context contract ·
+runner capabilities · evidence · assumptions · allowed tools · output
+schema.
 
-- strong at docs reconciliation,
-- weak at shell-heavy debugging,
-- strong at policy review,
-- tends to miss stale GitHub state,
-- needs stricter context,
-- produces high-quality handoffs.
+Codex, Claude, and Gemini may need different prompt shapes, but the
+underlying truth is shared.
 
-## Known Traps
+## Real-runner contract tests
 
-Projects should maintain known traps.
+Mocks are not enough for runner adapters. Craik periodically tests
+Codex, Claude, and Gemini adapters against fixture tasks and verifies
+that outputs conform to Craik contracts.
 
-Examples:
+## Memory impact preview
 
-- do not edit ADRs,
-- public docs cannot mention internal tracking labels,
-- tests must run outside sandbox,
-- generated docs live elsewhere,
-- local node advertises a different internal port,
-- package version is intentionally pre-release.
+Before writing facts to Stigmem, Craik shows a memory-diff preview:
+**facts to add · facts to invalidate · contradictions likely to open ·
+affected case files / handoffs / docs · scope and visibility ·
+confidence · evidence.**
 
-Known traps should appear in onboarding and case files.
+## Agent exit discipline
 
-## Evidence Expiration Rules
+Agents that cannot complete a task still leave useful state.
 
-Evidence should have freshness expectations by source type.
+**Incomplete exits include:** why blocked · what was checked · what is
+safe to continue · what is unsafe · missing context · unresolved
+delegations · next best action.
 
-Examples:
+## Red team mode
 
-- GitHub branch state expires quickly,
-- package registry availability changes quickly,
-- ADR policy is long-lived,
-- command output is tied to worktree and commit,
-- web search is time-sensitive,
-- user instruction remains active until superseded.
+High-risk tasks support a stricter reviewer mode. Checks include
+**leaked secrets · public/internal boundary violations · unsupported
+claims · unsafe command grants · bad memory writes · policy bypasses ·
+misleading docs updates.**
 
-## Handoff Quality Score
+## Work product classification
 
-Handoffs should be checked for completeness.
+Every artifact has a type and lifecycle, and the class drives policy.
 
-Signals:
+<div className="craik-grid">
 
-- completed work,
-- changed files,
-- validation,
-- assumptions,
-- unresolved questions,
-- next steps,
-- facts proposed or written,
-- receipts,
-- context debt,
-- and delegation status.
+<div><h4>Scratch</h4><p>Expires at task end.</p></div>
+<div><h4>Proposal</h4><p>Awaits review.</p></div>
+<div><h4>Implementation</h4><p>The primary deliverable.</p></div>
+<div><h4>Review</h4><p>Cross-agent review output.</p></div>
+<div><h4>Decision</h4><p>ADR or equivalent.</p></div>
+<div><h4>Release</h4><p>Versioned, signed.</p></div>
+<div><h4>Public docs</h4><p>External-facing.</p></div>
+<div><h4>Internal docs</h4><p>Operator-only.</p></div>
+<div><h4>Memory update</h4><p>Fact-store delta.</p></div>
+<div><h4>Audit artifact</h4><p>Receipt, handoff, graph export.</p></div>
 
-## Policy-Aware Prompt Compiler
+</div>
 
-Craik should compile runner-specific prompts from the same underlying runtime contracts.
+## What changed since last time
 
-Inputs:
+Before an agent starts, Craik shows relevant deltas since the last
+related run — continuity without forcing rediscovery.
 
-- locked task intent,
-- policy envelope,
-- context contract,
-- runner capabilities,
-- evidence,
-- assumptions,
-- allowed tools,
-- output schema.
+**Tracked deltas:** files changed · facts changed · issues changed ·
+PRs changed · policies changed · handoffs added · contradictions
+opened or resolved · package versions changed.
 
-Codex, Claude, and Gemini may need different prompt shapes, but the underlying truth should be shared.
+## What's next
 
-## Real-Runner Contract Tests
+<div className="craik-next">
 
-Mocks are not enough for runner adapters.
+<a href="features.md">
+<strong>Read next</strong>
+<span>Features</span>
+<small>The implementable feature surface — every MVP behavior with acceptance criteria.</small>
+</a>
 
-Craik should periodically test Codex, Claude, and Gemini adapters against fixture tasks and verify that outputs conform to Craik contracts.
+<a href="architecture.md">
+<strong>Read</strong>
+<span>Architecture</span>
+<small>The seven runtime layers that compose these differentiators.</small>
+</a>
 
-## Memory Impact Preview
+<a href="concepts/governance.md">
+<strong>Concept</strong>
+<span>Governance</span>
+<small>The runtime contract the differentiators ride on top of.</small>
+</a>
 
-Before writing facts to Stigmem, Craik should show a memory diff preview.
-
-Preview should include:
-
-- facts to add,
-- facts to invalidate,
-- contradictions likely to open,
-- affected case files, handoffs, or docs,
-- scope and visibility,
-- confidence,
-- and evidence.
-
-## Agent Exit Discipline
-
-Agents that cannot complete a task should still leave useful state.
-
-Incomplete exits should include:
-
-- why blocked,
-- what was checked,
-- what is safe to continue,
-- what is unsafe,
-- missing context,
-- unresolved delegations,
-- and next best action.
-
-## Red Team Mode
-
-High-risk tasks should support a stricter reviewer mode.
-
-Checks:
-
-- leaked secrets,
-- public/internal boundary violations,
-- unsupported claims,
-- unsafe command grants,
-- bad memory writes,
-- policy bypasses,
-- misleading docs updates.
-
-## Work Product Classification
-
-Every artifact should have a type and lifecycle.
-
-Types:
-
-- scratch,
-- proposal,
-- implementation,
-- review,
-- decision,
-- release,
-- public documentation,
-- internal documentation,
-- memory update,
-- audit artifact.
-
-Artifact class should drive policy.
-
-## What Changed Since Last Time
-
-Before an agent starts, Craik should show relevant deltas since the last related run.
-
-Examples:
-
-- files changed,
-- facts changed,
-- issues changed,
-- PRs changed,
-- policies changed,
-- handoffs added,
-- contradictions opened or resolved,
-- package versions changed.
-
-This gives agents continuity without forcing them to rediscover state.
+</div>

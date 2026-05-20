@@ -198,19 +198,19 @@ the ADR as a mutable doc and proposing an edit.
 
 <div className="craik-next">
 
-<a href="../concepts/case-files.md">
+<a href="../../concepts/case-files/">
 <strong>Read</strong>
 <span>Case files</span>
 <small>How evidence and assumptions compose into the per-task brief.</small>
 </a>
 
-<a href="memory-proposals.md">
+<a href="../memory-proposals/">
 <strong>Do</strong>
 <span>Memory proposals</span>
 <small>Promote an assumption to a fact via the proposal flow.</small>
 </a>
 
-<a href="contradiction-inbox.md">
+<a href="../contradiction-inbox/">
 <strong>Do</strong>
 <span>Contradiction inbox</span>
 <small>What to do when new evidence contradicts an existing fact.</small>

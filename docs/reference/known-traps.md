@@ -1,19 +1,81 @@
-# Known Traps And Negative Knowledge
+# Known traps and negative knowledge
 
-Known traps are evidence-backed pitfalls agents should avoid. Negative knowledge
-records evidence-backed statements about what is not true or not available in a
-scope.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`craik.known_trap` records the trap statement, avoidance guidance, evidence,
-handoff links, optional expiry, and whether the trap is active, expired, or
-contradicted.
+<div className="craik-lead">
 
-`craik.negative_knowledge` records a bounded negative statement, its scope,
-trust class, evidence, handoff links, contradictions, and optional expiry.
+**What you'll find here**
 
-Use negative knowledge only when absence matters and there is evidence for it,
-such as an inspected repository tree or a fresh tool attestation. Do not promote
-unsupported guesses about absence into negative knowledge.
+Two related contracts agents use to avoid repeating known mistakes:
+`craik.known_trap` (evidence-backed pitfalls) and
+`craik.negative_knowledge` (evidence-backed statements about what is
+not true or not available in a scope).
 
-Active, unexpired known traps are surfaced in onboarding and case-file stale-risk
-warnings so agents can avoid repeating known mistakes.
+</div>
+
+<div className="craik-keypoint">
+
+**Absence needs evidence too.**
+
+Use negative knowledge only when absence matters and there is evidence
+for it — inspected repository tree, fresh tool attestation, etc. Don't
+promote unsupported guesses about absence into negative knowledge.
+
+</div>
+
+## Contracts
+
+<div className="craik-fields">
+
+<div>
+<dt>Contract</dt>
+<dt><span className="craik-fields__type">Records</span></dt>
+<dd>Lifecycle</dd>
+</div>
+
+<div>
+<dt><code>craik.known_trap</code></dt>
+<dt><span className="craik-fields__type">pitfall</span></dt>
+<dd>Trap statement · avoidance guidance · evidence · handoff links · optional expiry · whether the trap is active, expired, or contradicted.</dd>
+</div>
+
+<div>
+<dt><code>craik.negative_knowledge</code></dt>
+<dt><span className="craik-fields__type">absence</span></dt>
+<dd>Bounded negative statement · scope · trust class · evidence · handoff links · contradictions · optional expiry.</dd>
+</div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Active, unexpired traps are surfaced.**
+
+Onboarding and case-file stale-risk warnings include active known
+traps so agents can avoid repeating known mistakes.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="known-traps-view/">
+<strong>Reference</strong>
+<span>Known traps view</span>
+<small>The operator surface formatter for traps.</small>
+</a>
+
+<a href="freshness/">
+<strong>Reference</strong>
+<span>Freshness</span>
+<small>How knowledge expiry interacts with stale-risk warnings.</small>
+</a>
+
+<a href="../guides/agent-onboarding/">
+<strong>Guide</strong>
+<span>Agent onboarding</span>
+<small>The first surface that exposes active traps.</small>
+</a>
+
+</div>

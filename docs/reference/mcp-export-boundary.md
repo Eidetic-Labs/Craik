@@ -1,63 +1,127 @@
-# MCP Export Boundary
+# MCP export boundary
 
-Craik can expose an MCP server surface only when the exported tools preserve the
-same policy boundaries used by local runner, gateway, and plugin workflows.
+<p className="craik-meta"><span>3 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-The current decision is conservative: stable, documented metadata and workflow
-surfaces can be exported; unstable internal surfaces, raw store internals, and
-secret-bearing operations are not exportable.
+<div className="craik-lead">
 
-## Export Criteria
+**What you'll find here**
 
-An MCP surface is exportable when it:
+The rule for which Craik surfaces can be exported as MCP tools.
+Stable, documented metadata and workflow surfaces can be exported.
+Unstable internals, raw store internals, and secret-bearing operations
+cannot.
 
-- has a stable contract and documented compatibility expectations;
-- does not expose raw secrets, tokens, credentials, signatures, or unredacted
-  payloads;
-- does not expose internal storage layouts, private state machines, or unstable
-  implementation details;
-- uses explicit capability grants for capability-bearing tools;
-- records receipts for side-effect capabilities such as file writes, shell
-  execution, network access, memory writes, and review comments;
-- returns redacted metadata rather than ambient runtime authority.
+</div>
 
-Experimental surfaces require compatibility review before export. Internal
-surfaces are blocked until promoted to a stable contract.
+<div className="craik-keypoint">
 
-## Chosen Boundary
+**Contract-first exports.**
 
-Craik MCP exports should be contract-first. Exported tools should wrap stable
-runtime contracts and documented command behavior, not private Python objects or
-database tables.
+Exported tools wrap stable runtime contracts and documented command
+behavior — never private Python objects or database tables.
 
-Allowed examples:
+</div>
 
-- read-only project, case file, handoff, receipt, and work graph inspection;
-- provider selection metadata that omits secret values;
-- policy preview and validation results;
-- documented runner or gateway status summaries.
+## Export criteria
 
-Blocked examples:
+A surface is **exportable** when every condition holds.
 
-- raw secret reads or secret file browsing;
-- direct local store table access;
-- write, shell, network, memory-write, or review-comment tools without matching
-  capability grants and receipts;
-- experimental sandbox or provider internals without compatibility review.
+<ol className="craik-steps">
+<li>It has a stable contract and documented compatibility expectations.</li>
+<li>It does not expose raw secrets, tokens, credentials, signatures, or unredacted payloads.</li>
+<li>It does not expose internal storage layouts, private state machines, or unstable implementation details.</li>
+<li>It uses explicit capability grants for capability-bearing tools.</li>
+<li>It records receipts for side-effect capabilities (file writes · shell · network · memory writes · review comments).</li>
+<li>It returns redacted metadata rather than ambient runtime authority.</li>
+</ol>
 
-## Compatibility Expectations
+Experimental surfaces require compatibility review before export.
+Internal surfaces are blocked until promoted to a stable contract.
 
-MCP tool names, input shapes, output fields, and error reasons are compatibility
-surface. Changes should be additive where possible. Removing a field, changing a
-status value, or exposing a previously redacted field requires review and
-documentation updates.
+## Chosen boundary
 
-Callers should treat `review_required` decisions as non-exportable until a human
-or release process promotes the surface. `blocked` decisions require a boundary
-change before export.
+<div className="craik-decision">
 
-The `craik.runtime.mcp_export` helper records the decision status, reason, and
-required controls for a candidate surface. It does not start an MCP server or
-grant runtime authority by itself.
+<div>
+<h4>Allowed</h4>
+<ul>
+<li>Read-only project, case file, handoff, receipt, and work-graph inspection</li>
+<li>Provider selection metadata that omits secret values</li>
+<li>Policy preview and validation results</li>
+<li>Documented runner or gateway status summaries</li>
+</ul>
+</div>
 
-For client-side provider and tool routing, see [MCP Client](mcp-client.md).
+<div>
+<h4>Blocked</h4>
+<ul>
+<li>Raw secret reads or secret-file browsing</li>
+<li>Direct local-store table access</li>
+<li>Write / shell / network / memory-write / review-comment tools without matching grants and receipts</li>
+<li>Experimental sandbox or provider internals without compatibility review</li>
+</ul>
+</div>
+
+</div>
+
+## Compatibility expectations
+
+<div className="craik-keypoint">
+
+**Names, inputs, outputs, and error reasons are compatibility surface.**
+
+Changes should be additive where possible. Removing a field, changing
+a status value, or exposing a previously redacted field requires
+review and documentation updates.
+
+</div>
+
+<div className="craik-fields">
+
+<div>
+<dt>Decision</dt>
+<dt><span className="craik-fields__type">Meaning</span></dt>
+<dd>Required action</dd>
+</div>
+
+<div>
+<dt><code>review_required</code></dt>
+<dt><span className="craik-fields__type">non-exportable</span></dt>
+<dd>Treat as non-exportable until a human or release process promotes the surface.</dd>
+</div>
+
+<div>
+<dt><code>blocked</code></dt>
+<dt><span className="craik-fields__type">unsupported</span></dt>
+<dd>Requires a boundary change before export.</dd>
+</div>
+
+</div>
+
+The `craik.runtime.mcp_export` helper records the decision status,
+reason, and required controls for a candidate surface. It does not
+start an MCP server or grant runtime authority by itself.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="mcp-client/">
+<strong>Reference</strong>
+<span>MCP client</span>
+<small>Client-side provider and tool routing.</small>
+</a>
+
+<a href="../guides/mcp-ecosystem-compatibility/">
+<strong>Guide</strong>
+<span>MCP ecosystem compatibility</span>
+<small>How to compose Craik with the wider MCP ecosystem.</small>
+</a>
+
+<a href="environment-receipts/">
+<strong>Reference</strong>
+<span>Environment receipts</span>
+<small>The audit trail an exported tool produces.</small>
+</a>
+
+</div>

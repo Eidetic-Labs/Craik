@@ -198,19 +198,19 @@ machine-readable answer.
 
 <div className="craik-next">
 
-<a href="../guides/scope-control.md">
+<a href="../../guides/scope-control/">
 <strong>Do</strong>
 <span>Scope control</span>
 <small>Patterns for keeping intent locks tight and updating them safely.</small>
 </a>
 
-<a href="case-files.md">
+<a href="../case-files/">
 <strong>Read</strong>
 <span>Case files</span>
 <small>How locks compose with the per-task case file.</small>
 </a>
 
-<a href="handoffs.md">
+<a href="../handoffs/">
 <strong>Read</strong>
 <span>Handoffs</span>
 <small>How locks travel across runs via the handoff contract.</small>

@@ -1,40 +1,99 @@
-# Local Store Migrations
+# Local store migrations
 
-Craik stores local runtime state in SQLite at `state/craik.sqlite3`.
-Migrations are forward-only and run during `LocalStore.initialize()`.
+<p className="craik-meta"><span>3 min read</span><span>For operators &amp; maintainers</span><span>Updated 2026-05-19</span></p>
 
-## Version Tracking
+<div className="craik-lead">
 
-Craik records the current migration in two places:
+**What you'll do**
 
-- SQLite `PRAGMA user_version`;
-- the `migrations` table, with one row per applied migration.
+Understand how Craik's local-state migrations run, where versions are
+tracked, how compatibility fixtures keep older stores on a path
+forward, and what to do when a migration fails.
 
-Migration `2` also creates `local_store_metadata`, which records the current
-store schema version and the contract registry count visible to the installed
-Craik build.
+</div>
 
-## Compatibility Fixtures
+<div className="craik-keypoint">
+
+**Forward-only, never silent.**
+
+Migrations run during <code>LocalStore.initialize()</code>. Craik
+never silently recreates an unreadable local store — receipts,
+handoffs, memory proposals, case files, and task runs may be needed
+for audit or recovery.
+
+</div>
+
+## Version tracking
+
+<div className="craik-fields">
+
+<div>
+<dt>Where</dt>
+<dt><span className="craik-fields__type">Records</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt>SQLite <code>PRAGMA user_version</code></dt>
+<dt><span className="craik-fields__type">current</span></dt>
+<dd>The current migration number.</dd>
+</div>
+
+<div>
+<dt><code>migrations</code> table</dt>
+<dt><span className="craik-fields__type">history</span></dt>
+<dd>One row per applied migration.</dd>
+</div>
+
+<div>
+<dt><code>local_store_metadata</code></dt>
+<dt><span className="craik-fields__type">metadata</span></dt>
+<dd>Created by migration 2 · records current store schema version and the contract registry count visible to the installed Craik build.</dd>
+</div>
+
+</div>
+
+## Compatibility fixtures
 
 Migration compatibility tests load prior schema fixtures from
-`tests/fixtures/local_store/`. The v1 fixture describes the first records-based
-store layout and is migrated to the current schema during tests. This keeps old
-local stores on an explicit compatibility path instead of depending only on
-fresh database initialization.
+`tests/fixtures/local_store/`. The v1 fixture describes the first
+records-based store layout and is migrated to the current schema
+during tests. This keeps old local stores on an explicit compatibility
+path instead of depending only on fresh database initialization.
 
-## Failure Handling
+## Failure handling
 
-Failed migrations raise a local store migration error with recovery guidance.
-Operators should:
+If a migration fails, Craik raises a local-store migration error with
+recovery guidance.
 
-1. Back up `state/craik.sqlite3`.
-2. Keep the original file unchanged.
-3. Run `craik doctor` for diagnostics.
-4. If the database version is newer than the installed Craik build supports,
-   upgrade Craik before opening the store.
-5. If a migration failed partway through, restore the backup or copy the
-   database aside before retrying.
+<ol className="craik-steps">
+<li>Back up <code>state/craik.sqlite3</code>.</li>
+<li>Keep the original file unchanged.</li>
+<li>Run <code>craik doctor</code> for diagnostics.</li>
+<li>If the database version is newer than the installed Craik build supports, upgrade Craik before opening the store.</li>
+<li>If a migration failed partway through, restore the backup or copy the database aside before retrying.</li>
+</ol>
 
-Craik does not silently recreate unreadable local stores. Recreating local state
-would discard receipts, handoffs, memory proposals, case files, and task runs
-that may be needed for audit or recovery.
+## What's next
+
+<div className="craik-next">
+
+<a href="../doctor/">
+<strong>Guide</strong>
+<span>Doctor diagnostics</span>
+<small>The first command to run when a migration fails.</small>
+</a>
+
+<a href="../../reference/local-store/">
+<strong>Reference</strong>
+<span>Local store</span>
+<small>The persistence-layer reference.</small>
+</a>
+
+<a href="../updating/">
+<strong>Guide</strong>
+<span>Updating Craik</span>
+<small>When to expect a migration during an upgrade.</small>
+</a>
+
+</div>

@@ -1,49 +1,101 @@
-# Scheduled Task Creation
+# Scheduled task creation
 
-Cron-like gateway schedules convert one schedule tick into one deterministic
-`craik.task_request`.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`craik.runtime.schedules` does not run a scheduler loop. It validates schedule
-definitions and converts an observed tick into a task while preserving gateway
-context.
+<div className="craik-lead">
 
-## Cron Shape
+**What you'll find here**
 
-Schedules use a conservative five-field cron-like expression. Supported field
-characters are digits, `*`, `/`, `,`, and `-`.
+The helper that converts one cron-like gateway schedule tick into one
+deterministic `craik.task_request` — cron shape, task context,
+deduplication, and limitations.
 
-Examples:
+</div>
+
+<div className="craik-keypoint">
+
+**Validation + conversion, not execution.**
+
+`craik.runtime.schedules` does not run a scheduler loop. It validates
+schedule definitions and converts an observed tick into a task while
+preserving gateway context.
+
+</div>
+
+## Cron shape
+
+Conservative five-field cron-like expression. Supported field
+characters: digits, `*`, `/`, `,`, `-`.
 
 ```text
 0 9 * * *
 */15 9-17 * * 1,2,3,4,5
 ```
 
-Named shortcuts such as `@daily` are not supported.
+<div className="craik-keypoint">
 
-## Task Context
+**No named shortcuts.**
+
+Named shortcuts such as <code>@daily</code> are not supported.
+
+</div>
+
+## Task context
 
 Created tasks preserve:
 
-- schedule id;
-- schedule tick id;
-- cron expression;
-- run timestamp;
-- project id;
-- policy envelope id;
-- channel;
-- linked receipt ids.
+<div className="craik-grid">
+
+<div><h4>Schedule id</h4></div>
+<div><h4>Schedule tick id</h4></div>
+<div><h4>Cron expression</h4></div>
+<div><h4>Run timestamp</h4></div>
+<div><h4>Project id</h4></div>
+<div><h4>Policy envelope id</h4></div>
+<div><h4>Channel</h4></div>
+<div><h4>Linked receipt ids</h4></div>
+
+</div>
 
 The task id is deterministic from schedule id and tick id.
 
 ## Deduplication
 
-Callers pass the set of already-seen tick ids. If the tick id was already seen,
-task creation returns `created = false` and does not create another
-`TaskRequest`.
+Callers pass the set of already-seen tick ids. If the tick id was
+already seen, task creation returns `created = false` and does not
+create another `TaskRequest`.
 
 ## Limitations
 
-Scheduled task creation does not execute the task, persist it, or start a clock.
-Future gateway scheduling layers are responsible for tracking seen ticks,
-persisting tasks, and emitting schedule execution receipts.
+<div className="craik-keypoint">
+
+**No execution, no persistence, no clock.**
+
+Future gateway scheduling layers are responsible for tracking seen
+ticks, persisting tasks, and emitting schedule execution receipts.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="scheduled-automations/">
+<strong>Reference</strong>
+<span>Scheduled automations</span>
+<small>The wider automation contract this helper supports.</small>
+</a>
+
+<a href="gateway-receipts/">
+<strong>Reference</strong>
+<span>Gateway receipts</span>
+<small>The receipt shape schedule execution produces.</small>
+</a>
+
+<a href="../guides/gateway-troubleshooting/">
+<strong>Guide</strong>
+<span>Gateway troubleshooting</span>
+<small>Diagnose schedule problems.</small>
+</a>
+
+</div>

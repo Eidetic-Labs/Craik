@@ -1,30 +1,76 @@
-# Plugin Descriptors
+# Plugin descriptors
 
-Plugin descriptors define governed plugin metadata without granting runtime
-authority.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-The `craik.plugin_descriptor` contract records:
+<div className="craik-lead">
 
-- identity: `id`, `name`, `publisher`, and `plugin_version`;
-- entrypoints: command, module, workflow, service, or docs paths exposed by the plugin;
-- capability declarations: requested capabilities, operations, targets, risk, and whether an explicit grant is required;
-- docs and security notes required for review;
-- compatibility metadata for Craik versions, Python versions, platforms, and support status;
-- optional links to skill packages and provenance records.
+**What you'll find here**
 
-Descriptors are declarations. They do not authorize execution, file writes,
-network access, memory access, or GitHub operations. Runtime authority remains
-separate in `craik.capability_grant` and must be checked before a runner invokes
+The `craik.plugin_descriptor` contract — governed plugin metadata
+that declares needs without granting runtime authority.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Declarations, not authorizations.**
+
+Descriptors do not authorize execution, file writes, network access,
+memory access, or GitHub operations. Runtime authority remains in
+`craik.capability_grant` and must be checked before a runner invokes
 plugin behavior.
+
+</div>
+
+## What it records
+
+<div className="craik-grid">
+
+<div><h4>Identity</h4><p><code>id</code> · <code>name</code> · <code>publisher</code> · <code>plugin_version</code>.</p></div>
+<div><h4>Entrypoints</h4><p>Command · module · workflow · service · docs paths exposed by the plugin.</p></div>
+<div><h4>Capability declarations</h4><p>Requested capabilities · operations · targets · risk · whether an explicit grant is required.</p></div>
+<div><h4>Docs and security notes</h4><p>Required for review.</p></div>
+<div><h4>Compatibility metadata</h4><p>Craik versions · Python versions · platforms · support status.</p></div>
+<div><h4>Optional links</h4><p>To skill packages and provenance records.</p></div>
+
+</div>
 
 ## Validation
 
-Craik rejects plugin descriptors that:
+Craik **rejects** descriptors that:
 
-- omit entrypoints, capabilities, docs, security notes, or compatibility metadata;
-- use a non-version-like `plugin_version`;
-- set `runtime_authority` to true;
-- declare high or critical risk capabilities without requiring explicit grants.
+<div className="craik-grid">
 
-This keeps plugin discovery and review independent from policy decisions about
-what the current run is allowed to do.
+<div><h4>Omit required fields</h4><p>Entrypoints · capabilities · docs · security notes · compatibility metadata.</p></div>
+<div><h4>Use a non-version-like <code>plugin_version</code></h4></div>
+<div><h4>Set <code>runtime_authority</code> to <code>true</code></h4></div>
+<div><h4>Declare high or critical risk capabilities</h4><p>Without requiring explicit grants.</p></div>
+
+</div>
+
+This keeps plugin discovery and review independent from policy
+decisions about what the current run is allowed to do.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="plugin-capability-grants/">
+<strong>Reference</strong>
+<span>Plugin capability grants</span>
+<small>The grant contract that authorizes bounded actions.</small>
+</a>
+
+<a href="plugin-probation/">
+<strong>Reference</strong>
+<span>Plugin probation</span>
+<small>How new descriptors enter trusted use.</small>
+</a>
+
+<a href="../guides/community-plugins/">
+<strong>Guide</strong>
+<span>Community plugins</span>
+<small>Review boundaries for plugin authors.</small>
+</a>
+
+</div>

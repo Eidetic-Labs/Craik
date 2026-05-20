@@ -209,19 +209,19 @@ public contract.
 
 <div className="craik-next">
 
-<a href="authentication.md">
+<a href="../authentication/">
 <strong>Do</strong>
 <span>Authentication &amp; credentials</span>
 <small>Add, rotate, or replace credential profiles that doctor flagged.</small>
 </a>
 
-<a href="setup.md">
+<a href="../setup/">
 <strong>Do</strong>
 <span>Run setup</span>
 <small>If doctor reported a missing home, run setup first.</small>
 </a>
 
-<a href="../reference/gateway-daemon.md">
+<a href="../../reference/gateway-daemon/">
 <strong>Reference</strong>
 <span>Gateway daemon mode</span>
 <small>The gateway prerequisites doctor inspects in detail.</small>

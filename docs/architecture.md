@@ -1,178 +1,122 @@
 # Architecture
 
-Craik is organized as a set of runtime layers. The layers should remain separable so Craik can support different model providers, tool environments, and memory backends without weakening the product thesis.
+<p className="craik-meta"><span>5 min read</span><span>For architects &amp; contributors</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll learn**
+
+- The seven runtime layers Craik composes against.
+- The flow a task moves through, from request to handoff.
+- The patterns Craik borrows from adjacent runtimes — and what Craik
+  adds on top.
+- The core typed contracts that make the layers interchangeable.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Layered, separable, contract-bound.**
+
+Craik is organized as a set of runtime layers. The layers should remain
+separable so Craik can support different model providers, tool
+environments, and memory backends without weakening the product thesis.
+
+</div>
 
 ## Layers
 
-### 1. Gateway Layer
+<div className="craik-grid">
 
-The gateway receives human and machine requests, normalizes them, and creates runtime tasks.
+<div>
+<h4>1 · Gateway</h4>
+<p>Receives human and machine requests, normalizes them, creates runtime
+tasks. Owns CLI / API / UI entry points, auth context, project
+selection, the initial policy envelope, and event streaming.</p>
+</div>
 
-Responsibilities:
+<div>
+<h4>2 · Project model</h4>
+<p>Builds the current working model for a task from repo state,
+issues/PRs, docs, ADRs, recent handoffs, Stigmem facts, CI artifacts,
+and user-provided instructions. Outputs the case file, constraints,
+relevant facts, stale-risk warnings, contradiction warnings, and
+verification plan.</p>
+</div>
 
-- CLI, API, and UI entry points,
-- auth context,
-- project selection,
-- task creation,
-- initial policy envelope,
-- and event streaming.
+<div>
+<h4>3 · Orchestration</h4>
+<p>Decomposes work and coordinates agents — role selection, model
+routing, task decomposition, parallel execution, specialist
+assignment, review loops, interruption handling, stateful handoff
+creation. Coordinates work; <em>does not</em> own truth.</p>
+</div>
 
-### 2. Project Model Layer
+<div>
+<h4>3a · Runner adapter</h4>
+<p>Thin boundary between Craik contracts and concrete agent
+environments. First-class adapters: Codex, Claude, Gemini. Adapters
+translate case files into runner-specific context, pass policy
+envelopes through, and translate runner-specific artifacts back into
+Craik contracts.</p>
+</div>
 
-The project model layer builds the current working model for a task.
+<div>
+<h4>4 · Capability</h4>
+<p>Exposes tools under explicit policy: file reads/writes, shell
+commands, Git ops, GitHub ops, web search, package registries, CI
+inspection, memory reads/writes, plugin execution. Each capability is
+scoped, auditable, and revocable.</p>
+</div>
 
-Inputs:
+<div>
+<h4>5 · Memory</h4>
+<p>Stores and retrieves durable state. Backends: ephemeral (tests),
+local SQLite (single-user), Stigmem (real team use). Depends on
+capabilities — facts, provenance, scopes, trust tiers, contradiction
+tracking, federation, retention — not specific feature assumptions.</p>
+</div>
 
-- repository state,
-- issue and PR state,
-- docs,
-- ADRs and policies,
-- recent agent handoffs,
-- Stigmem facts,
-- CI and release artifacts,
-- and user-provided instructions.
+<div>
+<h4>6 · Work graph</h4>
+<p>Connects runtime objects. Nodes: tasks, agents, handoffs, facts,
+decisions, issues, PRs, branches, files, docs, ADRs, commands, tests,
+CI runs, generated artifacts. Edges: <code>depends on</code>,
+<code>created by</code>, <code>verified by</code>, <code>contradicts</code>,
+<code>supersedes</code>, <code>implements</code>, <code>blocks</code>.</p>
+</div>
 
-Outputs:
+<div>
+<h4>7 · Experience</h4>
+<p>Operator surfaces — CLI, repository dashboard, task detail view,
+handoff viewer, contradiction inbox, work graph explorer, capability
+receipt log. The runtime's read surface.</p>
+</div>
 
-- task case file,
-- known constraints,
-- relevant facts,
-- stale-risk warnings,
-- contradiction warnings,
-- and required verification steps.
+</div>
 
-### 3. Orchestration Layer
+## Runtime flow
 
-The orchestration layer decomposes work and coordinates agents.
+A task moves through the layers in a deterministic sequence.
 
-Responsibilities:
+<ol className="craik-steps">
+<li>A user or system creates a task.</li>
+<li>Craik creates a policy envelope.</li>
+<li>Craik assembles a project case file.</li>
+<li>The orchestrator selects agent roles and work decomposition.</li>
+<li>Agents execute with scoped capabilities.</li>
+<li>Tool use creates receipts.</li>
+<li>Agents produce artifacts and findings.</li>
+<li>Craik verifies required checks.</li>
+<li>Memory updates are proposed or written according to policy.</li>
+<li>A structured handoff is created.</li>
+<li>The work graph is updated.</li>
+</ol>
 
-- role selection,
-- model routing,
-- task decomposition,
-- parallel execution,
-- specialist assignment,
-- review loops,
-- interruption handling,
-- and stateful handoff creation.
+## Borrowed patterns and Craik extensions
 
-The orchestrator should coordinate work, but it should not be the sole source of truth. Durable truth belongs in the memory substrate.
-
-### 3a. Runner Adapter Layer
-
-Runner adapters connect Craik contracts to concrete agent environments.
-
-Initial first-class adapters:
-
-- Codex,
-- Claude,
-- Gemini.
-
-Responsibilities:
-
-- translate case files into runner-specific task context,
-- pass policy envelopes and capability grants to the runner,
-- collect typed worker results,
-- collect or create capability receipts,
-- collect durable handoffs,
-- translate runner-specific artifacts back into Craik contracts,
-- and preserve enough metadata to make runs auditable.
-
-The adapter layer should be thin. Craik core should own contracts, state, policy, receipts, handoffs, and memory integration. Runners should own model execution and environment-specific interaction.
-
-### 4. Capability Layer
-
-The capability layer exposes tools under explicit policy.
-
-Capabilities include:
-
-- file reads,
-- file writes,
-- shell commands,
-- Git operations,
-- GitHub operations,
-- web search,
-- package registries,
-- CI inspection,
-- memory reads,
-- memory writes,
-- and plugin execution.
-
-Each capability should be scoped, auditable, and revocable.
-
-### 5. Memory Layer
-
-The memory layer stores and retrieves durable state.
-
-Backends:
-
-- ephemeral memory for tests and demos,
-- local file or SQLite memory for single-user development,
-- Stigmem memory for real team use.
-
-Craik should depend on memory capabilities rather than hard-coding feature assumptions:
-
-- durable facts,
-- provenance,
-- scopes,
-- trust tiers,
-- contradiction tracking,
-- federation,
-- and retention policy.
-
-### 6. Work Graph Layer
-
-The work graph connects runtime objects.
-
-Node types:
-
-- tasks,
-- agents,
-- handoffs,
-- facts,
-- decisions,
-- issues,
-- PRs,
-- branches,
-- files,
-- docs,
-- ADRs,
-- commands,
-- tests,
-- CI runs,
-- and generated artifacts.
-
-Edges capture relationships such as "depends on", "created by", "verified by", "contradicts", "supersedes", "implements", and "blocks".
-
-### 7. Experience Layer
-
-Craik should expose the runtime through practical operator surfaces.
-
-Initial surfaces:
-
-- CLI,
-- repository dashboard,
-- task detail view,
-- handoff viewer,
-- contradiction inbox,
-- work graph explorer,
-- and capability receipt log.
-
-## Runtime Flow
-
-1. A user or system creates a task.
-2. Craik creates a policy envelope.
-3. Craik assembles a project case file.
-4. The orchestrator selects agent roles and work decomposition.
-5. Agents execute with scoped capabilities.
-6. Tool use creates receipts.
-7. Agents produce artifacts and findings.
-8. Craik verifies required checks.
-9. Memory updates are proposed or written according to policy.
-10. A structured handoff is created.
-11. The work graph is updated.
-
-## Borrowed Patterns And Craik Extensions
+Adjacent agent runtimes have useful patterns. Craik adopts the ones
+that serve a durable runtime and adds what's needed on top.
 
 | Source pattern | Craik adoption | Craik extension |
 | --- | --- | --- |
@@ -183,21 +127,44 @@ Initial surfaces:
 | Orchestrator | Orchestrator decomposes complex tasks. | Orchestrator uses Stigmem-backed project memory and cannot flatten unresolved contradictions. |
 | Specialists | Workers receive scoped context and return typed results. | Worker results become graph-linked artifacts and durable handoffs. |
 | Task board | Task state survives the active run. | Task state becomes part of a work graph connected to facts, PRs, receipts, and decisions. |
-| Codex, Claude, Gemini runners | Direct adapters execute work in real agent environments. | Adapters normalize outputs into Craik contracts and memory proposals. |
+| Codex / Claude / Gemini runners | Direct adapters execute work in real agent environments. | Adapters normalize outputs into Craik contracts and memory proposals. |
 
-## Core Runtime Contracts
+## Core runtime contracts
 
-Craik should define stable schemas for:
+Craik defines stable schemas so adapters, runners, and plugins can
+integrate against the same product surface.
 
-- task requests,
-- project case files,
-- agent role manifests,
-- capability grants,
-- capability receipts,
-- handoffs,
-- facts proposed by agents,
-- contradiction reports,
-- verification results,
-- and work graph events.
+**The MVP contract set:** task requests · project case files · agent
+role manifests · capability grants · capability receipts · handoffs ·
+proposed facts · contradiction reports · verification results · work
+graph events.
 
-These contracts are more important than any single adapter language. Craik core starts as a Python 3.12+ CLI runtime, while the contracts remain the basis for interoperability with Codex, Claude, Gemini, local agent runtimes, GitHub, CI, TypeScript gateways, UI surfaces, and Stigmem.
+These contracts are more important than any single adapter language.
+Craik core starts as a Python 3.12+ CLI runtime, while the contracts
+remain the basis for interoperability with Codex, Claude, Gemini, local
+agent runtimes, GitHub, CI, TypeScript gateways, UI surfaces, and
+Stigmem.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="runtime-contracts.md">
+<strong>Read next</strong>
+<span>Runtime contracts</span>
+<small>The typed shapes every layer speaks.</small>
+</a>
+
+<a href="features.md">
+<strong>Read</strong>
+<span>Features</span>
+<small>Implementable feature surface across the seven layers.</small>
+</a>
+
+<a href="concepts/project-model.md">
+<strong>Concept</strong>
+<span>Project model</span>
+<small>The foundational layer-2 object every other layer composes against.</small>
+</a>
+
+</div>

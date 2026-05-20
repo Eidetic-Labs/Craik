@@ -1,123 +1,245 @@
-# Model Providers
+# Model providers
 
-Design rationale: [ADR 0002 Provider Transport And Mode Families](../adr/0002-provider-transport-and-mode-families.md).
+<p className="craik-meta"><span>4 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`craik.model_provider` records model provider and runtime execution path
-metadata for provider routing.
+<div className="craik-lead">
 
-The contract captures:
+**What you'll find here**
 
-- stable provider id;
-- provider name;
-- provider family;
-- supported modes, such as `chat`, `completion`, `embedding`, `tool`, and
-  `runner`;
-- capability declarations;
-- trust boundary;
-- non-secret configuration references;
-- secret reference names;
-- budget and quota reference names;
-- optional runtime path;
-- docs links.
+The `craik.model_provider` contract — what it records, the secret
+boundary, the registry, the provider runtime adapters (OpenAI +
+Anthropic), the provider-backed runner path, and budget/quota gating.
 
-## Secret Boundary
+</div>
 
-Provider metadata must not contain secret-like keys such as API keys, tokens,
-passwords, credentials, or secrets. Public provider records may name secret
-references, but they must not include secret values.
+<div className="craik-keypoint">
 
-Use `config_refs` for non-secret configuration names and `secret_ref_names` for
-external secret handles.
+**Design rationale: [ADR 0002 · Provider transport and mode families](../adr/0002-provider-transport-and-mode-families.md).**
 
-Use `budget_ref` and `quota_ref` for non-secret budget and quota handles. Do not
-store billing credentials, account tokens, or provider console secrets in model
-provider records.
+</div>
+
+## What it records
+
+<div className="craik-grid">
+
+<div><h4>Stable provider id</h4></div>
+<div><h4>Provider name</h4></div>
+<div><h4>Provider family</h4></div>
+<div><h4>Supported modes</h4><p><code>chat</code> · <code>completion</code> · <code>embedding</code> · <code>tool</code> · <code>runner</code>.</p></div>
+<div><h4>Capability declarations</h4></div>
+<div><h4>Trust boundary</h4></div>
+<div><h4>Non-secret config references</h4></div>
+<div><h4>Secret reference names</h4></div>
+<div><h4>Budget &amp; quota reference names</h4></div>
+<div><h4>Optional runtime path</h4></div>
+<div><h4>Docs links</h4></div>
+
+</div>
+
+## Secret boundary
+
+<div className="craik-keypoint">
+
+**References, not values.**
+
+Provider metadata must not contain secret-like keys such as API keys,
+tokens, passwords, credentials, or secrets. Public provider records
+may name secret references but must not include secret values.
+
+</div>
+
+<div className="craik-fields">
+
+<div>
+<dt>Field</dt>
+<dt><span className="craik-fields__type">Stores</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt><code>config_refs</code></dt>
+<dt><span className="craik-fields__type">references</span></dt>
+<dd>Non-secret configuration names.</dd>
+</div>
+
+<div>
+<dt><code>secret_ref_names</code></dt>
+<dt><span className="craik-fields__type">references</span></dt>
+<dd>External secret handles.</dd>
+</div>
+
+<div>
+<dt><code>budget_ref</code> · <code>quota_ref</code></dt>
+<dt><span className="craik-fields__type">references</span></dt>
+<dd>Non-secret budget and quota handles. Never billing credentials.</dd>
+</div>
+
+</div>
 
 ## Registry
 
-`craik.runtime.providers.model_providers.ModelProviderRegistry` provides in-memory
-registration and lookup by stable provider id. Duplicate provider ids are
-rejected, and missing providers raise a clear lookup error.
+`craik.runtime.providers.model_providers.ModelProviderRegistry`
+provides in-memory registration and lookup by stable provider id.
+Duplicate provider ids are rejected. Missing providers raise a clear
+lookup error.
 
-The registry is metadata-only. It does not call providers, load credentials, or
-grant execution authority by itself.
+<div className="craik-keypoint">
 
-The default registry includes three built-in providers:
+**Metadata-only.**
 
-- `provider_fixture_local` for deterministic local workflows;
-- `provider_openai` for OpenAI Responses API-compatible MVP execution;
-- `provider_anthropic` for Anthropic Messages API-compatible MVP execution.
+The registry does not call providers, load credentials, or grant
+execution authority by itself.
 
-OpenAI and Anthropic records use third-party trust boundaries, external secret
-references, budget and quota references, and runtime adapter paths under
-`craik.runtime.providers.provider_runtime`. Their default model metadata is
-non-secret and may be overridden by the named configuration references before
-live use.
+</div>
 
-## Provider Runtime
+Built-in providers:
 
-`craik.runtime.providers.provider_runtime` defines the provider-neutral request,
-result, adapter, retry decision, and receipt helpers used by the MVP provider
-path.
+<div className="craik-fields">
 
-The OpenAI adapter builds Responses API-style payloads with:
+<div>
+<dt>Provider</dt>
+<dt><span className="craik-fields__type">Path</span></dt>
+<dd>Use for</dd>
+</div>
 
-- system messages mapped to developer messages;
-- `stream` passthrough;
-- function tools with strict JSON schemas;
-- structured output through `text.format`;
-- normalized usage metadata and tool calls.
+<div>
+<dt><code>provider_fixture_local</code></dt>
+<dt><span className="craik-fields__type">deterministic</span></dt>
+<dd>Local workflows and tests.</dd>
+</div>
 
-The Anthropic adapter builds Messages API-style payloads with:
+<div>
+<dt><code>provider_openai</code></dt>
+<dt><span className="craik-fields__type">third-party</span></dt>
+<dd>OpenAI Responses API-compatible MVP execution.</dd>
+</div>
 
-- top-level system instructions;
-- user and assistant messages in the message list;
-- `stream` passthrough;
-- client tool declarations with `input_schema`;
-- structured output as a forced client tool;
-- normalized usage metadata and tool calls.
+<div>
+<dt><code>provider_anthropic</code></dt>
+<dt><span className="craik-fields__type">third-party</span></dt>
+<dd>Anthropic Messages API-compatible MVP execution.</dd>
+</div>
 
-Both adapters classify retryable API conditions and gate live access behind an
-explicit `live_enabled=true` runtime setting. Deterministic tests use fixtures
-and normalized payloads; they do not contact live providers.
+</div>
 
-## Provider-Backed Runner Path
+OpenAI and Anthropic records use third-party trust boundaries,
+external secret references, budget and quota references, and runtime
+adapter paths under `craik.runtime.providers.provider_runtime`.
+Default model metadata is non-secret and may be overridden by named
+configuration references before live use.
 
-`craik.runtime.provider_runner` connects the provider runtime to the governed
-single-agent loop. The MVP path:
+## Provider runtime
 
-- builds or loads the task case file;
-- compiles a provider-runner prompt from the case file and policy envelope;
-- executes the loop through `provider_openai` or `provider_anthropic`;
-- records provider receipts for every model step;
-- preserves side-effect receipts from the loop;
-- persists normalized run outputs;
-- creates a durable handoff for completed, blocked, failed, and interrupted
-  outcomes.
+`craik.runtime.providers.provider_runtime` defines the
+provider-neutral request, result, adapter, retry decision, and receipt
+helpers used by the MVP provider path.
 
-The default provider-backed path remains deterministic. It certifies the Craik
-handoff, receipt, and output plumbing without contacting live APIs. Live provider
-transport must be enabled explicitly by future caller configuration.
+<div className="craik-decision">
 
-## Budget And Quota Checks
+<div>
+<h4>OpenAI adapter</h4>
+<ul>
+<li>System messages → developer messages</li>
+<li><code>stream</code> passthrough</li>
+<li>Function tools with strict JSON schemas</li>
+<li>Structured output via <code>text.format</code></li>
+<li>Normalized usage metadata + tool calls</li>
+</ul>
+</div>
 
-`craik.runtime.provider_budgets` evaluates non-secret provider budget status
-before routing. Routing is blocked when:
+<div>
+<h4>Anthropic adapter</h4>
+<ul>
+<li>Top-level system instructions</li>
+<li>User &amp; assistant messages in the message list</li>
+<li><code>stream</code> passthrough</li>
+<li>Client tools with <code>input_schema</code></li>
+<li>Structured output as a forced client tool</li>
+<li>Normalized usage metadata + tool calls</li>
+</ul>
+</div>
 
-- status belongs to a different provider;
-- the status is explicitly blocked;
-- remaining budget is zero or below;
-- remaining quota is zero or below.
+</div>
 
-Allowed decisions preserve the provider id, budget ref, quota ref, and remaining
-budget/quota values for later receipts.
+Both adapters classify retryable API conditions and gate live access
+behind an explicit `live_enabled=true` runtime setting. **Deterministic
+tests use fixtures and normalized payloads; they do not contact live
+providers.**
 
-## Official Docs Verified
+## Provider-backed runner path
 
-Provider assumptions for the MVP runtime were checked against official provider
-docs on 2026-05-17:
+`craik.runtime.provider_runner` connects the provider runtime to the
+governed single-agent loop.
 
-- OpenAI Responses API, streaming responses, structured outputs, function
-  calling, and model docs.
-- Anthropic Messages API, streaming messages, tool use, model overview, and rate
-  limit docs.
+<ol className="craik-steps">
+<li>Build or load the task case file.</li>
+<li>Compile a provider-runner prompt from the case file and policy envelope.</li>
+<li>Execute the loop through <code>provider_openai</code> or <code>provider_anthropic</code>.</li>
+<li>Record provider receipts for every model step.</li>
+<li>Preserve side-effect receipts from the loop.</li>
+<li>Persist normalized run outputs.</li>
+<li>Create a durable handoff for completed / blocked / failed / interrupted outcomes.</li>
+</ol>
+
+<div className="craik-keypoint">
+
+**Deterministic by default.**
+
+The default provider-backed path certifies Craik handoff, receipt, and
+output plumbing without contacting live APIs. Live provider transport
+must be enabled explicitly by future caller configuration.
+
+</div>
+
+## Budget and quota checks
+
+`craik.runtime.provider_budgets` evaluates non-secret provider budget
+status before routing. Routing is **blocked** when:
+
+<div className="craik-grid">
+
+<div><h4>Status belongs to a different provider</h4></div>
+<div><h4>Status is explicitly blocked</h4></div>
+<div><h4>Remaining budget is zero or below</h4></div>
+<div><h4>Remaining quota is zero or below</h4></div>
+
+</div>
+
+Allowed decisions preserve provider id, budget ref, quota ref, and
+remaining budget/quota values for later receipts.
+
+## Official docs verified
+
+Provider assumptions for the MVP runtime were checked against official
+provider docs on **2026-05-17**:
+
+<div className="craik-grid">
+
+<div><h4>OpenAI</h4><p>Responses API · streaming responses · structured outputs · function calling · model docs.</p></div>
+<div><h4>Anthropic</h4><p>Messages API · streaming messages · tool use · model overview · rate limit docs.</p></div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../adr/provider-transport-and-mode-families/">
+<strong>ADR</strong>
+<span>0002 · Provider transport &amp; mode families</span>
+<small>Design rationale for the family/transport split.</small>
+</a>
+
+<a href="../guides/provider-routing/">
+<strong>Guide</strong>
+<span>Provider routing &amp; sandboxes</span>
+<small>End-to-end routing flow.</small>
+</a>
+
+<a href="provider-failover/">
+<strong>Reference</strong>
+<span>Provider failover</span>
+<small>How fallback rules compose with budgets.</small>
+</a>
+
+</div>

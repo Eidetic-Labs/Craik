@@ -173,19 +173,19 @@ should be looser overall.
 
 <div className="craik-next">
 
-<a href="scope-control.md">
+<a href="../scope-control/">
 <strong>Do</strong>
 <span>Scope control</span>
 <small>Keep grants tight by keeping intent locks tight.</small>
 </a>
 
-<a href="../reference/policy-profiles.md">
+<a href="../../reference/policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>How profiles set the default posture grants compose against.</small>
 </a>
 
-<a href="../concepts/governance.md">
+<a href="../../concepts/governance/">
 <strong>Read</strong>
 <span>Governance</span>
 <small>The full picture: profiles, grants, immutable paths, redaction, receipts.</small>
