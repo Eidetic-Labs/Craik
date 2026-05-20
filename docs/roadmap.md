@@ -238,6 +238,8 @@ per-run wall-clock budget enforcement before new phase or tool rounds.
 [#556](https://github.com/eidetic-labs/craik/issues/556) covers
 provider token budget ledger updates and interruption before additional
 provider calls once the budget is exhausted.
+[#559](https://github.com/eidetic-labs/craik/issues/559) covers
+operator-facing run inspection, resume, and cancellation commands.
 Keep this section updated as each v0.2.0 slice lands so the roadmap
 mirrors the current implementation state.
 
@@ -247,7 +249,7 @@ mirrors the current implementation state.
 <div><h4>Step-level idempotency keys</h4><p>First slice: stable keys are recorded in run state and runner step context to avoid duplicated phase outputs and side effects on replay.</p></div>
 <div><h4>Time controls</h4><p>First slice: per-run wall-clock budgets interrupt before the next phase or tool round when exhausted.</p></div>
 <div><h4>Provider budget enforcement</h4><p>First slice: provider token budgets are decremented from usage metadata and interrupt before the next provider call when exhausted.</p></div>
-<div><h4>Run inspection &amp; recovery</h4><p><code>craik run show</code> · <code>craik run resume</code> · <code>craik run cancel</code>.</p></div>
+<div><h4>Run inspection &amp; recovery</h4><p>First slice: <code>craik run show</code>, <code>craik run resume</code>, and <code>craik run cancel</code> expose persisted continuity state.</p></div>
 <div><h4>Agent exit discipline</h4><p>Enforced at runtime, not only declared.</p></div>
 <div><h4>Tool result attestation</h4><p>Signed or hashed record proving output came from the declared tool.</p></div>
 <div><h4>One real sandbox backend</h4><p><code>docker_sandbox</code> or <code>local_process</code> · every granted tool call dispatches through it · every call produces an environment receipt.</p></div>

@@ -983,12 +983,20 @@ def test_run_commands_inspect_persisted_run_state(tmp_path: Path) -> None:
         ["run", "inspect", "run_docs", "--include-outputs"],
         env={"CRAIK_HOME": str(home)},
     )
+    shown_alias = runner.invoke(
+        app,
+        ["run", "show", "run_docs", "--include-outputs"],
+        env={"CRAIK_HOME": str(home)},
+    )
 
     assert listed.exit_code == 0
     assert shown.exit_code == 0
+    assert shown_alias.exit_code == 0
     assert [item["id"] for item in json.loads(listed.stdout)] == ["run_docs"]
     payload = json.loads(shown.stdout)
+    alias_payload = json.loads(shown_alias.stdout)
     assert payload["run"]["id"] == "run_docs"
+    assert alias_payload == payload
     assert payload["next_allowed_action"] == "recover from the last safe boundary"
     assert payload["outputs"][0]["observed_output"] == {"status": "interrupted"}
     assert payload["receipts"][0]["id"] == "receipt_docs"
@@ -999,6 +1007,9 @@ def test_run_command_group_stays_mounted_after_module_extraction() -> None:
 
     assert result.exit_code == 0
     assert "execute" in result.stdout
+    assert "show" in result.stdout
+    assert "resume" in result.stdout
+    assert "cancel" in result.stdout
     assert "recover" in result.stdout
 
 
@@ -1054,6 +1065,84 @@ def test_run_execute_can_leave_blocked_grant_boundary(tmp_path: Path) -> None:
     assert payload["provider_ids"] == ["provider_openai"]
     assert payload["provider_families"] == ["openai"]
     assert payload["handoff"]["status"] == "blocked"
+
+
+def test_run_resume_continues_interrupted_provider_run(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    task_id = _seed_provider_task(home, tmp_path)
+
+    interrupted = runner.invoke(
+        app,
+        [
+            "run",
+            "execute",
+            task_id,
+            "--provider-id",
+            "provider_openai",
+            "--max-iterations",
+            "1",
+        ],
+        env={"CRAIK_HOME": str(home)},
+    )
+    resumed = runner.invoke(
+        app,
+        ["run", "resume", task_id, "--provider-id", "provider_openai"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert interrupted.exit_code == 0
+    assert resumed.exit_code == 0
+    interrupted_payload = json.loads(interrupted.stdout)
+    resumed_payload = json.loads(resumed.stdout)
+    assert interrupted_payload["status"] == "interrupted"
+    assert resumed_payload["status"] == "completed"
+    assert resumed_payload["run"]["id"] == interrupted_payload["run"]["id"]
+    assert "run_docs" not in resumed_payload["run"]["id"]
+
+
+def test_run_resume_refuses_non_interrupted_run(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="completed")
+
+    result = runner.invoke(
+        app,
+        ["run", "resume", "run_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code != 0
+    assert "only interrupted runs can be resumed" in result.output
+
+
+def test_run_cancel_interrupts_non_terminal_run(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="running")
+
+    result = runner.invoke(
+        app,
+        ["run", "cancel", "run_docs", "--reason", "operator pause"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["cancelled"] is True
+    assert payload["run"]["status"] == "interrupted"
+    assert payload["run"]["stop_reason"] == "operator pause"
+
+
+def test_run_cancel_refuses_terminal_run(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="completed")
+
+    result = runner.invoke(
+        app,
+        ["run", "cancel", "run_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code != 0
+    assert "terminal runs cannot be cancelled" in result.output
 
 
 def test_run_recover_prints_plan_for_interrupted_run(tmp_path: Path) -> None:

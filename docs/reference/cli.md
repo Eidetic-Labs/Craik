@@ -660,6 +660,18 @@ Execute, inspect, and recover single-agent task runs.
 craik run COMMAND [ARGS]...
 ```
 
+## `craik run cancel`
+
+Cancel a non-terminal run by persisting an interrupted stop state.
+
+```text
+craik run cancel [OPTIONS] RUN_ID_OR_TASK_ID
+```
+
+Options:
+
+- `--reason`: Reason recorded on the interrupted run.; default `cancelled by operator`
+
 ## `craik run execute`
 
 Execute a deterministic provider-backed MVP runner path for a task.
@@ -710,6 +722,32 @@ Options:
 
 - `--dry-run`: Print recovery plan without writing new state.; default `false`
 - `--reason`: Reason for recovery.
+
+## `craik run resume`
+
+Resume an interrupted provider-backed run from durable phase boundaries.
+
+```text
+craik run resume [OPTIONS] RUN_ID_OR_TASK_ID
+```
+
+Options:
+
+- `--provider-id`: Override the provider runner id recorded on the interrupted run.
+- `--allow-fixture-action, --no-allow-fixture-action`: Grant the deterministic fixture shell action required by the MVP loop.; default `true`
+- `--max-iterations`: Maximum single-agent loop iterations.; default `5`
+
+## `craik run show`
+
+Show one persisted task run and linked local state.
+
+```text
+craik run show [OPTIONS] RUN_ID_OR_TASK_ID
+```
+
+Options:
+
+- `--include-outputs, --no-include-outputs`: Include full captured output payloads.; default `false`
 
 ## `craik runners`
 
