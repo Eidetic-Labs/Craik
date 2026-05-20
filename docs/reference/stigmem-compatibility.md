@@ -1,6 +1,26 @@
-# Stigmem Compatibility
+# Stigmem compatibility
 
-Craik v0.1.0 uses a minimum Stigmem compatibility surface.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll find here**
+
+The minimum Stigmem HTTP surface Craik v0.1.0 targets — endpoints,
+error mapping, and capability detection.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Minimum compatibility, optional extensions.**
+
+The required endpoints are baseline; optional endpoints unlock
+ranked recall and contradiction import.
+
+</div>
+
+## Endpoints
 
 | Endpoint | Required | Craik use |
 | --- | --- | --- |
@@ -13,7 +33,7 @@ Craik v0.1.0 uses a minimum Stigmem compatibility surface.
 | `POST /v1/recall` | Optional | Future ranked recall path. |
 | `GET /v1/conflicts` | Optional | Future contradiction import path. |
 
-## Error Mapping
+## Error mapping
 
 | Stigmem response | Craik error |
 | --- | --- |
@@ -22,13 +42,42 @@ Craik v0.1.0 uses a minimum Stigmem compatibility surface.
 | Other HTTP failure | `StigmemRequestError` |
 | Missing local config or incompatible response shape | `StigmemCapabilityError` |
 
-## Capability Detection
+## Capability detection
 
-`craik connect stigmem` verifies the node can answer health, metadata, and authenticated fact query requests. The resulting capability payload records:
+`craik connect stigmem` verifies the node can answer health, metadata,
+and authenticated fact-query requests.
 
-- node URL,
-- node id,
-- whether auth is required,
-- required endpoint support,
-- optional recall/conflict/federation/source-attestation hints,
-- and the check timestamp.
+<div className="craik-grid">
+
+<div><h4>Node URL</h4></div>
+<div><h4>Node id</h4></div>
+<div><h4>Whether auth is required</h4></div>
+<div><h4>Required endpoint support</h4></div>
+<div><h4>Optional recall / conflict / federation / source-attestation hints</h4></div>
+<div><h4>Check timestamp</h4></div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../guides/connecting-stigmem/">
+<strong>Guide</strong>
+<span>Connecting Stigmem</span>
+<small>The operator-facing setup.</small>
+</a>
+
+<a href="memory-backends/">
+<strong>Reference</strong>
+<span>Memory backends</span>
+<small>The interface every backend implements.</small>
+</a>
+
+<a href="../stigmem-integration/">
+<strong>Read</strong>
+<span>Stigmem integration</span>
+<small>The full boundary, fact mapping, and contradiction strategy.</small>
+</a>
+
+</div>

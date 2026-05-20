@@ -1,75 +1,163 @@
-# Provider Certification
+# Provider certification
 
-Design rationale: [ADR 0002 Provider Transport And Mode Families](../adr/0002-provider-transport-and-mode-families.md).
+<p className="craik-meta"><span>3 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-Craik's MVP provider surface must support OpenAI and Anthropic through the same
-certification bar. Provider metadata alone is not enough; a provider is MVP-ready
-only when tests and receipts show that the runtime can safely use it in a
+<div className="craik-lead">
+
+**What you'll find here**
+
+The MVP certification bar OpenAI and Anthropic must clear before they
+ship as governed provider paths — requirements, families, the
+implementation boundary, and the deterministic test posture.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Design rationale: [ADR 0002 · Provider transport and mode families](../adr/0002-provider-transport-and-mode-families.md).**
+
+Provider metadata alone is not enough. A provider is MVP-ready only
+when tests and receipts show the runtime can safely use it in a
 governed workflow.
 
-## MVP Requirements
+</div>
+
+## MVP requirements
 
 Each certified provider path must cover:
 
-- chat;
-- streaming;
-- tool calls;
-- structured output;
-- usage metadata;
-- retryable errors;
-- redaction;
-- receipts.
+<div className="craik-grid">
 
-`ProviderCertification` records the provider family, model references,
-requirements that passed, requirements that are blocked, policy envelope,
-evidence, receipts, and documentation reference.
+<div><h4>Chat</h4></div>
+<div><h4>Streaming</h4></div>
+<div><h4>Tool calls</h4></div>
+<div><h4>Structured output</h4></div>
+<div><h4>Usage metadata</h4></div>
+<div><h4>Retryable errors</h4></div>
+<div><h4>Redaction</h4></div>
+<div><h4>Receipts</h4></div>
 
-`provider_certification_decision` returns `certified` only when every MVP
-requirement is supported and no requirement is blocked.
+</div>
 
-## Provider Families
+<div className="craik-keypoint">
 
-The MVP provider families are:
+**Certification gate.**
 
-- `openai`;
-- `anthropic`.
+<code>ProviderCertification</code> records provider family · model
+references · requirements that passed · requirements that are blocked
+· policy envelope · evidence · receipts · documentation reference.
+<code>provider_certification_decision</code> returns
+<code>certified</code> only when every MVP requirement is supported
+and none is blocked.
 
-Both providers use secret references for API credentials. Public metadata,
-receipts, docs, and certification fixtures must not include raw API keys,
-organization secrets, request bodies containing private task text, or provider
-console credentials.
+</div>
 
-## Implementation Boundary
+## Provider families
 
-Before implementing live API behavior, provider-specific assumptions should be
-verified against official provider documentation. Certification tests should
-remain deterministic by default and use fixtures unless a live smoke profile is
-explicitly enabled.
+<div className="craik-fields">
 
-## MVP Runtime Certification
+<div>
+<dt>Family</dt>
+<dt><span className="craik-fields__type">Status</span></dt>
+<dd>Notes</dd>
+</div>
 
-The MVP provider runtime certification is implemented as deterministic tests
-against `craik.runtime.providers.provider_runtime`. The tests certify both OpenAI and
+<div>
+<dt><code>openai</code></dt>
+<dt><span className="craik-fields__type">MVP</span></dt>
+<dd>Uses secret references for API credentials.</dd>
+</div>
+
+<div>
+<dt><code>anthropic</code></dt>
+<dt><span className="craik-fields__type">MVP</span></dt>
+<dd>Uses secret references for API credentials.</dd>
+</div>
+
+</div>
+
+Public metadata, receipts, docs, and certification fixtures must not
+include raw API keys, organization secrets, request bodies containing
+private task text, or provider console credentials.
+
+## Implementation boundary
+
+<div className="craik-keypoint">
+
+**Verify first, then implement.**
+
+Before implementing live API behavior, provider-specific assumptions
+should be verified against official provider documentation.
+Certification tests remain deterministic by default and use fixtures
+unless a live smoke profile is explicitly enabled.
+
+</div>
+
+## MVP runtime certification
+
+Deterministic tests against
+`craik.runtime.providers.provider_runtime` certify both OpenAI and
 Anthropic for:
 
-- request payload construction for chat, streaming, tools, and structured
-  output;
-- response normalization for text, tool calls, structured output, response ids,
-  and usage metadata;
-- retry decisions for provider throttling, transient failures, and overloads;
-- secret-reference-only configuration;
-- redacted provider receipts;
-- explicit live-access gating.
+<div className="craik-grid">
 
-Live provider calls remain disabled unless a caller constructs an adapter with
-`live_enabled=true` and supplies credentials through an external secret resolver.
-Provider metadata, receipts, CLI output, docs, and test fixtures must continue to
-name secret references only.
+<div><h4>Request payload construction</h4><p>Chat · streaming · tools · structured output.</p></div>
+<div><h4>Response normalization</h4><p>Text · tool calls · structured output · response ids · usage metadata.</p></div>
+<div><h4>Retry decisions</h4><p>Throttling · transient failures · overloads.</p></div>
+<div><h4>Secret-reference-only configuration</h4></div>
+<div><h4>Redacted provider receipts</h4></div>
+<div><h4>Explicit live-access gating</h4></div>
 
-## Official Provider References
+</div>
 
-OpenAI MVP assumptions were verified against official OpenAI docs for Responses,
-streaming responses, structured outputs, function calling, and models.
+Live provider calls remain disabled unless a caller constructs an
+adapter with `live_enabled=true` and supplies credentials through an
+external secret resolver.
 
-Anthropic MVP assumptions were verified against official Anthropic docs for
-Messages, streaming messages, tool use, model names, and rate limits.
+## Official provider references
+
+<div className="craik-fields">
+
+<div>
+<dt>Family</dt>
+<dt><span className="craik-fields__type">Docs verified for</span></dt>
+<dd>Surfaces</dd>
+</div>
+
+<div>
+<dt>OpenAI</dt>
+<dt><span className="craik-fields__type">official</span></dt>
+<dd>Responses · streaming · structured outputs · function calling · models.</dd>
+</div>
+
+<div>
+<dt>Anthropic</dt>
+<dt><span className="craik-fields__type">official</span></dt>
+<dd>Messages · streaming · tool use · model names · rate limits.</dd>
+</div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="model-providers/">
+<strong>Reference</strong>
+<span>Model providers</span>
+<small>The registry and the budget/quota gating.</small>
+</a>
+
+<a href="../adr/provider-transport-and-mode-families/">
+<strong>ADR</strong>
+<span>0002 · Provider transport</span>
+<small>The family/transport split this certification rests on.</small>
+</a>
+
+<a href="provider-failover/">
+<strong>Reference</strong>
+<span>Provider failover</span>
+<small>How fallback rules compose with certified providers.</small>
+</a>
+
+</div>
