@@ -62,19 +62,19 @@ and authenticated fact-query requests.
 
 <div className="craik-next">
 
-<a href="../guides/connecting-stigmem/">
+<a href="../../guides/connecting-stigmem/">
 <strong>Guide</strong>
 <span>Connecting Stigmem</span>
 <small>The operator-facing setup.</small>
 </a>
 
-<a href="memory-backends/">
+<a href="../memory-backends/">
 <strong>Reference</strong>
 <span>Memory backends</span>
 <small>The interface every backend implements.</small>
 </a>
 
-<a href="../stigmem-integration/">
+<a href="../../stigmem-integration/">
 <strong>Read</strong>
 <span>Stigmem integration</span>
 <small>The full boundary, fact mapping, and contradiction strategy.</small>

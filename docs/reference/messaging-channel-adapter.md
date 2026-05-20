@@ -98,19 +98,19 @@ channel, and redaction fields.
 
 <div className="craik-next">
 
-<a href="channel-identity-pairing/">
+<a href="../channel-identity-pairing/">
 <strong>Reference</strong>
 <span>Channel identity pairing</span>
 <small>Paired, unpaired, and revoked sender authority states.</small>
 </a>
 
-<a href="channel-allowlists/">
+<a href="../channel-allowlists/">
 <strong>Reference</strong>
 <span>Channel allowlists</span>
 <small>Deny-by-default ingress filtering after normalization.</small>
 </a>
 
-<a href="channel-adapter-contract/">
+<a href="../channel-adapter-contract/">
 <strong>Reference</strong>
 <span>Channel adapter contract</span>
 <small>The shared contract.</small>

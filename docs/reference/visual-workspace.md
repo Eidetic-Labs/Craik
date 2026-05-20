@@ -85,19 +85,19 @@ accessibility behavior.
 
 <div className="craik-next">
 
-<a href="work-graph-visual-bridge/">
+<a href="../work-graph-visual-bridge/">
 <strong>Reference</strong>
 <span>Work graph visual bridge</span>
 <small>The bridge that projects work-graph state into a renderable record.</small>
 </a>
 
-<a href="accessibility-requirements/">
+<a href="../accessibility-requirements/">
 <strong>Reference</strong>
 <span>Accessibility requirements</span>
 <small>The accessibility floor visual surfaces respect.</small>
 </a>
 
-<a href="../guides/companion-app-security/">
+<a href="../../guides/companion-app-security/">
 <strong>Guide</strong>
 <span>Companion app security</span>
 <small>The author-facing security posture for visual surfaces.</small>

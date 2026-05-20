@@ -66,19 +66,19 @@ read context, return typed findings, avoid side effects.
 
 <div className="craik-next">
 
-<a href="agent-roles/">
+<a href="../agent-roles/">
 <strong>Reference</strong>
 <span>Agent roles</span>
 <small>The role kinds that produce worker results.</small>
 </a>
 
-<a href="cross-agent-review/">
+<a href="../cross-agent-review/">
 <strong>Reference</strong>
 <span>Cross-agent review</span>
 <small>How worker results get reviewed and adjudicated.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>worker_result</code> shape.</small>

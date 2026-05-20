@@ -88,19 +88,19 @@ audit how the artifact entered the workflow.
 
 <div className="craik-next">
 
-<a href="voice-posture/">
+<a href="../voice-posture/">
 <strong>Reference</strong>
 <span>Voice posture</span>
 <small>The voice surface that consumes audio artifacts.</small>
 </a>
 
-<a href="speech-to-text-adapters/">
+<a href="../speech-to-text-adapters/">
 <strong>Reference</strong>
 <span>Speech-to-text adapters</span>
 <small>How audio artifacts become transcripts.</small>
 </a>
 
-<a href="visual-workspace/">
+<a href="../visual-workspace/">
 <strong>Reference</strong>
 <span>Visual workspace</span>
 <small>The canvas surface that renders artifact references.</small>

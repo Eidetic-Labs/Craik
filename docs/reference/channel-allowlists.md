@@ -86,19 +86,19 @@ external event can continue to later gateway stages.
 
 <div className="craik-next">
 
-<a href="channel-policy-envelopes/">
+<a href="../channel-policy-envelopes/">
 <strong>Reference</strong>
 <span>Channel policy envelopes</span>
 <small>The scoped policy selected after pairing and allowlist checks pass.</small>
 </a>
 
-<a href="channel-identity-pairing/">
+<a href="../channel-identity-pairing/">
 <strong>Reference</strong>
 <span>Channel identity pairing</span>
 <small>The other half of the pre-policy gate.</small>
 </a>
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>How denial decisions persist.</small>

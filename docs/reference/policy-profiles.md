@@ -239,19 +239,19 @@ The gate verifies:
 
 <div className="craik-next">
 
-<a href="../adr/policy-envelope-shape/">
+<a href="../../adr/policy-envelope-shape/">
 <strong>ADR</strong>
 <span>0004 · Policy envelope shape</span>
 <small>Design rationale for the envelope contract.</small>
 </a>
 
-<a href="../guides/fail-open/">
+<a href="../../guides/fail-open/">
 <strong>Guide</strong>
 <span>Fail-open</span>
 <small>How trusted-local opt-in works in practice.</small>
 </a>
 
-<a href="../guides/running-policy-tests/">
+<a href="../../guides/running-policy-tests/">
 <strong>Guide</strong>
 <span>Running policy tests</span>
 <small>The regression-gate workflow.</small>

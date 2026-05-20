@@ -62,19 +62,19 @@ warnings.
 
 <div className="craik-next">
 
-<a href="known-traps/">
+<a href="../known-traps/">
 <strong>Reference</strong>
 <span>Known traps</span>
 <small>How freshness interacts with active traps.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>Full attestation and probe shapes.</small>
 </a>
 
-<a href="../guides/agent-onboarding/">
+<a href="../../guides/agent-onboarding/">
 <strong>Guide</strong>
 <span>Agent onboarding</span>
 <small>Where stale-risk warnings appear at run start.</small>

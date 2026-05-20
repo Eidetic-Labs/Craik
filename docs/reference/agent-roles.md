@@ -57,19 +57,19 @@ Each role records:
 
 <div className="craik-next">
 
-<a href="cross-agent-review/">
+<a href="../cross-agent-review/">
 <strong>Reference</strong>
 <span>Cross-agent review</span>
 <small>How specialist roles request and produce reviews.</small>
 </a>
 
-<a href="debates/">
+<a href="../debates/">
 <strong>Reference</strong>
 <span>Structured debates</span>
 <small>How roles produce typed disagreement records.</small>
 </a>
 
-<a href="../adr/credential-and-identity-architecture/">
+<a href="../../adr/credential-and-identity-architecture/">
 <strong>ADR</strong>
 <span>0007 · Credential &amp; identity</span>
 <small>Why operator/credential identity isolates per role.</small>

@@ -378,19 +378,19 @@ deterministic. Stigmem remains the production-grade reference backend.
 
 <div className="craik-next">
 
-<a href="guides/stigmem-memory-backend.md">
+<a href="../guides/connecting-stigmem/">
 <strong>Guide</strong>
-<span>Stigmem memory backend</span>
+<span>Connecting Stigmem</span>
 <small>Concrete connection steps, capability detection, and troubleshooting.</small>
 </a>
 
-<a href="governance.md">
+<a href="../governance/">
 <strong>Read</strong>
 <span>Governance</span>
 <small>How memory writes are policy-gated and receipt-backed.</small>
 </a>
 
-<a href="runtime-contracts.md">
+<a href="../runtime-contracts/">
 <strong>Read</strong>
 <span>Runtime contracts</span>
 <small>The fact-proposal and memory-backend contract shapes.</small>

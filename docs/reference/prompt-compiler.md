@@ -97,19 +97,19 @@ compare output across runs.
 
 <div className="craik-next">
 
-<a href="../guides/runner-preview-workflows/">
+<a href="../../guides/runner-preview-workflows/">
 <strong>Guide</strong>
 <span>Runner preview workflows</span>
 <small>The full compile, fixture, receipt, and handoff flow.</small>
 </a>
 
-<a href="runner-adapter-contract/">
+<a href="../runner-adapter-contract/">
 <strong>Reference</strong>
 <span>Runner adapter contract</span>
 <small>The contract every compiled-prompt consumer implements.</small>
 </a>
 
-<a href="runner-capability-matrix/">
+<a href="../runner-capability-matrix/">
 <strong>Reference</strong>
 <span>Runner capability matrix</span>
 <small>The capability-profile input the compiler consumes.</small>

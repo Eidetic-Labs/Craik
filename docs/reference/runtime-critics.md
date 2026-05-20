@@ -91,19 +91,19 @@ adjudication.
 
 <div className="craik-next">
 
-<a href="quality-scores/">
+<a href="../quality-scores/">
 <strong>Reference</strong>
 <span>Quality scores</span>
 <small>The companion review records.</small>
 </a>
 
-<a href="cross-agent-review/">
+<a href="../cross-agent-review/">
 <strong>Reference</strong>
 <span>Cross-agent review</span>
 <small>The adjudication flow these findings feed.</small>
 </a>
 
-<a href="quality-gate-view/">
+<a href="../quality-gate-view/">
 <strong>Reference</strong>
 <span>Quality gate view</span>
 <small>The operator surface for findings and scores.</small>

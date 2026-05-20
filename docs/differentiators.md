@@ -703,19 +703,19 @@ opened or resolved · package versions changed.
 
 <div className="craik-next">
 
-<a href="features.md">
+<a href="../features/">
 <strong>Read next</strong>
 <span>Features</span>
 <small>The implementable feature surface — every MVP behavior with acceptance criteria.</small>
 </a>
 
-<a href="architecture.md">
+<a href="../architecture/">
 <strong>Read</strong>
 <span>Architecture</span>
 <small>The seven runtime layers that compose these differentiators.</small>
 </a>
 
-<a href="concepts/governance.md">
+<a href="../concepts/governance/">
 <strong>Concept</strong>
 <span>Governance</span>
 <small>The runtime contract the differentiators ride on top of.</small>

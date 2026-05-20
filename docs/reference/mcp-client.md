@@ -105,19 +105,19 @@ credentials stay outside Craik configuration — referenced by name only.
 
 <div className="craik-next">
 
-<a href="mcp-export-boundary/">
+<a href="../mcp-export-boundary/">
 <strong>Reference</strong>
 <span>MCP export boundary</span>
 <small>Which Craik surfaces can be exported as MCP tools.</small>
 </a>
 
-<a href="../guides/mcp-ecosystem-compatibility/">
+<a href="../../guides/mcp-ecosystem-compatibility/">
 <strong>Guide</strong>
 <span>MCP ecosystem compatibility</span>
 <small>Compatibility expectations and unsupported behavior.</small>
 </a>
 
-<a href="../guides/provider-routing/">
+<a href="../../guides/provider-routing/">
 <strong>Guide</strong>
 <span>Provider routing &amp; sandboxes</span>
 <small>How MCP fits into the broader routing flow.</small>

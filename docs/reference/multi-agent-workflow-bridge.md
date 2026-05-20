@@ -98,19 +98,19 @@ private task names.
 
 <div className="craik-next">
 
-<a href="multi-agent-workflow-migration/">
+<a href="../multi-agent-workflow-migration/">
 <strong>Reference</strong>
 <span>Multi-agent workflow migration</span>
 <small>The assessment that precedes a bridge.</small>
 </a>
 
-<a href="adjacent-runtime-bridge/">
+<a href="../adjacent-runtime-bridge/">
 <strong>Reference</strong>
 <span>Adjacent runtime bridge</span>
 <small>The runtime-level bridge contract.</small>
 </a>
 
-<a href="agent-roles/">
+<a href="../agent-roles/">
 <strong>Reference</strong>
 <span>Agent roles</span>
 <small>The roles external agents map to.</small>

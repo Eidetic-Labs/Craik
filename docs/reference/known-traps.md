@@ -60,19 +60,19 @@ traps so agents can avoid repeating known mistakes.
 
 <div className="craik-next">
 
-<a href="known-traps-view/">
+<a href="../known-traps-view/">
 <strong>Reference</strong>
 <span>Known traps view</span>
 <small>The operator surface formatter for traps.</small>
 </a>
 
-<a href="freshness/">
+<a href="../freshness/">
 <strong>Reference</strong>
 <span>Freshness</span>
 <small>How knowledge expiry interacts with stale-risk warnings.</small>
 </a>
 
-<a href="../guides/agent-onboarding/">
+<a href="../../guides/agent-onboarding/">
 <strong>Guide</strong>
 <span>Agent onboarding</span>
 <small>The first surface that exposes active traps.</small>

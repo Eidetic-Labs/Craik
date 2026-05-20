@@ -66,19 +66,19 @@ through the normal memory proposal workflow.
 
 <div className="craik-next">
 
-<a href="preference-facts/">
+<a href="../preference-facts/">
 <strong>Reference</strong>
 <span>Preference facts</span>
 <small>Inferred preferences awaiting review.</small>
 </a>
 
-<a href="../guides/memory-proposals/">
+<a href="../../guides/memory-proposals/">
 <strong>Guide</strong>
 <span>Memory proposals</span>
 <small>The proposal workflow review uses.</small>
 </a>
 
-<a href="learning-receipts/">
+<a href="../learning-receipts/">
 <strong>Reference</strong>
 <span>Learning receipts</span>
 <small>The receipt subtype for learning-loop decisions.</small>

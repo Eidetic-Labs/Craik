@@ -68,19 +68,19 @@ prove absence without the cited evidence.
 
 <div className="craik-next">
 
-<a href="known-traps/">
+<a href="../known-traps/">
 <strong>Reference</strong>
 <span>Known traps</span>
 <small>The underlying contract behavior.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="freshness/">
+<a href="../freshness/">
 <strong>Reference</strong>
 <span>Freshness</span>
 <small>How expiry interacts with stale-risk warnings.</small>

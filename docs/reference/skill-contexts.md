@@ -55,19 +55,19 @@ absent context as irrelevant.
 
 <div className="craik-next">
 
-<a href="skill-telemetry/">
+<a href="../skill-telemetry/">
 <strong>Reference</strong>
 <span>Skill telemetry</span>
 <small>Invocation outcomes, durations, validation signals.</small>
 </a>
 
-<a href="skill-packages/">
+<a href="../skill-packages/">
 <strong>Reference</strong>
 <span>Skill packages</span>
 <small>The reusable package contract this context invokes.</small>
 </a>
 
-<a href="../guides/community-skills/">
+<a href="../../guides/community-skills/">
 <strong>Guide</strong>
 <span>Community skills</span>
 <small>Author expectations.</small>

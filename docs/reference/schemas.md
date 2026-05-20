@@ -178,19 +178,19 @@ Pydantic models, and round-tripped through JSON.
 
 <div className="craik-next">
 
-<a href="../runtime-contracts/">
+<a href="../../runtime-contracts/">
 <strong>Read</strong>
 <span>Runtime contracts</span>
 <small>The wire-shape walkthrough behind these schemas.</small>
 </a>
 
-<a href="../adr/receipts-and-handoffs-as-public-contracts/">
+<a href="../../adr/receipts-and-handoffs-as-public-contracts/">
 <strong>ADR</strong>
 <span>0005 · Receipts &amp; handoffs as public contracts</span>
 <small>Why these contracts are versioned and safe to cite.</small>
 </a>
 
-<a href="cli/">
+<a href="../cli/">
 <strong>Reference</strong>
 <span>CLI</span>
 <small>Inspect schemas via the <code>craik schema</code> command.</small>

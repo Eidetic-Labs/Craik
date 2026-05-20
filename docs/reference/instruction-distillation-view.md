@@ -75,19 +75,19 @@ promoting a distilled instruction.
 
 <div className="craik-next">
 
-<a href="instruction-sources/">
+<a href="../instruction-sources/">
 <strong>Reference</strong>
 <span>Instruction sources</span>
 <small>The declared-source registry.</small>
 </a>
 
-<a href="instruction-distillation-workflow/">
+<a href="../instruction-distillation-workflow/">
 <strong>Reference</strong>
 <span>Instruction distillation workflow</span>
 <small>The pipeline this view audits.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>

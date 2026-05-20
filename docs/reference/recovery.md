@@ -76,19 +76,19 @@ contradictions, and then rebuild recovery mode.
 
 <div className="craik-next">
 
-<a href="run-delta-view/">
+<a href="../run-delta-view/">
 <strong>Reference</strong>
 <span>Run delta view</span>
 <small>The operator-facing delta surface.</small>
 </a>
 
-<a href="exit-discipline/">
+<a href="../exit-discipline/">
 <strong>Reference</strong>
 <span>Exit discipline</span>
 <small>How handoffs and recovery interact.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>run_delta</code> / <code>recovery_session</code> shapes.</small>

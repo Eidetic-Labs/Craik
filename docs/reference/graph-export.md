@@ -75,19 +75,19 @@ connect delegated work, external artifacts, and review decisions.
 
 <div className="craik-next">
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>work_graph_export</code> shape in the schema catalog.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The work-graph explorer view that consumes exports.</small>
 </a>
 
-<a href="local-store/">
+<a href="../local-store/">
 <strong>Reference</strong>
 <span>Local store</span>
 <small>Where the exported records live.</small>

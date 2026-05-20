@@ -81,19 +81,19 @@ Disclosure happens only after every gate below is green.
 
 <div className="craik-next">
 
-<a href="../release-readiness/">
+<a href="../../release-readiness/">
 <strong>Read</strong>
 <span>Release readiness</span>
 <small>The in-repo gates a security patch must still pass.</small>
 </a>
 
-<a href="../guides/release-management/">
+<a href="../../guides/release-management/">
 <strong>Guide</strong>
 <span>Release management</span>
 <small>The day-to-day release procedure this overlays on.</small>
 </a>
 
-<a href="../adr/secret-handling/">
+<a href="../../adr/secret-handling/">
 <strong>ADR</strong>
 <span>0003 · Secret handling</span>
 <small>Why receipts and fixtures don't leak credentials by design.</small>

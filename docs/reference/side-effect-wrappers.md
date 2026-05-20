@@ -66,19 +66,19 @@ metadata.
 
 <div className="craik-next">
 
-<a href="policy-profiles/">
+<a href="../policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>The profiles every wrapper checks.</small>
 </a>
 
-<a href="../guides/capability-grants/">
+<a href="../../guides/capability-grants/">
 <strong>Guide</strong>
 <span>Capability grants</span>
 <small>How operators issue the grants wrappers verify.</small>
 </a>
 
-<a href="redaction/">
+<a href="../redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>The persistence boundary wrappers run through.</small>

@@ -110,19 +110,19 @@ When a run blocks or fails:
 
 <div className="craik-next">
 
-<a href="exit-discipline/">
+<a href="../exit-discipline/">
 <strong>Reference</strong>
 <span>Exit discipline</span>
 <small>The checklist that turns failure into reviewable state.</small>
 </a>
 
-<a href="redaction/">
+<a href="../redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>The boundary that keeps secrets out of receipts.</small>
 </a>
 
-<a href="../limitations/">
+<a href="../../limitations/">
 <strong>Read</strong>
 <span>Limitations</span>
 <small>The honest current-vs-deferred boundary.</small>

@@ -144,19 +144,19 @@ craik project add /path/to/repo --immutable-path architecture/decisions/
 
 <div className="craik-next">
 
-<a href="../guides/project-registry/">
+<a href="../../guides/project-registry/">
 <strong>Guide</strong>
 <span>Project registry</span>
 <small>How operators add and list projects.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>project_profile</code> shape in the schema catalog.</small>
 </a>
 
-<a href="policy-profiles/">
+<a href="../policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>The profiles that consume immutable-path metadata.</small>

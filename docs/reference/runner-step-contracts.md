@@ -72,19 +72,19 @@ state.
 
 <div className="craik-next">
 
-<a href="run-state/">
+<a href="../run-state/">
 <strong>Reference</strong>
 <span>Run state</span>
 <small>The lifecycle that consumes these step contracts.</small>
 </a>
 
-<a href="../concepts/single-agent-loop/">
+<a href="../../concepts/single-agent-loop/">
 <strong>Concept</strong>
 <span>Single-agent loop</span>
 <small>The phase model behind the contracts.</small>
 </a>
 
-<a href="runner-adapter-contract/">
+<a href="../runner-adapter-contract/">
 <strong>Reference</strong>
 <span>Runner adapter contract</span>
 <small>The runner-level surface that emits step requests.</small>

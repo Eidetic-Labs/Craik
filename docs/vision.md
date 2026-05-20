@@ -233,19 +233,19 @@ long-running knowledge work.
 
 <div className="craik-next">
 
-<a href="product-strategy.md">
+<a href="../product-strategy/">
 <strong>Read next</strong>
 <span>Product strategy</span>
 <small>How the vision becomes positioning — agent runner strategy, license, gateway ergonomics.</small>
 </a>
 
-<a href="differentiators.md">
+<a href="../differentiators/">
 <strong>Read</strong>
 <span>Differentiators</span>
 <small>What keeps the roadmap from collapsing into basic CLI plumbing.</small>
 </a>
 
-<a href="concepts/project-model.md">
+<a href="../concepts/project-model/">
 <strong>Concept</strong>
 <span>Project model</span>
 <small>The foundational typed object the rest of the runtime composes against.</small>

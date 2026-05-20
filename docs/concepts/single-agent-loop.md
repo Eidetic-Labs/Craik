@@ -227,19 +227,19 @@ agent — no claiming work that did not complete.</p>
 
 <div className="craik-next">
 
-<a href="case-files.md">
+<a href="../case-files/">
 <strong>Read</strong>
 <span>Case files</span>
 <small>The per-task pre-run brief the loop reads from before plan.</small>
 </a>
 
-<a href="../reference/runner-step-contracts.md">
+<a href="../../reference/runner-step-contracts/">
 <strong>Reference</strong>
 <span>Runner step contracts</span>
 <small>The typed shape every step request and step result carries.</small>
 </a>
 
-<a href="../reference/recovery.md">
+<a href="../../reference/recovery/">
 <strong>Reference</strong>
 <span>Recovery mode</span>
 <small>The continuity view a resuming agent reads before acting.</small>

@@ -48,19 +48,19 @@ capability grants still decide what a run may do.
 
 <div className="craik-next">
 
-<a href="runner-adapter-contract/">
+<a href="../runner-adapter-contract/">
 <strong>Reference</strong>
 <span>Runner adapter contract</span>
 <small>The contract every packaged adapter implements.</small>
 </a>
 
-<a href="runner-metadata/">
+<a href="../runner-metadata/">
 <strong>Reference</strong>
 <span>Runner metadata</span>
 <small>The identity snapshot adapter packages link to.</small>
 </a>
 
-<a href="../guides/community-plugins/">
+<a href="../../guides/community-plugins/">
 <strong>Guide</strong>
 <span>Community plugins</span>
 <small>Author and review expectations for distributed adapters.</small>

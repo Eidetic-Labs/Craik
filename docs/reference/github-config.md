@@ -70,19 +70,19 @@ to lower rate limits and cannot access private repository data.
 
 <div className="craik-next">
 
-<a href="../guides/github-adapter/">
+<a href="../../guides/github-adapter/">
 <strong>Guide</strong>
 <span>GitHub adapter</span>
 <small>How the adapter loads context.</small>
 </a>
 
-<a href="config/">
+<a href="../config/">
 <strong>Reference</strong>
 <span>Config reference</span>
 <small>The wider config surface.</small>
 </a>
 
-<a href="redaction/">
+<a href="../redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>How token-shaped values stay out of state.</small>

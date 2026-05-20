@@ -151,19 +151,19 @@ security, docs, and package checks on `main` and uploads all artifacts.
 
 <div className="craik-next">
 
-<a href="../guides/development/">
+<a href="../../guides/development/">
 <strong>Guide</strong>
 <span>Development checks</span>
 <small>The local equivalent operators run.</small>
 </a>
 
-<a href="../release-readiness/">
+<a href="../../release-readiness/">
 <strong>Read</strong>
 <span>Release readiness</span>
 <small>The validation gates these CI jobs enforce.</small>
 </a>
 
-<a href="policy-tests/">
+<a href="../policy-tests/">
 <strong>Reference</strong>
 <span>Policy tests</span>
 <small>The regression gate that runs inside <code>security</code>.</small>

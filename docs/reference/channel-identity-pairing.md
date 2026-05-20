@@ -69,19 +69,19 @@ normalized.
 
 <div className="craik-next">
 
-<a href="channel-allowlists/">
+<a href="../channel-allowlists/">
 <strong>Reference</strong>
 <span>Channel allowlists</span>
 <small>The selector filter that runs alongside pairing.</small>
 </a>
 
-<a href="channel-policy-envelopes/">
+<a href="../channel-policy-envelopes/">
 <strong>Reference</strong>
 <span>Channel policy envelopes</span>
 <small>The policy selected after pairing and allowlist pass.</small>
 </a>
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>How pairing decisions persist.</small>

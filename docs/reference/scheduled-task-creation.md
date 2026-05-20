@@ -80,19 +80,19 @@ ticks, persisting tasks, and emitting schedule execution receipts.
 
 <div className="craik-next">
 
-<a href="scheduled-automations/">
+<a href="../scheduled-automations/">
 <strong>Reference</strong>
 <span>Scheduled automations</span>
 <small>The wider automation contract this helper supports.</small>
 </a>
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>The receipt shape schedule execution produces.</small>
 </a>
 
-<a href="../guides/gateway-troubleshooting/">
+<a href="../../guides/gateway-troubleshooting/">
 <strong>Guide</strong>
 <span>Gateway troubleshooting</span>
 <small>Diagnose schedule problems.</small>

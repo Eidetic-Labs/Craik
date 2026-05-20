@@ -71,19 +71,19 @@ promotion review, and active-context consumption.
 
 <div className="craik-next">
 
-<a href="instruction-sources/">
+<a href="../instruction-sources/">
 <strong>Reference</strong>
 <span>Instruction sources</span>
 <small>Registry boundaries, categories, and stale invalidation.</small>
 </a>
 
-<a href="instruction-distillation-view/">
+<a href="../instruction-distillation-view/">
 <strong>Reference</strong>
 <span>Instruction distillation view</span>
 <small>The operator surface that audits proposals.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>All instruction-related contract shapes.</small>

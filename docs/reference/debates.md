@@ -99,19 +99,19 @@ absent agreement or contradiction links are visible in review.
 
 <div className="craik-next">
 
-<a href="cross-agent-review/">
+<a href="../cross-agent-review/">
 <strong>Reference</strong>
 <span>Cross-agent review</span>
 <small>The review flow debates feed.</small>
 </a>
 
-<a href="agent-roles/">
+<a href="../agent-roles/">
 <strong>Reference</strong>
 <span>Agent roles</span>
 <small>The role kinds that produce turns.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>debate_turn</code> / <code>debate_summary</code> shapes.</small>

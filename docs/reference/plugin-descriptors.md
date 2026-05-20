@@ -55,19 +55,19 @@ decisions about what the current run is allowed to do.
 
 <div className="craik-next">
 
-<a href="plugin-capability-grants/">
+<a href="../plugin-capability-grants/">
 <strong>Reference</strong>
 <span>Plugin capability grants</span>
 <small>The grant contract that authorizes bounded actions.</small>
 </a>
 
-<a href="plugin-probation/">
+<a href="../plugin-probation/">
 <strong>Reference</strong>
 <span>Plugin probation</span>
 <small>How new descriptors enter trusted use.</small>
 </a>
 
-<a href="../guides/community-plugins/">
+<a href="../../guides/community-plugins/">
 <strong>Guide</strong>
 <span>Community plugins</span>
 <small>Review boundaries for plugin authors.</small>

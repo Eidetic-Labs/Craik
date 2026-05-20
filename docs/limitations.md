@@ -208,19 +208,19 @@ rather than published-package compatibility guarantees.
 
 <div className="craik-next">
 
-<a href="reference/post-mvp-scope.md">
+<a href="../reference/post-mvp-scope/">
 <strong>Reference</strong>
 <span>Post-MVP scope</span>
 <small>The full list of surfaces deliberately outside MVP, with the gates that move them forward.</small>
 </a>
 
-<a href="mvp-roadmap.md">
+<a href="../mvp-roadmap/">
 <strong>Read</strong>
 <span>MVP roadmap</span>
 <small>The release-readiness checklist driving v0.x.</small>
 </a>
 
-<a href="roadmap.md">
+<a href="../roadmap/">
 <strong>Read</strong>
 <span>Roadmap</span>
 <small>The broader trajectory through v0.12 and beyond.</small>

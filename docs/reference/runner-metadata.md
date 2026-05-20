@@ -81,19 +81,19 @@ credentials) are replaced with <code>[REDACTED]</code>.
 
 <div className="craik-next">
 
-<a href="runner-adapter-contract/">
+<a href="../runner-adapter-contract/">
 <strong>Reference</strong>
 <span>Runner adapter contract</span>
 <small>How adapters produce and preserve this metadata.</small>
 </a>
 
-<a href="../guides/runner-preview-workflows/">
+<a href="../../guides/runner-preview-workflows/">
 <strong>Guide</strong>
 <span>Runner preview workflows</span>
 <small>Smoke-test that metadata appears in outputs.</small>
 </a>
 
-<a href="../runtime-contracts/">
+<a href="../../runtime-contracts/">
 <strong>Read</strong>
 <span>Runtime contracts</span>
 <small>The wider receipt and handoff shapes this metadata attaches to.</small>

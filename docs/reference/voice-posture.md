@@ -106,19 +106,19 @@ transcripts.
 
 <div className="craik-next">
 
-<a href="speech-to-text-adapters/">
+<a href="../speech-to-text-adapters/">
 <strong>Reference</strong>
 <span>Speech-to-text adapters</span>
 <small>The input-direction adapter contract.</small>
 </a>
 
-<a href="text-to-speech-adapters/">
+<a href="../text-to-speech-adapters/">
 <strong>Reference</strong>
 <span>Text-to-speech adapters</span>
 <small>The output-direction adapter contract.</small>
 </a>
 
-<a href="accessibility-requirements/">
+<a href="../accessibility-requirements/">
 <strong>Reference</strong>
 <span>Accessibility requirements</span>
 <small>The accessibility floor every voice surface respects.</small>

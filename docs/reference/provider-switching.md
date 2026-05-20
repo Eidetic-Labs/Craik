@@ -82,19 +82,19 @@ boundaries and records the failover decision for audit.
 
 <div className="craik-next">
 
-<a href="model-providers/">
+<a href="../model-providers/">
 <strong>Reference</strong>
 <span>Model providers</span>
 <small>The provider metadata catalog plus budget/quota gating.</small>
 </a>
 
-<a href="provider-failover/">
+<a href="../provider-failover/">
 <strong>Reference</strong>
 <span>Provider failover</span>
 <small>The explicit fallback rules.</small>
 </a>
 
-<a href="../guides/provider-routing/">
+<a href="../../guides/provider-routing/">
 <strong>Guide</strong>
 <span>Provider routing &amp; sandboxes</span>
 <small>End-to-end provider routing.</small>

@@ -77,19 +77,19 @@ not that the underlying claims are true.
 
 <div className="craik-next">
 
-<a href="runtime-critics/">
+<a href="../runtime-critics/">
 <strong>Reference</strong>
 <span>Runtime critics &amp; red team</span>
 <small>The reviewable findings that compose with scores.</small>
 </a>
 
-<a href="self-audit/">
+<a href="../self-audit/">
 <strong>Reference</strong>
 <span>Self-audit</span>
 <small>The handoff-side checklist scores read.</small>
 </a>
 
-<a href="quality-gate-view/">
+<a href="../quality-gate-view/">
 <strong>Reference</strong>
 <span>Quality gate view</span>
 <small>The operator surface that surfaces scores.</small>

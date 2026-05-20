@@ -896,19 +896,19 @@ issue is explicitly internal-only scaffolding.
 
 <div className="craik-next">
 
-<a href="mvp-roadmap.md">
+<a href="../mvp-roadmap/">
 <strong>Read</strong>
 <span>MVP roadmap</span>
 <small>The checkable v0.x.0 plan that turns these gates into release-quality workflows.</small>
 </a>
 
-<a href="limitations.md">
+<a href="../limitations/">
 <strong>Read</strong>
 <span>Limitations</span>
 <small>Honest scope boundary for what's end-to-end today.</small>
 </a>
 
-<a href="implementation-plan.md">
+<a href="../implementation-plan/">
 <strong>Read</strong>
 <span>Implementation plan</span>
 <small>The buildable sequence under the chosen stack.</small>

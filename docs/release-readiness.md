@@ -233,19 +233,19 @@ tests/test_case_files.py tests/test_handoffs.py -q` — all passed.
 
 <div className="craik-next">
 
-<a href="mvp-roadmap.md">
+<a href="../mvp-roadmap/">
 <strong>Read</strong>
 <span>MVP roadmap</span>
 <small>The work this readiness report validates.</small>
 </a>
 
-<a href="limitations.md">
+<a href="../limitations/">
 <strong>Read</strong>
 <span>Limitations</span>
 <small>Honest scope after v0.1.0 ships.</small>
 </a>
 
-<a href="security/release-process.md">
+<a href="../security/release-process/">
 <strong>Read</strong>
 <span>Security release process</span>
 <small>The release-day procedure for security-sensitive work.</small>

@@ -97,19 +97,19 @@ a denied <code>SkillRollbackDecision</code>.
 
 <div className="craik-next">
 
-<a href="skill-promotion-gates/">
+<a href="../skill-promotion-gates/">
 <strong>Reference</strong>
 <span>Skill promotion gates</span>
 <small>The decision rollbacks undo.</small>
 </a>
 
-<a href="skill-replay/">
+<a href="../skill-replay/">
 <strong>Reference</strong>
 <span>Skill replay</span>
 <small>The replay result rollback decisions require.</small>
 </a>
 
-<a href="learning-receipts/">
+<a href="../learning-receipts/">
 <strong>Reference</strong>
 <span>Learning receipts</span>
 <small>Record rollback decisions with the <code>rollback</code> action.</small>

@@ -64,19 +64,19 @@ blocked.
 
 <div className="craik-next">
 
-<a href="import-dry-run/">
+<a href="../import-dry-run/">
 <strong>Reference</strong>
 <span>Import dry-run reports</span>
 <small>The dry-run report shape that consumes a map.</small>
 </a>
 
-<a href="adjacent-tool-migration/">
+<a href="../adjacent-tool-migration/">
 <strong>Reference</strong>
 <span>Adjacent-tool migration</span>
 <small>The assessment that defines mapping support per concept.</small>
 </a>
 
-<a href="secret-migration-policy/">
+<a href="../secret-migration-policy/">
 <strong>Reference</strong>
 <span>Secret migration policy</span>
 <small>Why secrets stay outside imports.</small>

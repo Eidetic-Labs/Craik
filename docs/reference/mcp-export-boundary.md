@@ -106,19 +106,19 @@ start an MCP server or grant runtime authority by itself.
 
 <div className="craik-next">
 
-<a href="mcp-client/">
+<a href="../mcp-client/">
 <strong>Reference</strong>
 <span>MCP client</span>
 <small>Client-side provider and tool routing.</small>
 </a>
 
-<a href="../guides/mcp-ecosystem-compatibility/">
+<a href="../../guides/mcp-ecosystem-compatibility/">
 <strong>Guide</strong>
 <span>MCP ecosystem compatibility</span>
 <small>How to compose Craik with the wider MCP ecosystem.</small>
 </a>
 
-<a href="environment-receipts/">
+<a href="../environment-receipts/">
 <strong>Reference</strong>
 <span>Environment receipts</span>
 <small>The audit trail an exported tool produces.</small>

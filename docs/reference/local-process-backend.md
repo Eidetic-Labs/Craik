@@ -64,19 +64,19 @@ field.
 
 <div className="craik-next">
 
-<a href="sandbox-backends/">
+<a href="../sandbox-backends/">
 <strong>Reference</strong>
 <span>Sandbox backends</span>
 <small>The shared contract.</small>
 </a>
 
-<a href="environment-receipts/">
+<a href="../environment-receipts/">
 <strong>Reference</strong>
 <span>Environment receipts</span>
 <small>How allowed and denied decisions persist.</small>
 </a>
 
-<a href="docker-sandbox-backend/">
+<a href="../docker-sandbox-backend/">
 <strong>Reference</strong>
 <span>Docker sandbox backend</span>
 <small>The container alternative when isolation matters.</small>

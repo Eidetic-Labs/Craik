@@ -167,19 +167,19 @@ craik memory preview <task-id>
 
 <div className="craik-next">
 
-<a href="../guides/memory-proposals/">
+<a href="../../guides/memory-proposals/">
 <strong>Guide</strong>
 <span>Memory proposals</span>
 <small>The operator-facing flow this backend serves.</small>
 </a>
 
-<a href="../guides/connecting-stigmem/">
+<a href="../../guides/connecting-stigmem/">
 <strong>Guide</strong>
 <span>Connecting Stigmem</span>
 <small>Configure the production backend.</small>
 </a>
 
-<a href="../stigmem-integration/">
+<a href="../../stigmem-integration/">
 <strong>Read</strong>
 <span>Stigmem integration</span>
 <small>The full boundary and endpoint mapping.</small>

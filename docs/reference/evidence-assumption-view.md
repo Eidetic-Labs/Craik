@@ -64,19 +64,19 @@ validate, reject, promote, or write memory facts.
 
 <div className="craik-next">
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="../guides/evidence-and-assumptions/">
+<a href="../../guides/evidence-and-assumptions/">
 <strong>Guide</strong>
 <span>Evidence and assumptions</span>
 <small>The operator workflow this view supports.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>evidence_reference</code> and <code>assumption</code> shapes.</small>

@@ -131,19 +131,19 @@ Secret migration receipts record:
 
 <div className="craik-next">
 
-<a href="migration-maps/">
+<a href="../migration-maps/">
 <strong>Reference</strong>
 <span>Migration maps</span>
 <small>The field-level mapping contract this policy gates.</small>
 </a>
 
-<a href="import-dry-run/">
+<a href="../import-dry-run/">
 <strong>Reference</strong>
 <span>Import dry-run reports</span>
 <small>How secret warnings reach operators.</small>
 </a>
 
-<a href="../adr/secret-handling/">
+<a href="../../adr/secret-handling/">
 <strong>ADR</strong>
 <span>0003 · Secret handling</span>
 <small>The references-not-values design.</small>

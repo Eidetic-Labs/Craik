@@ -22,7 +22,7 @@ adapter or plugin must produce.
 Craik is built around stable, versioned contracts. Adapters, agents,
 memory backends, and future plugins integrate through them. The
 typed Python implementation lives in <code>src/craik/contracts/</code>
-and is documented in <a href="reference/schemas.md">Schema reference</a>.
+and is documented in <a href="../reference/schemas/">Schema reference</a>.
 
 Contract examples below use JSON-like shapes for clarity. The shipped
 implementation defines them as strict Pydantic models with validation.
@@ -387,19 +387,19 @@ Events update the graph.
 
 <div className="craik-next">
 
-<a href="reference/schemas.md">
+<a href="../reference/schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>Strict Pydantic models, JSON Schema export, and the <code>craik schema</code> CLI.</small>
 </a>
 
-<a href="features.md">
+<a href="../features/">
 <strong>Read</strong>
 <span>Features</span>
 <small>How the contracts compose into the implementable feature surface.</small>
 </a>
 
-<a href="architecture.md">
+<a href="../architecture/">
 <strong>Read</strong>
 <span>Architecture</span>
 <small>The seven runtime layers these contracts hold together.</small>

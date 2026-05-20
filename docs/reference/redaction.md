@@ -99,19 +99,19 @@ Payloads must be redacted before they are written to:
 
 <div className="craik-next">
 
-<a href="../adr/secret-handling/">
+<a href="../../adr/secret-handling/">
 <strong>ADR</strong>
 <span>0003 · Secret handling</span>
 <small>The design behind references-not-values.</small>
 </a>
 
-<a href="../security/secrets/">
+<a href="../../security/secrets/">
 <strong>Security</strong>
 <span>Secrets handling</span>
 <small>Operator-facing secrets guide.</small>
 </a>
 
-<a href="policy-profiles/">
+<a href="../policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>Profiles that mark redaction as required.</small>

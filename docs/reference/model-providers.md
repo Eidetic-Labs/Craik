@@ -224,19 +224,19 @@ provider docs on **2026-05-17**:
 
 <div className="craik-next">
 
-<a href="../adr/provider-transport-and-mode-families/">
+<a href="../../adr/provider-transport-and-mode-families/">
 <strong>ADR</strong>
 <span>0002 · Provider transport &amp; mode families</span>
 <small>Design rationale for the family/transport split.</small>
 </a>
 
-<a href="../guides/provider-routing/">
+<a href="../../guides/provider-routing/">
 <strong>Guide</strong>
 <span>Provider routing &amp; sandboxes</span>
 <small>End-to-end routing flow.</small>
 </a>
 
-<a href="provider-failover/">
+<a href="../provider-failover/">
 <strong>Reference</strong>
 <span>Provider failover</span>
 <small>How fallback rules compose with budgets.</small>

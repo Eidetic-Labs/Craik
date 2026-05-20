@@ -105,19 +105,19 @@ before additional side effects.
 
 <div className="craik-next">
 
-<a href="../concepts/single-agent-loop/">
+<a href="../../concepts/single-agent-loop/">
 <strong>Concept</strong>
 <span>Single-agent execution loop</span>
 <small>The conceptual lifecycle.</small>
 </a>
 
-<a href="../guides/single-agent-fixture-loop/">
+<a href="../../guides/single-agent-fixture-loop/">
 <strong>Guide</strong>
 <span>Single-agent fixture loop</span>
 <small>The deterministic smoke-test workflow.</small>
 </a>
 
-<a href="runner-step-contracts/">
+<a href="../runner-step-contracts/">
 <strong>Reference</strong>
 <span>Runner step contracts</span>
 <small>The per-step request and result shapes.</small>

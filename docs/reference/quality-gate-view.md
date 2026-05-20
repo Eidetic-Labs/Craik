@@ -80,19 +80,19 @@ operators can distinguish review signals from accepted decisions.
 
 <div className="craik-next">
 
-<a href="quality-scores/">
+<a href="../quality-scores/">
 <strong>Reference</strong>
 <span>Quality scores</span>
 <small>The underlying contracts.</small>
 </a>
 
-<a href="runtime-critics/">
+<a href="../runtime-critics/">
 <strong>Reference</strong>
 <span>Runtime critics &amp; red team</span>
 <small>The reviewable findings.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>

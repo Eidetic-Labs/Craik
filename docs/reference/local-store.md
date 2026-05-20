@@ -179,19 +179,19 @@ continuity.
 
 <div className="craik-next">
 
-<a href="../guides/local-store-migrations/">
+<a href="../../guides/local-store-migrations/">
 <strong>Guide</strong>
 <span>Local store migrations</span>
 <small>Recovery from failed migrations.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The contracts these tables persist.</small>
 </a>
 
-<a href="redaction/">
+<a href="../redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>The boundary that keeps secrets out of the store.</small>

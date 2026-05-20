@@ -69,19 +69,19 @@ another agent to rerun it without relying on private state.
 
 <div className="craik-next">
 
-<a href="../guides/community-skills/">
+<a href="../../guides/community-skills/">
 <strong>Guide</strong>
 <span>Community skills</span>
 <small>How skill references compose with community distribution.</small>
 </a>
 
-<a href="../guides/community-plugins/">
+<a href="../../guides/community-plugins/">
 <strong>Guide</strong>
 <span>Community plugins</span>
 <small>How plugin references compose with community plugin review.</small>
 </a>
 
-<a href="adapter-packages/">
+<a href="../adapter-packages/">
 <strong>Reference</strong>
 <span>Adapter packages</span>
 <small>The adapter distribution metadata an adapter reference links to.</small>

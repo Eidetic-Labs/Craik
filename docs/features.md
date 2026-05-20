@@ -533,19 +533,19 @@ product classification · "what changed since last time" deltas.
 
 <div className="craik-next">
 
-<a href="architecture.md">
+<a href="../architecture/">
 <strong>Read next</strong>
 <span>Architecture</span>
 <small>The seven runtime layers these features compose against.</small>
 </a>
 
-<a href="runtime-contracts.md">
+<a href="../runtime-contracts/">
 <strong>Reference</strong>
 <span>Runtime contracts</span>
 <small>The typed objects every feature speaks.</small>
 </a>
 
-<a href="mvp.md">
+<a href="../mvp/">
 <strong>Read</strong>
 <span>MVP plan</span>
 <small>Which of these features ship in the first robust release.</small>
