@@ -11,12 +11,19 @@ from craik.contracts.models import (
     CapabilityGrant,
     PolicyEnvelope,
     RunnerStepResult,
+    SandboxBackend,
     ToolAttestationStatus,
     ToolResultAttestation,
 )
 from craik.runtime.policy.redaction import redact
+from craik.runtime.sandbox.local_process_backend import (
+    LocalProcessCommandRegistry,
+    LocalProcessRequest,
+    execute_local_process_command,
+)
 from craik.runtime.side_effects import (
     SideEffectResult,
+    planned_capability_receipt_id,
     run_github_write,
     run_shell_command_ref,
 )
@@ -53,6 +60,7 @@ def dispatch_tool_call_side_effect(
     grants: list[CapabilityGrant],
     tool_call: dict[str, Any],
     actor: str,
+    sandbox_config: object | None = None,
 ) -> SideEffectResult | None:
     """Dispatch a policy-gated side effect for a provider tool call."""
     name = tool_name(tool_call)
@@ -70,6 +78,12 @@ def dispatch_tool_call_side_effect(
             grants=grants,
             actor=actor,
             command_ref=command_ref,
+            executor=_local_process_executor(
+                policy=policy,
+                grants=grants,
+                command_ref=command_ref,
+                sandbox_config=sandbox_config,
+            ),
         )
     if name in {"github.write", "github_write", "run_github_write"}:
         return run_github_write(
@@ -80,6 +94,50 @@ def dispatch_tool_call_side_effect(
             operation=str(arguments.get("operation") or "write"),
             target=str(arguments.get("target") or ""),
         )
+    return None
+
+
+def _local_process_executor(
+    *,
+    policy: PolicyEnvelope,
+    grants: list[CapabilityGrant],
+    command_ref: str,
+    sandbox_config: object | None,
+) -> Any | None:
+    if not isinstance(sandbox_config, dict):
+        return None
+    raw_backend = sandbox_config.get("backend")
+    raw_commands = sandbox_config.get("commands")
+    if not isinstance(raw_backend, dict) or not isinstance(raw_commands, dict):
+        return None
+    backend = SandboxBackend.model_validate(raw_backend)
+    registry = LocalProcessCommandRegistry.from_mapping(raw_commands)
+    grant_id = _grant_id_for_shell_execute(grants)
+    receipt_id = planned_capability_receipt_id(policy, "shell.execute", command_ref)
+
+    def execute(command: str) -> dict[str, Any]:
+        request = LocalProcessRequest(
+            id=f"local_process_request_{policy.task_id}_{_slug(command)}",
+            backend_id=backend.id,
+            command_ref=command,
+            policy_envelope_id=policy.id,
+            capability_grant_id=grant_id,
+            receipt_id=receipt_id,
+        )
+        result = execute_local_process_command(
+            backend=backend,
+            request=request,
+            registry=registry,
+        )
+        return result.model_dump(mode="json")
+
+    return execute
+
+
+def _grant_id_for_shell_execute(grants: list[CapabilityGrant]) -> str | None:
+    for grant in grants:
+        if grant.capability == "shell.execute":
+            return grant.id
     return None
 
 

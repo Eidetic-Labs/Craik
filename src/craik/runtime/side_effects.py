@@ -58,8 +58,10 @@ def run_shell_command_ref(
     denied = _persist_denial(store=store, policy=policy, decision=decision, actor=actor)
     if denied is not None:
         return SideEffectResult(kind="shell", allowed=False, receipt=denied)
+    receipt_id = planned_capability_receipt_id(policy, decision.capability, command_ref)
     output = executor(command_ref) if executor else {"command_ref": command_ref}
     receipt = _passed_receipt(
+        receipt_id=receipt_id,
         policy=policy,
         actor=actor,
         capability=decision.capability,
@@ -208,6 +210,7 @@ def _persist_denial(
 
 def _passed_receipt(
     *,
+    receipt_id: str | None = None,
     policy: PolicyEnvelope,
     actor: str,
     capability: str,
@@ -217,7 +220,7 @@ def _passed_receipt(
 ) -> CapabilityReceipt:
     redacted_target = str(redact(target).value)
     return environment_receipt(
-        receipt_id=f"receipt_{policy.task_id}_{_slug(capability)}_{_slug(redacted_target)}",
+        receipt_id=receipt_id or planned_capability_receipt_id(policy, capability, redacted_target),
         action="sandbox_action",
         context=EnvironmentReceiptContext(
             task_id=policy.task_id,
@@ -232,6 +235,16 @@ def _passed_receipt(
         summary=reason,
         metadata=metadata,
     )
+
+
+def planned_capability_receipt_id(
+    policy: PolicyEnvelope,
+    capability: str,
+    target: str,
+) -> str:
+    """Return the deterministic receipt id a side-effect wrapper will persist."""
+    redacted_target = str(redact(target).value)
+    return f"receipt_{policy.task_id}_{_slug(capability)}_{_slug(redacted_target)}"
 
 
 def _safe_repo_path(repo_root: Path, relative_path: str) -> Path:

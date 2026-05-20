@@ -1,4 +1,5 @@
 import json
+import sys
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -12,6 +13,8 @@ from craik.contracts.models import (
     RunnerMetadata,
     RunnerStepRequest,
     RunnerStepResult,
+    SandboxBackend,
+    SandboxBackendCapability,
 )
 from craik.runtime.auth.operator import OperatorSession, OperatorSessionStore
 from craik.runtime.memory.memory import LocalMemoryStore
@@ -433,6 +436,39 @@ def test_loop_executes_tool_call_and_replays_tool_result(store: LocalStore) -> N
     assert result.step_results[-1].observed_output["text"] == "tool result consumed"
 
 
+def test_loop_dispatches_shell_tool_call_through_local_process_sandbox(
+    store: LocalStore,
+) -> None:
+    runner = ToolCallStepRunner()
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    result = executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture"),
+        runner_metadata=_runner(),
+        grants=[_shell_grant()],
+        steps=[
+            LoopStep(
+                phase="act",
+                input_prompt="Run the requested tool.",
+                context={"local_process_sandbox": _local_process_sandbox_config()},
+            )
+        ],
+        max_iterations=3,
+    )
+
+    assert result.run.status == "completed"
+    tool_content = json.loads(runner.requests[1].context["message_history"][0]["content"])
+    assert tool_content["output"]["backend_id"] == "sandbox_backend_local_fixture"
+    assert tool_content["output"]["executed"] is True
+    assert tool_content["output"]["stdout"] == "sandbox ok\n"
+
+
 def test_loop_captures_streaming_chunks(store: LocalStore) -> None:
     runner = StreamingStepRunner(chunks=["Hel", "lo", "!"])
     executor = SingleAgentLoopExecutor(
@@ -611,3 +647,30 @@ def _shell_grant() -> CapabilityGrant:
         reason="Allow deterministic fixture action.",
         approved_by="user:maintainer",
     )
+
+
+def _local_process_sandbox_config() -> dict[str, object]:
+    backend = SandboxBackend(
+        id="sandbox_backend_local_fixture",
+        name="Local Process Sandbox",
+        kind="local_process",
+        isolation_mode="process",
+        capabilities=[
+            SandboxBackendCapability(
+                name="shell.execute",
+                operations=["run"],
+                description="Execute command references under policy.",
+            )
+        ],
+        docs=["docs/reference/local-process-backend.md"],
+        created_at=datetime(2026, 5, 16, 12, 0, tzinfo=UTC),
+    )
+    return {
+        "backend": backend.model_dump(mode="json"),
+        "commands": {
+            "fixture-action": {
+                "argv": [sys.executable, "-c", "print('sandbox ok')"],
+                "timeout_seconds": 5,
+            }
+        },
+    }
