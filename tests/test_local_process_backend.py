@@ -3,7 +3,10 @@ from craik.contracts.models import (
     SandboxBackendCapability,
 )
 from craik.runtime.sandbox.local_process_backend import (
+    LocalProcessCommand,
+    LocalProcessCommandRegistry,
     LocalProcessRequest,
+    execute_local_process_command,
     local_process_decision,
 )
 
@@ -128,3 +131,37 @@ def test_local_process_decision_denies_inline_shell() -> None:
 
     assert decision.allowed is False
     assert decision.reason == "local process requests require command references, not inline shell"
+
+
+def test_local_process_executor_runs_registered_command_reference() -> None:
+    registry = LocalProcessCommandRegistry(
+        [
+            LocalProcessCommand(
+                ref="check_python",
+                argv=["python", "-c", "print('sandbox ok')"],
+            )
+        ]
+    )
+
+    result = execute_local_process_command(
+        backend=_backend(),
+        request=_request(command_ref="check_python"),
+        registry=registry,
+    )
+
+    assert result.allowed is True
+    assert result.executed is True
+    assert result.returncode == 0
+    assert result.stdout == "sandbox ok\n"
+
+
+def test_local_process_executor_denies_unregistered_command_reference() -> None:
+    result = execute_local_process_command(
+        backend=_backend(),
+        request=_request(command_ref="missing_command"),
+        registry=LocalProcessCommandRegistry(),
+    )
+
+    assert result.allowed is False
+    assert result.executed is False
+    assert result.reason == "command reference is not registered"

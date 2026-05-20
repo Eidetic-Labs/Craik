@@ -73,7 +73,6 @@ __all__ = [
 
 class LoopExecutionError(RuntimeError):
     """Base error for governed loop execution failures."""
-
 class LoopPolicyBlockedError(LoopExecutionError):
     """Raised when policy blocks a side-effect step."""
 
@@ -376,6 +375,7 @@ class SingleAgentLoopExecutor:
                             grants=active_grants,
                             tool_call=tool_call,
                             actor=f"runner:{runner_metadata.id}",
+                            sandbox_config=step_context.get("local_process_sandbox"),
                         )
                         if side_effect is None:
                             continue
