@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 import typer
@@ -15,6 +16,7 @@ from craik.runtime.providers.provider_runner import (
 )
 from craik.runtime.store import LocalStore
 from craik.runtime.work.case_files import ProjectNotFoundError, TaskNotFoundError
+from craik.runtime.work.runs import TERMINAL_RUN_STATUSES, RunTransition, TaskRunManager
 
 run_app = typer.Typer(help="Execute, inspect, and recover single-agent task runs.")
 
@@ -100,6 +102,118 @@ def run_inspect(
     ] = False,
 ) -> None:
     """Inspect one persisted task run and linked local state."""
+    _echo_run_inspection(run_id_or_task_id, include_outputs=include_outputs)
+
+
+@run_app.command("show")
+def run_show(
+    run_id_or_task_id: str,
+    include_outputs: Annotated[
+        bool,
+        typer.Option(
+            "--include-outputs/--no-include-outputs",
+            help="Include full captured output payloads.",
+        ),
+    ] = False,
+) -> None:
+    """Show one persisted task run and linked local state."""
+    _echo_run_inspection(run_id_or_task_id, include_outputs=include_outputs)
+
+
+@run_app.command("resume")
+def run_resume(
+    run_id_or_task_id: str,
+    provider_id: Annotated[
+        str | None,
+        typer.Option(
+            "--provider-id",
+            help="Override the provider runner id recorded on the interrupted run.",
+        ),
+    ] = None,
+    allow_fixture_action: Annotated[
+        bool,
+        typer.Option(
+            "--allow-fixture-action/--no-allow-fixture-action",
+            help="Grant the deterministic fixture shell action required by the MVP loop.",
+        ),
+    ] = True,
+    max_iterations: Annotated[
+        int,
+        typer.Option("--max-iterations", help="Maximum single-agent loop iterations."),
+    ] = 5,
+) -> None:
+    """Resume an interrupted provider-backed run from durable phase boundaries."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        run = _find_run(store, run_id_or_task_id)
+        if run is None:
+            raise typer.BadParameter(f"unknown run or task: {run_id_or_task_id}")
+        if run.status != "interrupted":
+            typer.echo(
+                f"run {run.id} is {run.status}; only interrupted runs can be resumed",
+                err=True,
+            )
+            raise typer.Exit(1)
+        grants = [_fixture_shell_grant(run.task_id)] if allow_fixture_action else []
+        result = ProviderBackedRunExecutor(store).execute(
+            task_id=run.task_id,
+            provider_id=provider_id or run.runner_id,
+            grants=grants,
+            max_iterations=max_iterations,
+            resume_run_id=run.id,
+        )
+        payload = _provider_run_payload(result)
+    except (
+        ModelProviderNotFoundError,
+        ProjectNotFoundError,
+        TaskNotFoundError,
+        ValueError,
+    ) as error:
+        raise typer.BadParameter(str(error)) from None
+    finally:
+        store.close()
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@run_app.command("cancel")
+def run_cancel(
+    run_id_or_task_id: str,
+    reason: Annotated[
+        str,
+        typer.Option("--reason", help="Reason recorded on the interrupted run."),
+    ] = "cancelled by operator",
+) -> None:
+    """Cancel a non-terminal run by persisting an interrupted stop state."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        run = _find_run(store, run_id_or_task_id)
+        if run is None:
+            raise typer.BadParameter(f"unknown run or task: {run_id_or_task_id}")
+        if run.status in TERMINAL_RUN_STATUSES:
+            typer.echo(
+                f"run {run.id} is {run.status}; terminal runs cannot be cancelled",
+                err=True,
+            )
+            raise typer.Exit(1)
+        run = TaskRunManager(store).transition(
+            run.id,
+            RunTransition(
+                status="interrupted",
+                phase="stop",
+                iteration=run.iteration,
+                stop_reason=reason,
+                at=datetime.now(UTC),
+            ),
+        )
+        payload = {"cancelled": True, "run": run.model_dump(mode="json", by_alias=True)}
+    finally:
+        store.close()
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+def _echo_run_inspection(run_id_or_task_id: str, *, include_outputs: bool) -> None:
     store = LocalStore.from_env()
     try:
         store.initialize()

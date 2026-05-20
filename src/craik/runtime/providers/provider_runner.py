@@ -220,6 +220,7 @@ class ProviderBackedRunExecutor:
         provider_token_budget: int | None = None,
         live_enabled: bool | None = None,
         started_at: datetime | None = None,
+        resume_run_id: str | None = None,
     ) -> ProviderBackedRunResult:
         """Compile the case-file prompt, run through a provider, and leave a handoff."""
         case_file = CaseFileAssembler(self.store).latest_for_task(task_id)
@@ -261,6 +262,7 @@ class ProviderBackedRunExecutor:
                 max_iterations=max_iterations,
                 provider_token_budget=provider_token_budget,
                 started_at=started_at,
+                resume_run_id=resume_run_id,
             )
             handoff = HandoffWriter(self.store).create_from_run(
                 loop.run.id,
