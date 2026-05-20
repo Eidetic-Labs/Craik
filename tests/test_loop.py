@@ -167,6 +167,46 @@ def test_loop_enforces_wall_clock_budget_before_next_step(store: LocalStore) -> 
     assert runner.requests == []
 
 
+def test_loop_enforces_wall_clock_budget_before_tool_dispatch(
+    store: LocalStore,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runner = ToolCallStepRunner()
+    checks = iter([None, None, "wall-clock budget 1s exceeded"])
+    monkeypatch.setattr(
+        "craik.runtime.work.loop_support.budgets.time_budget_stop_reason",
+        lambda **_: next(checks),
+    )
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    with pytest.raises(LoopTimeBudgetExceededError, match="wall-clock budget 1s exceeded"):
+        executor.execute(
+            task_id="task_docs_reconcile",
+            case_file_id="case_docs_reconcile",
+            policy=generate_policy_envelope(
+                task_id="task_docs_reconcile",
+                actor="runner:fixture",
+            ),
+            runner_metadata=_runner(),
+            grants=[_shell_grant()],
+            steps=[LoopStep(phase="act", input_prompt="Run the requested tool.")],
+            wall_clock_budget_seconds=1,
+            max_iterations=3,
+        )
+
+    run = store.list_task_runs()[0]
+    assert run.status == "interrupted"
+    assert run.iteration == 1
+    assert run.stop_reason == "wall-clock budget 1s exceeded"
+    assert len(runner.requests) == 1
+    assert store.list_receipts() == []
+    assert store.list_tool_result_attestations() == []
+
+
 def test_loop_enforces_provider_token_budget_before_next_provider_call(
     store: LocalStore,
 ) -> None:
