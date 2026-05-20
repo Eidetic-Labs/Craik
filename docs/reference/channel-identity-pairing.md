@@ -1,56 +1,90 @@
-# Channel Identity Pairing
+# Channel identity pairing
 
-`craik.channel_identity_pairing` records the relationship between an external
-channel account and a Craik subject.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-Pairing state is separate from channel adapter identity. A messaging adapter can
-normalize inbound events, but an external sender cannot authorize privileged
-ingress until a pairing record explicitly links that sender to a Craik subject,
-policy envelope, and audit trail.
+<div className="craik-lead">
+
+**What you'll find here**
+
+The contract that records the relationship between an external channel
+account and a Craik subject — unpaired, paired, revoked states and the
+authority each carries.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Pairing maps identity. It does not grant access.**
+
+A messaging adapter can normalize inbound events, but an external
+sender cannot authorize privileged ingress until a pairing record
+explicitly links that sender to a Craik subject, policy envelope, and
+audit trail.
+
+</div>
 
 ## States
 
-### Unpaired
+<div className="craik-fields">
 
-An unpaired record captures the observed external account only:
+<div>
+<dt>State</dt>
+<dt><span className="craik-fields__type">Authority</span></dt>
+<dd>Required fields</dd>
+</div>
 
-- channel kind;
-- external account id;
-- optional service name;
-- optional display name;
-- optional metadata.
+<div>
+<dt>Unpaired</dt>
+<dt><span className="craik-fields__type">observation only</span></dt>
+<dd>Channel kind · external account id · optional service name · optional display name · optional metadata. <strong>Must not</strong> carry subject, policy envelope, pairing audit, or revocation fields. Does not allow privileged ingress.</dd>
+</div>
 
-Unpaired records must not carry a subject, policy envelope, pairing audit fields,
-or revocation fields. They do not allow privileged ingress.
+<div>
+<dt>Paired</dt>
+<dt><span className="craik-fields__type">conditional</span></dt>
+<dd>Craik subject · policy envelope id · pairing timestamp · actor that approved · at least one audit id. Authorizes privileged ingress only through the linked policy envelope and only when later allowlist and capability checks pass.</dd>
+</div>
 
-### Paired
+<div>
+<dt>Revoked</dt>
+<dt><span className="craik-fields__type">never</span></dt>
+<dd>Preserves the original subject and pairing audit fields, then adds revocation timestamp · actor that revoked · reason · revocation audit id. <strong>Never</strong> allows privileged ingress.</dd>
+</div>
 
-A paired record must include:
+</div>
 
-- Craik subject;
-- policy envelope id;
-- pairing timestamp;
-- actor that approved the pairing;
-- at least one audit id.
+## Authority limits
 
-Paired identities can authorize privileged ingress only through the linked
-policy envelope and only when later allowlist and capability checks pass.
+<div className="craik-keypoint">
 
-### Revoked
+**Identity maps a sender; it doesn't grant access.**
 
-A revoked record preserves the original subject and pairing audit fields, then
-adds:
-
-- revocation timestamp;
-- actor that revoked the pairing;
-- revocation reason;
-- audit id for the revocation.
-
-Revoked identities never allow privileged ingress.
-
-## Authority Limits
-
-Identity pairing does not grant broad channel access. It only establishes who an
-external account maps to. Gateway policy, channel allowlists, capability grants,
-redaction, and receipts still decide what can happen after an inbound event is
+Gateway policy, channel allowlists, capability grants, redaction, and
+receipts still decide what can happen after an inbound event is
 normalized.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="channel-allowlists/">
+<strong>Reference</strong>
+<span>Channel allowlists</span>
+<small>The selector filter that runs alongside pairing.</small>
+</a>
+
+<a href="channel-policy-envelopes/">
+<strong>Reference</strong>
+<span>Channel policy envelopes</span>
+<small>The policy selected after pairing and allowlist pass.</small>
+</a>
+
+<a href="gateway-receipts/">
+<strong>Reference</strong>
+<span>Gateway receipts</span>
+<small>How pairing decisions persist.</small>
+</a>
+
+</div>

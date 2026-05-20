@@ -1,14 +1,27 @@
-# Messaging Channel Adapter
+# Messaging channel adapter
 
-The first messaging channel adapter is a fixture adapter for controlled gateway
-ingress. It does not connect to Slack, Discord, email, SMS, or any external
-service. It defines the normalized behavior future messaging adapters must keep:
+<p className="craik-meta"><span>3 min read</span><span>Reference · preview</span><span>Updated 2026-05-19</span></p>
 
-- inbound message normalization;
-- paired sender identity context;
-- policy envelope linkage;
-- redacted receipts;
-- outbound response payload construction without delivery.
+<div className="craik-lead">
+
+**What you'll find here**
+
+The first messaging channel adapter — a fixture for controlled gateway
+ingress. It does not connect to Slack, Discord, email, SMS, or any
+external service. It defines the normalized behavior every future
+messaging adapter must keep.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Fixture, not delivery.**
+
+Inbound normalization · paired identity context · policy envelope
+linkage · redacted receipts · outbound payload construction —
+**without delivery**.
+
+</div>
 
 ## Setup
 
@@ -41,40 +54,66 @@ receipt = inbound_message_receipt(
 )
 ```
 
-## Inbound Normalization
+## Inbound normalization
 
 Normalized inbound messages include:
 
-- `event_id`;
-- `channel` set to `messaging`;
-- `received_at`;
-- `sender.external_id`;
-- optional paired `sender.identity_id`;
-- optional `sender.policy_envelope_id`;
-- message `text`;
-- optional `thread_id`;
-- adapter metadata.
+<div className="craik-grid">
 
-The message text is part of the inbound event so downstream policy and task
-creation can inspect it. Receipts redact message text.
+<div><h4><code>event_id</code></h4></div>
+<div><h4><code>channel</code></h4><p>Set to <code>messaging</code>.</p></div>
+<div><h4><code>received_at</code></h4></div>
+<div><h4><code>sender.external_id</code></h4></div>
+<div><h4>Paired <code>sender.identity_id</code></h4><p>Optional.</p></div>
+<div><h4><code>sender.policy_envelope_id</code></h4><p>Optional.</p></div>
+<div><h4>Message <code>text</code></h4></div>
+<div><h4><code>thread_id</code></h4><p>Optional.</p></div>
+<div><h4>Adapter metadata</h4></div>
+
+</div>
+
+The message text is part of the inbound event so downstream policy and
+task creation can inspect it. **Receipts redact message text.**
 
 ## Receipts
 
 `inbound_message_receipt` emits a `craik.capability_receipt` for
-`channel.message.receive`. Receipt metadata preserves the policy envelope id,
-event id, sender external id, paired identity id, channel, and redaction fields.
+`channel.message.receive`. Receipt metadata preserves the policy
+envelope id, event id, sender external id, paired identity id,
+channel, and redaction fields.
 
 ## Limitations
 
-- No external messaging provider is contacted.
-- No channel credentials are stored.
-- No outbound response is delivered.
-- Sender identity pairing and allowlists are enforced by later gateway layers.
-- Policy envelopes and capability grants remain required before privileged
-  action can happen.
+<div className="craik-grid">
 
-See [Channel Identity Pairing](channel-identity-pairing.md) for paired,
-unpaired, and revoked sender authority states.
+<div><h4>No external messaging provider contacted</h4></div>
+<div><h4>No channel credentials stored</h4></div>
+<div><h4>No outbound response delivered</h4></div>
+<div><h4>Identity pairing &amp; allowlists</h4><p>Enforced by later gateway layers.</p></div>
+<div><h4>Policy envelopes &amp; grants</h4><p>Required before privileged action.</p></div>
 
-See [Channel Allowlists](channel-allowlists.md) for deny-by-default ingress
-filtering after normalization.
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="channel-identity-pairing/">
+<strong>Reference</strong>
+<span>Channel identity pairing</span>
+<small>Paired, unpaired, and revoked sender authority states.</small>
+</a>
+
+<a href="channel-allowlists/">
+<strong>Reference</strong>
+<span>Channel allowlists</span>
+<small>Deny-by-default ingress filtering after normalization.</small>
+</a>
+
+<a href="channel-adapter-contract/">
+<strong>Reference</strong>
+<span>Channel adapter contract</span>
+<small>The shared contract.</small>
+</a>
+
+</div>
