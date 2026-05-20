@@ -1,5 +1,6 @@
 import json
 import sys
+import threading
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -469,6 +470,42 @@ def test_loop_dispatches_shell_tool_call_through_local_process_sandbox(
     assert tool_content["output"]["stdout"] == "sandbox ok\n"
 
 
+def test_loop_replays_cancelled_local_process_sandbox_result(store: LocalStore) -> None:
+    runner = ToolCallStepRunner()
+    cancel_event = threading.Event()
+    cancel_event.set()
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture"),
+        runner_metadata=_runner(),
+        grants=[_shell_grant()],
+        steps=[
+            LoopStep(
+                phase="act",
+                input_prompt="Run the requested tool.",
+                context={
+                    "local_process_sandbox": _local_process_sandbox_config(
+                        cancel_event=cancel_event,
+                        slow=True,
+                    )
+                },
+            )
+        ],
+        max_iterations=3,
+    )
+
+    tool_content = json.loads(runner.requests[1].context["message_history"][0]["content"])
+    assert tool_content["output"]["cancelled"] is True
+    assert tool_content["output"]["reason"] == "local process command cancelled"
+
+
 def test_loop_captures_streaming_chunks(store: LocalStore) -> None:
     runner = StreamingStepRunner(chunks=["Hel", "lo", "!"])
     executor = SingleAgentLoopExecutor(
@@ -649,7 +686,11 @@ def _shell_grant() -> CapabilityGrant:
     )
 
 
-def _local_process_sandbox_config() -> dict[str, object]:
+def _local_process_sandbox_config(
+    *,
+    cancel_event: threading.Event | None = None,
+    slow: bool = False,
+) -> dict[str, object]:
     backend = SandboxBackend(
         id="sandbox_backend_local_fixture",
         name="Local Process Sandbox",
@@ -665,12 +706,20 @@ def _local_process_sandbox_config() -> dict[str, object]:
         docs=["docs/reference/local-process-backend.md"],
         created_at=datetime(2026, 5, 16, 12, 0, tzinfo=UTC),
     )
-    return {
+    command = (
+        [sys.executable, "-c", "import time; time.sleep(5)"]
+        if slow
+        else [sys.executable, "-c", "print('sandbox ok')"]
+    )
+    config: dict[str, object] = {
         "backend": backend.model_dump(mode="json"),
         "commands": {
             "fixture-action": {
-                "argv": [sys.executable, "-c", "print('sandbox ok')"],
+                "argv": command,
                 "timeout_seconds": 5,
             }
         },
     }
+    if cancel_event is not None:
+        config["cancel_event"] = cancel_event
+    return config

@@ -114,6 +114,7 @@ def _local_process_executor(
     registry = LocalProcessCommandRegistry.from_mapping(raw_commands)
     grant_id = _grant_id_for_shell_execute(grants)
     receipt_id = planned_capability_receipt_id(policy, "shell.execute", command_ref)
+    cancel_event = sandbox_config.get("cancel_event")
 
     def execute(command: str) -> dict[str, Any]:
         request = LocalProcessRequest(
@@ -128,6 +129,7 @@ def _local_process_executor(
             backend=backend,
             request=request,
             registry=registry,
+            cancel_event=cancel_event if hasattr(cancel_event, "is_set") else None,
         )
         return result.model_dump(mode="json")
 

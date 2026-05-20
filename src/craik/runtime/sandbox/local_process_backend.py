@@ -4,7 +4,9 @@ from __future__ import annotations
 
 # Local-process execution is restricted to registered argv lists and never uses shell=True.
 import subprocess  # nosec B404
+import time
 from pathlib import Path
+from threading import Event
 from typing import Literal
 
 from pydantic import Field
@@ -63,6 +65,7 @@ class LocalProcessExecution(CraikModel):
     stdout: str = ""
     stderr: str = ""
     timeout_seconds: float | None = None
+    cancelled: bool = False
 
 
 class LocalProcessCommandRegistry:
@@ -129,6 +132,8 @@ def execute_local_process_command(
     backend: SandboxBackend,
     request: LocalProcessRequest,
     registry: LocalProcessCommandRegistry,
+    cancel_event: Event | None = None,
+    poll_interval_seconds: float = 0.05,
 ) -> LocalProcessExecution:
     """Execute a registered command reference after local-process sandbox checks."""
     decision = local_process_decision(backend=backend, request=request)
@@ -137,29 +142,51 @@ def execute_local_process_command(
     command = registry.get(request.command_ref)
     if command is None:
         return _execution_denied(request, "command reference is not registered")
-    try:
-        # command.argv comes from the command registry, not provider text.
-        completed = subprocess.run(  # nosec B603
-            command.argv,
-            cwd=command.cwd,
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=command.timeout_seconds,
-        )
-    except subprocess.TimeoutExpired as exc:
-        return LocalProcessExecution(
-            allowed=True,
-            executed=True,
-            reason="local process command timed out",
-            backend_id=request.backend_id,
-            command_ref=request.command_ref,
-            argv=command.argv,
-            returncode=None,
-            stdout=_text(exc.stdout),
-            stderr=_text(exc.stderr),
-            timeout_seconds=command.timeout_seconds,
-        )
+    deadline = time.monotonic() + command.timeout_seconds
+    # command.argv comes from the command registry, not provider text.
+    process = subprocess.Popen(  # nosec B603
+        command.argv,
+        cwd=command.cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    while True:
+        if cancel_event is not None and cancel_event.is_set():
+            stdout, stderr = _terminate(process)
+            return LocalProcessExecution(
+                allowed=True,
+                executed=True,
+                reason="local process command cancelled",
+                backend_id=request.backend_id,
+                command_ref=request.command_ref,
+                argv=command.argv,
+                returncode=process.returncode,
+                stdout=stdout,
+                stderr=stderr,
+                timeout_seconds=command.timeout_seconds,
+                cancelled=True,
+            )
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            stdout, stderr = _terminate(process)
+            return LocalProcessExecution(
+                allowed=True,
+                executed=True,
+                reason="local process command timed out",
+                backend_id=request.backend_id,
+                command_ref=request.command_ref,
+                argv=command.argv,
+                returncode=process.returncode,
+                stdout=stdout,
+                stderr=stderr,
+                timeout_seconds=command.timeout_seconds,
+            )
+        try:
+            stdout, stderr = process.communicate(timeout=min(poll_interval_seconds, remaining))
+            break
+        except subprocess.TimeoutExpired:
+            continue
     return LocalProcessExecution(
         allowed=True,
         executed=True,
@@ -167,9 +194,9 @@ def execute_local_process_command(
         backend_id=request.backend_id,
         command_ref=request.command_ref,
         argv=command.argv,
-        returncode=completed.returncode,
-        stdout=completed.stdout,
-        stderr=completed.stderr,
+        returncode=process.returncode,
+        stdout=stdout,
+        stderr=stderr,
         timeout_seconds=command.timeout_seconds,
     )
 
@@ -197,6 +224,16 @@ def _text(value: bytes | str | None) -> str:
     if isinstance(value, bytes):
         return value.decode("utf-8", errors="replace")
     return value
+
+
+def _terminate(process: subprocess.Popen[str]) -> tuple[str, str]:
+    process.terminate()
+    try:
+        stdout, stderr = process.communicate(timeout=1)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        stdout, stderr = process.communicate()
+    return stdout, stderr
 
 
 def _looks_like_inline_shell(command_ref: str) -> bool:
