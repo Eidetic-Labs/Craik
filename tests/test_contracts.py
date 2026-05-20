@@ -176,6 +176,7 @@ def test_task_run_identity_fields_round_trip(
             "operator_issuer": "https://issuer.example.test",
             "completed_step_keys": ["run_docs:1:plan", "run_docs:2:act"],
             "last_step_key": "run_docs:2:act",
+            "wall_clock_budget_seconds": 120.5,
         }
     )
 
@@ -188,6 +189,7 @@ def test_task_run_identity_fields_round_trip(
     assert dumped["operator_issuer"] == "https://issuer.example.test"
     assert dumped["completed_step_keys"] == ["run_docs:1:plan", "run_docs:2:act"]
     assert dumped["last_step_key"] == "run_docs:2:act"
+    assert dumped["wall_clock_budget_seconds"] == 120.5
 
 
 def test_runner_contract_models_keep_legacy_import_surface() -> None:

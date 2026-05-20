@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -21,6 +21,7 @@ from craik.runtime.work.loop import (
     FixtureStepRunner,
     LoopMaxIterationsError,
     LoopStep,
+    LoopTimeBudgetExceededError,
     SingleAgentLoopExecutor,
 )
 
@@ -128,6 +129,36 @@ def test_loop_enforces_max_iterations(store: LocalStore) -> None:
             grants=[_shell_grant()],
             max_iterations=1,
         )
+
+
+def test_loop_enforces_wall_clock_budget_before_next_step(store: LocalStore) -> None:
+    runner = RecordingStepRunner()
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+
+    with pytest.raises(LoopTimeBudgetExceededError, match="wall-clock budget 1s exceeded"):
+        executor.execute(
+            task_id="task_docs_reconcile",
+            case_file_id="case_docs_reconcile",
+            policy=generate_policy_envelope(
+                task_id="task_docs_reconcile",
+                actor="runner:fixture",
+            ),
+            runner_metadata=_runner(),
+            steps=[LoopStep(phase="plan", input_prompt="Plan.")],
+            wall_clock_budget_seconds=1,
+            started_at=datetime.now(UTC) - timedelta(seconds=5),
+        )
+
+    run = store.list_task_runs()[0]
+    assert run.status == "interrupted"
+    assert run.iteration == 0
+    assert run.wall_clock_budget_seconds == 1
+    assert run.stop_reason == "wall-clock budget 1s exceeded"
+    assert runner.requests == []
 
 
 def test_loop_resumes_interrupted_run_from_completed_phase_boundary(

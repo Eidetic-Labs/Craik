@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from craik.contracts.models import (
     CapabilityGrant,
@@ -92,6 +92,21 @@ def intent_stop_reason(intent_lock: IntentLock | None, step: LoopStep) -> str | 
         return None
     if str(trigger) in intent_lock.stop_conditions:
         return f"intent stop condition triggered: {trigger}"
+    return None
+
+
+def time_budget_stop_reason(
+    *,
+    started_at: datetime,
+    budget_seconds: float | None,
+    now: datetime | None = None,
+) -> str | None:
+    """Return a stop reason when a run has exhausted its wall-clock budget."""
+    if budget_seconds is None:
+        return None
+    checked_at = now or datetime.now(UTC)
+    if checked_at >= started_at + timedelta(seconds=budget_seconds):
+        return f"wall-clock budget {budget_seconds:g}s exceeded"
     return None
 
 
