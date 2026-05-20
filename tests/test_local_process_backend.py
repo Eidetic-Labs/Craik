@@ -1,3 +1,7 @@
+import sys
+import threading
+import time
+
 from craik.contracts.models import (
     SandboxBackend,
     SandboxBackendCapability,
@@ -165,3 +169,34 @@ def test_local_process_executor_denies_unregistered_command_reference() -> None:
     assert result.allowed is False
     assert result.executed is False
     assert result.reason == "command reference is not registered"
+
+
+def test_local_process_executor_cancels_in_flight_command_reference() -> None:
+    cancel_event = threading.Event()
+    registry = LocalProcessCommandRegistry(
+        [
+            LocalProcessCommand(
+                ref="slow_python",
+                argv=[sys.executable, "-c", "import time; time.sleep(5)"],
+                timeout_seconds=10,
+            )
+        ]
+    )
+    timer = threading.Timer(0.1, cancel_event.set)
+    timer.start()
+    started = time.monotonic()
+    try:
+        result = execute_local_process_command(
+            backend=_backend(),
+            request=_request(command_ref="slow_python"),
+            registry=registry,
+            cancel_event=cancel_event,
+        )
+    finally:
+        timer.cancel()
+
+    assert time.monotonic() - started < 2
+    assert result.allowed is True
+    assert result.executed is True
+    assert result.cancelled is True
+    assert result.reason == "local process command cancelled"

@@ -246,6 +246,8 @@ runtime exit-discipline checks persisted at the handoff boundary.
 tool-result attestations for dispatched provider tool calls.
 [#565](https://github.com/eidetic-labs/craik/issues/565) covers
 registered local-process sandbox execution for shell tool calls.
+[#567](https://github.com/eidetic-labs/craik/issues/567) covers
+cancellation propagation into in-flight local-process sandbox commands.
 Keep this section updated as each v0.2.0 slice lands so the roadmap
 mirrors the current implementation state.
 
@@ -259,7 +261,7 @@ mirrors the current implementation state.
 <div><h4>Agent exit discipline</h4><p>First slice: handoff creation persists exit-discipline checks so missing validation, risks, or next steps are runtime state.</p></div>
 <div><h4>Tool result attestation</h4><p>First slice: dispatched tool calls persist hashed attestations linked to the side-effect receipt and replay message.</p></div>
 <div><h4>One real sandbox backend</h4><p>First slice: <code>local_process</code> executes registered command references through <code>subprocess.run</code> without shell expansion when the loop is configured with a sandbox backend.</p></div>
-<div><h4>Sandbox cancellation</h4><p>Transport-level cancellation propagates into in-flight tool calls.</p></div>
+<div><h4>Sandbox cancellation</h4><p>First slice: local-process sandbox commands poll a cancellation event, terminate in-flight processes, and replay a cancelled tool result.</p></div>
 <div><h4>Schema migration framework</h4><p>Documented runner migrating SQLite state across breaking changes · one example migration shipped.</p></div>
 <div><h4>Run delta view</h4><p>CLI-only "what changed between this run and the prior one" from durable state.</p></div>
 
