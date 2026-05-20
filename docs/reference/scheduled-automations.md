@@ -1,42 +1,90 @@
-# Scheduled Automations
+# Scheduled automations
 
-Scheduled automations are enabled gateway definitions backed by cron-like
-schedules. They evaluate one observed schedule tick at a time.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll find here**
+
+`craik.runtime.scheduled_automations` — enabled gateway definitions
+backed by cron-like schedules, evaluated one tick at a time, with
+deduplication and redacted receipts.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Observation only.**
+
+Scheduled automations do not run a clock or execute created tasks.
+They preserve the boundary between schedule observation, task
+creation, and later task execution under policy.
+
+</div>
+
+## Enforcement
 
 `craik.runtime.scheduled_automations` enforces:
 
-- explicit enabled state;
-- policy envelope checks;
-- narrow `gateway.schedule.execute` authority;
-- schedule tick deduplication;
-- redacted automation receipts.
+<div className="craik-grid">
 
-## Execution Boundary
+<div><h4>Explicit enabled state</h4></div>
+<div><h4>Policy envelope checks</h4></div>
+<div><h4>Narrow <code>gateway.schedule.execute</code> authority</h4></div>
+<div><h4>Schedule tick deduplication</h4></div>
+<div><h4>Redacted automation receipts</h4></div>
 
-A scheduled automation creates a task only when:
+</div>
 
-- the automation is enabled;
-- the policy allows `gateway.schedule.execute`;
-- the tick id has not already created a task;
-- the schedule expression is valid.
+## Execution boundary
 
-Disabled automations, policy-denied automations, and duplicate ticks do not
-create tasks.
+An automation creates a task only when **every** condition holds.
+
+<ol className="craik-steps">
+<li>The automation is enabled.</li>
+<li>Policy allows <code>gateway.schedule.execute</code>.</li>
+<li>The tick id has not already created a task.</li>
+<li>The schedule expression is valid.</li>
+</ol>
+
+Disabled, policy-denied, and duplicate ticks do not create tasks.
 
 ## Receipts
 
 Automation receipts record:
 
-- policy envelope id;
-- automation id;
-- schedule id;
-- tick id;
-- created task id when one exists.
+<div className="craik-grid">
+
+<div><h4>Policy envelope id</h4></div>
+<div><h4>Automation id</h4></div>
+<div><h4>Schedule id</h4></div>
+<div><h4>Tick id</h4></div>
+<div><h4>Created task id</h4><p>When one exists.</p></div>
+
+</div>
 
 Receipts use `gateway.schedule.execute` and stay redacted.
 
-## Limits
+## What's next
 
-Scheduled automations do not run a clock or execute created tasks. They preserve
-the boundary between schedule observation, task creation, and later task
-execution under policy.
+<div className="craik-next">
+
+<a href="scheduled-task-creation/">
+<strong>Reference</strong>
+<span>Scheduled task creation</span>
+<small>The helper that converts one tick into a task.</small>
+</a>
+
+<a href="gateway-daemon/">
+<strong>Reference</strong>
+<span>Gateway daemon</span>
+<small>The (post-MVP) daemon that would drive automations.</small>
+</a>
+
+<a href="gateway-receipts/">
+<strong>Reference</strong>
+<span>Gateway receipts</span>
+<small>The receipt shape automations produce.</small>
+</a>
+
+</div>

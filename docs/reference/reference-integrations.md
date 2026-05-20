@@ -1,28 +1,90 @@
-# Reference Integrations
+# Reference integrations
 
-Reference integrations describe safe, reproducible examples for skills,
-plugins, and adapters.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-The `craik.reference_integration` contract records:
+<div className="craik-lead">
 
-- integration kind: `skill`, `plugin`, or `adapter`;
-- the matching skill package, plugin descriptor, or adapter package id;
-- docs and fixture paths;
-- check commands;
-- receipt links when relevant;
-- compatibility notes;
-- provenance.
+**What you'll find here**
 
-Reference integrations must be safe to run locally and reproducible. They are
-examples and validation fixtures, not durable trust grants.
+`craik.reference_integration` — safe, reproducible examples for
+skills, plugins, and adapters that show known-good paths through the
+ecosystem.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Examples, not trust grants.**
+
+Reference integrations must be safe to run locally and reproducible.
+They are validation fixtures, not durable trust grants.
+
+</div>
+
+## What it records
+
+<div className="craik-grid">
+
+<div><h4>Integration kind</h4><p><code>skill</code> · <code>plugin</code> · <code>adapter</code>.</p></div>
+<div><h4>Matching package or descriptor id</h4></div>
+<div><h4>Docs and fixture paths</h4></div>
+<div><h4>Check commands</h4></div>
+<div><h4>Receipt links</h4><p>When relevant.</p></div>
+<div><h4>Compatibility notes</h4></div>
+<div><h4>Provenance</h4></div>
+
+</div>
 
 ## Scope
 
-Use reference integrations to show known-good paths through the ecosystem:
+<div className="craik-decision">
 
-- a skill package with instructions and expected contracts;
-- a plugin descriptor plus receipts and checks;
-- an adapter package with compatibility and runner metadata links.
+<div>
+<h4>Skill reference</h4>
+<p>Package with instructions and expected contracts.</p>
+</div>
 
-Each reference should include enough docs, fixtures, and checks for another
-agent to rerun it without relying on private state.
+<div>
+<h4>Plugin reference</h4>
+<p>Descriptor plus receipts and checks.</p>
+</div>
+
+<div>
+<h4>Adapter reference</h4>
+<p>Adapter package with compatibility and runner metadata links.</p>
+</div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Reproducible offline.**
+
+Each reference must include enough docs, fixtures, and checks for
+another agent to rerun it without relying on private state.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../guides/community-skills/">
+<strong>Guide</strong>
+<span>Community skills</span>
+<small>How skill references compose with community distribution.</small>
+</a>
+
+<a href="../guides/community-plugins/">
+<strong>Guide</strong>
+<span>Community plugins</span>
+<small>How plugin references compose with community plugin review.</small>
+</a>
+
+<a href="adapter-packages/">
+<strong>Reference</strong>
+<span>Adapter packages</span>
+<small>The adapter distribution metadata an adapter reference links to.</small>
+</a>
+
+</div>
