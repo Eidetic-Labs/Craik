@@ -78,16 +78,18 @@ from craik.contracts.models import (
 from craik.contracts.registry import CONTRACT_REGISTRY, ContractModel
 from craik.runtime.paths import CraikPaths, ensure_craik_home
 from craik.runtime.policy.redaction import contains_unredacted_secret
+from craik.runtime.store.migrations import (
+    CURRENT_MIGRATION,
+    MIGRATION_RECOVERY_GUIDANCE,
+    StoreMigrationRuntimeError,
+    _record_migration,
+)
+from craik.runtime.store.migrations import (
+    apply_local_store_migrations as _apply_migrations,
+)
 from craik.runtime.store_kinds import CONTRACT_KINDS
 
-CURRENT_MIGRATION = 2
 DATABASE_NAME = "craik.sqlite3"
-MIGRATION_RECOVERY_GUIDANCE = (
-    "Back up state/craik.sqlite3, keep the original file unchanged, and run "
-    "`craik doctor` for diagnostics. If the database version is newer than this "
-    "Craik build supports, upgrade Craik before opening the store. If a migration "
-    "failed partway through, restore the backup or copy the database aside before retrying."
-)
 
 class LocalStoreError(RuntimeError):
     """Base error for local store failures."""
@@ -144,8 +146,8 @@ class LocalStoreCore:
             with self._connection:
                 connection = self._connection
                 _apply_migrations(connection)
-        except LocalStoreMigrationError:
-            raise
+        except StoreMigrationRuntimeError as error:
+            raise LocalStoreMigrationError(str(error)) from error
         except sqlite3.DatabaseError as error:
             message = f"cannot initialize local store: {error}"
             raise LocalStoreMigrationError(message) from error
@@ -248,86 +250,6 @@ class LocalStoreCore:
         except sqlite3.DatabaseError as error:
             raise LocalStoreCorruptError(f"cannot list contracts {schema_name}: {error}") from error
         return [_parse_payload(model, str(row["payload_json"])) for row in rows]
-def _apply_migrations(connection: sqlite3.Connection) -> None:
-    current = int(connection.execute("PRAGMA user_version").fetchone()[0])
-    if current > CURRENT_MIGRATION:
-        raise LocalStoreMigrationError(
-            f"local store migration {current} is newer than supported {CURRENT_MIGRATION}"
-        )
-    if current < 1:
-        _migration_1(connection)
-        current = 1
-    if current < 2:
-        _migration_2(connection)
-        current = 2
-    if current != CURRENT_MIGRATION:
-        raise LocalStoreMigrationError(
-            f"local store migration ended at {current}, expected {CURRENT_MIGRATION}"
-        )
-
-
-def _migration_1(connection: sqlite3.Connection) -> None:
-    connection.executescript(
-        """
-        CREATE TABLE IF NOT EXISTS records (
-          kind TEXT NOT NULL,
-          id TEXT NOT NULL,
-          schema TEXT NOT NULL,
-          version TEXT NOT NULL,
-          payload_json TEXT NOT NULL,
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL,
-          PRIMARY KEY (kind, id)
-        );
-        CREATE INDEX IF NOT EXISTS idx_records_schema ON records(schema);
-        CREATE TABLE IF NOT EXISTS migrations (
-          version INTEGER PRIMARY KEY,
-          applied_at TEXT NOT NULL
-        );
-        """
-    )
-    _record_migration(connection, 1)
-
-
-def _migration_2(connection: sqlite3.Connection) -> None:
-    connection.executescript(
-        """
-        CREATE TABLE IF NOT EXISTS local_store_metadata (
-          key TEXT PRIMARY KEY,
-          value TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-        CREATE INDEX IF NOT EXISTS idx_records_kind_updated_at
-          ON records(kind, updated_at);
-        """
-    )
-    now = _utc_now()
-    metadata = {
-        "schema_version": str(CURRENT_MIGRATION),
-        "contract_registry_count": str(len(CONTRACT_REGISTRY)),
-    }
-    for key, value in metadata.items():
-        connection.execute(
-            """
-            INSERT INTO local_store_metadata(key, value, updated_at)
-            VALUES (?, ?, ?)
-            ON CONFLICT(key) DO UPDATE SET
-              value = excluded.value,
-              updated_at = excluded.updated_at
-            """,
-            (key, value, now),
-        )
-    _record_migration(connection, 2)
-
-
-def _record_migration(connection: sqlite3.Connection, version: int) -> None:
-    connection.execute(
-        "INSERT OR IGNORE INTO migrations(version, applied_at) VALUES (?, ?)",
-        (version, _utc_now()),
-    )
-    connection.execute(f"PRAGMA user_version = {version}")
-
-
 def _parse_payload(model: ContractModel, payload_json: str) -> BaseModel:
     try:
         return model.model_validate_json(payload_json)

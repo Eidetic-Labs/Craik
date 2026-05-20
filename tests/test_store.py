@@ -72,6 +72,7 @@ from craik.runtime.store import (
     LocalStoreMigrationError,
     UnredactedSecretError,
 )
+from craik.runtime.store.migrations import StoreMigration, StoreMigrationRunner
 from craik.runtime.store_kinds import CONTRACT_KINDS as STORE_KIND_MAPPING
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "contracts" / "v0_1" / "contracts.json"
@@ -106,7 +107,7 @@ def test_initialize_creates_database_and_migration(tmp_path: Path) -> None:
 
     assert (paths.state / DATABASE_NAME).is_file()
     assert local_store.migration_version() == CURRENT_MIGRATION
-    assert [item["version"] for item in local_store.applied_migrations()] == [1, 2]
+    assert [item["version"] for item in local_store.applied_migrations()] == [1, 2, 3]
     local_store.close()
 
 
@@ -167,7 +168,7 @@ def test_v1_fixture_database_migrates_deterministically(tmp_path: Path) -> None:
     local_store.initialize()
 
     assert local_store.migration_version() == CURRENT_MIGRATION
-    assert [item["version"] for item in local_store.applied_migrations()] == [1, 2]
+    assert [item["version"] for item in local_store.applied_migrations()] == [1, 2, 3]
     assert local_store.get_task("task_fixture") is not None
     with sqlite3.connect(database_path) as connection:
         indexes = {
@@ -177,7 +178,43 @@ def test_v1_fixture_database_migrates_deterministically(tmp_path: Path) -> None:
         metadata = dict(connection.execute("SELECT key, value FROM local_store_metadata"))
     assert "idx_records_kind_updated_at" in indexes
     assert metadata["schema_version"] == str(CURRENT_MIGRATION)
+    assert metadata["migration_framework"] == "registered"
     local_store.close()
+
+
+def test_migration_runner_rejects_non_contiguous_registry() -> None:
+    with pytest.raises(ValueError, match="contiguous"):
+        StoreMigrationRunner([StoreMigration(2, "skip_one", lambda connection: None)])
+
+
+def test_migration_runner_rolls_back_failed_migration(tmp_path: Path) -> None:
+    database_path = tmp_path / "broken-migration.sqlite3"
+
+    def migration_1(connection: sqlite3.Connection) -> None:
+        connection.execute("CREATE TABLE marker (id TEXT PRIMARY KEY)")
+        connection.execute("INSERT INTO marker(id) VALUES ('created')")
+        connection.execute("PRAGMA user_version = 1")
+
+    def migration_2(connection: sqlite3.Connection) -> None:
+        connection.execute("INSERT INTO marker(id) VALUES ('rolled_back')")
+        raise RuntimeError("fixture failure")
+
+    runner = StoreMigrationRunner(
+        [
+            StoreMigration(1, "create_marker", migration_1),
+            StoreMigration(2, "fail_after_write", migration_2),
+        ]
+    )
+
+    with sqlite3.connect(database_path) as connection:
+        with pytest.raises(RuntimeError, match="fixture failure"):
+            with connection:
+                runner.apply(connection)
+        rows = connection.execute("SELECT id FROM marker ORDER BY id").fetchall()
+        version = connection.execute("PRAGMA user_version").fetchone()[0]
+
+    assert rows == []
+    assert version == 0
 
 
 def test_persists_project_profile(store: LocalStore, fixtures: dict[str, dict[str, Any]]) -> None:
