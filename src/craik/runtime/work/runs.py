@@ -39,6 +39,8 @@ class RunTransition:
     receipt_id: str | None = None
     handoff_id: str | None = None
     stop_reason: str | None = None
+    completed_step_key: str | None = None
+    last_step_key: str | None = None
     auth_profile_id: str | None = None
     auth_identity_hash: str | None = None
     operator_subject: str | None = None
@@ -118,6 +120,12 @@ class TaskRunManager:
         receipt_ids = list(run.receipt_ids)
         if transition.receipt_id is not None and transition.receipt_id not in receipt_ids:
             receipt_ids.append(transition.receipt_id)
+        completed_step_keys = list(run.completed_step_keys)
+        if (
+            transition.completed_step_key is not None
+            and transition.completed_step_key not in completed_step_keys
+        ):
+            completed_step_keys.append(transition.completed_step_key)
 
         ended_at = now if status in TERMINAL_RUN_STATUSES else run.ended_at
         phase_started_at = now if phase != run.phase else run.phase_started_at
@@ -132,10 +140,38 @@ class TaskRunManager:
                 "stop_reason": transition.stop_reason or run.stop_reason,
                 "receipt_ids": receipt_ids,
                 "handoff_id": transition.handoff_id or run.handoff_id,
+                "completed_step_keys": completed_step_keys,
+                "last_step_key": transition.last_step_key or run.last_step_key,
                 "auth_profile_id": transition.auth_profile_id or run.auth_profile_id,
                 "auth_identity_hash": transition.auth_identity_hash or run.auth_identity_hash,
                 "operator_subject": transition.operator_subject or run.operator_subject,
                 "operator_issuer": transition.operator_issuer or run.operator_issuer,
+            }
+        )
+        self.store.put_task_run(updated)
+        return updated
+
+    def prepare_resume(
+        self,
+        run_id: str,
+        *,
+        max_iterations: int | None = None,
+        at: datetime | None = None,
+    ) -> TaskRun:
+        """Reopen an interrupted run so execution can continue from durable state."""
+        run = self.require(run_id)
+        if run.status != "interrupted":
+            raise TaskRunTransitionError(f"task run is not interrupted: {run_id}")
+
+        now = at or datetime.now(UTC)
+        updated = run.model_copy(
+            update={
+                "status": "running",
+                "ended_at": None,
+                "stop_reason": None,
+                "max_iterations": max(max_iterations or run.max_iterations, run.max_iterations),
+                "phase_started_at": now,
+                "updated_at": now,
             }
         )
         self.store.put_task_run(updated)

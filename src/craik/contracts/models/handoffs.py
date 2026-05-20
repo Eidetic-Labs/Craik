@@ -192,6 +192,8 @@ class TaskRun(CraikModel):
     receipt_ids: list[str] = Field(default_factory=list)
     handoff_id: str | None = None
     runner_metadata: list[dict[str, Any]] = Field(default_factory=list)
+    completed_step_keys: list[str] = Field(default_factory=list)
+    last_step_key: str | None = None
     auth_profile_id: str | None = None
     auth_identity_hash: str | None = None
     operator_subject: str | None = None
