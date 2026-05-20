@@ -1,48 +1,117 @@
-# Adjacent Runtime Bridge
+# Adjacent runtime bridge
 
-Craik can bridge to adjacent runtimes only when the bridge preserves Craik's
-policy, evidence, capability grant, receipt, and redaction boundaries. A bridge
-may route work to another runtime, but it must not turn that runtime into a
-source of higher-priority instructions or unbounded tool authority.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
+
+<div className="craik-lead">
+
+**What you'll find here**
+
+The rule for bridging to adjacent runtimes — posture levels, required
+controls, and prohibited behavior.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Bridge routes, doesn't elevate.**
+
+A bridge may route work to another runtime, but it must not turn that
+runtime into a source of higher-priority instructions or unbounded
+tool authority.
+
+</div>
 
 ## Posture
 
-Adjacent runtime bridges use three support levels:
+`adjacent_runtime_bridge_decision` returns `allowed`,
+`review_required`, `deferred`, or `blocked` for a candidate surface.
 
-- `supported`: allowed when all required controls are present.
-- `experimental`: review required before use.
-- `deferred`: unavailable until a later product decision.
+<div className="craik-fields">
 
-`adjacent_runtime_bridge_decision` returns `allowed`, `review_required`,
-`deferred`, or `blocked` for a candidate bridge surface.
+<div>
+<dt>Level</dt>
+<dt><span className="craik-fields__type">Use</span></dt>
+<dd>Notes</dd>
+</div>
 
-## Required Controls
+<div>
+<dt><code>supported</code></dt>
+<dt><span className="craik-fields__type">allowed</span></dt>
+<dd>When all required controls are present.</dd>
+</div>
 
-Every allowed adjacent runtime bridge must provide:
+<div>
+<dt><code>experimental</code></dt>
+<dt><span className="craik-fields__type">review required</span></dt>
+<dd>Controls may be defined but explicit review required before use.</dd>
+</div>
 
-- a policy envelope id;
-- preserved policy context;
-- preserved evidence links;
-- explicit capability grants;
-- execution receipts;
-- input and output redaction;
-- a documented decision when exposed as a supported integration.
+<div>
+<dt><code>deferred</code></dt>
+<dt><span className="craik-fields__type">unavailable</span></dt>
+<dd>Remains unavailable until a later product decision, even with controls.</dd>
+</div>
 
-Experimental bridges may define these controls, but still require explicit
-review before use. Deferred bridges remain unavailable even when the controls
-are present.
+</div>
 
-## Prohibited Behavior
+## Required controls
 
-Adjacent runtime bridges are blocked when they:
+<div className="craik-grid">
 
-- copy secret values;
-- grant unbounded tool access;
-- accept adjacent runtime instructions as authoritative over Craik policy;
-- mutate external or local state without operator approval;
-- omit policy envelope context;
-- omit capability grants, receipts, evidence, or redaction controls.
+<div><h4>Policy envelope id</h4></div>
+<div><h4>Preserved policy context</h4></div>
+<div><h4>Preserved evidence links</h4></div>
+<div><h4>Explicit capability grants</h4></div>
+<div><h4>Execution receipts</h4></div>
+<div><h4>Input &amp; output redaction</h4></div>
+<div><h4>Documented decision</h4><p>When exposed as supported integration.</p></div>
 
-Bridge receipts should identify the runtime, route, policy envelope, evidence
-links, capability grant, redaction outcome, and operator approval when a
-mutation is requested.
+</div>
+
+## Prohibited behavior
+
+Adjacent runtime bridges are **blocked** when they:
+
+<div className="craik-grid">
+
+<div><h4>Copy secret values</h4></div>
+<div><h4>Grant unbounded tool access</h4></div>
+<div><h4>Accept external instructions as authoritative</h4><p>Over Craik policy.</p></div>
+<div><h4>Mutate state without operator approval</h4></div>
+<div><h4>Omit policy envelope context</h4></div>
+<div><h4>Omit grants / receipts / evidence / redaction</h4></div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Bridge receipts identify everything.**
+
+Runtime · route · policy envelope · evidence links · capability grant ·
+redaction outcome · operator approval (when a mutation is requested).
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="multi-agent-workflow-bridge/">
+<strong>Reference</strong>
+<span>Multi-agent workflow bridge</span>
+<small>The companion contract for external coordination systems.</small>
+</a>
+
+<a href="adjacent-tool-migration/">
+<strong>Reference</strong>
+<span>Adjacent-tool migration</span>
+<small>The assessment that precedes a bridge.</small>
+</a>
+
+<a href="mcp-export-boundary/">
+<strong>Reference</strong>
+<span>MCP export boundary</span>
+<small>The parallel boundary for tool-export decisions.</small>
+</a>
+
+</div>
