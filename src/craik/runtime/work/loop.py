@@ -31,6 +31,8 @@ from craik.runtime.work.loop_support.execution import (
     intent_stop_reason,
     loop_step_key,
     message_history_from_context,
+    provider_budget_stop_reason,
+    provider_usage_total_tokens,
     request_id,
     result_with_idempotency_key,
     runtime_policy_context,
@@ -61,6 +63,7 @@ __all__ = [
     "LoopExecutionResult",
     "LoopMaxIterationsError",
     "LoopPolicyBlockedError",
+    "LoopProviderBudgetExceededError",
     "LoopTimeBudgetExceededError",
     "LoopStep",
     "RunnerStepHandler",
@@ -83,6 +86,10 @@ class LoopMaxIterationsError(LoopExecutionError):
 
 class LoopTimeBudgetExceededError(LoopExecutionError):
     """Raised when the loop exhausts its wall-clock budget."""
+
+
+class LoopProviderBudgetExceededError(LoopExecutionError):
+    """Raised when the loop exhausts its provider token budget."""
 
 
 class RunnerStepHandler(Protocol):
@@ -164,6 +171,7 @@ class SingleAgentLoopExecutor:
         steps: list[LoopStep] | None = None,
         max_iterations: int = 5,
         wall_clock_budget_seconds: float | None = None,
+        provider_token_budget: int | None = None,
         started_at: datetime | None = None,
         resume_run_id: str | None = None,
     ) -> LoopExecutionResult:
@@ -185,6 +193,7 @@ class SingleAgentLoopExecutor:
                 runner_mode=runner_metadata.mode,
                 max_iterations=max_iterations,
                 wall_clock_budget_seconds=wall_clock_budget_seconds,
+                provider_token_budget=provider_token_budget,
                 created_at=started_at,
             )
         )
@@ -241,6 +250,8 @@ class SingleAgentLoopExecutor:
                     ),
                 )
                 raise LoopTimeBudgetExceededError(run.stop_reason or stop_reason)
+
+            self._raise_provider_budget_if_exhausted(run.id, iteration)
 
             if iteration >= max_iterations:
                 run = self.runs.transition(
@@ -313,6 +324,8 @@ class SingleAgentLoopExecutor:
                 created_at=datetime.now(UTC),
             )
             while True:
+                self._raise_provider_budget_if_exhausted(run.id, iteration)
+
                 if iteration >= max_iterations:
                     run = self.runs.transition(
                         run.id,
@@ -345,6 +358,15 @@ class SingleAgentLoopExecutor:
                 if stream_chunks:
                     result = result_with_stream_chunks(result, stream_chunks)
                 result = result_with_idempotency_key(result, step_key)
+                token_delta = provider_usage_total_tokens(result.observed_output)
+                if token_delta:
+                    run = self.runs.transition(
+                        run.id,
+                        RunTransition(
+                            provider_tokens_used_delta=token_delta,
+                            at=datetime.now(UTC),
+                        ),
+                    )
                 receipt_ids = list(result.receipt_ids)
                 if side_effect_receipt is not None and side_effect_receipt.id not in receipt_ids:
                     receipt_ids.append(side_effect_receipt.id)
@@ -439,6 +461,23 @@ class SingleAgentLoopExecutor:
             ),
         )
         return LoopExecutionResult(run, step_results, output_captures, receipts)
+
+    def _raise_provider_budget_if_exhausted(self, run_id: str, iteration: int) -> None:
+        run = self.runs.require(run_id)
+        stop_reason = provider_budget_stop_reason(run.provider_token_budget_remaining)
+        if stop_reason is None:
+            return
+        run = self.runs.transition(
+            run.id,
+            RunTransition(
+                status="interrupted",
+                phase="stop",
+                iteration=iteration,
+                stop_reason=stop_reason,
+                at=datetime.now(UTC),
+            ),
+        )
+        raise LoopProviderBudgetExceededError(run.stop_reason or stop_reason)
 
     def _completed_step_capture(
         self,

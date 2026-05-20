@@ -30,8 +30,8 @@ def test_instruction_workflow_docs_cover_operator_steps() -> None:
         "Capture source identity",
         "Create reviewable",
         "Invalidate proposals",
-        "Open `craik.contradiction_report`",
-        "Record `craik.instruction_promotion_review`",
+        "Open <code>craik.contradiction_report</code>",
+        "Record <code>craik.instruction_promotion_review</code>",
         "Consume active constraints",
     ):
         assert phrase in body

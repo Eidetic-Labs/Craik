@@ -15,6 +15,9 @@ NON_SECRET_KEYS = frozenset(
         "allowed_credential_profiles",
         "estimated_tokens",
         "max_tokens",
+        "provider_token_budget",
+        "provider_token_budget_remaining",
+        "provider_tokens_used",
     }
 )
 REDACTED_VALUES = ("[REDACTED]", "<redacted>", "redacted")

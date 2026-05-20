@@ -41,6 +41,7 @@ class RunTransition:
     stop_reason: str | None = None
     completed_step_key: str | None = None
     last_step_key: str | None = None
+    provider_tokens_used_delta: int = 0
     auth_profile_id: str | None = None
     auth_identity_hash: str | None = None
     operator_subject: str | None = None
@@ -66,6 +67,7 @@ class TaskRunManager:
         run_id: str | None = None,
         max_iterations: int = 5,
         wall_clock_budget_seconds: float | None = None,
+        provider_token_budget: int | None = None,
         runner_metadata: list[dict[str, object]] | None = None,
         auth_profile_id: str | None = None,
         auth_identity_hash: str | None = None,
@@ -84,6 +86,8 @@ class TaskRunManager:
             runner_mode=runner_mode,
             max_iterations=max_iterations,
             wall_clock_budget_seconds=wall_clock_budget_seconds,
+            provider_token_budget=provider_token_budget,
+            provider_token_budget_remaining=provider_token_budget,
             started_at=now,
             phase_started_at=now,
             updated_at=now,
@@ -129,6 +133,16 @@ class TaskRunManager:
         ):
             completed_step_keys.append(transition.completed_step_key)
 
+        provider_tokens_used = run.provider_tokens_used + max(
+            transition.provider_tokens_used_delta,
+            0,
+        )
+        provider_token_budget_remaining = (
+            None
+            if run.provider_token_budget is None
+            else max(run.provider_token_budget - provider_tokens_used, 0)
+        )
+
         ended_at = now if status in TERMINAL_RUN_STATUSES else run.ended_at
         phase_started_at = now if phase != run.phase else run.phase_started_at
         updated = run.model_copy(
@@ -144,6 +158,8 @@ class TaskRunManager:
                 "handoff_id": transition.handoff_id or run.handoff_id,
                 "completed_step_keys": completed_step_keys,
                 "last_step_key": transition.last_step_key or run.last_step_key,
+                "provider_tokens_used": provider_tokens_used,
+                "provider_token_budget_remaining": provider_token_budget_remaining,
                 "auth_profile_id": transition.auth_profile_id or run.auth_profile_id,
                 "auth_identity_hash": transition.auth_identity_hash or run.auth_identity_hash,
                 "operator_subject": transition.operator_subject or run.operator_subject,
