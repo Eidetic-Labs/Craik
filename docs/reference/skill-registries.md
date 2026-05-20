@@ -1,35 +1,86 @@
-# Skill Registries
+# Skill registries
 
-Skill registries describe which reusable skills are available to a project and
-where each skill came from.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-The `craik.skill_registry` contract records project-local and global skill
-entries. Each entry includes:
+<div className="craik-lead">
 
-- `skill_package_id`;
-- `scope`: `project` or `global`;
-- source path;
-- trust boundary;
-- numeric precedence;
-- active state;
-- provenance links;
-- declaration owner and timestamp.
+**What you'll find here**
 
-Project-scoped entries require `project_id`. Global entries must omit
-`project_id`. This keeps global discovery from being confused with project-local
-authority.
+The `craik.skill_registry` contract that records which reusable
+skills are available to a project — project-local versus global,
+precedence, and provenance.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Project-local wins.**
+
+When a project-local and global entry reference the same skill
+package, the project-local entry must outrank the global entry.
+
+</div>
+
+## Entry fields
+
+<div className="craik-grid">
+
+<div><h4><code>skill_package_id</code></h4></div>
+<div><h4><code>scope</code></h4><p><code>project</code> or <code>global</code>.</p></div>
+<div><h4>Source path</h4></div>
+<div><h4>Trust boundary</h4></div>
+<div><h4>Numeric precedence</h4></div>
+<div><h4>Active state</h4></div>
+<div><h4>Provenance links</h4></div>
+<div><h4>Declaration owner &amp; timestamp</h4></div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Scope discipline.**
+
+Project-scoped entries require <code>project_id</code>. Global entries
+must omit <code>project_id</code>. This keeps global discovery from
+being confused with project-local authority.
+
+</div>
 
 ## Precedence
 
-Lower `precedence` values win. Active precedence values must be unique.
+Lower `precedence` values win. **Active precedence values must be
+unique.**
 
-When a project-local and global entry reference the same skill package, the
-project-local entry must outrank the global entry. The registry can also record
-`precedence_order` for consumers that want a stable ordered list of active skill
-entry ids.
+The registry can also record `precedence_order` for consumers that
+want a stable ordered list of active skill entry ids.
 
 ## Provenance
 
-Every registry entry requires provenance. Discovery should preserve the source
-that caused a skill to enter the registry, such as a project skill path, a global
-skill path, or an evidence record captured during onboarding.
+Every registry entry requires provenance. Discovery should preserve
+the source that caused a skill to enter the registry — a project skill
+path, a global skill path, or an evidence record captured during
+onboarding.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="skill-packages/">
+<strong>Reference</strong>
+<span>Skill packages</span>
+<small>The package contract entries reference.</small>
+</a>
+
+<a href="skill-contexts/">
+<strong>Reference</strong>
+<span>Skill invocation contexts</span>
+<small>The per-run record produced when a registered skill executes.</small>
+</a>
+
+<a href="../guides/community-skills/">
+<strong>Guide</strong>
+<span>Community skills</span>
+<small>How skills enter the registry.</small>
+</a>
+
+</div>

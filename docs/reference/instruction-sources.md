@@ -1,12 +1,27 @@
-# Instruction Sources
+# Instruction sources
 
-Instruction source registries declare which project files Craik may use for
-runtime instruction distillation. Craik does not treat every Markdown file as
-runtime authority.
+<p className="craik-meta"><span>4 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-## Supported Sources
+<div className="craik-lead">
 
-`craik.instruction_source` supports these standard source kinds and paths:
+**What you'll find here**
+
+The registry, hash state, provenance, categories, stale invalidation,
+conflict handling, and promotion rules that turn declared instruction
+files into runtime constraints.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Not every Markdown file is authority.**
+
+Craik does not treat raw instruction files as runtime authority.
+Sources declare candidate evidence; promotion is a separate gate.
+
+</div>
+
+## Supported sources
 
 | Kind | Path |
 | --- | --- |
@@ -20,44 +35,73 @@ runtime authority.
 | `codex_instructions` | `.codex/instructions.md` |
 | `policy_doc` | Explicitly declared project policy doc path |
 
-Standard source kinds must use their canonical path. `policy_doc` sources are
-the exception: their path is declared by the project and must be listed in the
-registry's `declared_policy_doc_paths`.
+Standard source kinds must use their canonical path. `policy_doc`
+sources declare their own path and must be listed in the registry's
+`declared_policy_doc_paths`.
 
-## Registry Boundaries
+## Registry boundaries
 
-`craik.instruction_source_registry` is project-scoped. It records declared
-sources, active source IDs, and policy doc paths. Active source IDs must refer to
-registered active sources.
+`craik.instruction_source_registry` is project-scoped. It records
+declared sources, active source IDs, and policy doc paths. Active
+source IDs must refer to registered active sources.
+
+<div className="craik-keypoint">
+
+**Discovery, not approval.**
 
 The registry is a discovery boundary, not an approval boundary. Later
-distillation and promotion steps must still preserve provenance, stale-source
-state, contradiction reports, and human approval before extracted instructions
-become active runtime constraints.
+distillation and promotion steps must still preserve provenance,
+stale-source state, contradiction reports, and human approval before
+extracted instructions become active runtime constraints.
 
-## Hash State And Provenance
+</div>
 
-`craik.instruction_source_snapshot` records observed source identity with a
-`sha256` content hash when the source is present. Hash status is one of:
+## Hash state and provenance
 
-- `unchanged`: the observed hash matches the previous known state.
-- `changed`: the source exists and differs from the previous known state.
-- `missing`: the declared source was not found and must not include a content
-  hash.
-- `new`: the source exists but has no previous known state.
+`craik.instruction_source_snapshot` records observed source identity
+with a `sha256` content hash when the source is present.
 
-`craik.instruction_provenance` links distilled material back to a source and
-optional snapshot. Provenance can use a precise line range when available or a
-source-level fallback when the extractor cannot identify stable lines. Partial
-line ranges are invalid because they make review ambiguous.
+<div className="craik-fields">
 
-## Distilled Instruction Categories
+<div>
+<dt>Hash status</dt>
+<dt><span className="craik-fields__type">Meaning</span></dt>
+<dd>Notes</dd>
+</div>
 
-`craik.distilled_instruction_proposal` keeps extracted instructions reviewable.
-Every proposal must cite provenance and remain inactive until a later promotion
-decision approves it.
+<div>
+<dt><code>unchanged</code></dt>
+<dt><span className="craik-fields__type">stable</span></dt>
+<dd>Observed hash matches the previous known state.</dd>
+</div>
 
-Supported categories:
+<div>
+<dt><code>changed</code></dt>
+<dt><span className="craik-fields__type">drift</span></dt>
+<dd>Source exists and differs from the previous known state.</dd>
+</div>
+
+<div>
+<dt><code>missing</code></dt>
+<dt><span className="craik-fields__type">gone</span></dt>
+<dd>Declared source was not found · must not include a content hash.</dd>
+</div>
+
+<div>
+<dt><code>new</code></dt>
+<dt><span className="craik-fields__type">first time</span></dt>
+<dd>Source exists but has no previous known state.</dd>
+</div>
+
+</div>
+
+`craik.instruction_provenance` links distilled material back to a
+source and optional snapshot. Provenance uses a precise line range
+when available or a source-level fallback when the extractor cannot
+identify stable lines. **Partial line ranges are invalid** because
+they make review ambiguous.
+
+## Distilled instruction categories
 
 | Category | Meaning |
 | --- | --- |
@@ -71,60 +115,98 @@ Supported categories:
 | `security_rule` | Security, secret, or safety-sensitive requirement. |
 | `stale_risk` | Warning that prior context may become stale or unsafe. |
 
-Policy and security-rule proposals require evidence IDs in addition to
-provenance. Approved proposals must include a promoted constraint ID plus
-reviewer and decision time. Rejected and deferred proposals also preserve
-reviewer and decision time so future agents can see that extraction did not
-silently become active runtime behavior.
+<div className="craik-keypoint">
 
-## Stale Invalidation
+**Policy and security-rule proposals require evidence.**
 
-Instruction source snapshots are compared by source ID and content hash.
-Distillations are deferred when their source changes, goes missing, is newly
-discovered, or is omitted from the current scan. Deferral preserves the
-proposal, provenance, evidence, and previous review decision for audit, but the
-proposal is excluded from automatic promotion until it is reviewed again.
+In addition to provenance. Approved proposals must include a promoted
+constraint ID plus reviewer and decision time. Rejected and deferred
+proposals also preserve reviewer and decision time.
 
-Case files and onboarding reports surface stale instruction warnings so agents
-do not treat outdated distilled instructions as active constraints.
+</div>
 
-## Instruction Conflicts
+## Stale invalidation
 
-Distilled proposals from different sources can conflict. Craik opens local
-`craik.contradiction_report` records for incompatible instruction, policy,
-command, boundary, or security-rule proposals. Reports link the conflicting
-proposal IDs, source IDs, and provenance IDs so a human reviewer can inspect the
-source material.
+Snapshots are compared by source ID and content hash. Distillations
+are deferred when their source changes, goes missing, is newly
+discovered, or is omitted from the current scan. Deferral preserves
+the proposal, provenance, evidence, and previous review decision for
+audit, but the proposal is excluded from automatic promotion until it
+is reviewed again.
 
-Conflicting proposals are deferred and excluded from automatic promotion until
-the contradiction is reviewed. Preference and stale-risk disagreements are kept
-as reviewable proposals, but they do not automatically become contradiction
-reports because they may represent tolerable local variation rather than
-mutually exclusive runtime authority.
+Case files and onboarding reports surface stale instruction warnings
+so agents do not treat outdated distilled instructions as active
+constraints.
 
-## Promotion Reviews
+## Instruction conflicts
 
-`craik.instruction_promotion_review` records approved, rejected, and deferred
-promotion decisions. Reviews link policy envelopes, receipts, memory proposals,
-and handoffs so promotion is auditable.
+<div className="craik-decision">
 
-Approved reviews create `craik.promoted_instruction_constraint` records. Active
-constraints retain the proposal ID, source ID, source snapshot ID, provenance
-IDs, evidence IDs, and review links. Rejected and deferred reviews do not create
-active constraints, and unapproved distilled proposals must not affect case-file
-or policy behavior.
+<div>
+<h4>Open a contradiction report</h4>
+<p>Incompatible <code>instruction</code> · <code>policy</code> · <code>command</code> · <code>boundary</code> · <code>security_rule</code> proposals. Reports link conflicting proposal IDs, source IDs, and provenance IDs.</p>
+</div>
 
-## Runtime Consumption
+<div>
+<h4>Keep as reviewable disagreement</h4>
+<p><code>preference</code> and <code>stale_risk</code> disagreements stay as reviewable proposals — they may represent tolerable local variation, not mutually exclusive authority.</p>
+</div>
 
-Case files include active promoted constraints in
-`context_budget.active_instruction_constraints`. Prompt compilation renders
-those statements in the context section so runners can apply them with the same
-care as other case-file context.
+</div>
 
-Onboarding reports include active instruction summaries in the project model.
-Handoffs carry active instruction constraint IDs forward as context debt so the
-next agent can audit which promoted distillations influenced the run.
+Conflicting proposals are deferred and excluded from automatic
+promotion until the contradiction is reviewed.
 
-Only active `craik.promoted_instruction_constraint` records linked to approved,
-non-contradicted proposals are consumed. Proposed, rejected, deferred, stale, or
-contradicted distillations remain visible for review but inactive.
+## Promotion reviews
+
+`craik.instruction_promotion_review` records approved, rejected, and
+deferred promotion decisions. Reviews link policy envelopes, receipts,
+memory proposals, and handoffs.
+
+Approved reviews create `craik.promoted_instruction_constraint`
+records. Active constraints retain proposal ID · source ID · source
+snapshot ID · provenance IDs · evidence IDs · review links.
+
+<div className="craik-keypoint">
+
+**Only approved, non-contradicted constraints are consumed.**
+
+Proposed, rejected, deferred, stale, or contradicted distillations
+remain visible for review but inactive.
+
+</div>
+
+## Runtime consumption
+
+<div className="craik-grid">
+
+<div><h4>Case files</h4><p>Include active constraints in <code>context_budget.active_instruction_constraints</code>.</p></div>
+<div><h4>Prompts</h4><p>Compilation renders constraints in the context section.</p></div>
+<div><h4>Onboarding</h4><p>Reports include active instruction summaries in the project model.</p></div>
+<div><h4>Handoffs</h4><p>Carry active constraint IDs forward as context debt.</p></div>
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="instruction-distillation-workflow/">
+<strong>Reference</strong>
+<span>Instruction distillation workflow</span>
+<small>The 9-step pipeline these contracts feed.</small>
+</a>
+
+<a href="instruction-distillation-view/">
+<strong>Reference</strong>
+<span>Instruction distillation view</span>
+<small>The operator surface that audits proposals.</small>
+</a>
+
+<a href="schemas/">
+<strong>Reference</strong>
+<span>Schema reference</span>
+<small>All instruction-related contract shapes.</small>
+</a>
+
+</div>

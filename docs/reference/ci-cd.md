@@ -1,8 +1,27 @@
-# CI/CD Gates
+# CI/CD gates
 
-Craik CI is split by surface so failures point at the area that regressed.
+<p className="craik-meta"><span>3 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-## Pull Request Gates
+<div className="craik-lead">
+
+**What you'll find here**
+
+The split CI surface — pull-request gates, coverage ratchet, conformance
+reports, provider integration, code scanning, dependency audit, static
+analysis, changed-file strictness, and nightly reliability.
+
+</div>
+
+<div className="craik-keypoint">
+
+**Surface-split so failures point.**
+
+Craik CI is split by surface so failures point at the area that
+regressed.
+
+</div>
+
+## Pull request gates
 
 | Gate | Purpose |
 | --- | --- |
@@ -11,84 +30,143 @@ Craik CI is split by surface so failures point at the area that regressed.
 | `unit` | Full pytest suite with coverage XML and JUnit artifacts. |
 | `contract` | Runtime contract fixture conformance and report generation. |
 | `integration` | Recorded provider integration tests that do not require live credentials. |
-| `security` | Dependency audit, static analysis, policy baseline, release readiness, and public documentation hygiene. |
-| `CodeQL` | GitHub code scanning for Python on pull requests and pushes to `main`. |
-| `docs` | Generated CLI docs, docs hygiene, and Docusaurus build. |
+| `security` | Dependency audit, static analysis, policy baseline, release readiness, public docs hygiene. |
+| `CodeQL` | GitHub code scanning for Python on PRs and pushes to `main`. |
+| `docs` | Generated CLI docs, docs hygiene, Docusaurus build. |
 | `package` | Source distribution and wheel build, metadata validation, smoke install. |
 
-## Coverage Ratchet
+## Coverage ratchet
 
-Coverage is configured in `pyproject.toml` and currently fails below 75 percent
-line coverage. The threshold is intentionally conservative for the MVP ramp. It
-should only move upward after CI has been green at the higher threshold on
-`main`.
+<div className="craik-keypoint">
 
-Coverage artifacts are uploaded from the `unit` job:
+**Currently 75% line coverage.**
 
-- `reports/tests/unit.xml`;
-- `reports/coverage/coverage.xml`.
+Configured in <code>pyproject.toml</code>. Conservative for the MVP
+ramp — only moves upward after CI has been green at the higher
+threshold on <code>main</code>.
 
-## Conformance Reports
+</div>
 
-The contract job validates every registered runtime schema against the pinned
-fixture bundle and writes:
+Coverage artifacts uploaded from the `unit` job:
 
-- `reports/conformance/contracts.json`;
-- `reports/conformance/contracts.md`.
+<div className="craik-grid">
 
-These reports are uploaded as CI artifacts and are also produced by the nightly
-reliability workflow.
+<div><h4><code>reports/tests/unit.xml</code></h4></div>
+<div><h4><code>reports/coverage/coverage.xml</code></h4></div>
 
-## Provider Integration
+</div>
 
-The `integration` job runs recorded provider integration tests with
-`pytest -m "integration and not live" tests/integration`. These tests exercise
-live-shaped provider payloads through cassettes so pull requests can validate
-provider wiring without requiring paid API keys, localhost model servers, or
-secret material in CI.
+## Conformance reports
 
-Optional live provider checks stay gated behind explicit environment flags such
-as `CRAIK_RUN_LIVE_TESTS=1` and are not part of the default pull request gate.
+The contract job validates every registered runtime schema against the
+pinned fixture bundle and writes:
 
-## Code Scanning
+<div className="craik-grid">
 
-The repo-owned CodeQL workflow runs Python analysis on pull requests and pushes
-to `main`, using the default query suite with `build-mode: none`. The analyze
-step uses its default SARIF upload behavior, so results are published to GitHub
-Security -> Code scanning when repository code-scanning configuration permits
-advanced workflow uploads.
+<div><h4><code>reports/conformance/contracts.json</code></h4></div>
+<div><h4><code>reports/conformance/contracts.md</code></h4></div>
 
-## Dependency Audit
+</div>
 
-The `security` job exports `uv.lock` to a hash-pinned requirements file and
-runs `pip-audit` against that locked dependency set. The audit runs in
-pip-free mode so CI checks the committed lock state without resolving a new
-dependency graph.
+These reports are uploaded as CI artifacts and also produced by the
+nightly reliability workflow.
 
-## Static Analysis
+## Provider integration
 
-The `security` job runs Bandit against `src/craik` with an explicit baseline
-for accepted findings. New findings fail the job and should either be fixed or
-added to the baseline only with a reviewable rationale.
+<div className="craik-keypoint">
 
-The same job runs Gitleaks against the checked-out tree with the repo-local
-`.gitleaks.toml` configuration. The configuration extends the default rules and
-only allowlists generated documentation dependency trees plus intentionally
-fake test credential fixtures.
+**Cassettes, not live credentials.**
 
-## Changed-File Strictness
+The <code>integration</code> job runs
+<code>pytest -m "integration and not live" tests/integration</code>.
+Live-shaped payloads pass through cassettes so PRs validate provider
+wiring without paid API keys or secrets in CI.
 
-`scripts/check_changed_file_strictness.py` enforces minimum review discipline:
+</div>
 
-- package source changes require tests;
-- contract model changes require contract test coverage;
-- workflow-only changes require a docs or scripts rationale change.
+Optional live provider checks stay gated behind explicit env flags
+such as `CRAIK_RUN_LIVE_TESTS=1` and are not part of the default PR
+gate.
 
-This is not a substitute for review. It is a low-friction guard against
-high-risk changes landing without visible verification.
+## Code scanning
 
-## Nightly Reliability
+The repo-owned CodeQL workflow runs Python analysis on pull requests
+and pushes to `main`, using the default query suite with
+`build-mode: none`. The analyze step uses its default SARIF upload
+behavior; results publish to GitHub Security → Code scanning when
+repository code-scanning configuration permits advanced workflow
+uploads.
 
-The nightly workflow runs the full quality, coverage, conformance, security,
-docs, and package checks on `main` and uploads test, coverage, conformance,
-docs, and package artifacts.
+## Dependency audit
+
+The `security` job exports `uv.lock` to a hash-pinned requirements
+file and runs `pip-audit` against that locked set. The audit runs in
+pip-free mode so CI checks the committed lock state without resolving
+a new dependency graph.
+
+## Static analysis
+
+<div className="craik-decision">
+
+<div>
+<h4>Bandit</h4>
+<p>Runs against <code>src/craik</code> with an explicit baseline for accepted findings. New findings fail the job and should either be fixed or added to the baseline only with a reviewable rationale.</p>
+</div>
+
+<div>
+<h4>Gitleaks</h4>
+<p>Runs against the checked-out tree with repo-local <code>.gitleaks.toml</code>. The configuration extends the default rules and only allowlists generated documentation dependency trees plus intentionally fake test credential fixtures.</p>
+</div>
+
+</div>
+
+## Changed-file strictness
+
+`scripts/check_changed_file_strictness.py` enforces minimum review
+discipline.
+
+<div className="craik-grid">
+
+<div><h4>Package source changes</h4><p>Require tests.</p></div>
+<div><h4>Contract model changes</h4><p>Require contract test coverage.</p></div>
+<div><h4>Workflow-only changes</h4><p>Require a docs or scripts rationale change.</p></div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Guard, not substitute.**
+
+This is a low-friction guard against high-risk changes landing without
+visible verification — not a substitute for review.
+
+</div>
+
+## Nightly reliability
+
+The nightly workflow runs the full quality, coverage, conformance,
+security, docs, and package checks on `main` and uploads all artifacts.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="../guides/development/">
+<strong>Guide</strong>
+<span>Development checks</span>
+<small>The local equivalent operators run.</small>
+</a>
+
+<a href="../release-readiness/">
+<strong>Read</strong>
+<span>Release readiness</span>
+<small>The validation gates these CI jobs enforce.</small>
+</a>
+
+<a href="policy-tests/">
+<strong>Reference</strong>
+<span>Policy tests</span>
+<small>The regression gate that runs inside <code>security</code>.</small>
+</a>
+
+</div>

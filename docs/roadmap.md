@@ -230,19 +230,11 @@ survives schema changes via a documented migration path.
 
 </div>
 
-Tracking issues for the execution continuity slices:
-[#552](https://github.com/eidetic-labs/craik/issues/552) covers
-phase-boundary resume and deterministic step idempotency keys.
-[#554](https://github.com/eidetic-labs/craik/issues/554) covers
-per-run wall-clock budget enforcement before new phase or tool rounds.
-Keep this section updated as each v0.2.0 slice lands so the roadmap
-mirrors the current implementation state.
-
 <div className="craik-grid">
 
-<div><h4>Resumable interrupted runs</h4><p>First slice: interrupted runs can reopen from persisted phase outputs and continue at the next unfinished phase.</p></div>
-<div><h4>Step-level idempotency keys</h4><p>First slice: stable keys are recorded in run state and runner step context to avoid duplicated phase outputs and side effects on replay.</p></div>
-<div><h4>Time controls</h4><p>First slice: per-run wall-clock budgets interrupt before the next phase or tool round when exhausted.</p></div>
+<div><h4>Resumable interrupted runs</h4><p>Process crash mid-phase recovers to last persisted phase boundary.</p></div>
+<div><h4>Step-level idempotency keys</h4><p>Prevent duplicated receipts, memory proposals, and tool side effects on replay.</p></div>
+<div><h4>Time controls</h4><p>Per-run wall-clock budgets enforced by the loop.</p></div>
 <div><h4>Provider budget enforcement</h4><p>Budget ledger decremented per call · abort when exceeded.</p></div>
 <div><h4>Run inspection &amp; recovery</h4><p><code>craik run show</code> · <code>craik run resume</code> · <code>craik run cancel</code>.</p></div>
 <div><h4>Agent exit discipline</h4><p>Enforced at runtime, not only declared.</p></div>

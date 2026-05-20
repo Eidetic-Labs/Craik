@@ -1,56 +1,87 @@
-# Speech-To-Text Adapter Contract
+# Speech-to-text adapter contract
 
-Speech-to-text adapters convert referenced audio artifacts into redacted
-transcripts while preserving Craik's policy, evidence, and receipt model.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`SpeechToTextInputMetadata` records:
+<div className="craik-lead">
 
-- media artifact id;
-- media MIME type;
-- duration in milliseconds;
-- language hint;
-- channel count;
-- redacted metadata.
+**What you'll find here**
 
-`SpeechToTextTranscript` records:
+The three records that compose a speech-to-text adapter result, the
+validation rules, and the redaction boundary.
 
-- transcript text;
-- language;
-- confidence;
-- transcript segments;
-- redacted metadata;
-- redaction status.
+</div>
 
-`SpeechToTextResult` records:
+<div className="craik-keypoint">
 
-- result id;
-- task id;
-- adapter id;
-- status: `completed`, `partial`, or `failed`;
-- input metadata;
-- transcript;
-- errors;
-- policy envelope id;
-- evidence ids;
-- receipt ids;
-- redacted paths;
-- creation timestamp.
+**Audio in, transcript out — never raw payloads in receipts.**
+
+Speech-to-text results must not persist raw audio, audio bytes,
+waveforms, raw payloads, private transcript metadata, credentials,
+tokens, or private local state.
+
+</div>
+
+## Records
+
+<div className="craik-fields">
+
+<div>
+<dt>Record</dt>
+<dt><span className="craik-fields__type">Captures</span></dt>
+<dd>Fields</dd>
+</div>
+
+<div>
+<dt><code>SpeechToTextInputMetadata</code></dt>
+<dt><span className="craik-fields__type">input</span></dt>
+<dd>Media artifact id · MIME type · duration (ms) · language hint · channel count · redacted metadata.</dd>
+</div>
+
+<div>
+<dt><code>SpeechToTextTranscript</code></dt>
+<dt><span className="craik-fields__type">output</span></dt>
+<dd>Transcript text · language · confidence · transcript segments · redacted metadata · redaction status.</dd>
+</div>
+
+<div>
+<dt><code>SpeechToTextResult</code></dt>
+<dt><span className="craik-fields__type">envelope</span></dt>
+<dd>Result id · task id · adapter id · status (<code>completed</code> / <code>partial</code> / <code>failed</code>) · input metadata · transcript · errors · policy envelope id · evidence ids · receipt ids · redacted paths · creation timestamp.</dd>
+</div>
+
+</div>
 
 ## Validation
 
-Completed and partial results require a transcript. Failed results require at
-least one error. All results require policy envelope, evidence, and receipt
-links.
+<div className="craik-grid">
 
-Transcript segments can carry start and end offsets. When both offsets are
-present, the end must be greater than or equal to the start.
+<div><h4>Completed / partial</h4><p>Require a transcript.</p></div>
+<div><h4>Failed</h4><p>Require at least one error.</p></div>
+<div><h4>All</h4><p>Require policy envelope, evidence, and receipt links.</p></div>
+<div><h4>Segment offsets</h4><p>When both present, end ≥ start.</p></div>
 
-## Redaction Boundary
+</div>
 
-Speech-to-text results must not persist raw audio payloads, audio bytes,
-waveforms, raw payloads, private transcript metadata, credentials, tokens, or
-private local state.
+## What's next
 
-Adapters should preserve media artifact ids and transcript summaries instead of
-embedding raw audio. Use [Voice Input And Output Posture](voice-posture.md) to
-evaluate whether a voice surface may call an adapter.
+<div className="craik-next">
+
+<a href="voice-posture/">
+<strong>Reference</strong>
+<span>Voice posture</span>
+<small>The decision that authorizes adapter calls.</small>
+</a>
+
+<a href="text-to-speech-adapters/">
+<strong>Reference</strong>
+<span>Text-to-speech adapters</span>
+<small>The output-direction counterpart.</small>
+</a>
+
+<a href="multimodal-artifacts/">
+<strong>Reference</strong>
+<span>Multimodal artifact references</span>
+<small>How adapters cite audio without raw payloads.</small>
+</a>
+
+</div>
