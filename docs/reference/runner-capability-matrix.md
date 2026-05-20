@@ -8,7 +8,7 @@
 
 The validated capability and trust profile every runner adapter
 exposes. The matrix is the capability-profile input the
-[prompt compiler](../prompt-compiler/) consumes, and it is what
+[prompt compiler](prompt-compiler.md) consumes, and it is what
 governance checks consult to decide whether a side effect is supported,
 needs an explicit grant, or must be denied outright.
 

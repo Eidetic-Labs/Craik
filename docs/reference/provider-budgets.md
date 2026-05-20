@@ -8,7 +8,7 @@
 
 The pre-routing budget and quota check that gates whether Craik is
 allowed to dispatch a request to a configured model provider. This is
-the gate; the [budget and quota view](../budget-quota-view/) is the
+the gate; the [budget and quota view](budget-quota-view.md) is the
 read-only operator display of the same information.
 
 </div>
