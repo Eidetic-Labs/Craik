@@ -22,6 +22,10 @@ from craik.contracts.models import (
 from craik.runtime.memory.memory import MemoryStore
 from craik.runtime.policy.policy import denial_receipt
 from craik.runtime.store import LocalStore
+from craik.runtime.work.loop_support.budgets import (
+    raise_provider_budget_if_exhausted,
+    raise_time_budget_if_exhausted,
+)
 from craik.runtime.work.loop_support.execution import (
     LoopStep,
     context_with_idempotency,
@@ -31,13 +35,11 @@ from craik.runtime.work.loop_support.execution import (
     intent_stop_reason,
     loop_step_key,
     message_history_from_context,
-    provider_budget_stop_reason,
     provider_usage_total_tokens,
     request_id,
     result_with_idempotency_key,
     runtime_policy_context,
     stream_chunks_from_output,
-    time_budget_stop_reason,
 )
 from craik.runtime.work.loop_support.execution import (
     operator_policy_decision as check_active_operator_policy,
@@ -227,22 +229,7 @@ class SingleAgentLoopExecutor:
                     output_captures.append(existing_capture)
                     continue
 
-            stop_reason = time_budget_stop_reason(
-                started_at=run.started_at,
-                budget_seconds=run.wall_clock_budget_seconds,
-            )
-            if stop_reason is not None:
-                run = self.runs.transition(
-                    run.id,
-                    RunTransition(
-                        status="interrupted",
-                        phase="stop",
-                        iteration=iteration,
-                        stop_reason=stop_reason,
-                        at=datetime.now(UTC),
-                    ),
-                )
-                raise LoopTimeBudgetExceededError(run.stop_reason or stop_reason)
+            self._raise_time_budget_if_exhausted(run.id, iteration)
 
             self._raise_provider_budget_if_exhausted(run.id, iteration)
 
@@ -317,6 +304,7 @@ class SingleAgentLoopExecutor:
                 created_at=datetime.now(UTC),
             )
             while True:
+                self._raise_time_budget_if_exhausted(run.id, iteration)
                 self._raise_provider_budget_if_exhausted(run.id, iteration)
 
                 if iteration >= max_iterations:
@@ -369,6 +357,7 @@ class SingleAgentLoopExecutor:
                 denied_tool_receipt: CapabilityReceipt | None = None
                 if tool_calls:
                     for tool_call in tool_calls:
+                        self._raise_time_budget_if_exhausted(run.id, iteration)
                         side_effect = dispatch_tool_call_side_effect(
                             store=self.store,
                             policy=policy,
@@ -464,22 +453,21 @@ class SingleAgentLoopExecutor:
         )
         return LoopExecutionResult(run, step_results, output_captures, receipts)
 
-    def _raise_provider_budget_if_exhausted(self, run_id: str, iteration: int) -> None:
-        run = self.runs.require(run_id)
-        stop_reason = provider_budget_stop_reason(run.provider_token_budget_remaining)
-        if stop_reason is None:
-            return
-        run = self.runs.transition(
-            run.id,
-            RunTransition(
-                status="interrupted",
-                phase="stop",
-                iteration=iteration,
-                stop_reason=stop_reason,
-                at=datetime.now(UTC),
-            ),
+    def _raise_time_budget_if_exhausted(self, run_id: str, iteration: int) -> None:
+        raise_time_budget_if_exhausted(
+            runs=self.runs,
+            run_id=run_id,
+            iteration=iteration,
+            error_type=LoopTimeBudgetExceededError,
         )
-        raise LoopProviderBudgetExceededError(run.stop_reason or stop_reason)
+
+    def _raise_provider_budget_if_exhausted(self, run_id: str, iteration: int) -> None:
+        raise_provider_budget_if_exhausted(
+            runs=self.runs,
+            run_id=run_id,
+            iteration=iteration,
+            error_type=LoopProviderBudgetExceededError,
+        )
 
     def _completed_step_capture(
         self,
