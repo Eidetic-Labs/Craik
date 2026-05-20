@@ -13,6 +13,7 @@ from craik.runtime.work.loop_support.tool_dispatch import (
     result_with_stream_chunks,
     tool_arguments,
     tool_message,
+    tool_result_attestation,
 )
 
 
@@ -56,6 +57,7 @@ def test_tool_message_serializes_side_effect_result() -> None:
             receipt=_receipt(),
             output={"ok": True},
         ),
+        attestation_id="attestation_tool",
     )
 
     assert message["role"] == "tool"
@@ -63,10 +65,34 @@ def test_tool_message_serializes_side_effect_result() -> None:
     content = json.loads(message["content"])
     assert content == {
         "allowed": True,
+        "attestation_id": "attestation_tool",
         "output": {"ok": True},
         "receipt_id": "receipt_tool",
         "summary": "allowed",
     }
+
+
+def test_tool_result_attestation_hashes_replayed_payload() -> None:
+    attestation = tool_result_attestation(
+        task_id="task_tool_dispatch",
+        case_file_id="case_tool_dispatch",
+        tool_call={"id": "call_shell", "name": "shell.execute", "arguments": {"command": "status"}},
+        side_effect=SideEffectResult(
+            kind="shell",
+            allowed=True,
+            receipt=_receipt(),
+            output={"result": "ok"},
+        ),
+    )
+
+    assert attestation.id == "attestation_task_tool_dispatch_call_shell"
+    assert attestation.case_file_id == "case_tool_dispatch"
+    assert attestation.tool_name == "shell.execute"
+    assert attestation.tool_identity == "call_shell"
+    assert attestation.command == "status"
+    assert attestation.output_hash
+    assert attestation.receipt_id == "receipt_tool"
+    assert attestation.status == "attested"
 
 
 def _step_result(observed_output: dict[str, object]) -> RunnerStepResult:

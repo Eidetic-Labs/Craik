@@ -23,6 +23,7 @@ def _attestation(**overrides: object) -> ToolResultAttestation:
         "tool_identity": "gh issue view",
         "command": "gh issue view 113 --json title",
         "observed_output_summary": "Issue 113 describes freshness probes.",
+        "output_hash": "a" * 64,
         "trust_class": "observed",
         "evidence_ids": ["evidence_gh_issue"],
         "captured_at": NOW,

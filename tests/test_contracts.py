@@ -198,6 +198,36 @@ def test_task_run_identity_fields_round_trip(
     assert dumped["provider_token_budget_remaining"] == 22500
 
 
+def test_tool_result_attestation_hash_fields_round_trip(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.tool_result_attestation"])
+    payload.update(
+        {
+            "case_file_id": "case_docs_reconcile",
+            "output_hash": "b" * 64,
+            "hash_algorithm": "sha256",
+        }
+    )
+
+    parsed = CONTRACT_REGISTRY["craik.tool_result_attestation"].model_validate(payload)
+    dumped = parsed.model_dump(mode="json", by_alias=True)
+
+    assert dumped["case_file_id"] == "case_docs_reconcile"
+    assert dumped["output_hash"] == "b" * 64
+    assert dumped["hash_algorithm"] == "sha256"
+
+
+def test_blocked_tool_result_attestation_requires_receipt(
+    fixtures: dict[str, dict[str, Any]],
+) -> None:
+    payload = dict(fixtures["craik.tool_result_attestation"])
+    payload.update({"status": "blocked", "receipt_id": None})
+
+    with pytest.raises(ValidationError, match="blocked tool results require receipt_id"):
+        CONTRACT_REGISTRY["craik.tool_result_attestation"].model_validate(payload)
+
+
 def test_runner_contract_models_keep_legacy_import_surface() -> None:
     from craik.contracts import models
     from craik.contracts.runner_models import RunnerMetadata
