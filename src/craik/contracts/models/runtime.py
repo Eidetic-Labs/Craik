@@ -137,10 +137,13 @@ class ToolResultAttestation(CraikModel):
     id: str
     task_id: str
     project_id: str | None = None
+    case_file_id: str | None = None
     tool_name: str
     tool_identity: str
     command: str | None = None
     observed_output_summary: str
+    output_hash: str | None = None
+    hash_algorithm: Literal["sha256"] = "sha256"
     trust_class: TrustClass
     status: ToolAttestationStatus = "attested"
     evidence_ids: list[str] = Field(default_factory=list)
@@ -157,6 +160,8 @@ class ToolResultAttestation(CraikModel):
             raise ValueError("missing attestations must not include evidence or receipt links")
         if self.status == "attested" and not self.evidence_ids and self.receipt_id is None:
             raise ValueError("attested tool results require evidence_ids or receipt_id")
+        if self.status == "blocked" and self.receipt_id is None:
+            raise ValueError("blocked tool results require receipt_id")
         return self
 
 

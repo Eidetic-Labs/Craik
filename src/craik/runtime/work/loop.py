@@ -46,10 +46,10 @@ from craik.runtime.work.loop_support.execution import (
     side_effect_receipt as build_side_effect_receipt,
 )
 from craik.runtime.work.loop_support.tool_dispatch import (
+    attested_tool_message,
     dispatch_tool_call_side_effect,
     dispatchable_tool_calls,
     result_with_stream_chunks,
-    tool_message,
 )
 from craik.runtime.work.run_outputs import (
     RunOutputCapture,
@@ -71,26 +71,20 @@ __all__ = [
     "default_loop_steps",
 ]
 
-
 class LoopExecutionError(RuntimeError):
     """Base error for governed loop execution failures."""
-
 
 class LoopPolicyBlockedError(LoopExecutionError):
     """Raised when policy blocks a side-effect step."""
 
-
 class LoopMaxIterationsError(LoopExecutionError):
     """Raised when the loop reaches its iteration bound."""
-
 
 class LoopTimeBudgetExceededError(LoopExecutionError):
     """Raised when the loop exhausts its wall-clock budget."""
 
-
 class LoopProviderBudgetExceededError(LoopExecutionError):
     """Raised when the loop exhausts its provider token budget."""
-
 
 class RunnerStepHandler(Protocol):
     """Minimal runner boundary for one loop step."""
@@ -388,7 +382,15 @@ class SingleAgentLoopExecutor:
                         receipts.append(side_effect.receipt)
                         if side_effect.receipt.id not in receipt_ids:
                             receipt_ids.append(side_effect.receipt.id)
-                        tool_messages.append(tool_message(tool_call, side_effect))
+                        tool_messages.append(
+                            attested_tool_message(
+                                store=self.store,
+                                task_id=task_id,
+                                case_file_id=case_file_id,
+                                tool_call=tool_call,
+                                side_effect=side_effect,
+                            )
+                        )
                         if not side_effect.allowed:
                             denied_tool_receipt = side_effect.receipt
                             break

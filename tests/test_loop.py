@@ -1,3 +1,4 @@
+import json
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -419,8 +420,16 @@ def test_loop_executes_tool_call_and_replays_tool_result(store: LocalStore) -> N
     assert result.receipts[0].capability == "shell.execute"
     assert result.receipts[0].result.metadata["command_ref"] == "fixture-action"
     assert store.get_receipt(result.receipts[0].id) == result.receipts[0]
+    attestation = store.get_tool_result_attestation("attestation_task_docs_reconcile_call_shell")
+    assert attestation is not None
+    assert attestation.tool_name == "shell.execute"
+    assert attestation.case_file_id == "case_docs_reconcile"
+    assert attestation.receipt_id == result.receipts[0].id
+    assert attestation.output_hash
     assert runner.requests[1].context["message_history"][0]["role"] == "tool"
     assert runner.requests[1].context["message_history"][0]["tool_call_id"] == "call_shell"
+    tool_content = json.loads(runner.requests[1].context["message_history"][0]["content"])
+    assert tool_content["attestation_id"] == attestation.id
     assert result.step_results[-1].observed_output["text"] == "tool result consumed"
 
 

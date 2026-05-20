@@ -242,6 +242,8 @@ provider calls once the budget is exhausted.
 operator-facing run inspection, resume, and cancellation commands.
 [#561](https://github.com/eidetic-labs/craik/issues/561) covers
 runtime exit-discipline checks persisted at the handoff boundary.
+[#563](https://github.com/eidetic-labs/craik/issues/563) covers
+tool-result attestations for dispatched provider tool calls.
 Keep this section updated as each v0.2.0 slice lands so the roadmap
 mirrors the current implementation state.
 
@@ -253,7 +255,7 @@ mirrors the current implementation state.
 <div><h4>Provider budget enforcement</h4><p>First slice: provider token budgets are decremented from usage metadata and interrupt before the next provider call when exhausted.</p></div>
 <div><h4>Run inspection &amp; recovery</h4><p>First slice: <code>craik run show</code>, <code>craik run resume</code>, and <code>craik run cancel</code> expose persisted continuity state.</p></div>
 <div><h4>Agent exit discipline</h4><p>First slice: handoff creation persists exit-discipline checks so missing validation, risks, or next steps are runtime state.</p></div>
-<div><h4>Tool result attestation</h4><p>Signed or hashed record proving output came from the declared tool.</p></div>
+<div><h4>Tool result attestation</h4><p>First slice: dispatched tool calls persist hashed attestations linked to the side-effect receipt and replay message.</p></div>
 <div><h4>One real sandbox backend</h4><p><code>docker_sandbox</code> or <code>local_process</code> · every granted tool call dispatches through it · every call produces an environment receipt.</p></div>
 <div><h4>Sandbox cancellation</h4><p>Transport-level cancellation propagates into in-flight tool calls.</p></div>
 <div><h4>Schema migration framework</h4><p>Documented runner migrating SQLite state across breaking changes · one example migration shipped.</p></div>

@@ -720,6 +720,7 @@
     "tool_identity": "gh issue view",
     "command": "gh issue view 113 --json title",
     "observed_output_summary": "GitHub issue state was observed for a fixture task.",
+    "output_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "trust_class": "observed",
     "status": "attested",
     "evidence_ids": ["evidence_readme_status"],

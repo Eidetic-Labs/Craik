@@ -89,7 +89,7 @@ ContextDebtKind = Literal[
     "other",
 ]
 ContextDebtStatus = Literal["created", "carried_forward", "resolved"]
-ToolAttestationStatus = Literal["attested", "missing", "expired"]
+ToolAttestationStatus = Literal["attested", "missing", "expired", "blocked"]
 FreshnessProbeStatus = Literal["fresh", "expiring", "expired", "missing"]
 FreshnessProbeKind = Literal[
     "github_state",

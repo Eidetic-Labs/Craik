@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+from datetime import UTC, datetime
 from typing import Any
 
 from craik.contracts.models import (
     CapabilityGrant,
     PolicyEnvelope,
     RunnerStepResult,
+    ToolAttestationStatus,
+    ToolResultAttestation,
 )
+from craik.runtime.policy.redaction import redact
 from craik.runtime.side_effects import (
     SideEffectResult,
     run_github_write,
@@ -91,11 +96,17 @@ def result_with_stream_chunks(
     return result.model_copy(update={"observed_output": observed_output})
 
 
-def tool_message(tool_call: dict[str, Any], side_effect: SideEffectResult) -> dict[str, str]:
+def tool_message(
+    tool_call: dict[str, Any],
+    side_effect: SideEffectResult,
+    *,
+    attestation_id: str | None = None,
+) -> dict[str, str]:
     """Build the provider-facing tool response message for a side effect."""
     content = {
         "allowed": side_effect.allowed,
         "receipt_id": side_effect.receipt.id,
+        "attestation_id": attestation_id,
         "summary": side_effect.receipt.result.summary,
         "output": side_effect.output or {},
     }
@@ -105,6 +116,64 @@ def tool_message(tool_call: dict[str, Any], side_effect: SideEffectResult) -> di
         "tool_call_id": str(tool_call_id),
         "content": json.dumps(content, sort_keys=True),
     }
+
+
+def tool_result_attestation(
+    *,
+    task_id: str,
+    case_file_id: str,
+    tool_call: dict[str, Any],
+    side_effect: SideEffectResult,
+) -> ToolResultAttestation:
+    """Build a durable attestation for the exact tool payload replayed to the model."""
+    name = tool_name(tool_call)
+    tool_call_id = str(tool_call.get("id") or tool_call.get("call_id") or name)
+    output = redact(side_effect.output or {}).value
+    output_hash = _hash_payload(
+        {
+            "allowed": side_effect.allowed,
+            "receipt_id": side_effect.receipt.id,
+            "summary": side_effect.receipt.result.summary,
+            "output": output,
+        }
+    )
+    status: ToolAttestationStatus = "attested" if side_effect.allowed else "blocked"
+    return ToolResultAttestation(
+        id=f"attestation_{task_id}_{_slug(tool_call_id)}",
+        task_id=task_id,
+        case_file_id=case_file_id,
+        tool_name=name,
+        tool_identity=tool_call_id,
+        command=_command_summary(name, tool_arguments(tool_call)),
+        observed_output_summary=(
+            f"Tool {name} {'returned' if side_effect.allowed else 'was blocked with'} "
+            f"receipt {side_effect.receipt.id}."
+        ),
+        output_hash=output_hash,
+        trust_class="observed" if side_effect.allowed else "policy",
+        status=status,
+        receipt_id=side_effect.receipt.id,
+        captured_at=datetime.now(UTC),
+    )
+
+
+def attested_tool_message(
+    *,
+    store: LocalStore,
+    task_id: str,
+    case_file_id: str,
+    tool_call: dict[str, Any],
+    side_effect: SideEffectResult,
+) -> dict[str, str]:
+    """Persist a tool-result attestation and return the replay message."""
+    attestation = tool_result_attestation(
+        task_id=task_id,
+        case_file_id=case_file_id,
+        tool_call=tool_call,
+        side_effect=side_effect,
+    )
+    store.put_tool_result_attestation(attestation)
+    return tool_message(tool_call, side_effect, attestation_id=attestation.id)
 
 
 def tool_name(tool_call: dict[str, Any]) -> str:
@@ -135,3 +204,25 @@ def tool_arguments(tool_call: dict[str, Any]) -> dict[str, Any]:
             return {"raw": raw_arguments}
         return parsed if isinstance(parsed, dict) else {"value": parsed}
     return {}
+
+
+def _hash_payload(payload: dict[str, Any]) -> str:
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _command_summary(name: str, arguments: dict[str, Any]) -> str | None:
+    if name in {"shell.execute", "shell_execute", "run_shell_command_ref"}:
+        return str(
+            arguments.get("command_ref")
+            or arguments.get("command")
+            or arguments.get("target")
+            or ""
+        )
+    if name in {"github.write", "github_write", "run_github_write"}:
+        return str(arguments.get("operation") or "write")
+    return None
+
+
+def _slug(value: str) -> str:
+    return "".join(character if character.isalnum() else "_" for character in value).strip("_")
