@@ -130,6 +130,89 @@ def test_loop_enforces_max_iterations(store: LocalStore) -> None:
         )
 
 
+def test_loop_resumes_interrupted_run_from_completed_phase_boundary(
+    store: LocalStore,
+) -> None:
+    runner = RecordingStepRunner()
+    executor = SingleAgentLoopExecutor(
+        store=store,
+        memory=LocalMemoryStore(store),
+        runner=runner,
+    )
+    steps = [
+        LoopStep(phase="plan", input_prompt="Plan."),
+        LoopStep(
+            phase="act",
+            input_prompt="Act.",
+            side_effect_capability="shell.execute",
+            side_effect_target="fixture-action",
+        ),
+        LoopStep(phase="observe", input_prompt="Observe."),
+        LoopStep(phase="evaluate", input_prompt="Evaluate."),
+    ]
+
+    with pytest.raises(LoopMaxIterationsError, match="max iterations 2 reached"):
+        executor.execute(
+            task_id="task_docs_reconcile",
+            case_file_id="case_docs_reconcile",
+            policy=generate_policy_envelope(
+                task_id="task_docs_reconcile",
+                actor="runner:fixture",
+            ),
+            runner_metadata=_runner(),
+            grants=[_shell_grant()],
+            steps=steps,
+            max_iterations=2,
+        )
+
+    interrupted = store.list_task_runs()[0]
+    assert interrupted.status == "interrupted"
+    assert interrupted.iteration == 2
+    assert interrupted.completed_step_keys == [
+        f"{interrupted.id}:1:plan",
+        f"{interrupted.id}:2:act",
+    ]
+    assert len(store.list_run_outputs()) == 2
+    assert len(store.list_receipts()) == 1
+
+    resumed = executor.execute(
+        task_id="task_docs_reconcile",
+        case_file_id="case_docs_reconcile",
+        policy=generate_policy_envelope(task_id="task_docs_reconcile", actor="runner:fixture"),
+        runner_metadata=_runner(),
+        grants=[_shell_grant()],
+        steps=steps,
+        max_iterations=5,
+        resume_run_id=interrupted.id,
+    )
+
+    assert resumed.run.status == "completed"
+    assert resumed.run.iteration == 4
+    assert [request.phase for request in runner.requests] == [
+        "plan",
+        "act",
+        "observe",
+        "evaluate",
+    ]
+    assert [request.context["idempotency_key"] for request in runner.requests] == [
+        f"{interrupted.id}:1:plan",
+        f"{interrupted.id}:2:act",
+        f"{interrupted.id}:3:observe",
+        f"{interrupted.id}:4:evaluate",
+    ]
+    assert [capture.output.phase for capture in resumed.output_captures] == [
+        "plan",
+        "act",
+        "observe",
+        "evaluate",
+    ]
+    assert resumed.output_captures[0].skipped_reasons == [
+        "step already completed; reused durable output"
+    ]
+    assert len(store.list_run_outputs()) == 4
+    assert len(store.list_receipts()) == 1
+
+
 def test_loop_enforces_intent_stop_condition_before_step(store: LocalStore) -> None:
     executor = SingleAgentLoopExecutor(
         store=store,

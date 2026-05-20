@@ -174,6 +174,8 @@ def test_task_run_identity_fields_round_trip(
             "auth_identity_hash": "b" * 64,
             "operator_subject": "operator-b",
             "operator_issuer": "https://issuer.example.test",
+            "completed_step_keys": ["run_docs:1:plan", "run_docs:2:act"],
+            "last_step_key": "run_docs:2:act",
         }
     )
 
@@ -184,6 +186,8 @@ def test_task_run_identity_fields_round_trip(
     assert dumped["auth_identity_hash"] == "b" * 64
     assert dumped["operator_subject"] == "operator-b"
     assert dumped["operator_issuer"] == "https://issuer.example.test"
+    assert dumped["completed_step_keys"] == ["run_docs:1:plan", "run_docs:2:act"]
+    assert dumped["last_step_key"] == "run_docs:2:act"
 
 
 def test_runner_contract_models_keep_legacy_import_surface() -> None:

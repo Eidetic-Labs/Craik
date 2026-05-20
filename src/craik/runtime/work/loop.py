@@ -12,25 +12,36 @@ from craik.contracts.models import (
     CapabilityReceipt,
     IntentLock,
     PolicyEnvelope,
-    ReceiptResult,
     RunnerMetadata,
     RunnerResultStatus,
     RunnerStepRequest,
     RunnerStepResult,
     TaskRun,
-    TaskRunPhase,
     TaskRunStatus,
 )
-from craik.runtime.auth.operator import active_operator_session
 from craik.runtime.memory.memory import MemoryStore
-from craik.runtime.policy.credential_policy import credential_policy_metadata
-from craik.runtime.policy.operator_policy import check_operator_policy
-from craik.runtime.policy.policy import (
-    GrantDecision,
-    check_shell_grant,
-    denial_receipt,
-)
+from craik.runtime.policy.policy import denial_receipt
 from craik.runtime.store import LocalStore
+from craik.runtime.work.loop_support.execution import (
+    LoopStep,
+    context_with_idempotency,
+    context_with_message_history,
+    credential_policy_context,
+    default_loop_steps,
+    intent_stop_reason,
+    loop_step_key,
+    message_history_from_context,
+    request_id,
+    result_with_idempotency_key,
+    runtime_policy_context,
+    stream_chunks_from_output,
+)
+from craik.runtime.work.loop_support.execution import (
+    operator_policy_decision as check_active_operator_policy,
+)
+from craik.runtime.work.loop_support.execution import (
+    side_effect_receipt as build_side_effect_receipt,
+)
 from craik.runtime.work.loop_support.tool_dispatch import (
     dispatch_tool_call_side_effect,
     dispatchable_tool_calls,
@@ -39,10 +50,21 @@ from craik.runtime.work.loop_support.tool_dispatch import (
 )
 from craik.runtime.work.run_outputs import (
     RunOutputCapture,
-    RunOutputProposalSpec,
     RunOutputRecorder,
 )
 from craik.runtime.work.runs import RunTransition, TaskRunManager
+
+__all__ = [
+    "FixtureStepRunner",
+    "LoopExecutionError",
+    "LoopExecutionResult",
+    "LoopMaxIterationsError",
+    "LoopPolicyBlockedError",
+    "LoopStep",
+    "RunnerStepHandler",
+    "SingleAgentLoopExecutor",
+    "default_loop_steps",
+]
 
 
 class LoopExecutionError(RuntimeError):
@@ -67,18 +89,6 @@ class RunnerStepHandler(Protocol):
         stream_callback: Callable[[str], None] | None = None,
     ) -> RunnerStepResult:
         """Execute one step request and return a normalized result."""
-
-
-@dataclass(frozen=True)
-class LoopStep:
-    """One planned loop phase."""
-
-    phase: TaskRunPhase
-    input_prompt: str
-    context: dict[str, object] = field(default_factory=dict)
-    side_effect_capability: str | None = None
-    side_effect_target: str | None = None
-    proposal_specs: list[RunOutputProposalSpec] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -148,24 +158,34 @@ class SingleAgentLoopExecutor:
         steps: list[LoopStep] | None = None,
         max_iterations: int = 5,
         started_at: datetime | None = None,
+        resume_run_id: str | None = None,
     ) -> LoopExecutionResult:
         active_steps = steps or default_loop_steps()
-        run = self.runs.create(
-            task_id=task_id,
-            case_file_id=case_file_id,
-            policy_envelope_id=policy.id,
-            intent_lock_id=intent_lock.id if intent_lock else None,
-            runner_id=runner_metadata.id,
-            runner_mode=runner_metadata.mode,
-            max_iterations=max_iterations,
-            created_at=started_at,
+        resuming = resume_run_id is not None
+        run = (
+            self.runs.prepare_resume(
+                resume_run_id,
+                max_iterations=max_iterations,
+                at=started_at,
+            )
+            if resume_run_id is not None
+            else self.runs.create(
+                task_id=task_id,
+                case_file_id=case_file_id,
+                policy_envelope_id=policy.id,
+                intent_lock_id=intent_lock.id if intent_lock else None,
+                runner_id=runner_metadata.id,
+                runner_mode=runner_metadata.mode,
+                max_iterations=max_iterations,
+                created_at=started_at,
+            )
         )
         receipts: list[CapabilityReceipt] = []
         step_results: list[RunnerStepResult] = []
         output_captures: list[RunOutputCapture] = []
         active_grants = grants or []
-        iteration = 0
-        operator_policy_decision = _check_operator_policy(policy)
+        iteration = run.iteration
+        operator_policy_decision = check_active_operator_policy(policy)
         if not operator_policy_decision.allowed:
             receipt = denial_receipt(
                 policy=policy,
@@ -187,9 +207,16 @@ class SingleAgentLoopExecutor:
             )
             return LoopExecutionResult(run, step_results, output_captures, receipts)
         operator_policy = operator_policy_decision.receipt_metadata
-        credential_policy = credential_policy_metadata(policy)
+        credential_policy = credential_policy_context(policy)
 
         for index, step in enumerate(active_steps, start=1):
+            step_key = loop_step_key(run.id, index, step.phase)
+            if resuming:
+                existing_capture = self._completed_step_capture(run.id, step_key)
+                if existing_capture is not None:
+                    output_captures.append(existing_capture)
+                    continue
+
             if iteration >= max_iterations:
                 run = self.runs.transition(
                     run.id,
@@ -202,7 +229,7 @@ class SingleAgentLoopExecutor:
                 )
                 raise LoopMaxIterationsError(run.stop_reason or "max iterations reached")
 
-            stop_reason = _intent_stop_reason(intent_lock, step)
+            stop_reason = intent_stop_reason(intent_lock, step)
             if stop_reason is not None:
                 run = self.runs.transition(
                     run.id,
@@ -216,7 +243,7 @@ class SingleAgentLoopExecutor:
                 )
                 return LoopExecutionResult(run, step_results, output_captures, receipts)
 
-            side_effect_receipt = self._side_effect_receipt(
+            side_effect_receipt = build_side_effect_receipt(
                 policy=policy,
                 grants=active_grants,
                 step=step,
@@ -239,8 +266,8 @@ class SingleAgentLoopExecutor:
                     )
                     return LoopExecutionResult(run, step_results, output_captures, receipts)
 
-            message_history = _message_history_from_context(step.context)
-            step_context = _context_with_runtime_policies(
+            message_history = message_history_from_context(step.context)
+            step_context = runtime_policy_context(
                 step.context,
                 operator_policy=operator_policy,
                 credential_policy=credential_policy,
@@ -275,9 +302,13 @@ class SingleAgentLoopExecutor:
 
                 request = request.model_copy(
                     update={
-                        "id": _request_id(run.id, index, step.phase, tool_round),
-                        "context": _context_with_message_history(
-                            step_context,
+                        "id": request_id(run.id, index, step.phase, tool_round),
+                        "context": context_with_message_history(
+                            context_with_idempotency(
+                                step_context,
+                                step_key=step_key,
+                                tool_round=tool_round,
+                            ),
                             message_history,
                         ),
                         "created_at": datetime.now(UTC),
@@ -288,6 +319,7 @@ class SingleAgentLoopExecutor:
                 iteration += 1
                 if stream_chunks:
                     result = result_with_stream_chunks(result, stream_chunks)
+                result = result_with_idempotency_key(result, step_key)
                 receipt_ids = list(result.receipt_ids)
                 if side_effect_receipt is not None and side_effect_receipt.id not in receipt_ids:
                     receipt_ids.append(side_effect_receipt.id)
@@ -366,6 +398,8 @@ class SingleAgentLoopExecutor:
                     phase=step.phase,
                     iteration=iteration,
                     receipt_id=side_effect_receipt.id if side_effect_receipt else None,
+                    completed_step_key=step_key,
+                    last_step_key=step_key,
                     at=datetime.now(UTC),
                 ),
             )
@@ -381,113 +415,20 @@ class SingleAgentLoopExecutor:
         )
         return LoopExecutionResult(run, step_results, output_captures, receipts)
 
-    def _side_effect_receipt(
+    def _completed_step_capture(
         self,
-        *,
-        policy: PolicyEnvelope,
-        grants: list[CapabilityGrant],
-        step: LoopStep,
-        actor: str,
-    ) -> CapabilityReceipt | None:
-        if step.side_effect_capability is None:
-            return None
-        target = step.side_effect_target or step.phase
-        if step.side_effect_capability != "shell.execute":
-            decision = check_shell_grant(policy=policy, grants=[], command=target)
-        else:
-            decision = check_shell_grant(policy=policy, grants=grants, command=target)
-        if not decision.allowed:
-            return denial_receipt(policy=policy, decision=decision, actor=actor)
-        return CapabilityReceipt(
-            id=f"receipt_{policy.task_id}_{step.phase}_{_receipt_slug(target)}",
-            task_id=policy.task_id,
-            actor=actor,
-            capability=decision.capability,
-            target=target,
-            policy_profile=policy.profile,
-            fail_open=policy.fail_open,
-            reason=decision.reason,
-            result=ReceiptResult(status="passed", summary=decision.reason),
-            redacted=True,
-            created_at=datetime.now(UTC),
-        )
-
-
-def default_loop_steps() -> list[LoopStep]:
-    """Return the default deterministic single-agent loop phases."""
-    return [
-        LoopStep(phase="plan", input_prompt="Plan the next governed step."),
-        LoopStep(
-            phase="act",
-            input_prompt="Perform the approved action.",
-            side_effect_capability="shell.execute",
-            side_effect_target="fixture-action",
-        ),
-        LoopStep(phase="observe", input_prompt="Capture observed output."),
-        LoopStep(phase="evaluate", input_prompt="Evaluate whether the task is complete."),
-    ]
-def _intent_stop_reason(intent_lock: IntentLock | None, step: LoopStep) -> str | None:
-    if intent_lock is None:
+        run_id: str,
+        step_key: str,
+    ) -> RunOutputCapture | None:
+        for output in self.store.list_run_outputs():
+            if output.run_id != run_id:
+                continue
+            if output.observed_output.get("idempotency_key") != step_key:
+                continue
+            return RunOutputCapture(
+                output=output,
+                proposals=[],
+                skipped_reasons=["step already completed; reused durable output"],
+                chunks=stream_chunks_from_output(output.observed_output),
+            )
         return None
-    trigger = step.context.get("trigger_stop_condition")
-    if trigger is None:
-        return None
-    if str(trigger) in intent_lock.stop_conditions:
-        return f"intent stop condition triggered: {trigger}"
-    return None
-
-
-def _request_id(run_id: str, index: int, phase: TaskRunPhase, tool_round: int) -> str:
-    base = f"runner_step_request_{run_id}_{index}_{phase}"
-    if tool_round == 0:
-        return base
-    return f"{base}_tool_round_{tool_round}"
-def _message_history_from_context(context: dict[str, object]) -> list[dict[str, str]]:
-    raw_messages = context.get("message_history") or context.get("messages")
-    if not isinstance(raw_messages, list):
-        return []
-    messages: list[dict[str, str]] = []
-    for raw_message in raw_messages:
-        if not isinstance(raw_message, dict):
-            continue
-        role = raw_message.get("role")
-        content = raw_message.get("content")
-        if role is None or content is None:
-            continue
-        message = {"role": str(role), "content": str(content)}
-        tool_call_id = raw_message.get("tool_call_id")
-        if tool_call_id is not None:
-            message["tool_call_id"] = str(tool_call_id)
-        messages.append(message)
-    return messages
-def _context_with_message_history(
-    context: dict[str, object],
-    message_history: list[dict[str, str]],
-) -> dict[str, object]:
-    if not message_history:
-        return dict(context)
-    return {**context, "message_history": list(message_history)}
-def _context_with_runtime_policies(
-    context: dict[str, object],
-    *,
-    operator_policy: dict[str, object],
-    credential_policy: dict[str, object],
-) -> dict[str, object]:
-    updated = dict(context)
-    policies = {"operator_policy": operator_policy, "credential_policy": credential_policy}
-    for key, value in policies.items():
-        if value:
-            updated[key] = dict(value)
-    return updated
-def _check_operator_policy(policy: PolicyEnvelope) -> GrantDecision:
-    session = active_operator_session()
-    return check_operator_policy(
-        policy=policy,
-        operator_subject=session.subject if session is not None else None,
-        operator_issuer=session.issuer if session is not None else None,
-        operator_groups=list(session.groups) if session is not None else [],
-    )
-
-
-def _receipt_slug(value: str) -> str:
-    return "".join(character if character.isalnum() else "_" for character in value).strip("_")
