@@ -1,4 +1,4 @@
-# Security release process
+# Security Release Process
 
 <p className="craik-meta"><span>3 min read</span><span>For maintainers</span><span>Updated 2026-05-19</span></p>
 
@@ -21,7 +21,7 @@ generated docs until patched artifacts are available.
 
 </div>
 
-## Security patch flow
+## Security Patch Flow
 
 <ol className="craik-steps">
 <li>Triage the report privately and record the impacted versions.</li>
@@ -32,7 +32,7 @@ generated docs until patched artifacts are available.
 <li>Publish advisory details after patched artifacts are available.</li>
 </ol>
 
-## Private coordination
+## Private Coordination
 
 <div className="craik-keypoint">
 
@@ -69,7 +69,7 @@ Disclosure happens only after every gate below is green.
 <li>Any required advisory or CVE entry is ready.</li>
 </ol>
 
-## Post-release verification
+## Post-Release Verification
 
 <ol className="craik-steps">
 <li>Install the patched package from PyPI in a clean environment.</li>

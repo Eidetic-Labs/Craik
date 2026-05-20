@@ -1,4 +1,4 @@
-# Release management
+# Release Management
 
 <p className="craik-meta"><span>5 min read</span><span>For maintainers</span><span>Updated 2026-05-19</span></p>
 
@@ -52,7 +52,7 @@ quality, and changelog gates as a stable line.
 
 </div>
 
-## Tag policy
+## Tag Policy
 
 Release tags use `vMAJOR.MINOR.PATCH` — e.g. `v0.1.0`.
 
@@ -64,7 +64,7 @@ Release tags use `vMAJOR.MINOR.PATCH` — e.g. `v0.1.0`.
 <li>Tag only the merge commit from the release PR.</li>
 </ol>
 
-## Release notes
+## Release Notes
 
 Every release needs a GitHub release entry and a matching
 `CHANGELOG.md` section.
