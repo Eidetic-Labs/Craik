@@ -16,7 +16,10 @@ boundary that keeps it honest.
 
 **Summarizes; doesn't inspect.**
 
-Run deltas summarize already-persisted local state. The view does not
+Run deltas summarize already-persisted local state. `craik run delta`
+reads those durable records by delta id, run id, or task id and renders
+the operator view. Add `--json` to return the same delta and linked
+recovery sessions for automation. The view does not
 inspect the working tree, refresh GitHub, query Stigmem, or decide
 whether a run can continue.
 

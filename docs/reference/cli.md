@@ -672,6 +672,18 @@ Options:
 
 - `--reason`: Reason recorded on the interrupted run.; default `cancelled by operator`
 
+## `craik run delta`
+
+Show what changed since the previous usable handoff or resume point.
+
+```text
+craik run delta [OPTIONS] DELTA_ID_OR_RUN_ID_OR_TASK_ID
+```
+
+Options:
+
+- `--json, --view`: Print JSON instead of the operator view.; default `false`
+
 ## `craik run execute`
 
 Execute a deterministic provider-backed MVP runner path for a task.
