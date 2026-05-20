@@ -116,9 +116,11 @@ registry **before persistence and again when loaded**.
 ## Migrations
 
 Craik tracks migration state through SQLite `PRAGMA user_version` and
-the `migrations` table. Migration `2` adds `local_store_metadata` so
-diagnostics can distinguish the store schema version from the package
-version.
+the `migrations` table. Migrations run through a registered,
+forward-only migration runner. Migration `2` adds
+`local_store_metadata` so diagnostics can distinguish the store schema
+version from the package version. Migration `3` records that the store
+was upgraded through the registered migration framework.
 
 <div className="craik-grid">
 

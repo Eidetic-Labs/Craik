@@ -48,10 +48,23 @@ for audit or recovery.
 <div>
 <dt><code>local_store_metadata</code></dt>
 <dt><span className="craik-fields__type">metadata</span></dt>
-<dd>Created by migration 2 · records current store schema version and the contract registry count visible to the installed Craik build.</dd>
+<dd>Created by migration 2 · updated by later framework migrations · records current store schema version and the contract registry count visible to the installed Craik build.</dd>
 </div>
 
 </div>
+
+## Migration runner
+
+Craik applies local-store migrations through a registered,
+forward-only runner. Each migration has an integer version, a stable
+name, and one function that mutates SQLite state. The registry must be
+contiguous from version 1 to the current supported migration; gaps fail
+at import time rather than leaving operators with an ambiguous upgrade
+path.
+
+The v0.2 migration framework keeps the existing v1 and v2 behavior and
+adds migration 3 as an example metadata migration. Migration 3 records
+that the store was upgraded through the registered migration framework.
 
 ## Compatibility fixtures
 
