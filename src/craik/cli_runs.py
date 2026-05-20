@@ -8,7 +8,17 @@ from typing import Annotated, Any
 
 import typer
 
-from craik.contracts.models import CapabilityGrant, CapabilityTarget, TaskRun
+from craik.contracts.models import (
+    CapabilityGrant,
+    CapabilityTarget,
+    RecoverySession,
+    RunDelta,
+    TaskRun,
+)
+from craik.runtime.companions.operator_views import (
+    RunDeltaSnapshot,
+    format_run_delta_view,
+)
 from craik.runtime.providers.model_providers import ModelProviderNotFoundError
 from craik.runtime.providers.provider_runner import (
     ProviderBackedRunExecutor,
@@ -257,6 +267,33 @@ def run_recover(
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
+@run_app.command("delta")
+def run_delta(
+    delta_id_or_run_id_or_task_id: str,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json/--view", help="Print JSON instead of the operator view."),
+    ] = False,
+) -> None:
+    """Show what changed since the previous usable handoff or resume point."""
+    store = LocalStore.from_env()
+    try:
+        store.initialize()
+        delta = _find_run_delta(store, delta_id_or_run_id_or_task_id)
+        if delta is None:
+            raise typer.BadParameter(
+                f"unknown run delta, run, or task: {delta_id_or_run_id_or_task_id}"
+            )
+        recovery_sessions = _recovery_sessions_for_delta(store, delta.id)
+        payload = _run_delta_payload(delta, recovery_sessions)
+    finally:
+        store.close()
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+        return
+    typer.echo("\n".join(payload["lines"]))
+
+
 def _fixture_shell_grant(task_id: str) -> CapabilityGrant:
     return CapabilityGrant(
         id=f"grant_{task_id.removeprefix('task_')}_fixture_shell",
@@ -375,6 +412,54 @@ def _run_recovery_payload(
             "verify max-iteration budget",
         ],
         "output_ids": [output.id for output in outputs],
+    }
+
+
+def _find_run_delta(store: LocalStore, delta_id_or_run_id_or_task_id: str) -> RunDelta | None:
+    delta = store.get_run_delta(delta_id_or_run_id_or_task_id)
+    if delta is not None:
+        return delta
+    run = _find_run(store, delta_id_or_run_id_or_task_id)
+    task_id = run.task_id if run is not None else delta_id_or_run_id_or_task_id
+    candidates = [item for item in store.list_run_deltas() if item.task_id == task_id]
+    if run is not None and run.handoff_id:
+        handoff_matches = [
+            item
+            for item in candidates
+            if item.current_handoff_id == run.handoff_id
+            or item.previous_handoff_id == run.handoff_id
+        ]
+        if handoff_matches:
+            candidates = handoff_matches
+    if not candidates:
+        return None
+    return sorted(candidates, key=lambda item: (item.created_at, item.id))[-1]
+
+
+def _recovery_sessions_for_delta(
+    store: LocalStore,
+    delta_id: str,
+) -> list[RecoverySession]:
+    return [
+        session
+        for session in store.list_recovery_sessions()
+        if session.run_delta_id == delta_id
+    ]
+
+
+def _run_delta_payload(
+    delta: RunDelta,
+    recovery_sessions: list[RecoverySession],
+) -> dict[str, Any]:
+    snapshot = RunDeltaSnapshot(delta=delta, recovery_sessions=recovery_sessions)
+    return {
+        "schema": "craik.run_delta_view",
+        "version": "0.1.0",
+        "delta": delta.model_dump(mode="json", by_alias=True),
+        "recovery_sessions": [
+            session.model_dump(mode="json", by_alias=True) for session in recovery_sessions
+        ],
+        "lines": format_run_delta_view(snapshot),
     }
 
 

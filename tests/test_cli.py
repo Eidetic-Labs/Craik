@@ -11,6 +11,9 @@ from craik.cli_receipts import receipts_app
 from craik.contracts.models import (
     CapabilityReceipt,
     ReceiptResult,
+    RecoverySession,
+    RunDelta,
+    RunDeltaItem,
     RunOutput,
     TaskRun,
     TaskRunStatus,
@@ -1011,6 +1014,62 @@ def test_run_command_group_stays_mounted_after_module_extraction() -> None:
     assert "resume" in result.stdout
     assert "cancel" in result.stdout
     assert "recover" in result.stdout
+    assert "delta" in result.stdout
+
+
+def test_run_delta_prints_operator_view_for_persisted_delta(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="interrupted")
+    _seed_run_delta_state(home)
+
+    result = runner.invoke(
+        app,
+        ["run", "delta", "run_delta_task_docs"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert result.exit_code == 0
+    assert "Run Delta: run_delta_task_docs" in result.stdout
+    assert "Task: task_docs" in result.stdout
+    assert "Updated: 1" in result.stdout
+    assert "- recovery_task_docs [changed_state] delta=run_delta_task_docs" in result.stdout
+
+
+def test_run_delta_json_resolves_latest_delta_by_run_or_task(tmp_path: Path) -> None:
+    home = tmp_path / "home"
+    _seed_run_state(home, status="interrupted")
+    _seed_run_delta_state(home)
+
+    by_run = runner.invoke(
+        app,
+        ["run", "delta", "run_docs", "--json"],
+        env={"CRAIK_HOME": str(home)},
+    )
+    by_task = runner.invoke(
+        app,
+        ["run", "delta", "task_docs", "--json"],
+        env={"CRAIK_HOME": str(home)},
+    )
+
+    assert by_run.exit_code == 0
+    assert by_task.exit_code == 0
+    run_payload = json.loads(by_run.stdout)
+    task_payload = json.loads(by_task.stdout)
+    assert run_payload["schema"] == "craik.run_delta_view"
+    assert run_payload["delta"]["id"] == "run_delta_task_docs"
+    assert run_payload["recovery_sessions"][0]["id"] == "recovery_task_docs"
+    assert task_payload == run_payload
+
+
+def test_run_delta_reports_missing_delta(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["run", "delta", "run_delta_missing"],
+        env={"CRAIK_HOME": str(tmp_path / "home")},
+    )
+
+    assert result.exit_code != 0
+    assert "unknown run delta, run, or task: run_delta_missing" in result.output
 
 
 def test_run_execute_runs_provider_backed_mvp_path(tmp_path: Path) -> None:
@@ -1273,6 +1332,59 @@ def _seed_run_state(home: Path, *, status: TaskRunStatus) -> None:
             )
         )
         ReceiptStore(store).record_receipt(_receipt("receipt_docs", task_id="task_docs"))
+    finally:
+        store.close()
+
+
+def _seed_run_delta_state(home: Path) -> None:
+    paths = ensure_craik_home({"CRAIK_HOME": str(home)})
+    store = LocalStore.from_paths(paths)
+    try:
+        store.initialize()
+        store.put_run_delta(
+            RunDelta(
+                id="run_delta_task_docs",
+                project_id="project_docs",
+                task_id="task_docs",
+                previous_handoff_id="handoff_previous",
+                current_handoff_id="handoff_current",
+                case_file_ids=["case_docs"],
+                receipt_ids=["receipt_docs"],
+                contradiction_ids=["contradiction_docs"],
+                active_instruction_constraint_ids=["constraint_docs"],
+                changes=[
+                    RunDeltaItem(
+                        kind="updated",
+                        entity_type="handoff",
+                        entity_id="handoff_current",
+                        summary="Current handoff replaced the stale recovery point.",
+                        previous_ref="handoff_previous",
+                        current_ref="handoff_current",
+                        evidence_ids=["receipt_docs"],
+                    )
+                ],
+                summary="One handoff changed since the previous recovery point.",
+                created_at=datetime(2026, 5, 16, 12, 3, tzinfo=UTC),
+            )
+        )
+        store.put_recovery_session(
+            RecoverySession(
+                id="recovery_task_docs",
+                project_id="project_docs",
+                task_id="task_docs",
+                status="changed_state",
+                run_delta_id="run_delta_task_docs",
+                resume_summary="Review changed handoff before resuming.",
+                required_actions=["review changed handoff"],
+                stale_risks=["handoff changed since last run"],
+                handoff_ids=["handoff_previous", "handoff_current"],
+                case_file_ids=["case_docs"],
+                receipt_ids=["receipt_docs"],
+                contradiction_ids=["contradiction_docs"],
+                active_instruction_constraint_ids=["constraint_docs"],
+                created_at=datetime(2026, 5, 16, 12, 4, tzinfo=UTC),
+            )
+        )
     finally:
         store.close()
 
