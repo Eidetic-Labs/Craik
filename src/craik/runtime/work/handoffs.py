@@ -25,6 +25,7 @@ from craik.runtime.runners.runner_metadata import (
 from craik.runtime.store import LocalStore
 from craik.runtime.work.case_files import CaseFileAssembler
 from craik.runtime.work.context_debt import context_debt_summaries, records_from_case_file
+from craik.runtime.work.exit_discipline import build_exit_discipline_check
 from craik.runtime.work.receipts import ReceiptStore
 from craik.runtime.work.scratchpad import unknown_summaries
 
@@ -32,18 +33,14 @@ from craik.runtime.work.scratchpad import unknown_summaries
 class HandoffError(RuntimeError):
     """Base error for handoff failures."""
 
-
 class HandoffNotFoundError(HandoffError):
     """Raised when a requested handoff does not exist."""
-
 
 class HandoffContextError(HandoffError):
     """Raised when required handoff context is missing."""
 
-
 class RunHandoffContextError(HandoffContextError):
     """Raised when required run handoff context is missing."""
-
 
 @dataclass(frozen=True)
 class HandoffWriter:
@@ -148,6 +145,9 @@ class HandoffWriter:
             created_at=datetime.now(UTC),
         )
         self.store.put_handoff(handoff)
+        self.store.put_exit_discipline_check(
+            build_exit_discipline_check(handoff, task_id=task_id, project_id=project.id)
+        )
         for debt in debt_records:
             self.store.put_context_debt_record(debt)
         return handoff

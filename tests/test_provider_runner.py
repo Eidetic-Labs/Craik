@@ -57,6 +57,10 @@ def test_provider_backed_runner_completes_full_mvp_path(
     assert any(receipt.capability == "shell.execute" for receipt in store.list_receipts())
     assert result.handoff.receipt_ids
     assert result.handoff.artifacts == [output.id for output in store.list_run_outputs()]
+    exit_check = store.get_exit_discipline_check(f"exit_discipline_{task_id}")
+    assert exit_check is not None
+    assert exit_check.status == "complete"
+    assert exit_check.handoff_id == result.handoff.id
 
 
 def test_provider_backed_runner_blocks_with_durable_handoff_when_policy_denies(

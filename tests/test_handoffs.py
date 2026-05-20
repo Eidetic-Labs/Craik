@@ -60,6 +60,10 @@ def test_handoff_writer_creates_structured_handoff(store: LocalStore, tmp_path: 
     assert [record.summary for record in debt_records] == handoff.context_debt
     assert all(record.handoff_id == handoff.id for record in debt_records)
     assert store.get_handoff(handoff.id) == handoff
+    exit_check = store.get_exit_discipline_check(f"exit_discipline_{task_id}")
+    assert exit_check is not None
+    assert exit_check.status == "complete"
+    assert exit_check.handoff_id == handoff.id
 
 
 def test_handoff_preserves_runner_metadata_from_receipts(
@@ -122,6 +126,12 @@ def test_incomplete_handoff_records_missing_validation_and_policy_exception(
     assert handoff.status == "incomplete"
     assert handoff.self_audit.validation_recorded is False
     assert handoff.policy_exceptions == ["No policy exception used."]
+    exit_check = store.get_exit_discipline_check(f"exit_discipline_{task_id}")
+    assert exit_check is not None
+    assert exit_check.status == "blocked"
+    assert "Validation was not recorded." in exit_check.blocking_reasons
+    assert "Residual risks were not recorded." in exit_check.blocking_reasons
+    assert "Next steps were not recorded." in exit_check.blocking_reasons
 
 
 def test_markdown_handoff_is_deterministic(store: LocalStore, tmp_path: Path) -> None:
