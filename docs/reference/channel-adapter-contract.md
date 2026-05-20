@@ -128,19 +128,19 @@ emission visible at this contract boundary.
 
 <div className="craik-next">
 
-<a href="messaging-channel-adapter/">
+<a href="../messaging-channel-adapter/">
 <strong>Reference</strong>
 <span>Messaging channel adapter</span>
 <small>The first concrete fixture.</small>
 </a>
 
-<a href="channel-identity-pairing/">
+<a href="../channel-identity-pairing/">
 <strong>Reference</strong>
 <span>Channel identity pairing</span>
 <small>Paired, unpaired, and revoked sender authority states.</small>
 </a>
 
-<a href="channel-allowlists/">
+<a href="../channel-allowlists/">
 <strong>Reference</strong>
 <span>Channel allowlists</span>
 <small>Deny-by-default ingress filtering.</small>

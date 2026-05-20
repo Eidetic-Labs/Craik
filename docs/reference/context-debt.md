@@ -71,19 +71,19 @@ separately.
 
 <div className="craik-next">
 
-<a href="../guides/context-budgeting/">
+<a href="../../guides/context-budgeting/">
 <strong>Guide</strong>
 <span>Context budgeting</span>
 <small>How case-file omissions become debt.</small>
 </a>
 
-<a href="evidence-assumption-view/">
+<a href="../evidence-assumption-view/">
 <strong>Reference</strong>
 <span>Evidence and assumption view</span>
 <small>The operator surface where unresolved debt surfaces.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>context_debt_record</code> shape.</small>

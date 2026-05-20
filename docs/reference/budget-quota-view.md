@@ -48,19 +48,19 @@ or mutate policy.
 
 <div className="craik-next">
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>Where budget-relevant records are persisted.</small>
 </a>
 
-<a href="provider-budgets/">
+<a href="../provider-budgets/">
 <strong>Reference</strong>
 <span>Provider budgets</span>
 <small>The pre-routing budget check this view surfaces.</small>

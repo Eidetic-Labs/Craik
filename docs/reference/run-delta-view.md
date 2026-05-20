@@ -53,19 +53,19 @@ through stale or incomplete state.
 
 <div className="craik-next">
 
-<a href="recovery/">
+<a href="../recovery/">
 <strong>Reference</strong>
 <span>Recovery mode</span>
 <small>The underlying contract behavior.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>run_delta</code> and <code>recovery_session</code> shapes.</small>

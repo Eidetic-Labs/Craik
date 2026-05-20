@@ -446,19 +446,19 @@ only.
 
 <div className="craik-next">
 
-<a href="concepts/governance.md">
+<a href="../concepts/governance/">
 <strong>Read</strong>
 <span>Governance concept</span>
 <small>The same model from the runtime side — how the pieces fit together.</small>
 </a>
 
-<a href="reference/policy-profiles.md">
+<a href="../reference/policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>The full ruleset for every profile Craik ships.</small>
 </a>
 
-<a href="reference/policy-tests.md">
+<a href="../reference/policy-tests/">
 <strong>Reference</strong>
 <span>Policy tests</span>
 <small>The CI gate that verifies this contract on every PR.</small>

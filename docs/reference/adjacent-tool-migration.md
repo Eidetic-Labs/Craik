@@ -71,19 +71,19 @@ decisions.
 
 <div className="craik-next">
 
-<a href="import-dry-run/">
+<a href="../import-dry-run/">
 <strong>Reference</strong>
 <span>Import dry-run reports</span>
 <small>How an assessment becomes a reviewable dry run.</small>
 </a>
 
-<a href="migration-maps/">
+<a href="../migration-maps/">
 <strong>Reference</strong>
 <span>Migration maps</span>
 <small>Field-level mapping for memory, skill, and config imports.</small>
 </a>
 
-<a href="adjacent-runtime-bridge/">
+<a href="../adjacent-runtime-bridge/">
 <strong>Reference</strong>
 <span>Adjacent runtime bridge</span>
 <small>The runtime-level bridge contract.</small>

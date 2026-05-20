@@ -60,19 +60,19 @@ Evidence gaps are shown by proposal ID.
 
 <div className="craik-next">
 
-<a href="memory-backends/">
+<a href="../memory-backends/">
 <strong>Reference</strong>
 <span>Memory backends</span>
 <small>The backends that consume promoted proposals.</small>
 </a>
 
-<a href="../guides/memory-proposals/">
+<a href="../../guides/memory-proposals/">
 <strong>Guide</strong>
 <span>Memory proposals</span>
 <small>The operator workflow this view supports.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>

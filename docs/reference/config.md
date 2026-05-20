@@ -199,19 +199,19 @@ uv run --python 3.12 --extra dev craik policy test
 
 <div className="craik-next">
 
-<a href="cli/">
+<a href="../cli/">
 <strong>Reference</strong>
 <span>CLI</span>
 <small>The auto-generated command reference.</small>
 </a>
 
-<a href="../guides/configuring-craik-home/">
+<a href="../../guides/configuring-craik-home/">
 <strong>Guide</strong>
 <span>Configuring Craik home</span>
 <small>Relocation rules, multi-host shares, and CI conventions.</small>
 </a>
 
-<a href="../guides/development/">
+<a href="../../guides/development/">
 <strong>Guide</strong>
 <span>Development checks</span>
 <small>Pre-publication validation in detail.</small>

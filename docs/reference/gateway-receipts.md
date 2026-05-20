@@ -97,19 +97,19 @@ see that payload material was intentionally omitted.
 
 <div className="craik-next">
 
-<a href="channel-policy-envelopes/">
+<a href="../channel-policy-envelopes/">
 <strong>Reference</strong>
 <span>Channel policy envelopes</span>
 <small>How channel policy produces denial reasons.</small>
 </a>
 
-<a href="receipt-viewer/">
+<a href="../receipt-viewer/">
 <strong>Reference</strong>
 <span>Receipt viewer</span>
 <small>The operator surface that displays gateway receipts.</small>
 </a>
 
-<a href="../guides/gateway-troubleshooting/">
+<a href="../../guides/gateway-troubleshooting/">
 <strong>Guide</strong>
 <span>Gateway troubleshooting</span>
 <small>Diagnose what a receipt records.</small>

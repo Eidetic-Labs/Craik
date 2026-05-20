@@ -149,19 +149,19 @@ Stigmem.
 
 <div className="craik-next">
 
-<a href="runtime-contracts.md">
+<a href="../runtime-contracts/">
 <strong>Read next</strong>
 <span>Runtime contracts</span>
 <small>The typed shapes every layer speaks.</small>
 </a>
 
-<a href="features.md">
+<a href="../features/">
 <strong>Read</strong>
 <span>Features</span>
 <small>Implementable feature surface across the seven layers.</small>
 </a>
 
-<a href="concepts/project-model.md">
+<a href="../concepts/project-model/">
 <strong>Concept</strong>
 <span>Project model</span>
 <small>The foundational layer-2 object every other layer composes against.</small>

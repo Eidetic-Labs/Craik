@@ -32,6 +32,8 @@ jobs:
         run: python scripts/generate_cli_reference.py --check
       - name: Check public docs hygiene
         run: python scripts/check_public_docs_hygiene.py
+      - name: Check doc links (raw HTML <a href>)
+        run: python scripts/check_doc_links.py
       - name: Install docs dependencies
         working-directory: docs
         run: npm ci

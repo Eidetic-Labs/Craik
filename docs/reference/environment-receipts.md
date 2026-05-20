@@ -98,19 +98,19 @@ credentials.
 
 <div className="craik-next">
 
-<a href="sandbox-backends/">
+<a href="../sandbox-backends/">
 <strong>Reference</strong>
 <span>Sandbox backends</span>
 <small>The contract every sandbox decision records against.</small>
 </a>
 
-<a href="model-providers/">
+<a href="../model-providers/">
 <strong>Reference</strong>
 <span>Model providers</span>
 <small>The provider metadata the receipt links to.</small>
 </a>
 
-<a href="../guides/provider-routing/">
+<a href="../../guides/provider-routing/">
 <strong>Guide</strong>
 <span>Provider routing &amp; sandboxes</span>
 <small>The end-to-end routing flow these receipts back.</small>

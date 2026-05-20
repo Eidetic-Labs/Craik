@@ -70,19 +70,19 @@ migration decisions remain auditable.
 
 <div className="craik-next">
 
-<a href="migration-maps/">
+<a href="../migration-maps/">
 <strong>Reference</strong>
 <span>Migration maps</span>
 <small>The field-level mapping dry runs consume.</small>
 </a>
 
-<a href="adjacent-tool-migration/">
+<a href="../adjacent-tool-migration/">
 <strong>Reference</strong>
 <span>Adjacent-tool migration</span>
 <small>The assessment that precedes a dry run.</small>
 </a>
 
-<a href="secret-migration-policy/">
+<a href="../secret-migration-policy/">
 <strong>Reference</strong>
 <span>Secret migration policy</span>
 <small>Why secrets stay outside imports.</small>

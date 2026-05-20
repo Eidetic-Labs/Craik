@@ -131,9 +131,9 @@ deterministic contract tests without live runner credentials.
 
 <div className="craik-grid">
 
-<div><h4><a href="codex-runner-adapter/">Codex</a></h4><p>Codex-compatible prompt handoff and deterministic fixture runs.</p></div>
-<div><h4><a href="claude-runner-adapter/">Claude</a></h4><p>Claude-compatible prompt handoff and deterministic fixture runs.</p></div>
-<div><h4><a href="gemini-runner-adapter/">Gemini</a></h4><p>Gemini-compatible read/review-oriented prompt handoff and deterministic fixture runs.</p></div>
+<div><h4><a href="../codex-runner-adapter/">Codex</a></h4><p>Codex-compatible prompt handoff and deterministic fixture runs.</p></div>
+<div><h4><a href="../claude-runner-adapter/">Claude</a></h4><p>Claude-compatible prompt handoff and deterministic fixture runs.</p></div>
+<div><h4><a href="../gemini-runner-adapter/">Gemini</a></h4><p>Gemini-compatible read/review-oriented prompt handoff and deterministic fixture runs.</p></div>
 
 </div>
 
@@ -263,19 +263,19 @@ requirements as the MVP OpenAI and Anthropic provider paths. See
 
 <div className="craik-next">
 
-<a href="runner-metadata/">
+<a href="../runner-metadata/">
 <strong>Reference</strong>
 <span>Runner metadata</span>
 <small>The stable identity snapshot every adapter preserves.</small>
 </a>
 
-<a href="../guides/runner-preview-workflows/">
+<a href="../../guides/runner-preview-workflows/">
 <strong>Guide</strong>
 <span>Runner preview workflows</span>
 <small>The end-to-end preview path and smoke-test checklist.</small>
 </a>
 
-<a href="prompt-compiler/">
+<a href="../prompt-compiler/">
 <strong>Reference</strong>
 <span>Prompt compiler</span>
 <small>How matrices flow into compiled prompts.</small>

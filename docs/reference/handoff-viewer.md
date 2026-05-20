@@ -50,19 +50,19 @@ empty section from a formatter failure.
 
 <div className="craik-next">
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="receipt-viewer/">
+<a href="../receipt-viewer/">
 <strong>Reference</strong>
 <span>Receipt viewer</span>
 <small>The receipts the handoff links to.</small>
 </a>
 
-<a href="../adr/receipts-and-handoffs-as-public-contracts/">
+<a href="../../adr/receipts-and-handoffs-as-public-contracts/">
 <strong>ADR</strong>
 <span>0005 · Receipts &amp; handoffs as public contracts</span>
 <small>Why handoffs are first-class.</small>

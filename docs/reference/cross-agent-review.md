@@ -66,19 +66,19 @@ which role made each decision.
 
 <div className="craik-next">
 
-<a href="agent-roles/">
+<a href="../agent-roles/">
 <strong>Reference</strong>
 <span>Agent roles</span>
 <small>The role kinds that request and produce reviews.</small>
 </a>
 
-<a href="debates/">
+<a href="../debates/">
 <strong>Reference</strong>
 <span>Structured debates</span>
 <small>The debate record adjudication consumes.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>review_request</code> / <code>review_result</code> / <code>adjudication_outcome</code> shapes.</small>

@@ -106,19 +106,19 @@ before promotion.
 
 <div className="craik-next">
 
-<a href="skill-promotion-gates/">
+<a href="../skill-promotion-gates/">
 <strong>Reference</strong>
 <span>Skill promotion gates</span>
 <small>Turn an approved proposal into promoted guidance.</small>
 </a>
 
-<a href="skill-replay/">
+<a href="../skill-replay/">
 <strong>Reference</strong>
 <span>Skill replay</span>
 <small>Compare current behavior against fixtures before promotion.</small>
 </a>
 
-<a href="skill-rollbacks/">
+<a href="../skill-rollbacks/">
 <strong>Reference</strong>
 <span>Skill rollbacks</span>
 <small>The reviewable path back to a prior promoted version.</small>

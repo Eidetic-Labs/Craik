@@ -76,19 +76,19 @@ Promotion is approved only when **every** gate is satisfied.
 
 <div className="craik-next">
 
-<a href="skill-proposals/">
+<a href="../skill-proposals/">
 <strong>Reference</strong>
 <span>Skill proposals</span>
 <small>The proposal contract these gates accept or deny.</small>
 </a>
 
-<a href="skill-replay/">
+<a href="../skill-replay/">
 <strong>Reference</strong>
 <span>Skill replay</span>
 <small>The replay results that compose with promotion.</small>
 </a>
 
-<a href="learning-receipts/">
+<a href="../learning-receipts/">
 <strong>Reference</strong>
 <span>Learning receipts</span>
 <small>Record promotion decisions.</small>

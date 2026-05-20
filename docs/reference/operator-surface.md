@@ -111,19 +111,19 @@ contracts before it is described as operational.
 
 <div className="craik-next">
 
-<a href="post-mvp-scope/">
+<a href="../post-mvp-scope/">
 <strong>Reference</strong>
 <span>Post-MVP scope</span>
 <small>What a full dashboard would add beyond the preview surface.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The persisted contracts these views read.</small>
 </a>
 
-<a href="handoff-viewer/">
+<a href="../handoff-viewer/">
 <strong>Reference</strong>
 <span>Handoff viewer</span>
 <small>The first operator-surface contract.</small>

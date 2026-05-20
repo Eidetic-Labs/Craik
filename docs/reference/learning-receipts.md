@@ -69,19 +69,19 @@ evidence, credentials, and secret-like metadata keys.
 
 <div className="craik-next">
 
-<a href="trajectory-exports/">
+<a href="../trajectory-exports/">
 <strong>Reference</strong>
 <span>Trajectory exports</span>
 <small>The redacted replay-and-review artifact.</small>
 </a>
 
-<a href="skill-promotion-gates/">
+<a href="../skill-promotion-gates/">
 <strong>Reference</strong>
 <span>Skill promotion gates</span>
 <small>The gates a learning receipt records.</small>
 </a>
 
-<a href="../guides/learning-loops/">
+<a href="../../guides/learning-loops/">
 <strong>Guide</strong>
 <span>Learning loops</span>
 <small>The full discipline.</small>

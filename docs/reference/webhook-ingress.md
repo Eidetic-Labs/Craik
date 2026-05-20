@@ -96,19 +96,19 @@ content are not stored in receipt metadata.**
 
 <div className="craik-next">
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>The receipt shape ingress produces.</small>
 </a>
 
-<a href="channel-policy-envelopes/">
+<a href="../channel-policy-envelopes/">
 <strong>Reference</strong>
 <span>Channel policy envelopes</span>
 <small>The next stage in the gateway pipeline.</small>
 </a>
 
-<a href="../guides/gateway-troubleshooting/">
+<a href="../../guides/gateway-troubleshooting/">
 <strong>Guide</strong>
 <span>Gateway troubleshooting</span>
 <small>Diagnose webhook failures.</small>

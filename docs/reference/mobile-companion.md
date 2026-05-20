@@ -93,19 +93,19 @@ deferred.
 
 <div className="craik-next">
 
-<a href="desktop-companion/">
+<a href="../desktop-companion/">
 <strong>Reference</strong>
 <span>Desktop companion</span>
 <small>The desktop counterpart.</small>
 </a>
 
-<a href="accessibility-requirements/">
+<a href="../accessibility-requirements/">
 <strong>Reference</strong>
 <span>Accessibility requirements</span>
 <small>The accessibility floor every companion respects.</small>
 </a>
 
-<a href="../guides/companion-app-security/">
+<a href="../../guides/companion-app-security/">
 <strong>Guide</strong>
 <span>Companion app security</span>
 <small>The author-facing security posture.</small>

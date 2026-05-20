@@ -39,7 +39,7 @@ live provider call. Four docs, in order.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/quickstart.md">
+<a className="craik-product-feature" href="../guides/quickstart/">
 <div>
 <p className="craik-product-feature__num">Hands-on · 01</p>
 <h4 className="craik-product-feature__title">Quickstart</h4>
@@ -71,7 +71,7 @@ provider call. Every output we discuss is real and persists on disk.
 <ol className="craik-product-list">
 
 <li>
-<a className="craik-product-card" href="guides/installation.md">
+<a className="craik-product-card" href="../guides/installation/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="20" width="36" height="28" rx="3" />
 <path d="M 32 14 L 32 30" />
@@ -104,7 +104,7 @@ to put the CLI on your PATH.
 </li>
 
 <li>
-<a className="craik-product-card" href="guides/setup.md">
+<a className="craik-product-card" href="../guides/setup/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="32" cy="32" r="14" />
 <circle cx="32" cy="32" r="6" fill="var(--craik-lavender)" stroke="none" />
@@ -141,7 +141,7 @@ credentials.
 </li>
 
 <li>
-<a className="craik-product-card" href="guides/configuring-craik-home.md">
+<a className="craik-product-card" href="../guides/configuring-craik-home/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <path d="M 14 30 L 32 14 L 50 30 L 50 50 L 14 50 Z" />
 <rect x="22" y="34" width="20" height="16" />
@@ -194,7 +194,7 @@ end. These four docs cover the full project-to-handoff lifecycle.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/project-registry.md">
+<a className="craik-product-feature" href="../guides/project-registry/">
 <div>
 <p className="craik-product-feature__num">Entry point · 01</p>
 <h4 className="craik-product-feature__title">Project registry</h4>
@@ -226,7 +226,7 @@ or <code>$CRAIK_HOME</code>. It does not create project-local
 <ol className="craik-product-list">
 
 <li>
-<a className="craik-product-card" href="reference/project-profile.md">
+<a className="craik-product-card" href="../reference/project-profile/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="14" width="36" height="36" rx="2" />
 <line x1="14" y1="22" x2="50" y2="22" />
@@ -260,7 +260,7 @@ Project profiles describe repositories Craik can reason about.
 </li>
 
 <li>
-<a className="craik-product-card" href="guides/using-case-files.md">
+<a className="craik-product-card" href="../guides/using-case-files/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <path d="M 14 14 L 14 50 L 50 50 L 50 22 L 42 14 Z" />
 <path d="M 42 14 L 42 22 L 50 22" />
@@ -294,7 +294,7 @@ Case files are only as good as the project they're built against.
 </li>
 
 <li>
-<a className="craik-product-card" href="guides/writing-handoffs.md">
+<a className="craik-product-card" href="../guides/writing-handoffs/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="16" cy="32" r="5" />
 <circle cx="48" cy="32" r="5" fill="var(--craik-lavender)" stroke="none" />
@@ -351,7 +351,7 @@ adapters that ship today, and the workflows around them.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/runner-adapter-contract.md">
+<a className="craik-product-feature" href="../reference/runner-adapter-contract/">
 <div>
 <p className="craik-product-feature__num">Protocol · 01</p>
 <h4 className="craik-product-feature__title">Runner adapter contract</h4>
@@ -384,7 +384,7 @@ leaking provider-specific details into core contracts.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/runner-step-contracts.md">
+<a className="craik-adr-card" href="../reference/runner-step-contracts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
@@ -400,7 +400,7 @@ runner itself.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/runner-metadata.md">
+<a className="craik-adr-card" href="../reference/runner-metadata/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
@@ -416,7 +416,7 @@ the stable contract surface.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/codex-runner-adapter.md">
+<a className="craik-adr-card" href="../reference/codex-runner-adapter/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter · preview</span>
@@ -432,7 +432,7 @@ execution is unavailable.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/claude-runner-adapter.md">
+<a className="craik-adr-card" href="../reference/claude-runner-adapter/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter · preview</span>
@@ -447,7 +447,7 @@ external execution is a later milestone in the adapter roadmap.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/gemini-runner-adapter.md">
+<a className="craik-adr-card" href="../reference/gemini-runner-adapter/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter · preview</span>
@@ -463,7 +463,7 @@ adapter is post-MVP.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/runner-preview-workflows.md">
+<a className="craik-adr-card" href="../guides/runner-preview-workflows/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">07</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Workflow</span>
@@ -479,7 +479,7 @@ receipt-plus-handoff metadata capture.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/single-agent-fixture-loop.md">
+<a className="craik-adr-card" href="../guides/single-agent-fixture-loop/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">08</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Workflow</span>
@@ -494,7 +494,7 @@ external side effects. The pattern CI uses for every PR.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/agent-roles.md">
+<a className="craik-adr-card" href="../reference/agent-roles/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">09</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Reference · v0.3</span>
@@ -510,7 +510,7 @@ they do not grant new runtime permissions by themselves.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/adapter-packages.md">
+<a className="craik-adr-card" href="../reference/adapter-packages/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">10</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Reference</span>
@@ -526,7 +526,7 @@ plugin discovery uses.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/worker-results.md">
+<a className="craik-adr-card" href="../reference/worker-results/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">11</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
@@ -562,7 +562,7 @@ certification, identity, and prompt compilation.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/model-providers.md">
+<a className="craik-product-feature" href="../reference/model-providers/">
 <div>
 <p className="craik-product-feature__num">Contract · 01</p>
 <h4 className="craik-product-feature__title">Model providers</h4>
@@ -596,7 +596,7 @@ execution path metadata for provider routing.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/provider-routing.md">
+<a className="craik-adr-card" href="../guides/provider-routing/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Guide</span>
@@ -612,7 +612,7 @@ receipts, and redaction can audit each boundary independently.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/provider-switching.md">
+<a className="craik-adr-card" href="../reference/provider-switching/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">CLI</span>
@@ -628,7 +628,7 @@ within the bounds the policy envelope allows.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/provider-failover.md">
+<a className="craik-adr-card" href="../reference/provider-failover/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Policy</span>
@@ -644,7 +644,7 @@ matches — every fallback preserves the active policy envelope id.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/provider-certification.md">
+<a className="craik-adr-card" href="../reference/provider-certification/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">MVP bar</span>
@@ -660,7 +660,7 @@ receipts show the runtime can safely use it in a governed workflow.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/authentication.md">
+<a className="craik-adr-card" href="../guides/authentication/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Identity</span>
@@ -677,7 +677,7 @@ it out" without inspecting secret material.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/prompt-compiler.md">
+<a className="craik-adr-card" href="../reference/prompt-compiler/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">07</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Tool</span>
@@ -713,7 +713,7 @@ and the contracts beneath.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/connecting-stigmem.md">
+<a className="craik-product-feature" href="../guides/connecting-stigmem/">
 <div>
 <p className="craik-product-feature__num">Wire it up · 01</p>
 <h4 className="craik-product-feature__title">Connecting Stigmem</h4>
@@ -746,7 +746,7 @@ HTTP endpoint surface.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/stigmem-docs-demo.md">
+<a className="craik-adr-card" href="../guides/stigmem-docs-demo/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Demo</span>
@@ -762,7 +762,7 @@ every PR — <code>craik demo stigmem-docs --repo-path . --no-github</code>.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/memory-backends.md">
+<a className="craik-adr-card" href="../reference/memory-backends/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract</span>
@@ -778,7 +778,7 @@ audit, and refuse direct durable writes without a matching grant.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/stigmem-compatibility.md">
+<a className="craik-adr-card" href="../reference/stigmem-compatibility/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Compatibility</span>
@@ -794,7 +794,7 @@ hooks) remain explicitly post-MVP.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/local-store.md">
+<a className="craik-adr-card" href="../reference/local-store/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Persistence</span>
@@ -810,7 +810,7 @@ contradictions, run state, and work-graph projections.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/local-state.md">
+<a className="craik-adr-card" href="../reference/local-state/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">On-disk layout</span>
@@ -846,7 +846,7 @@ GitHub adapter, and the CI/CD gate matrix that runs on every PR.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/cli.md">
+<a className="craik-product-feature" href="../reference/cli/">
 <div>
 <p className="craik-product-feature__num">Generated · 01</p>
 <h4 className="craik-product-feature__title">CLI reference</h4>
@@ -880,7 +880,7 @@ edited by hand, so the docs match the shipped binary.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/config.md">
+<a className="craik-adr-card" href="../reference/config/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Config</span>
@@ -896,7 +896,7 @@ every recognized variable and its purpose.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/github-config.md">
+<a className="craik-adr-card" href="../reference/github-config/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter</span>
@@ -912,7 +912,7 @@ writes are explicitly post-MVP.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/ci-cd.md">
+<a className="craik-adr-card" href="../reference/ci-cd/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Gates</span>
@@ -948,7 +948,7 @@ provenance, the self-audit, and what's explicitly post-MVP.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/side-effect-wrappers.md">
+<a className="craik-product-feature" href="../reference/side-effect-wrappers/">
 <div>
 <p className="craik-product-feature__num">Boundary · 01</p>
 <h4 className="craik-product-feature__title">Side-effect wrappers</h4>
@@ -982,7 +982,7 @@ receipt boundaries.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/failure-modes.md">
+<a className="craik-adr-card" href="../reference/failure-modes/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Posture</span>
@@ -999,7 +999,7 @@ does <em>not</em> claim.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/recovery.md">
+<a className="craik-adr-card" href="../reference/recovery/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Continuity</span>
@@ -1016,7 +1016,7 @@ replace policy checks.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/public-boundary-provenance.md">
+<a className="craik-adr-card" href="../reference/public-boundary-provenance/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Provenance</span>
@@ -1032,7 +1032,7 @@ provides the machine-checkable MVP boundary.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/self-audit.md">
+<a className="craik-adr-card" href="../reference/self-audit/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Honesty</span>
@@ -1049,7 +1049,7 @@ as complete.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/post-mvp-scope.md">
+<a className="craik-adr-card" href="../reference/post-mvp-scope/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Post-MVP</span>
@@ -1090,7 +1090,7 @@ contracts and approval flow; distribution is later.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/community-skills.md">
+<a className="craik-product-feature" href="../guides/community-skills/">
 <div>
 <p className="craik-product-feature__num">Entry · 01</p>
 <h4 className="craik-product-feature__title">Community skills</h4>
@@ -1124,7 +1124,7 @@ use and safe to run under Craik policy.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/community-plugins.md">
+<a className="craik-adr-card" href="../guides/community-plugins/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Guide · plugins</span>
@@ -1140,7 +1140,7 @@ been inspected. Marketplace workflows are post-MVP.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-packages.md">
+<a className="craik-adr-card" href="../reference/skill-packages/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1156,7 +1156,7 @@ authority — they are pure operating guidance.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-registries.md">
+<a className="craik-adr-card" href="../reference/skill-registries/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1172,7 +1172,7 @@ which skills a project can use at a given point in time.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-contexts.md">
+<a className="craik-adr-card" href="../reference/skill-contexts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1188,7 +1188,7 @@ auditable boundary for one skill invocation.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-telemetry.md">
+<a className="craik-adr-card" href="../reference/skill-telemetry/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1204,7 +1204,7 @@ guidance.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-proposals.md">
+<a className="craik-adr-card" href="../reference/skill-proposals/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">07</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1220,7 +1220,7 @@ Reviewer approval gates promotion.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-replay.md">
+<a className="craik-adr-card" href="../reference/skill-replay/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">08</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1236,7 +1236,7 @@ promoted.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-promotion-gates.md">
+<a className="craik-adr-card" href="../reference/skill-promotion-gates/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">09</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1252,7 +1252,7 @@ promotion is named and dated.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/skill-rollbacks.md">
+<a className="craik-adr-card" href="../reference/skill-rollbacks/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">10</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · skill</span>
@@ -1268,7 +1268,7 @@ regressions or violates policy.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/plugin-descriptors.md">
+<a className="craik-adr-card" href="../reference/plugin-descriptors/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">11</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
@@ -1284,7 +1284,7 @@ receipts — never the descriptor alone.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/plugin-probation.md">
+<a className="craik-adr-card" href="../reference/plugin-probation/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">12</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
@@ -1300,7 +1300,7 @@ gate between "available" and "trusted".
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/plugin-receipts.md">
+<a className="craik-adr-card" href="../reference/plugin-receipts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">13</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
@@ -1316,7 +1316,7 @@ that authorized the call.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/plugin-capability-grants.md">
+<a className="craik-adr-card" href="../reference/plugin-capability-grants/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">14</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · plugin</span>
@@ -1367,7 +1367,7 @@ in <code>$CRAIK_HOME/state/</code>.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/graph-export.md">
+<a className="craik-product-feature" href="../reference/graph-export/">
 <div>
 <p className="craik-product-feature__num">Tool · 01</p>
 <h4 className="craik-product-feature__title">Graph export</h4>

@@ -186,13 +186,7 @@ policy/evidence/receipt/redaction semantics were preserved.
 <a href="../../reference/locale-i18n-framework/">
 <strong>Reference</strong>
 <span>Locale i18n framework</span>
-<small>The metadata and resolution contracts.</small>
-</a>
-
-<a href="../../reference/translated-docs-strategy/">
-<strong>Reference</strong>
-<span>Translated docs strategy</span>
-<small>The shipped contract for translation status.</small>
+<small>Metadata, resolution contracts, and the shipped TranslationStatus values.</small>
 </a>
 
 <a href="../../limitations/">

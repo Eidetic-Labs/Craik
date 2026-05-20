@@ -77,19 +77,19 @@ even if the underlying policy profile could allow broader authority.
 
 <div className="craik-next">
 
-<a href="plugin-descriptors/">
+<a href="../plugin-descriptors/">
 <strong>Reference</strong>
 <span>Plugin descriptors</span>
 <small>The descriptor a grant attaches to.</small>
 </a>
 
-<a href="plugin-probation/">
+<a href="../plugin-probation/">
 <strong>Reference</strong>
 <span>Plugin probation</span>
 <small>How new descriptors enter trusted use.</small>
 </a>
 
-<a href="plugin-receipts/">
+<a href="../plugin-receipts/">
 <strong>Reference</strong>
 <span>Plugin receipts</span>
 <small>The receipt every plugin action produces.</small>

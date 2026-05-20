@@ -7,3 +7,9 @@ repos:
         language: system
         files: ^src/.*\.py$
         pass_filenames: true
+      - id: doc-links
+        name: Validate raw-HTML <a href> links in docs
+        entry: python scripts/check_doc_links.py
+        language: system
+        files: ^docs/.*\.(md|mdx)$
+        pass_filenames: false

@@ -70,19 +70,19 @@ the decision can be audited later.
 
 <div className="craik-next">
 
-<a href="desktop-companion/">
+<a href="../desktop-companion/">
 <strong>Reference</strong>
 <span>Desktop companion</span>
 <small>The desktop surface decision this evidence feeds.</small>
 </a>
 
-<a href="mobile-companion/">
+<a href="../mobile-companion/">
 <strong>Reference</strong>
 <span>Mobile companion</span>
 <small>The mobile surface decision.</small>
 </a>
 
-<a href="visual-workspace/">
+<a href="../visual-workspace/">
 <strong>Reference</strong>
 <span>Visual workspace</span>
 <small>The live workspace decision.</small>

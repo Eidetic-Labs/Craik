@@ -95,19 +95,19 @@ is required before work resumes.
 
 <div className="craik-next">
 
-<a href="delegation-queue-view/">
+<a href="../delegation-queue-view/">
 <strong>Reference</strong>
 <span>Delegation queue view</span>
 <small>The operator surface that displays open delegations.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The full delegation and scope-change schemas.</small>
 </a>
 
-<a href="../guides/scope-control/">
+<a href="../../guides/scope-control/">
 <strong>Guide</strong>
 <span>Scope control</span>
 <small>How intent locks and stop-conditions compose with delegation.</small>

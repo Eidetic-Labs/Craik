@@ -75,19 +75,19 @@ timestamp.
 
 <div className="craik-next">
 
-<a href="memory-review-nudges/">
+<a href="../memory-review-nudges/">
 <strong>Reference</strong>
 <span>Memory review nudges</span>
 <small>The reminder layer that surfaces stale preferences for review.</small>
 </a>
 
-<a href="learning-receipts/">
+<a href="../learning-receipts/">
 <strong>Reference</strong>
 <span>Learning receipts</span>
 <small>The receipt subtype for preference reviews.</small>
 </a>
 
-<a href="../guides/learning-loops/">
+<a href="../../guides/learning-loops/">
 <strong>Guide</strong>
 <span>Learning loops</span>
 <small>The full discipline preference review sits inside.</small>

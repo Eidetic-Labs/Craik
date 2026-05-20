@@ -74,19 +74,19 @@ without copying raw private payloads.
 
 <div className="craik-next">
 
-<a href="visual-workspace/">
+<a href="../visual-workspace/">
 <strong>Reference</strong>
 <span>Visual workspace decision</span>
 <small>Whether a surface may render or interact with the projection.</small>
 </a>
 
-<a href="graph-export/">
+<a href="../graph-export/">
 <strong>Reference</strong>
 <span>Graph export</span>
 <small>The source record this bridge projects.</small>
 </a>
 
-<a href="multimodal-artifacts/">
+<a href="../multimodal-artifacts/">
 <strong>Reference</strong>
 <span>Multimodal artifact references</span>
 <small>How visual surfaces cite media without raw payloads.</small>

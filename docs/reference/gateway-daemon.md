@@ -125,19 +125,19 @@ than background processes.
 
 <div className="craik-next">
 
-<a href="post-mvp-scope/">
+<a href="../post-mvp-scope/">
 <strong>Reference</strong>
 <span>Post-MVP scope</span>
 <small>Why a production gateway daemon is deferred.</small>
 </a>
 
-<a href="../guides/gateway-troubleshooting/">
+<a href="../../guides/gateway-troubleshooting/">
 <strong>Guide</strong>
 <span>Gateway troubleshooting</span>
 <small>What's diagnosable from the contracts today.</small>
 </a>
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>What every channel decision records.</small>

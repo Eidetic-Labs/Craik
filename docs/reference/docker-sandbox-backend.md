@@ -73,19 +73,19 @@ API keys.
 
 <div className="craik-next">
 
-<a href="sandbox-backends/">
+<a href="../sandbox-backends/">
 <strong>Reference</strong>
 <span>Sandbox backends</span>
 <small>The shared contract.</small>
 </a>
 
-<a href="environment-receipts/">
+<a href="../environment-receipts/">
 <strong>Reference</strong>
 <span>Environment receipts</span>
 <small>How allowed and denied decisions persist.</small>
 </a>
 
-<a href="local-process-backend/">
+<a href="../local-process-backend/">
 <strong>Reference</strong>
 <span>Local process backend</span>
 <small>The host-process alternative.</small>

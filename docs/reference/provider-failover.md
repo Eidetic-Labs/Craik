@@ -89,19 +89,19 @@ policy envelopes.
 
 <div className="craik-next">
 
-<a href="provider-switching/">
+<a href="../provider-switching/">
 <strong>Reference</strong>
 <span>Provider switching</span>
 <small>The CLI surface for operator-driven selection.</small>
 </a>
 
-<a href="model-providers/">
+<a href="../model-providers/">
 <strong>Reference</strong>
 <span>Model providers</span>
 <small>The registry and budget gating.</small>
 </a>
 
-<a href="environment-receipts/">
+<a href="../environment-receipts/">
 <strong>Reference</strong>
 <span>Environment receipts</span>
 <small>How failover decisions persist.</small>

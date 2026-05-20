@@ -85,19 +85,19 @@ themselves.
 
 <div className="craik-next">
 
-<a href="policy-profiles/">
+<a href="../policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>The base profiles channel envelopes specialize.</small>
 </a>
 
-<a href="channel-identity-pairing/">
+<a href="../channel-identity-pairing/">
 <strong>Reference</strong>
 <span>Channel identity pairing</span>
 <small>The pre-policy gate.</small>
 </a>
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>How denials persist.</small>

@@ -65,19 +65,19 @@ onboarding.
 
 <div className="craik-next">
 
-<a href="skill-packages/">
+<a href="../skill-packages/">
 <strong>Reference</strong>
 <span>Skill packages</span>
 <small>The package contract entries reference.</small>
 </a>
 
-<a href="skill-contexts/">
+<a href="../skill-contexts/">
 <strong>Reference</strong>
 <span>Skill invocation contexts</span>
 <small>The per-run record produced when a registered skill executes.</small>
 </a>
 
-<a href="../guides/community-skills/">
+<a href="../../guides/community-skills/">
 <strong>Guide</strong>
 <span>Community skills</span>
 <small>How skills enter the registry.</small>

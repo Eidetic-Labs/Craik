@@ -942,19 +942,19 @@ needed after `0.1.0`.
 
 <div className="craik-next">
 
-<a href="mvp.md">
+<a href="../mvp/">
 <strong>Read</strong>
 <span>MVP plan</span>
 <small>The accepted v0.x.0 scope and proof workflow.</small>
 </a>
 
-<a href="mvp-roadmap.md">
+<a href="../mvp-roadmap/">
 <strong>Read</strong>
 <span>MVP roadmap</span>
 <small>The release-readiness checklist driving v0.x.</small>
 </a>
 
-<a href="runtime-contracts.md">
+<a href="../runtime-contracts/">
 <strong>Read</strong>
 <span>Runtime contracts</span>
 <small>The persisted contract shapes these milestones build against.</small>

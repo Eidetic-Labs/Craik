@@ -71,19 +71,19 @@ both allowed and denied decisions.
 
 <div className="craik-next">
 
-<a href="sandbox-backends/">
+<a href="../sandbox-backends/">
 <strong>Reference</strong>
 <span>Sandbox backends</span>
 <small>The shared contract this boundary specializes.</small>
 </a>
 
-<a href="environment-receipts/">
+<a href="../environment-receipts/">
 <strong>Reference</strong>
 <span>Environment receipts</span>
 <small>The receipt shape decisions produce.</small>
 </a>
 
-<a href="../guides/provider-routing/">
+<a href="../../guides/provider-routing/">
 <strong>Guide</strong>
 <span>Provider routing &amp; sandboxes</span>
 <small>End-to-end routing.</small>

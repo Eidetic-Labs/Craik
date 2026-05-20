@@ -96,19 +96,19 @@ redaction outcome · operator approval (when a mutation is requested).
 
 <div className="craik-next">
 
-<a href="multi-agent-workflow-bridge/">
+<a href="../multi-agent-workflow-bridge/">
 <strong>Reference</strong>
 <span>Multi-agent workflow bridge</span>
 <small>The companion contract for external coordination systems.</small>
 </a>
 
-<a href="adjacent-tool-migration/">
+<a href="../adjacent-tool-migration/">
 <strong>Reference</strong>
 <span>Adjacent-tool migration</span>
 <small>The assessment that precedes a bridge.</small>
 </a>
 
-<a href="mcp-export-boundary/">
+<a href="../mcp-export-boundary/">
 <strong>Reference</strong>
 <span>MCP export boundary</span>
 <small>The parallel boundary for tool-export decisions.</small>

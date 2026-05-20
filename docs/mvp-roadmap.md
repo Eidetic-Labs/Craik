@@ -284,19 +284,19 @@ The release ships when every criterion below holds.
 
 <div className="craik-next">
 
-<a href="release-readiness.md">
+<a href="../release-readiness/">
 <strong>Snapshot</strong>
 <span>Release readiness · v0.1.0</span>
 <small>The concrete pass/fail checklist captured against the current main.</small>
 </a>
 
-<a href="limitations.md">
+<a href="../limitations/">
 <strong>Honest scope</strong>
 <span>Limitations</span>
 <small>What's end-to-end today and what's scheduled for later milestones.</small>
 </a>
 
-<a href="roadmap.md">
+<a href="../roadmap/">
 <strong>Read</strong>
 <span>Roadmap</span>
 <small>The broader trajectory after the MVP ships.</small>

@@ -38,19 +38,19 @@ in <code>risks</code>, <code>context_debt</code>, or
 
 <div className="craik-next">
 
-<a href="../guides/writing-handoffs/">
+<a href="../../guides/writing-handoffs/">
 <strong>Guide</strong>
 <span>Writing handoffs</span>
 <small>The writer-facing workflow this audit constrains.</small>
 </a>
 
-<a href="exit-discipline/">
+<a href="../exit-discipline/">
 <strong>Reference</strong>
 <span>Exit discipline</span>
 <small>The exit-discipline checklist that builds on self-audit.</small>
 </a>
 
-<a href="handoff-viewer/">
+<a href="../handoff-viewer/">
 <strong>Reference</strong>
 <span>Handoff viewer</span>
 <small>How the audit fields surface in the operator view.</small>

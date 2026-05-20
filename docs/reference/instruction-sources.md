@@ -191,19 +191,19 @@ remain visible for review but inactive.
 
 <div className="craik-next">
 
-<a href="instruction-distillation-workflow/">
+<a href="../instruction-distillation-workflow/">
 <strong>Reference</strong>
 <span>Instruction distillation workflow</span>
 <small>The 9-step pipeline these contracts feed.</small>
 </a>
 
-<a href="instruction-distillation-view/">
+<a href="../instruction-distillation-view/">
 <strong>Reference</strong>
 <span>Instruction distillation view</span>
 <small>The operator surface that audits proposals.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>All instruction-related contract shapes.</small>

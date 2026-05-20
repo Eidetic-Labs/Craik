@@ -88,10 +88,10 @@ independently.
 
 <div className="craik-grid">
 
-<div><h4><a href="local-process-backend/">Local process backend</a></h4><p>Host process execution boundaries.</p></div>
-<div><h4><a href="remote-shell-backend/">Remote shell backend</a></h4><p>SSH and remote command boundaries.</p></div>
-<div><h4><a href="browser-tool-boundary/">Browser tool boundary</a></h4><p>Browser automation and tool execution boundaries.</p></div>
-<div><h4><a href="docker-sandbox-backend/">Docker sandbox backend</a></h4><p>Containerized execution boundaries.</p></div>
+<div><h4><a href="../local-process-backend/">Local process backend</a></h4><p>Host process execution boundaries.</p></div>
+<div><h4><a href="../remote-shell-backend/">Remote shell backend</a></h4><p>SSH and remote command boundaries.</p></div>
+<div><h4><a href="../browser-tool-boundary/">Browser tool boundary</a></h4><p>Browser automation and tool execution boundaries.</p></div>
+<div><h4><a href="../docker-sandbox-backend/">Docker sandbox backend</a></h4><p>Containerized execution boundaries.</p></div>
 
 </div>
 
@@ -99,19 +99,19 @@ independently.
 
 <div className="craik-next">
 
-<a href="environment-receipts/">
+<a href="../environment-receipts/">
 <strong>Reference</strong>
 <span>Environment receipts</span>
 <small>What every sandbox decision records.</small>
 </a>
 
-<a href="../guides/provider-routing/">
+<a href="../../guides/provider-routing/">
 <strong>Guide</strong>
 <span>Provider routing &amp; sandboxes</span>
 <small>The end-to-end routing flow.</small>
 </a>
 
-<a href="model-providers/">
+<a href="../model-providers/">
 <strong>Reference</strong>
 <span>Model providers</span>
 <small>The provider side of the dual-routing decision.</small>

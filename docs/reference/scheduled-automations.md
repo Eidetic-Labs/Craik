@@ -69,19 +69,19 @@ Receipts use `gateway.schedule.execute` and stay redacted.
 
 <div className="craik-next">
 
-<a href="scheduled-task-creation/">
+<a href="../scheduled-task-creation/">
 <strong>Reference</strong>
 <span>Scheduled task creation</span>
 <small>The helper that converts one tick into a task.</small>
 </a>
 
-<a href="gateway-daemon/">
+<a href="../gateway-daemon/">
 <strong>Reference</strong>
 <span>Gateway daemon</span>
 <small>The (post-MVP) daemon that would drive automations.</small>
 </a>
 
-<a href="gateway-receipts/">
+<a href="../gateway-receipts/">
 <strong>Reference</strong>
 <span>Gateway receipts</span>
 <small>The receipt shape automations produce.</small>

@@ -237,7 +237,7 @@ else composes on top.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="concepts/project-model.md">
+<a className="craik-product-feature" href="../concepts/project-model/">
 <div>
 <p className="craik-product-feature__num">Foundation · 01</p>
 <h4 className="craik-product-feature__title">Project model</h4>
@@ -270,7 +270,7 @@ configured, and which next actions are currently allowed.
 <ol className="craik-product-list">
 
 <li>
-<a className="craik-product-card" href="concepts/case-files.md">
+<a className="craik-product-card" href="../concepts/case-files/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="10" width="36" height="44" rx="3" />
 <line x1="20" y1="20" x2="44" y2="20" />
@@ -304,7 +304,7 @@ A case file is not a memory store, and it is not a transcript.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/single-agent-loop.md">
+<a className="craik-product-card" href="../concepts/single-agent-loop/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="32" cy="32" r="22" />
 <line x1="32" y1="10" x2="32" y2="18" />
@@ -340,7 +340,7 @@ a matching capability grant before it runs.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/receipts.md">
+<a className="craik-product-card" href="../concepts/receipts/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <path d="M 14 10 L 50 10 L 50 50 L 42 54 L 34 50 L 26 54 L 18 50 L 14 54 Z" />
 <line x1="20" y1="20" x2="44" y2="20" />
@@ -375,7 +375,7 @@ happened, and how it ended.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/handoffs.md">
+<a className="craik-product-card" href="../concepts/handoffs/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="14" cy="32" r="6" />
 <circle cx="50" cy="32" r="6" fill="var(--craik-lavender)" stroke="none" />
@@ -409,7 +409,7 @@ continuity record that lets the next actor pick up.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/work-graph.md">
+<a className="craik-product-card" href="../concepts/work-graph/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="32" cy="12" r="3.5" />
 <circle cx="14" cy="32" r="3.5" />
@@ -447,7 +447,7 @@ existing typed objects in <code>$CRAIK_HOME/state/</code>.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/memory-and-stigmem.md">
+<a className="craik-product-card" href="../concepts/memory-and-stigmem/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="22" cy="22" r="10" />
 <circle cx="42" cy="42" r="10" fill="var(--craik-lavender)" stroke="none" />
@@ -482,7 +482,7 @@ grant) promotes them.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/governance.md">
+<a className="craik-product-card" href="../concepts/governance/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <path d="M 32 10 L 52 18 L 52 32 C 52 44 44 50 32 54 C 20 50 12 44 12 32 L 12 18 Z" />
 <path d="M 24 32 L 30 38 L 42 26" />
@@ -515,7 +515,7 @@ capability grants, and immutable paths are first-class records.
 </li>
 
 <li>
-<a className="craik-product-card" href="concepts/intent-locks.md">
+<a className="craik-product-card" href="../concepts/intent-locks/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="16" y="26" width="32" height="24" rx="3" />
 <path d="M 22 26 L 22 18 C 22 14 26 10 32 10 C 38 10 42 14 42 18 L 42 26" />
@@ -570,7 +570,7 @@ policy, ship an adapter, or interpret a receipt.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="runtime-contracts.md">
+<a className="craik-product-feature" href="../runtime-contracts/">
 <div>
 <p className="craik-product-feature__num">Foundation · 01</p>
 <h4 className="craik-product-feature__title">Runtime contracts overview</h4>
@@ -604,7 +604,7 @@ plugins should integrate through them.
 <ol className="craik-product-list">
 
 <li>
-<a className="craik-product-card" href="reference/schemas.md">
+<a className="craik-product-card" href="../reference/schemas/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="14" width="36" height="36" rx="2" />
 <line x1="14" y1="22" x2="50" y2="22" />
@@ -639,7 +639,7 @@ plugins do not silently depend on accidental payload shape.
 </li>
 
 <li>
-<a className="craik-product-card" href="reference/project-profile.md">
+<a className="craik-product-card" href="../reference/project-profile/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="14" width="36" height="36" rx="3" />
 <path d="M 22 24 L 30 24 L 32 28 L 42 28 L 42 38 L 22 38 Z" />
@@ -670,7 +670,7 @@ Project profiles describe repositories Craik can reason about.
 </li>
 
 <li>
-<a className="craik-product-card" href="reference/run-state.md">
+<a className="craik-product-card" href="../reference/run-state/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="14" cy="32" r="3" />
 <circle cx="32" cy="32" r="3" />
@@ -708,7 +708,7 @@ depending on an untracked chat transcript.
 </li>
 
 <li>
-<a className="craik-product-card" href="reference/worker-results.md">
+<a className="craik-product-card" href="../reference/worker-results/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="32" cy="14" r="4" />
 <rect x="16" y="26" width="32" height="8" rx="2" />
@@ -745,7 +745,7 @@ not flatten conflicting results into a single consensus.
 </li>
 
 <li>
-<a className="craik-product-card" href="reference/failure-modes.md">
+<a className="craik-product-card" href="../reference/failure-modes/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <path d="M 32 10 L 54 50 L 10 50 Z" />
 <line x1="32" y1="26" x2="32" y2="38" />
@@ -799,7 +799,7 @@ surfaces, and the gates an item must clear before it ships.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="mvp-roadmap.md">
+<a className="craik-product-feature" href="../mvp-roadmap/">
 <div>
 <p className="craik-product-feature__num">Active · 01</p>
 <h4 className="craik-product-feature__title">MVP roadmap</h4>
@@ -832,7 +832,7 @@ handoff, accurate documentation, and package-release quality gates.
 <ol className="craik-product-list">
 
 <li>
-<a className="craik-product-card" href="mvp.md">
+<a className="craik-product-card" href="../mvp/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <circle cx="32" cy="32" r="22" />
 <circle cx="32" cy="32" r="12" />
@@ -864,7 +864,7 @@ platform shell.
 </li>
 
 <li>
-<a className="craik-product-card" href="roadmap.md">
+<a className="craik-product-card" href="../roadmap/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <line x1="10" y1="32" x2="54" y2="32" />
 <circle cx="14" cy="32" r="3" fill="var(--craik-lavender)" stroke="none" />
@@ -901,7 +901,7 @@ code or only exist as strategy.
 </li>
 
 <li>
-<a className="craik-product-card" href="release-readiness.md">
+<a className="craik-product-card" href="../release-readiness/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="14" width="36" height="36" rx="3" />
 <path d="M 22 32 L 30 40 L 44 24" />
@@ -935,7 +935,7 @@ protected publication process when the maintainer is ready.
 </li>
 
 <li>
-<a className="craik-product-card" href="limitations.md">
+<a className="craik-product-card" href="../limitations/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="10" y="14" width="44" height="36" rx="3" />
 <line x1="14" y1="22" x2="40" y2="22" />
@@ -972,7 +972,7 @@ Several surfaces are not yet end-to-end production workflows.
 </li>
 
 <li>
-<a className="craik-product-card" href="implementation-plan.md">
+<a className="craik-product-card" href="../implementation-plan/">
 <svg className="craik-card-motif" viewBox="0 0 64 64" aria-hidden="true">
 <rect x="14" y="14" width="36" height="8" rx="1" />
 <rect x="14" y="26" width="28" height="8" rx="1" />
@@ -1176,7 +1176,7 @@ boundary between what Craik owns and what Stigmem owns.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="stigmem-integration.md">
+<a className="craik-product-feature" href="../stigmem-integration/">
 <div>
 <p className="craik-product-feature__num">Substrate · 01</p>
 <h4 className="craik-product-feature__title">Stigmem integration</h4>

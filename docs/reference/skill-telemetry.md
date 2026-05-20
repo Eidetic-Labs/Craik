@@ -63,19 +63,19 @@ tokens, passwords, or API keys.
 
 <div className="craik-next">
 
-<a href="skill-proposals/">
+<a href="../skill-proposals/">
 <strong>Reference</strong>
 <span>Skill proposals</span>
 <small>Draft reviewable changes from telemetry.</small>
 </a>
 
-<a href="learning-receipts/">
+<a href="../learning-receipts/">
 <strong>Reference</strong>
 <span>Learning receipts</span>
 <small>Record every learning decision.</small>
 </a>
 
-<a href="../guides/learning-loops/">
+<a href="../../guides/learning-loops/">
 <strong>Guide</strong>
 <span>Learning loops</span>
 <small>The full discipline telemetry sits inside.</small>

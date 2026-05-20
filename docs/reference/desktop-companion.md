@@ -92,19 +92,19 @@ roadmap gate adds stronger product and security requirements.
 
 <div className="craik-next">
 
-<a href="mobile-companion/">
+<a href="../mobile-companion/">
 <strong>Reference</strong>
 <span>Mobile companion</span>
 <small>The mobile counterpart.</small>
 </a>
 
-<a href="accessibility-requirements/">
+<a href="../accessibility-requirements/">
 <strong>Reference</strong>
 <span>Accessibility requirements</span>
 <small>The accessibility floor every companion respects.</small>
 </a>
 
-<a href="../guides/companion-app-security/">
+<a href="../../guides/companion-app-security/">
 <strong>Guide</strong>
 <span>Companion app security</span>
 <small>The author-facing security posture.</small>

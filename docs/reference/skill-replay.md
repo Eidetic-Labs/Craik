@@ -66,19 +66,19 @@ stdout, stderr, payloads, responses, or credentials.
 
 <div className="craik-next">
 
-<a href="skill-promotion-gates/">
+<a href="../skill-promotion-gates/">
 <strong>Reference</strong>
 <span>Skill promotion gates</span>
 <small>The promotion decision replay results gate.</small>
 </a>
 
-<a href="skill-proposals/">
+<a href="../skill-proposals/">
 <strong>Reference</strong>
 <span>Skill proposals</span>
 <small>The proposal that requires fixture ids for high-risk plans.</small>
 </a>
 
-<a href="memory-review-nudges/">
+<a href="../memory-review-nudges/">
 <strong>Reference</strong>
 <span>Memory review nudges</span>
 <small>The companion review-only signal.</small>

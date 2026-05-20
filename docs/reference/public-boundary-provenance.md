@@ -89,19 +89,19 @@ redaction, secret handling, or task naming.
 
 <div className="craik-next">
 
-<a href="redaction/">
+<a href="../redaction/">
 <strong>Reference</strong>
 <span>Redaction</span>
 <small>The persistence-time redaction utility.</small>
 </a>
 
-<a href="../security/release-process/">
+<a href="../../security/release-process/">
 <strong>Security</strong>
 <span>Release process</span>
 <small>How public boundary findings interact with releases.</small>
 </a>
 
-<a href="failure-modes/">
+<a href="../failure-modes/">
 <strong>Reference</strong>
 <span>Failure modes</span>
 <small>How the hygiene gate composes with the wider failure posture.</small>

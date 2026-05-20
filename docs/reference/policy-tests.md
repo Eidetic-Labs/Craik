@@ -89,19 +89,19 @@ with status code <code>1</code>.
 
 <div className="craik-next">
 
-<a href="policy-profiles/">
+<a href="../policy-profiles/">
 <strong>Reference</strong>
 <span>Policy profiles</span>
 <small>The profiles each check exercises.</small>
 </a>
 
-<a href="../guides/running-policy-tests/">
+<a href="../../guides/running-policy-tests/">
 <strong>Guide</strong>
 <span>Running policy tests</span>
 <small>How operators invoke the gate.</small>
 </a>
 
-<a href="../adr/policy-envelope-shape/">
+<a href="../../adr/policy-envelope-shape/">
 <strong>ADR</strong>
 <span>0004 · Policy envelope shape</span>
 <small>The envelope contract these checks verify.</small>

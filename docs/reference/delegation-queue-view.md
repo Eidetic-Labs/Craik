@@ -58,19 +58,19 @@ already recorded.
 
 <div className="craik-next">
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="human-delegation/">
+<a href="../human-delegation/">
 <strong>Reference</strong>
 <span>Human delegation</span>
 <small>The contract this view reads.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>human_delegation_point</code> shape.</small>

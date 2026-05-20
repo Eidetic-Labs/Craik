@@ -46,19 +46,19 @@ and grant model.
 
 <div className="craik-next">
 
-<a href="skill-registries/">
+<a href="../skill-registries/">
 <strong>Reference</strong>
 <span>Skill registries</span>
 <small>How packages enter project-local and global discovery.</small>
 </a>
 
-<a href="skill-contexts/">
+<a href="../skill-contexts/">
 <strong>Reference</strong>
 <span>Skill invocation contexts</span>
 <small>The per-run record produced when a skill executes.</small>
 </a>
 
-<a href="../guides/community-skills/">
+<a href="../../guides/community-skills/">
 <strong>Guide</strong>
 <span>Community skills</span>
 <small>Author and review expectations.</small>

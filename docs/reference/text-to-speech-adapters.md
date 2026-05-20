@@ -65,19 +65,19 @@ credentials, tokens, or private media metadata.
 
 <div className="craik-next">
 
-<a href="voice-posture/">
+<a href="../voice-posture/">
 <strong>Reference</strong>
 <span>Voice posture</span>
 <small>The decision that authorizes adapter calls.</small>
 </a>
 
-<a href="speech-to-text-adapters/">
+<a href="../speech-to-text-adapters/">
 <strong>Reference</strong>
 <span>Speech-to-text adapters</span>
 <small>The input-direction counterpart.</small>
 </a>
 
-<a href="multimodal-artifacts/">
+<a href="../multimodal-artifacts/">
 <strong>Reference</strong>
 <span>Multimodal artifact references</span>
 <small>How adapters cite generated speech without raw payloads.</small>

@@ -124,19 +124,19 @@ Stigmem-backed truth.
 
 <div className="craik-next">
 
-<a href="local-store/">
+<a href="../local-store/">
 <strong>Reference</strong>
 <span>Local store</span>
 <small>The SQLite contract catalog inside <code>state/</code>.</small>
 </a>
 
-<a href="../guides/configuring-craik-home/">
+<a href="../../guides/configuring-craik-home/">
 <strong>Guide</strong>
 <span>Configuring Craik home</span>
 <small>Relocation rules and CI conventions.</small>
 </a>
 
-<a href="config/">
+<a href="../config/">
 <strong>Reference</strong>
 <span>Config reference</span>
 <small>The env-var surface that drives this layout.</small>

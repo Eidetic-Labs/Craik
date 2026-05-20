@@ -75,19 +75,19 @@ maps, and bridge decisions stay reviewable.
 
 <div className="craik-next">
 
-<a href="multi-agent-workflow-bridge/">
+<a href="../multi-agent-workflow-bridge/">
 <strong>Reference</strong>
 <span>Multi-agent workflow bridge</span>
 <small>The bridge that follows an assessment.</small>
 </a>
 
-<a href="import-dry-run/">
+<a href="../import-dry-run/">
 <strong>Reference</strong>
 <span>Import dry-run reports</span>
 <small>How an assessment becomes a reviewable dry run.</small>
 </a>
 
-<a href="agent-roles/">
+<a href="../agent-roles/">
 <strong>Reference</strong>
 <span>Agent roles</span>
 <small>The roles external agents map to.</small>

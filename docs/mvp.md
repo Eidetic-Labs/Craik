@@ -238,19 +238,19 @@ requires:
 
 <div className="craik-next">
 
-<a href="mvp-roadmap.md">
+<a href="../mvp-roadmap/">
 <strong>Read next</strong>
 <span>MVP roadmap</span>
 <small>The release-readiness work that must land before v0.1 ships.</small>
 </a>
 
-<a href="features.md">
+<a href="../features/">
 <strong>Read</strong>
 <span>Features</span>
 <small>Per-feature acceptance criteria that compose into the MVP.</small>
 </a>
 
-<a href="implementation-plan.md">
+<a href="../implementation-plan/">
 <strong>Read</strong>
 <span>Implementation plan</span>
 <small>The buildable sequence under the chosen stack.</small>

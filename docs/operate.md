@@ -33,7 +33,7 @@ already-running install or preparing to cut a release.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/doctor.md">
+<a className="craik-product-feature" href="../guides/doctor/">
 <div>
 <p className="craik-product-feature__num">Diagnostic · 01</p>
 <h4 className="craik-product-feature__title">Doctor diagnostics</h4>
@@ -67,7 +67,7 @@ database, contact Stigmem, start a gateway, or write receipts.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/development.md">
+<a className="craik-adr-card" href="../guides/development/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Quality gates</span>
@@ -83,7 +83,7 @@ on every push — green locally usually means green in CI.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/updating.md">
+<a className="craik-adr-card" href="../guides/updating/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Safe update</span>
@@ -100,7 +100,7 @@ control of the actual upgrade.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/release-management.md">
+<a className="craik-adr-card" href="../guides/release-management/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Release</span>
@@ -135,7 +135,7 @@ policy that applies whenever data crosses runtime boundaries.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/local-store.md">
+<a className="craik-product-feature" href="../reference/local-store/">
 <div>
 <p className="craik-product-feature__num">Persistence · 01</p>
 <h4 className="craik-product-feature__title">Local store</h4>
@@ -167,7 +167,7 @@ Craik uses SQLite for local runtime persistence.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/local-state.md">
+<a className="craik-adr-card" href="../reference/local-state/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">On-disk layout</span>
@@ -185,7 +185,7 @@ with <code>CRAIK_HOME</code>.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/local-store-migrations.md">
+<a className="craik-adr-card" href="../guides/local-store-migrations/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Migrations</span>
@@ -202,7 +202,7 @@ is idempotent.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/secret-migration-policy.md">
+<a className="craik-adr-card" href="../reference/secret-migration-policy/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Policy</span>
@@ -244,7 +244,7 @@ and formatter helpers today. A complete TUI or dashboard is
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/operator-surface.md">
+<a className="craik-product-feature" href="../reference/operator-surface/">
 <div>
 <p className="craik-product-feature__num">Catalog · 01</p>
 <h4 className="craik-product-feature__title">Operator surface</h4>
@@ -277,7 +277,7 @@ complete TUI or dashboard is post-MVP scope.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/work-graph-explorer.md">
+<a className="craik-adr-card" href="../reference/work-graph-explorer/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · graph</span>
@@ -294,7 +294,7 @@ evidence, assumptions, and contradictions.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/handoff-viewer.md">
+<a className="craik-adr-card" href="../reference/handoff-viewer/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · handoff</span>
@@ -310,7 +310,7 @@ surface for picking up a paused or completed run.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/receipt-viewer.md">
+<a className="craik-adr-card" href="../reference/receipt-viewer/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · receipt</span>
@@ -326,7 +326,7 @@ envelope that gated it. Joins back to the task and handoff.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/contradiction-inbox-view.md">
+<a className="craik-adr-card" href="../reference/contradiction-inbox-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · contradiction</span>
@@ -342,7 +342,7 @@ resolution, status, and optional Stigmem conflict id.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/evidence-assumption-view.md">
+<a className="craik-adr-card" href="../reference/evidence-assumption-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · evidence</span>
@@ -358,7 +358,7 @@ tell what was cited from what was guessed.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/delegation-queue-view.md">
+<a className="craik-adr-card" href="../reference/delegation-queue-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">07</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · delegation</span>
@@ -373,7 +373,7 @@ Read-only view over <code>craik.human_delegation_point</code> records
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/budget-quota-view.md">
+<a className="craik-adr-card" href="../reference/budget-quota-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">08</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · budget</span>
@@ -388,7 +388,7 @@ operator notes for tokens, time, and credentials.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/quality-gate-view.md">
+<a className="craik-adr-card" href="../reference/quality-gate-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">09</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · quality</span>
@@ -403,7 +403,7 @@ and red-team outcomes — every quality signal in one operator panel.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/run-delta-view.md">
+<a className="craik-adr-card" href="../reference/run-delta-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">10</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · delta</span>
@@ -418,7 +418,7 @@ resume point. The "what's new since I was last here?" surface.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/memory-impact-preview-view.md">
+<a className="craik-adr-card" href="../reference/memory-impact-preview-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">11</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · memory</span>
@@ -434,7 +434,7 @@ invalidated and likely contradictions.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/memory-review-nudges.md">
+<a className="craik-adr-card" href="../reference/memory-review-nudges/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">12</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · memory</span>
@@ -449,7 +449,7 @@ memory. Nudges are signals for the reviewer, never autonomous edits.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/known-traps-view.md">
+<a className="craik-adr-card" href="../reference/known-traps-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">13</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · traps</span>
@@ -465,7 +465,7 @@ approaches.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/preference-facts.md">
+<a className="craik-adr-card" href="../reference/preference-facts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">14</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · preferences</span>
@@ -480,7 +480,7 @@ are facts with explicit scope, not implicit settings buried in config.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/instruction-distillation-view.md">
+<a className="craik-adr-card" href="../reference/instruction-distillation-view/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">15</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">View · instructions</span>
@@ -496,7 +496,7 @@ runtime constraint actually came from.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/instruction-distillation-workflow.md">
+<a className="craik-adr-card" href="../reference/instruction-distillation-workflow/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">16</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Workflow · instructions</span>
@@ -512,7 +512,7 @@ authority — until distilled through review.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/instruction-sources.md">
+<a className="craik-adr-card" href="../reference/instruction-sources/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">17</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Registry · instructions</span>
@@ -548,7 +548,7 @@ nothing rewrites itself silently.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/agent-onboarding.md">
+<a className="craik-product-feature" href="../guides/agent-onboarding/">
 <div>
 <p className="craik-product-feature__num">Onboarding · 01</p>
 <h4 className="craik-product-feature__title">Agent onboarding</h4>
@@ -583,7 +583,7 @@ parse directly.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/context-budgeting.md">
+<a className="craik-adr-card" href="../guides/context-budgeting/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Guide · context</span>
@@ -599,7 +599,7 @@ justifiable.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/context-debt.md">
+<a className="craik-adr-card" href="../reference/context-debt/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · context</span>
@@ -615,7 +615,7 @@ inheriting silent omissions.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/scratchpad-and-unknowns.md">
+<a className="craik-adr-card" href="../reference/scratchpad-and-unknowns/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · context</span>
@@ -631,7 +631,7 @@ explicit review path.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/exit-discipline.md">
+<a className="craik-adr-card" href="../reference/exit-discipline/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · context</span>
@@ -647,7 +647,7 @@ delegation points so a stop is never silent.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/known-traps.md">
+<a className="craik-adr-card" href="../reference/known-traps/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · knowledge</span>
@@ -663,7 +663,7 @@ knowledge is first-class, not implied by absence.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/freshness.md">
+<a className="craik-adr-card" href="../reference/freshness/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">07</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · knowledge</span>
@@ -679,7 +679,7 @@ fresh, expiring, or stale.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/quality-scores.md">
+<a className="craik-adr-card" href="../reference/quality-scores/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">08</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · knowledge</span>
@@ -695,7 +695,7 @@ or a substitute for evidence.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/learning-loops.md">
+<a className="craik-adr-card" href="../guides/learning-loops/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">09</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Guide · learning</span>
@@ -711,7 +711,7 @@ proposals route through the skill promotion gates.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/learning-receipts.md">
+<a className="craik-adr-card" href="../reference/learning-receipts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">10</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · learning</span>
@@ -727,7 +727,7 @@ the same way every other governed action is.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/trajectory-exports.md">
+<a className="craik-adr-card" href="../reference/trajectory-exports/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">11</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · learning</span>
@@ -743,7 +743,7 @@ the trajectory.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/cross-agent-review.md">
+<a className="craik-adr-card" href="../reference/cross-agent-review/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">12</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
@@ -758,7 +758,7 @@ collapsing distinct decisions into a single worker result.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/debates.md">
+<a className="craik-adr-card" href="../reference/debates/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">13</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
@@ -774,7 +774,7 @@ mechanism.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/human-delegation.md">
+<a className="craik-adr-card" href="../reference/human-delegation/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">14</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
@@ -790,7 +790,7 @@ is itself a typed object.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/runtime-critics.md">
+<a className="craik-adr-card" href="../reference/runtime-critics/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">15</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · multi-agent</span>
@@ -832,7 +832,7 @@ Discord / email / SMS yet).
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/gateway-daemon.md">
+<a className="craik-product-feature" href="../reference/gateway-daemon/">
 <div>
 <p className="craik-product-feature__num">Mode · 01</p>
 <h4 className="craik-product-feature__title">Gateway daemon mode</h4>
@@ -866,7 +866,7 @@ and deterministic lifecycle.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/gateway-troubleshooting.md">
+<a className="craik-adr-card" href="../guides/gateway-troubleshooting/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Guide</span>
@@ -882,7 +882,7 @@ deserve operator attention.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/channel-adapter-contract.md">
+<a className="craik-adr-card" href="../reference/channel-adapter-contract/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · channel</span>
@@ -898,7 +898,7 @@ typed surface every adapter implements against.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/messaging-channel-adapter.md">
+<a className="craik-adr-card" href="../reference/messaging-channel-adapter/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter · fixture</span>
@@ -914,7 +914,7 @@ are explicitly out of scope until daemon mode promotes.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/channel-identity-pairing.md">
+<a className="craik-adr-card" href="../reference/channel-identity-pairing/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · identity</span>
@@ -930,7 +930,7 @@ can name the human, not just the channel id.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/channel-allowlists.md">
+<a className="craik-adr-card" href="../reference/channel-allowlists/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · ingress</span>
@@ -946,7 +946,7 @@ channel events may continue past the gateway ingress boundary — the
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/channel-policy-envelopes.md">
+<a className="craik-adr-card" href="../reference/channel-policy-envelopes/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">07</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Policy · ingress</span>
@@ -962,7 +962,7 @@ operator authority.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/webhook-ingress.md">
+<a className="craik-adr-card" href="../reference/webhook-ingress/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">08</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · ingress</span>
@@ -978,7 +978,7 @@ before the runtime sees the request.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/scheduled-task-creation.md">
+<a className="craik-adr-card" href="../reference/scheduled-task-creation/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">09</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · schedule</span>
@@ -994,7 +994,7 @@ operator-initiated tasks use.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/scheduled-automations.md">
+<a className="craik-adr-card" href="../reference/scheduled-automations/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">10</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · schedule</span>
@@ -1010,7 +1010,7 @@ ticks don't pile up into surprise bursts.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/gateway-receipts.md">
+<a className="craik-adr-card" href="../reference/gateway-receipts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">11</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Contract · receipt</span>
@@ -1046,7 +1046,7 @@ runtime authority on its own.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/companion-app-security.md">
+<a className="craik-product-feature" href="../guides/companion-app-security/">
 <div>
 <p className="craik-product-feature__num">Security · 01</p>
 <h4 className="craik-product-feature__title">Companion app security</h4>
@@ -1081,7 +1081,7 @@ actions, but they must not [grant runtime authority on their own].
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/desktop-companion.md">
+<a className="craik-adr-card" href="../reference/desktop-companion/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Decision · desktop</span>
@@ -1097,7 +1097,7 @@ runs under.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/mobile-companion.md">
+<a className="craik-adr-card" href="../reference/mobile-companion/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Decision · mobile</span>
@@ -1113,7 +1113,7 @@ edit.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/visual-workspace.md">
+<a className="craik-adr-card" href="../reference/visual-workspace/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Decision · visual</span>
@@ -1129,7 +1129,7 @@ must not silently mutate it.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/work-graph-visual-bridge.md">
+<a className="craik-adr-card" href="../reference/work-graph-visual-bridge/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Bridge · visual</span>
@@ -1145,7 +1145,7 @@ implements against.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/accessibility-requirements.md">
+<a className="craik-adr-card" href="../reference/accessibility-requirements/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">A11y</span>
@@ -1181,7 +1181,7 @@ receipt model.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/multimodal-artifacts.md">
+<a className="craik-product-feature" href="../reference/multimodal-artifacts/">
 <div>
 <p className="craik-product-feature__num">Contract · 01</p>
 <h4 className="craik-product-feature__title">Multimodal artifact references</h4>
@@ -1215,7 +1215,7 @@ raw media.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/voice-posture.md">
+<a className="craik-adr-card" href="../reference/voice-posture/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Posture · voice</span>
@@ -1230,7 +1230,7 @@ an always-on assistant layer. Voice is opt-in, scoped, and receipted.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/speech-to-text-adapters.md">
+<a className="craik-adr-card" href="../reference/speech-to-text-adapters/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter · STT</span>
@@ -1246,7 +1246,7 @@ boundary, not a passthrough.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/text-to-speech-adapters.md">
+<a className="craik-adr-card" href="../reference/text-to-speech-adapters/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Adapter · TTS</span>
@@ -1281,7 +1281,7 @@ implements it.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/translated-docs.md">
+<a className="craik-product-feature" href="../guides/translated-docs/">
 <div>
 <p className="craik-product-feature__num">Strategy · 01</p>
 <h4 className="craik-product-feature__title">Translated documentation strategy</h4>
@@ -1315,7 +1315,7 @@ runtime identifiers.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/locale-i18n-framework.md">
+<a className="craik-adr-card" href="../reference/locale-i18n-framework/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Framework · locale</span>

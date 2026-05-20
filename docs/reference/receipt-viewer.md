@@ -70,19 +70,19 @@ mutate receipt records.
 
 <div className="craik-next">
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="handoff-viewer/">
+<a href="../handoff-viewer/">
 <strong>Reference</strong>
 <span>Handoff viewer</span>
 <small>The handoff side of the receipt-handoff pair.</small>
 </a>
 
-<a href="plugin-receipts/">
+<a href="../plugin-receipts/">
 <strong>Reference</strong>
 <span>Plugin receipts</span>
 <small>The plugin-receipt contract this viewer reads.</small>

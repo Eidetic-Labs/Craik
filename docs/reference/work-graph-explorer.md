@@ -41,19 +41,19 @@ links without reading raw logs.
 
 <div className="craik-next">
 
-<a href="graph-export/">
+<a href="../graph-export/">
 <strong>Reference</strong>
 <span>Graph export</span>
 <small>The export command this view reads.</small>
 </a>
 
-<a href="operator-surface/">
+<a href="../operator-surface/">
 <strong>Reference</strong>
 <span>Operator surface</span>
 <small>The shared TUI boundary.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>work_graph_export</code> and <code>work_graph_event</code> shapes.</small>

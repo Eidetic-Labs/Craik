@@ -50,19 +50,19 @@ without guessing.
 
 <div className="craik-next">
 
-<a href="../guides/writing-handoffs/">
+<a href="../../guides/writing-handoffs/">
 <strong>Guide</strong>
 <span>Writing handoffs</span>
 <small>The handoff that exit discipline verifies.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The shapes of both contracts.</small>
 </a>
 
-<a href="failure-modes/">
+<a href="../failure-modes/">
 <strong>Reference</strong>
 <span>Failure modes</span>
 <small>How blocked exits compose with the wider failure posture.</small>

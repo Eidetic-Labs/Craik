@@ -66,19 +66,19 @@ tokens, or private local state.
 
 <div className="craik-next">
 
-<a href="voice-posture/">
+<a href="../voice-posture/">
 <strong>Reference</strong>
 <span>Voice posture</span>
 <small>The decision that authorizes adapter calls.</small>
 </a>
 
-<a href="text-to-speech-adapters/">
+<a href="../text-to-speech-adapters/">
 <strong>Reference</strong>
 <span>Text-to-speech adapters</span>
 <small>The output-direction counterpart.</small>
 </a>
 
-<a href="multimodal-artifacts/">
+<a href="../multimodal-artifacts/">
 <strong>Reference</strong>
 <span>Multimodal artifact references</span>
 <small>How adapters cite audio without raw payloads.</small>

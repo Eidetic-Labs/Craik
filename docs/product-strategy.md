@@ -361,19 +361,19 @@ Craik should make those failures visible, structured, and fixable.
 
 <div className="craik-next">
 
-<a href="differentiators.md">
+<a href="../differentiators/">
 <strong>Read next</strong>
 <span>Differentiators</span>
 <small>The features that keep the roadmap from collapsing into basic CLI plumbing.</small>
 </a>
 
-<a href="features.md">
+<a href="../features/">
 <strong>Read</strong>
 <span>Features</span>
 <small>The implementable feature surface — every MVP behavior with acceptance criteria.</small>
 </a>
 
-<a href="architecture.md">
+<a href="../architecture/">
 <strong>Read</strong>
 <span>Architecture</span>
 <small>The seven runtime layers and the contracts that hold them together.</small>

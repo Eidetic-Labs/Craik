@@ -80,19 +80,19 @@ without reading raw plugin output.
 
 <div className="craik-next">
 
-<a href="plugin-descriptors/">
+<a href="../plugin-descriptors/">
 <strong>Reference</strong>
 <span>Plugin descriptors</span>
 <small>What plugins declare before running.</small>
 </a>
 
-<a href="plugin-capability-grants/">
+<a href="../plugin-capability-grants/">
 <strong>Reference</strong>
 <span>Plugin capability grants</span>
 <small>The authority side of the descriptor / grant / receipt triangle.</small>
 </a>
 
-<a href="../guides/community-plugins/">
+<a href="../../guides/community-plugins/">
 <strong>Guide</strong>
 <span>Community plugins</span>
 <small>Author and review expectations.</small>

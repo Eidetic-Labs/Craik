@@ -119,19 +119,19 @@ per-step timestamps must load the source export.
 
 <div className="craik-next">
 
-<a href="skill-replay/">
+<a href="../skill-replay/">
 <strong>Reference</strong>
 <span>Skill replay</span>
 <small>The replay-fixture contract trajectories support.</small>
 </a>
 
-<a href="learning-receipts/">
+<a href="../learning-receipts/">
 <strong>Reference</strong>
 <span>Learning receipts</span>
 <small>Record export decisions with the <code>export</code> action.</small>
 </a>
 
-<a href="../guides/learning-loops/">
+<a href="../../guides/learning-loops/">
 <strong>Guide</strong>
 <span>Learning loops</span>
 <small>The discipline trajectories support.</small>

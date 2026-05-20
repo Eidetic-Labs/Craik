@@ -59,19 +59,19 @@ continuing.
 
 <div className="craik-next">
 
-<a href="context-debt/">
+<a href="../context-debt/">
 <strong>Reference</strong>
 <span>Context debt</span>
 <small>How unknowns flow into the durable debt record.</small>
 </a>
 
-<a href="exit-discipline/">
+<a href="../exit-discipline/">
 <strong>Reference</strong>
 <span>Exit discipline</span>
 <small>The exit checklist that surfaces unresolved unknowns.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>The <code>scratchpad_record</code> and <code>unknown_record</code> shapes.</small>

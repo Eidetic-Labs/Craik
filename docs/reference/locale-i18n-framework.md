@@ -120,19 +120,19 @@ and redaction semantics were preserved.
 
 <div className="craik-next">
 
-<a href="../guides/translated-docs/">
+<a href="../../guides/translated-docs/">
 <strong>Guide</strong>
 <span>Translated documentation strategy</span>
 <small>The author-facing rules.</small>
 </a>
 
-<a href="schemas/">
+<a href="../schemas/">
 <strong>Reference</strong>
 <span>Schema reference</span>
 <small>Where translatable-doc metadata sits in the contract catalog.</small>
 </a>
 
-<a href="public-boundary-provenance/">
+<a href="../public-boundary-provenance/">
 <strong>Reference</strong>
 <span>Public boundary</span>
 <small>What translated docs must not expose.</small>

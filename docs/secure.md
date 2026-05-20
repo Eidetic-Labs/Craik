@@ -35,7 +35,7 @@ the scope-control flow, and the narrow fail-open exception.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="concepts/governance.md">
+<a className="craik-product-feature" href="../concepts/governance/">
 <div>
 <p className="craik-product-feature__num">Concept · 01</p>
 <h4 className="craik-product-feature__title">Governance</h4>
@@ -68,7 +68,7 @@ it is part of the runtime contract.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="governance.md">
+<a className="craik-adr-card" href="../governance/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Model</span>
@@ -84,7 +84,7 @@ is typed, every immutable boundary is enforced.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/capability-grants.md">
+<a className="craik-adr-card" href="../guides/capability-grants/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Grants</span>
@@ -100,7 +100,7 @@ v0.1 runtime enforces four capability hooks today.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/scope-control.md">
+<a className="craik-adr-card" href="../guides/scope-control/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Scope</span>
@@ -116,7 +116,7 @@ stop conditions, scope-change rules) plus the mid-run update flow.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/fail-open.md">
+<a className="craik-adr-card" href="../guides/fail-open/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Exception</span>
@@ -150,7 +150,7 @@ the operator workflow for running it locally and in CI.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/policy-profiles.md">
+<a className="craik-product-feature" href="../reference/policy-profiles/">
 <div>
 <p className="craik-product-feature__num">Profiles · 01</p>
 <h4 className="craik-product-feature__title">Policy profiles</h4>
@@ -158,7 +158,7 @@ the operator workflow for running it locally and in CI.
 The named profiles Craik ships — <code>strict</code> (default),
 <code>trusted-local</code> (opt-in fail-open), and <code>automation</code>
 (strict-but-headless). Design rationale lives in
-<a href="adr/policy-envelope-shape/">ADR 0004</a>.
+<a href="../adr/policy-envelope-shape/">ADR 0004</a>.
 </p>
 <ul className="craik-product-feature__topics">
 <li>strict default</li>
@@ -184,7 +184,7 @@ obligations all bound into one typed record.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/policy-tests.md">
+<a className="craik-adr-card" href="../reference/policy-tests/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Gate</span>
@@ -200,7 +200,7 @@ prints a structured <code>craik.policy_test_report</code>.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/running-policy-tests.md">
+<a className="craik-adr-card" href="../guides/running-policy-tests/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Operator</span>
@@ -236,7 +236,7 @@ underlying design.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/authentication.md">
+<a className="craik-product-feature" href="../guides/authentication/">
 <div>
 <p className="craik-product-feature__num">Workflow · 01</p>
 <h4 className="craik-product-feature__title">Authentication &amp; credentials</h4>
@@ -271,7 +271,7 @@ receipts record both.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="adr/0007-credential-and-identity-architecture.md">
+<a className="craik-adr-card" href="../adr/credential-and-identity-architecture/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">ADR 0007</span>
 <span className="craik-adr-card__status">Accepted</span>
@@ -308,7 +308,7 @@ across version bumps.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="security/secrets.md">
+<a className="craik-product-feature" href="../security/secrets/">
 <div>
 <p className="craik-product-feature__num">Overview · 01</p>
 <h4 className="craik-product-feature__title">Secrets</h4>
@@ -343,7 +343,7 @@ leak into receipts, case files, or handoffs in raw form.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/redaction.md">
+<a className="craik-adr-card" href="../reference/redaction/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Guard</span>
@@ -360,7 +360,7 @@ all scrubbed before storage.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/secret-migration-policy.md">
+<a className="craik-adr-card" href="../reference/secret-migration-policy/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Policy</span>
@@ -376,7 +376,7 @@ Four policy outcomes: <code>redact</code> · <code>strip</code> ·
 </li>
 
 <li>
-<a className="craik-adr-card" href="security/release-process.md">
+<a className="craik-adr-card" href="../security/release-process/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Process</span>
@@ -411,7 +411,7 @@ become a durable fact.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="guides/evidence-and-assumptions.md">
+<a className="craik-product-feature" href="../guides/evidence-and-assumptions/">
 <div>
 <p className="craik-product-feature__num">Foundation · 01</p>
 <h4 className="craik-product-feature__title">Evidence &amp; assumptions</h4>
@@ -445,7 +445,7 @@ the two is how an agent runtime starts hallucinating policy.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="guides/contradiction-inbox.md">
+<a className="craik-adr-card" href="../guides/contradiction-inbox/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Inbox</span>
@@ -462,7 +462,7 @@ both exist.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/memory-proposals.md">
+<a className="craik-adr-card" href="../guides/memory-proposals/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Lifecycle</span>
@@ -478,7 +478,7 @@ evidence. Direct durable writes still need a
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/memory-diffs.md">
+<a className="craik-adr-card" href="../guides/memory-diffs/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Audit</span>
@@ -494,7 +494,7 @@ inspect when deciding whether a run's memory effect was acceptable.
 </li>
 
 <li>
-<a className="craik-adr-card" href="guides/memory-impact-preview.md">
+<a className="craik-adr-card" href="../guides/memory-impact-preview/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Preview</span>
@@ -529,7 +529,7 @@ environment receipts every sandbox decision emits.
 
 <div className="craik-product-spread">
 
-<a className="craik-product-feature" href="reference/sandbox-backends.md">
+<a className="craik-product-feature" href="../reference/sandbox-backends/">
 <div>
 <p className="craik-product-feature__num">Contract · 01</p>
 <h4 className="craik-product-feature__title">Sandbox backends</h4>
@@ -563,7 +563,7 @@ backend without binding it to any model provider.
 <ol className="craik-adr-grid">
 
 <li>
-<a className="craik-adr-card" href="reference/local-process-backend.md">
+<a className="craik-adr-card" href="../reference/local-process-backend/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">02</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Backend · local</span>
@@ -579,7 +579,7 @@ runtime authority unless a matching grant exists.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/remote-shell-backend.md">
+<a className="craik-adr-card" href="../reference/remote-shell-backend/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">03</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Backend · remote</span>
@@ -595,7 +595,7 @@ execute commands by itself.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/docker-sandbox-backend.md">
+<a className="craik-adr-card" href="../reference/docker-sandbox-backend/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">04</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Backend · docker</span>
@@ -611,7 +611,7 @@ start containers itself.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/browser-tool-boundary.md">
+<a className="craik-adr-card" href="../reference/browser-tool-boundary/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">05</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Backend · browser</span>
@@ -627,7 +627,7 @@ receipts emitted for each navigation or action.
 </li>
 
 <li>
-<a className="craik-adr-card" href="reference/environment-receipts.md">
+<a className="craik-adr-card" href="../reference/environment-receipts/">
 <div className="craik-adr-card__head">
 <span className="craik-adr-card__num">06</span>
 <span className="craik-adr-card__status craik-adr-card__status--type">Receipt</span>

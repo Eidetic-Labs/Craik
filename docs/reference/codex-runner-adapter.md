@@ -100,19 +100,19 @@ be used for side-effecting work.
 
 <div className="craik-next">
 
-<a href="runner-adapter-contract/">
+<a href="../runner-adapter-contract/">
 <strong>Reference</strong>
 <span>Runner adapter contract</span>
 <small>The shared contract.</small>
 </a>
 
-<a href="claude-runner-adapter/">
+<a href="../claude-runner-adapter/">
 <strong>Reference</strong>
 <span>Claude runner adapter</span>
 <small>The Claude preview counterpart.</small>
 </a>
 
-<a href="../guides/runner-preview-workflows/">
+<a href="../../guides/runner-preview-workflows/">
 <strong>Guide</strong>
 <span>Runner preview workflows</span>
 <small>End-to-end smoke testing.</small>

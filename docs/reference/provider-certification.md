@@ -142,19 +142,19 @@ external secret resolver.
 
 <div className="craik-next">
 
-<a href="model-providers/">
+<a href="../model-providers/">
 <strong>Reference</strong>
 <span>Model providers</span>
 <small>The registry and the budget/quota gating.</small>
 </a>
 
-<a href="../adr/provider-transport-and-mode-families/">
+<a href="../../adr/provider-transport-and-mode-families/">
 <strong>ADR</strong>
 <span>0002 · Provider transport</span>
 <small>The family/transport split this certification rests on.</small>
 </a>
 
-<a href="provider-failover/">
+<a href="../provider-failover/">
 <strong>Reference</strong>
 <span>Provider failover</span>
 <small>How fallback rules compose with certified providers.</small>
