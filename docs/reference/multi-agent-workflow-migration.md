@@ -1,42 +1,96 @@
-# Multi-Agent Workflow Migration Assessment
+# Multi-agent workflow migration assessment
 
-Multi-agent workflow migration assessments describe how external workflow
-systems map into Craik before bridges or importers are built.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`MultiAgentWorkflowMapping` records:
+<div className="craik-lead">
 
-- source concept;
-- target workflow concept: `agent`, `role`, `queue`, `artifact`, `memory`, or
-  `approval`;
-- target Craik surface;
-- support level: `supported`, `partial`, or `unsupported`;
-- notes;
-- required controls;
-- unsupported fields.
+**What you'll find here**
 
-`MultiAgentWorkflowMigrationAssessment` records:
+The `MultiAgentWorkflowMapping` and
+`MultiAgentWorkflowMigrationAssessment` contracts that describe how
+external workflow systems map into Craik before bridges or importers
+are built.
 
-- assessment id;
-- workflow name;
-- overall support level;
-- mappings;
-- policy notes;
-- redaction requirement;
-- policy envelope id;
-- evidence ids;
-- receipt ids.
+</div>
+
+<div className="craik-keypoint">
+
+**Assessment, not bridge.**
+
+Records migration compatibility and risks so later dry runs, migration
+maps, and bridge decisions stay reviewable.
+
+</div>
+
+## Records
+
+<div className="craik-fields">
+
+<div>
+<dt>Contract</dt>
+<dt><span className="craik-fields__type">Records</span></dt>
+<dd>Fields</dd>
+</div>
+
+<div>
+<dt><code>MultiAgentWorkflowMapping</code></dt>
+<dt><span className="craik-fields__type">per concept</span></dt>
+<dd>Source concept · target workflow concept (<code>agent</code> / <code>role</code> / <code>queue</code> / <code>artifact</code> / <code>memory</code> / <code>approval</code>) · target Craik surface · support level (<code>supported</code> / <code>partial</code> / <code>unsupported</code>) · notes · required controls · unsupported fields.</dd>
+</div>
+
+<div>
+<dt><code>MultiAgentWorkflowMigrationAssessment</code></dt>
+<dt><span className="craik-fields__type">per workflow</span></dt>
+<dd>Assessment id · workflow name · overall support level · mappings · policy notes · redaction requirement · policy envelope id · evidence ids · receipt ids.</dd>
+</div>
+
+</div>
 
 ## Compatibility
 
-Agents and roles can map to Craik agent roles when authority is explicit.
-Queues can map to delegation queues only when dispatch, ownership, receipts, and
-operator review are bounded. Artifacts, memories, and approvals must preserve
-evidence, receipt, policy, and redaction semantics.
+<div className="craik-decision">
 
-Unbounded autonomous queues, hidden side effects, raw private artifacts, and
-approval steps without receipts are unsupported.
+<div>
+<h4>Supported mappings</h4>
+<ul>
+<li>Agents &amp; roles → Craik agent roles when authority is explicit</li>
+<li>Queues → delegation queues when dispatch, ownership, receipts, and review are bounded</li>
+<li>Artifacts, memories, approvals → preserve evidence, receipt, policy, redaction semantics</li>
+</ul>
+</div>
 
-## Boundary
+<div>
+<h4>Unsupported</h4>
+<ul>
+<li>Unbounded autonomous queues</li>
+<li>Hidden side effects</li>
+<li>Raw private artifacts</li>
+<li>Approval steps without receipts</li>
+</ul>
+</div>
 
-An assessment is not a bridge. It records migration compatibility and risks so
-later dry runs, migration maps, and bridge decisions can stay reviewable.
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="multi-agent-workflow-bridge/">
+<strong>Reference</strong>
+<span>Multi-agent workflow bridge</span>
+<small>The bridge that follows an assessment.</small>
+</a>
+
+<a href="import-dry-run/">
+<strong>Reference</strong>
+<span>Import dry-run reports</span>
+<small>How an assessment becomes a reviewable dry run.</small>
+</a>
+
+<a href="agent-roles/">
+<strong>Reference</strong>
+<span>Agent roles</span>
+<small>The roles external agents map to.</small>
+</a>
+
+</div>

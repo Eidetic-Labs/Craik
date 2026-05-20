@@ -1,18 +1,67 @@
-# Skill Packages
+# Skill packages
 
-Skill packages describe reusable instructions, entrypoints, docs, and assets.
-They do not carry plugin runtime authority.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`craik.skill_package` records:
+<div className="craik-lead">
 
-- package id, name, version, and description,
-- one or more entrypoints,
-- expected input and output schemas,
-- documentation files,
-- asset paths,
-- provenance links,
-- and an optional plugin descriptor link.
+**What you'll find here**
 
-Skill packages must include docs and at least one entrypoint. Runtime authority
-is always `false`; any executable authority must be represented through the
-separate plugin governance and grant model.
+The `craik.skill_package` contract — reusable instructions,
+entrypoints, docs, and assets. Packages don't carry plugin runtime
+authority.
+
+</div>
+
+<div className="craik-keypoint">
+
+**No runtime authority on packages.**
+
+Runtime authority is always <code>false</code>. Any executable
+authority must be represented through the separate plugin governance
+and grant model.
+
+</div>
+
+## What it records
+
+<div className="craik-grid">
+
+<div><h4>Package id · name · version · description</h4></div>
+<div><h4>One or more entrypoints</h4></div>
+<div><h4>Expected input &amp; output schemas</h4></div>
+<div><h4>Documentation files</h4></div>
+<div><h4>Asset paths</h4></div>
+<div><h4>Provenance links</h4></div>
+<div><h4>Optional plugin descriptor link</h4></div>
+
+</div>
+
+<div className="craik-keypoint">
+
+**Docs and at least one entrypoint are required.**
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="skill-registries/">
+<strong>Reference</strong>
+<span>Skill registries</span>
+<small>How packages enter project-local and global discovery.</small>
+</a>
+
+<a href="skill-contexts/">
+<strong>Reference</strong>
+<span>Skill invocation contexts</span>
+<small>The per-run record produced when a skill executes.</small>
+</a>
+
+<a href="../guides/community-skills/">
+<strong>Guide</strong>
+<span>Community skills</span>
+<small>Author and review expectations.</small>
+</a>
+
+</div>

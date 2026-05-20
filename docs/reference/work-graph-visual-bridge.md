@@ -1,52 +1,95 @@
-# Work Graph Visual Workspace Bridge
+# Work graph → visual workspace bridge
 
-The work graph visual workspace bridge projects `craik.work_graph_export`
-records into portable visual workspace records.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`WorkGraphVisualWorkspace` records:
+<div className="craik-lead">
 
-- source graph id;
-- task id;
-- visual nodes;
-- visual edges;
-- policy envelope ids;
-- evidence ids;
-- receipt ids;
-- redacted paths;
-- redaction status.
+**What you'll find here**
 
-`VisualWorkspaceNode` records:
+The bridge that projects `craik.work_graph_export` records into
+portable visual workspace records — and the boundary that keeps the
+projection read-only.
 
-- visual node id;
-- source work graph node id;
-- type;
-- label;
-- deterministic layout coordinates;
-- redacted metadata.
+</div>
 
-`VisualWorkspaceEdge` records:
+<div className="craik-keypoint">
 
-- visual edge id;
-- source work graph edge id;
-- type;
-- visual source node id;
-- visual target node id;
-- redacted metadata.
+**Read-only projection.**
+
+The bridge does not mutate the work graph. It creates a read-only
+projection that a visual surface can render while preserving source
+node and edge ids.
+
+</div>
+
+## Records
+
+<div className="craik-fields">
+
+<div>
+<dt>Record</dt>
+<dt><span className="craik-fields__type">Captures</span></dt>
+<dd>Fields</dd>
+</div>
+
+<div>
+<dt><code>WorkGraphVisualWorkspace</code></dt>
+<dt><span className="craik-fields__type">projection</span></dt>
+<dd>Source graph id · task id · visual nodes · visual edges · policy envelope ids · evidence ids · receipt ids · redacted paths · redaction status.</dd>
+</div>
+
+<div>
+<dt><code>VisualWorkspaceNode</code></dt>
+<dt><span className="craik-fields__type">node</span></dt>
+<dd>Visual node id · source work-graph node id · type · label · deterministic layout coordinates · redacted metadata.</dd>
+</div>
+
+<div>
+<dt><code>VisualWorkspaceEdge</code></dt>
+<dt><span className="craik-fields__type">edge</span></dt>
+<dd>Visual edge id · source work-graph edge id · type · visual source node id · visual target node id · redacted metadata.</dd>
+</div>
+
+</div>
 
 ## Boundary
 
-The bridge does not mutate the work graph. It creates a read-only projection
-that a visual surface can render while preserving source node and edge ids.
+<div className="craik-keypoint">
 
-Visual state must remain portable. The bridge uses deterministic layout hints
-instead of storing editor-specific canvas state. Consumers can apply their own
-layout while keeping the source links.
+**Portable visual state.**
+
+The bridge uses deterministic layout hints instead of storing
+editor-specific canvas state. Consumers can apply their own layout
+while keeping the source links.
+
+</div>
 
 ## Redaction
 
-Node labels and metadata pass through shared redaction. The visual workspace
-record preserves evidence, receipt, and policy references without copying raw
-private payloads.
+Node labels and metadata pass through shared redaction. The visual
+workspace record preserves evidence, receipt, and policy references
+without copying raw private payloads.
 
-Use [Live Visual Workspace Decision](visual-workspace.md) to evaluate whether a
-surface may render or interact with the projection.
+## What's next
+
+<div className="craik-next">
+
+<a href="visual-workspace/">
+<strong>Reference</strong>
+<span>Visual workspace decision</span>
+<small>Whether a surface may render or interact with the projection.</small>
+</a>
+
+<a href="graph-export/">
+<strong>Reference</strong>
+<span>Graph export</span>
+<small>The source record this bridge projects.</small>
+</a>
+
+<a href="multimodal-artifacts/">
+<strong>Reference</strong>
+<span>Multimodal artifact references</span>
+<small>How visual surfaces cite media without raw payloads.</small>
+</a>
+
+</div>

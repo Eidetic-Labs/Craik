@@ -1,40 +1,94 @@
-# Docker Sandbox Backend
+# Docker sandbox backend
 
-The Docker sandbox backend represents containerized execution as an explicit
-environment boundary. It does not start containers by itself.
+<p className="craik-meta"><span>2 min read</span><span>Reference</span><span>Updated 2026-05-19</span></p>
 
-`DockerSandboxRequest` records:
+<div className="craik-lead">
 
-- backend id;
-- image reference;
-- command reference;
-- network mode;
-- mount references and target paths;
-- environment reference names;
-- privileged flag;
-- policy envelope id;
-- capability grant id;
-- receipt id.
+**What you'll find here**
 
-## Isolation Defaults
+The `DockerSandboxRequest` boundary that represents containerized
+execution as an explicit environment decision — isolation defaults,
+required refs, and the receipt path.
 
-Docker sandbox requests are allowed only when:
+</div>
 
-- the backend is `container` with `container` isolation;
-- the backend declares `container.run` with `run` operation;
-- `privileged` is false;
-- network mode is `none` or `restricted`;
-- mounts are read-only by default;
-- policy, grant, and receipt links are present.
+<div className="craik-keypoint">
 
-Requests using host-like network defaults, privileged containers, read-write
-mounts, missing policy controls, or missing receipts are denied before dispatch.
+**Does not start containers.**
 
-## Explicit Settings
+The backend records and evaluates the decision. A separate governed
+container runtime executes.
 
-Image refs, command refs, mount refs, and environment refs are references. They
-must not embed raw credentials, tokens, passwords, or API keys.
+</div>
 
-Use [Environment Receipts](environment-receipts.md) to record allowed and denied
-Docker sandbox decisions before a caller dispatches through a governed container
-runtime.
+## What it records
+
+`DockerSandboxRequest`:
+
+<div className="craik-grid">
+
+<div><h4>Backend id</h4></div>
+<div><h4>Image reference</h4></div>
+<div><h4>Command reference</h4></div>
+<div><h4>Network mode</h4></div>
+<div><h4>Mount references and target paths</h4></div>
+<div><h4>Environment reference names</h4></div>
+<div><h4>Privileged flag</h4></div>
+<div><h4>Policy envelope id</h4></div>
+<div><h4>Capability grant id</h4></div>
+<div><h4>Receipt id</h4></div>
+
+</div>
+
+## Isolation defaults
+
+Docker sandbox requests are **allowed only when**:
+
+<ol className="craik-steps">
+<li>Backend is <code>container</code> with <code>container</code> isolation.</li>
+<li>Backend declares <code>container.run</code> with <code>run</code> operation.</li>
+<li><code>privileged</code> is <code>false</code>.</li>
+<li>Network mode is <code>none</code> or <code>restricted</code>.</li>
+<li>Mounts are read-only by default.</li>
+<li>Policy, grant, and receipt links are present.</li>
+</ol>
+
+<div className="craik-keypoint">
+
+**Common denials.**
+
+Requests using host-like network defaults, privileged containers,
+read-write mounts, missing policy controls, or missing receipts are
+denied before dispatch.
+
+</div>
+
+## Explicit settings
+
+Image refs, command refs, mount refs, and environment refs are
+references. They must not embed raw credentials, tokens, passwords, or
+API keys.
+
+## What's next
+
+<div className="craik-next">
+
+<a href="sandbox-backends/">
+<strong>Reference</strong>
+<span>Sandbox backends</span>
+<small>The shared contract.</small>
+</a>
+
+<a href="environment-receipts/">
+<strong>Reference</strong>
+<span>Environment receipts</span>
+<small>How allowed and denied decisions persist.</small>
+</a>
+
+<a href="local-process-backend/">
+<strong>Reference</strong>
+<span>Local process backend</span>
+<small>The host-process alternative.</small>
+</a>
+
+</div>

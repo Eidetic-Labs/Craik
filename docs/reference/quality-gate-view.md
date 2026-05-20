@@ -1,37 +1,101 @@
-# Quality Gate View
+# Quality gate view
 
-The quality gate view is a read-only operator display for handoff quality
-scores, evidence coverage scores, runtime critic findings, and red-team
-findings.
+<p className="craik-meta"><span>2 min read</span><span>Reference · preview</span><span>Updated 2026-05-19</span></p>
 
-The v0.7.0 TUI surface formats:
+<div className="craik-lead">
 
-- handoff score bands and blocking reasons;
-- evidence coverage score bands, missing evidence, and weak claims;
-- critic findings by review status and severity;
-- red-team findings, including blocking state;
-- adjudication links when a finding has been reviewed.
+**What you'll find here**
 
-## Gate States
+The read-only operator display for handoff quality scores, evidence
+coverage, runtime critic findings, and red-team findings — what it
+formats and the gate states it reports.
 
-The view reports a display-only gate state:
+</div>
 
-- `blocked` when a handoff or evidence score is poor, or an unadjudicated
-  red-team finding is blocking;
-- `reviewable` when high or critical critic findings remain reviewable, or any
-  score is adequate rather than excellent;
-- `clear` when no scores or findings require operator attention.
+<div className="craik-keypoint">
 
-This state does not mutate policy or approve work. It is a compact operator
-summary of the underlying contracts.
+**Display only, never authority.**
 
-## Authority Boundary
+The gate state does not mutate policy or approve work. It is a compact
+operator summary of the underlying contracts.
 
-Runtime critic and red-team findings remain non-authoritative unless a separate
-adjudication accepts, revises, rejects, or defers them. The view shows
-`authoritative=false` and any adjudication ID so operators can distinguish
-review signals from accepted decisions.
+</div>
 
-See [Quality Scores](quality-scores.md) and
-[Runtime Critics And Red Team](runtime-critics.md) for the underlying contract
-behavior.
+## What it formats
+
+<div className="craik-grid">
+
+<div><h4>Handoff score bands</h4><p>And blocking reasons.</p></div>
+<div><h4>Evidence coverage scores</h4><p>Missing evidence and weak claims.</p></div>
+<div><h4>Critic findings</h4><p>By review status and severity.</p></div>
+<div><h4>Red-team findings</h4><p>Including blocking state.</p></div>
+<div><h4>Adjudication links</h4><p>When a finding has been reviewed.</p></div>
+
+</div>
+
+## Gate states
+
+<div className="craik-fields">
+
+<div>
+<dt>State</dt>
+<dt><span className="craik-fields__type">Trigger</span></dt>
+<dd>Notes</dd>
+</div>
+
+<div>
+<dt><code>blocked</code></dt>
+<dt><span className="craik-fields__type">attention needed</span></dt>
+<dd>Handoff or evidence score is poor, or an unadjudicated red-team finding is blocking.</dd>
+</div>
+
+<div>
+<dt><code>reviewable</code></dt>
+<dt><span className="craik-fields__type">review pending</span></dt>
+<dd>High or critical critic findings remain reviewable, or any score is adequate rather than excellent.</dd>
+</div>
+
+<div>
+<dt><code>clear</code></dt>
+<dt><span className="craik-fields__type">no attention</span></dt>
+<dd>No scores or findings require operator attention.</dd>
+</div>
+
+</div>
+
+## Authority boundary
+
+<div className="craik-keypoint">
+
+**Findings are non-authoritative.**
+
+Runtime critic and red-team findings remain non-authoritative unless a
+separate adjudication accepts, revises, rejects, or defers them. The
+view shows <code>authoritative=false</code> and any adjudication ID so
+operators can distinguish review signals from accepted decisions.
+
+</div>
+
+## What's next
+
+<div className="craik-next">
+
+<a href="quality-scores/">
+<strong>Reference</strong>
+<span>Quality scores</span>
+<small>The underlying contracts.</small>
+</a>
+
+<a href="runtime-critics/">
+<strong>Reference</strong>
+<span>Runtime critics &amp; red team</span>
+<small>The reviewable findings.</small>
+</a>
+
+<a href="operator-surface/">
+<strong>Reference</strong>
+<span>Operator surface</span>
+<small>The shared TUI boundary.</small>
+</a>
+
+</div>
